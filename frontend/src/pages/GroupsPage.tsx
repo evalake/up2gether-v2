@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { useCreateGroup, useGroups } from '@/features/groups/hooks'
 import { fetchMyGuilds, type DiscordGuild } from '@/features/auth/api'
+import { api } from '@/lib/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -121,6 +122,7 @@ export function GroupsPage() {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pending, setPending] = useState<DiscordGuild | null>(null)
   const [webhook, setWebhook] = useState('')
+  const [steam, setSteam] = useState('')
   const toast = useToast()
 
   const registered = useMemo(
@@ -132,11 +134,25 @@ export function GroupsPage() {
     setPickerOpen(false)
     setPending(g)
     setWebhook('')
+    setSteam('')
   }
 
   const finishCreate = async () => {
     if (!pending) return
     try {
+      // importa steam ANTES: assim o backend ja linka ownership dos games ao criar/entrar no grupo
+      if (steam.trim()) {
+        try {
+          const r = await api<{ owned_count: number; matched_count: number }>(
+            '/steam/library/import',
+            { method: 'POST', body: { steam_id_or_vanity: steam.trim() } },
+          )
+          toast.success(`steam: ${r.matched_count}/${r.owned_count} jogos vinculados`)
+        } catch (e) {
+          toast.error(e instanceof Error ? `steam: ${e.message}` : 'falha ao importar steam')
+          // continua mesmo assim, usuario pode linkar dps em settings
+        }
+      }
       await create.mutateAsync({
         discord_guild_id: pending.id,
         name: pending.name,
@@ -191,6 +207,18 @@ export function GroupsPage() {
             <p className="mt-2 text-[10px] text-nerv-dim">
               cole o webhook do canal onde quer receber avisos de votacoes, sessoes e temas. da pra configurar depois.
             </p>
+
+            <div className="mt-4 text-[11px] uppercase tracking-wider text-nerv-dim">steam (opcional)</div>
+            <input
+              value={steam}
+              onChange={(e) => setSteam(e.target.value)}
+              placeholder="seu nick, id64 ou url do perfil"
+              className="mt-1 h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus:border-nerv-orange focus:outline-none"
+            />
+            <p className="mt-2 text-[10px] text-nerv-dim">
+              importa sua biblioteca pra marcar automaticamente os jogos que ja sao seus nesse grupo. da pra fazer dps em settings.
+            </p>
+
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => setPending(null)}

@@ -3,8 +3,10 @@ from __future__ import annotations
 import uuid
 
 from fastapi import HTTPException, status
+from sqlalchemy import select
 
 from app.domain.enums import GroupRole
+from app.models.game import Game, SteamGameOwnership
 from app.models.group import Group, GroupMembership
 from app.models.user import User
 from app.repositories.group_repo import GroupRepository
@@ -76,6 +78,7 @@ class GroupService:
             if existing.owner_user_id is None and is_priv:
                 existing.owner_user_id = actor.id
                 await self.repo.db.commit()
+            await self._sync_steam_ownership(actor, existing.id)
             return GroupResponse.model_validate(existing)
 
         group = await self.repo.create_with_owner(
@@ -85,7 +88,48 @@ class GroupService:
             webhook_url=webhook_url,
             owner_user_id=actor.id,
         )
+        await self._sync_steam_ownership(actor, group.id)
         return GroupResponse.model_validate(group)
+
+    async def _sync_steam_ownership(self, actor: User, group_id: uuid.UUID) -> None:
+        """pra quando um user entra/cria grupo: se ele ja importou a lib do steam
+        (settings.steam_owned_appids), marca ownership pros games desse grupo
+        que ele possui. idempotente."""
+        owned = (actor.settings or {}).get("steam_owned_appids") or []
+        if not owned:
+            return
+        db = self.repo.db
+        games = (
+            (
+                await db.execute(
+                    select(Game).where(
+                        Game.group_id == group_id,
+                        Game.steam_appid.in_(owned),
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if not games:
+            return
+        game_ids = [g.id for g in games]
+        existing = set(
+            (
+                await db.execute(
+                    select(SteamGameOwnership.game_id).where(
+                        SteamGameOwnership.user_id == actor.id,
+                        SteamGameOwnership.game_id.in_(game_ids),
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        for g in games:
+            if g.id not in existing:
+                db.add(SteamGameOwnership(user_id=actor.id, game_id=g.id, manual=False))
+        await db.commit()
 
     async def purge(self, group_id: uuid.UUID, actor: User) -> None:
         group = await self.repo.get_by_id(group_id)
