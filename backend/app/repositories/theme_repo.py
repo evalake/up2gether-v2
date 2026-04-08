@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import delete as sa_delete, select
+from sqlalchemy import delete as sa_delete
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.theme import MonthlyTheme, ThemeCycle, ThemeSuggestion, ThemeVote
@@ -44,9 +45,7 @@ class ThemeRepository:
     async def get_cycle(self, cycle_id: uuid.UUID) -> ThemeCycle | None:
         return await self.db.get(ThemeCycle, cycle_id)
 
-    async def get_cycle_for_month(
-        self, group_id: uuid.UUID, month_year: str
-    ) -> ThemeCycle | None:
+    async def get_cycle_for_month(self, group_id: uuid.UUID, month_year: str) -> ThemeCycle | None:
         result = await self.db.execute(
             select(ThemeCycle).where(
                 ThemeCycle.group_id == group_id,
@@ -97,7 +96,9 @@ class ThemeRepository:
         await self.db.commit()
 
     async def delete_suggestions(self, cycle_id: uuid.UUID) -> None:
-        await self.db.execute(sa_delete(ThemeSuggestion).where(ThemeSuggestion.cycle_id == cycle_id))
+        await self.db.execute(
+            sa_delete(ThemeSuggestion).where(ThemeSuggestion.cycle_id == cycle_id)
+        )
         await self.db.commit()
 
     async def delete_votes(self, cycle_id: uuid.UUID) -> None:
@@ -105,14 +106,10 @@ class ThemeRepository:
         await self.db.commit()
 
     async def list_votes(self, cycle_id: uuid.UUID) -> list[ThemeVote]:
-        result = await self.db.execute(
-            select(ThemeVote).where(ThemeVote.cycle_id == cycle_id)
-        )
+        result = await self.db.execute(select(ThemeVote).where(ThemeVote.cycle_id == cycle_id))
         return list(result.scalars().all())
 
-    async def get_user_vote(
-        self, cycle_id: uuid.UUID, user_id: uuid.UUID
-    ) -> ThemeVote | None:
+    async def get_user_vote(self, cycle_id: uuid.UUID, user_id: uuid.UUID) -> ThemeVote | None:
         result = await self.db.execute(
             select(ThemeVote).where(
                 ThemeVote.cycle_id == cycle_id,
@@ -126,9 +123,7 @@ class ThemeRepository:
     ) -> ThemeVote:
         existing = await self.get_user_vote(cycle_id, user_id)
         if existing is None:
-            existing = ThemeVote(
-                cycle_id=cycle_id, user_id=user_id, suggestion_id=suggestion_id
-            )
+            existing = ThemeVote(cycle_id=cycle_id, user_id=user_id, suggestion_id=suggestion_id)
             self.db.add(existing)
         else:
             existing.suggestion_id = suggestion_id

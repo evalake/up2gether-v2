@@ -94,7 +94,9 @@ async def upsert_suggestion(
     return await service.upsert_suggestion(group_id, cycle_id, payload, actor)
 
 
-@router.delete("/groups/{group_id}/themes/cycle/{cycle_id}/suggestion", response_model=CycleResponse)
+@router.delete(
+    "/groups/{group_id}/themes/cycle/{cycle_id}/suggestion", response_model=CycleResponse
+)
 async def delete_suggestion(
     group_id: uuid.UUID,
     cycle_id: uuid.UUID,
@@ -104,7 +106,10 @@ async def delete_suggestion(
     return await service.delete_suggestion(group_id, cycle_id, actor)
 
 
-@router.delete("/groups/{group_id}/themes/cycle/{cycle_id}/suggestion/{suggestion_id}", response_model=CycleResponse)
+@router.delete(
+    "/groups/{group_id}/themes/cycle/{cycle_id}/suggestion/{suggestion_id}",
+    response_model=CycleResponse,
+)
 async def delete_suggestion_by_id(
     group_id: uuid.UUID,
     cycle_id: uuid.UUID,
@@ -115,7 +120,9 @@ async def delete_suggestion_by_id(
     return await service.delete_suggestion(group_id, cycle_id, actor, suggestion_id)
 
 
-@router.post("/groups/{group_id}/themes/cycle/{cycle_id}/start-voting", response_model=CycleResponse)
+@router.post(
+    "/groups/{group_id}/themes/cycle/{cycle_id}/start-voting", response_model=CycleResponse
+)
 async def start_voting(
     group_id: uuid.UUID,
     cycle_id: uuid.UUID,
@@ -146,7 +153,9 @@ async def close_cycle(
     return await service.close_cycle(group_id, cycle_id, actor)
 
 
-@router.post("/groups/{group_id}/themes/cycle/{cycle_id}/force/{suggestion_id}", response_model=CycleResponse)
+@router.post(
+    "/groups/{group_id}/themes/cycle/{cycle_id}/force/{suggestion_id}", response_model=CycleResponse
+)
 async def force_decide(
     group_id: uuid.UUID,
     cycle_id: uuid.UUID,

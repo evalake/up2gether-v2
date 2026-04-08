@@ -1,11 +1,19 @@
 import uuid
+from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import CurrentUser
+from app.domain.enums import AuthProvider, InterestSignal
+from app.integrations.discord import DiscordClient, get_discord_client
+from app.models.game import Game
+from app.models.session import PlaySession
+from app.models.user import User
+from app.models.vote import VoteSession
 from app.repositories.group_repo import GroupRepository
 from app.schemas.group import (
     CurrentGameAudit,
@@ -17,18 +25,7 @@ from app.schemas.group import (
     PromoteRequest,
     WebhookUpdate,
 )
-from app.repositories.game_repo import GameRepository
-from app.models.vote import VoteSession
-from app.models.user import User
-from app.models.game import Game
-from app.models.session import PlaySession
-from sqlalchemy import select, func
-from datetime import datetime, UTC
-from app.domain.enums import InterestSignal
 from app.services.group_service import GroupService
-from app.integrations.discord import DiscordClient, get_discord_client
-from app.domain.enums import AuthProvider
-from fastapi import HTTPException
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -170,6 +167,7 @@ async def set_current_game(
     await db.commit()
     await db.refresh(grp)
     from app.services.notifications import notify_group
+
     if payload.game_id is not None:
         g2 = await db.get(Game, payload.game_id)
         await notify_group(
@@ -222,16 +220,18 @@ async def current_game_audit(
     derived_set_at = grp.current_game_set_at
     derived_source = grp.current_game_source
     if current_game_id is None:
-        last_vote = (await db.execute(
-            select(VoteSession)
-            .where(
-                VoteSession.group_id == group_id,
-                VoteSession.status == "closed",
-                VoteSession.winner_game_id.is_not(None),
+        last_vote = (
+            await db.execute(
+                select(VoteSession)
+                .where(
+                    VoteSession.group_id == group_id,
+                    VoteSession.status == "closed",
+                    VoteSession.winner_game_id.is_not(None),
+                )
+                .order_by(VoteSession.closed_at.desc())
+                .limit(1)
             )
-            .order_by(VoteSession.closed_at.desc())
-            .limit(1)
-        )).scalar_one_or_none()
+        ).scalar_one_or_none()
         if last_vote is None:
             return None
         current_game_id = last_vote.winner_game_id
@@ -265,14 +265,17 @@ async def current_game_audit(
             vote_eligible = vote.eligible_voter_count
             # conta approvals por candidate
             from app.models.vote import VoteBallot
-            ballots_rows = (await db.execute(
-                select(VoteBallot).where(VoteBallot.vote_session_id == vote.id)
-            )).scalars().all()
+
+            ballots_rows = (
+                (await db.execute(select(VoteBallot).where(VoteBallot.vote_session_id == vote.id)))
+                .scalars()
+                .all()
+            )
             tally_map: dict[uuid.UUID, int] = {}
             for cid in vote.candidate_game_ids:
                 tally_map[cid] = 0
             for b in ballots_rows:
-                for a in (b.approvals or []):
+                for a in b.approvals or []:
                     tally_map[a] = tally_map.get(a, 0) + 1
             vote_winner_approvals = tally_map.get(game.id, 0)
             # runner ups top 3 sem vencedor
@@ -283,30 +286,45 @@ async def current_game_audit(
             for cid, c in others:
                 og = await db.get(Game, cid)
                 if og:
-                    vote_runner_ups.append({
-                        "game_id": str(cid),
-                        "name": og.name,
-                        "cover_url": og.cover_url,
-                        "approvals": c,
-                    })
+                    vote_runner_ups.append(
+                        {
+                            "game_id": str(cid),
+                            "name": og.name,
+                            "cover_url": og.cover_url,
+                            "approvals": c,
+                        }
+                    )
             # empate se top2 = top1 (ignorando vencedor)
             top_approvals = max((c for _, c in tally_map.items()), default=0)
             tied = [cid for cid, c in tally_map.items() if c == top_approvals]
             vote_was_tiebreak = len(tied) > 1
     # interest signals
     from app.models.game import InterestSignalRow, SteamGameOwnership
-    interest_rows = (await db.execute(
-        select(InterestSignalRow.signal, func.count())
-        .where(InterestSignalRow.game_id == game.id)
-        .group_by(InterestSignalRow.signal)
-    )).all()
+
+    interest_rows = (
+        await db.execute(
+            select(InterestSignalRow.signal, func.count())
+            .where(InterestSignalRow.game_id == game.id)
+            .group_by(InterestSignalRow.signal)
+        )
+    ).all()
     interest_map = {s: int(c) for s, c in interest_rows}
-    owners = int((await db.execute(
-        select(func.count()).select_from(SteamGameOwnership).where(SteamGameOwnership.game_id == game.id)
-    )).scalar_one())
-    sessions = int((await db.execute(
-        select(func.count()).select_from(PlaySession).where(PlaySession.game_id == game.id)
-    )).scalar_one())
+    owners = int(
+        (
+            await db.execute(
+                select(func.count())
+                .select_from(SteamGameOwnership)
+                .where(SteamGameOwnership.game_id == game.id)
+            )
+        ).scalar_one()
+    )
+    sessions = int(
+        (
+            await db.execute(
+                select(func.count()).select_from(PlaySession).where(PlaySession.game_id == game.id)
+            )
+        ).scalar_one()
+    )
     return CurrentGameAudit(
         game_id=game.id,
         name=game.name,

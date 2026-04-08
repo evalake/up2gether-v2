@@ -53,6 +53,7 @@ async def import_library(
     raw = payload.steam_id_or_vanity.strip()
     # aceita url completa colada direto: extrai o nick ou id numerico
     import re as _re
+
     m = _re.search(r"steamcommunity\.com/(?:id|profiles)/([^/?#\s]+)", raw, _re.I)
     if m:
         raw = m.group(1)
@@ -81,11 +82,7 @@ async def import_library(
     if existing_int:
         existing_int.external_id = steam_id
     else:
-        db.add(
-            IntegrationAccount(
-                user_id=actor.id, provider="steam", external_id=steam_id
-            )
-        )
+        db.add(IntegrationAccount(user_id=actor.id, provider="steam", external_id=steam_id))
 
     # persiste a lista de owned_appids no settings do user pra auto-match em jogos
     # que forem criados depois. sem isso so casaria com jogos ja existentes no momento
@@ -94,13 +91,16 @@ async def import_library(
     new_settings["steam_owned_appids"] = sorted(owned_appids)
     actor.settings = new_settings
     from sqlalchemy.orm.attributes import flag_modified as _fm
+
     _fm(actor, "settings")
 
     # marca ownership pra todo Game cujo steam_appid esta na biblioteca
     matches = (
         (
             await db.execute(
-                select(Game).where(Game.steam_appid.in_(owned_appids)) if owned_appids else select(Game).where(Game.id == None)  # noqa: E711
+                select(Game).where(Game.steam_appid.in_(owned_appids))
+                if owned_appids
+                else select(Game).where(Game.id == None)  # noqa: E711
             )
         )
         .scalars()

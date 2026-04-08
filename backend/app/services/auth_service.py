@@ -7,7 +7,6 @@ from app.repositories.user_repo import UserRepository
 from app.schemas.auth import AuthTokenResponse
 from app.schemas.user import UserResponse
 
-
 # nota: discord_avatar guarda apenas o hash retornado pela api do discord.
 # o frontend constroi a URL final via cdn.discordapp.com/avatars/{discord_id}/{hash}.png
 

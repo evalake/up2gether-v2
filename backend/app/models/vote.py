@@ -64,15 +64,11 @@ class VoteStage(Base):
 
     __tablename__ = "vote_stages"
     __table_args__ = (
-        UniqueConstraint(
-            "vote_session_id", "stage_number", name="uq_stage_session_number"
-        ),
+        UniqueConstraint("vote_session_id", "stage_number", name="uq_stage_session_number"),
         Index("ix_stage_session_status", "vote_session_id", "status"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     vote_session_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("vote_sessions.id", ondelete="CASCADE"),
         nullable=False,
@@ -87,12 +83,8 @@ class VoteStage(Base):
     opens_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, nullable=False
     )
-    closes_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    closed_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    closes_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class VoteBallot(Base):

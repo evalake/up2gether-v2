@@ -35,6 +35,7 @@ class User(Base, TimestampMixin):
     @property
     def is_sys_admin(self) -> bool:
         from app.core.config import get_settings
+
         return self.discord_id in get_settings().sys_admin_discord_ids
 
 

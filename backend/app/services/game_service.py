@@ -44,6 +44,7 @@ class GameService:
         if m is None:
             if actor.is_sys_admin:
                 from app.models.group import GroupMembership
+
                 m = GroupMembership(group_id=group_id, user_id=actor.id, role=GroupRole.ADMIN)
             else:
                 raise _forbid("Not a member of this group")
@@ -95,8 +96,9 @@ class GameService:
         # toda vez que um jogo novo e cadastrado.
         if game.steam_appid is not None:
             try:
-                from app.models.game import SteamGameOwnership
                 from sqlalchemy import select as _select
+
+                from app.models.game import SteamGameOwnership
 
                 members = await self.groups.list_members(group_id)
                 for mem in members:
@@ -120,16 +122,24 @@ class GameService:
                 await self.games.db.commit()
             except Exception:
                 import logging as _log
+
                 _log.getLogger(__name__).warning("steam auto-match falhou", exc_info=True)
         from app.services.notifications import notify_group
+
         fields = []
         if game.player_min:
-            pl = f"{game.player_min}+" if not game.player_max else f"{game.player_min}-{game.player_max}"
+            pl = (
+                f"{game.player_min}+"
+                if not game.player_max
+                else f"{game.player_min}-{game.player_max}"
+            )
             fields.append({"name": "Jogadores", "value": pl, "inline": True})
         if game.is_free:
             fields.append({"name": "Preço", "value": "Grátis", "inline": True})
         elif game.price_current:
-            fields.append({"name": "Preço", "value": f"R$ {game.price_current:.2f}", "inline": True})
+            fields.append(
+                {"name": "Preço", "value": f"R$ {game.price_current:.2f}", "inline": True}
+            )
         await notify_group(
             self.games.db,
             group_id=group_id,

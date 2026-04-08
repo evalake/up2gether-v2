@@ -23,16 +23,27 @@ class Group(Base, TimestampMixin):
     accent_color: Mapped[int | None] = mapped_column(Integer, nullable=True)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     current_game_id: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey("games.id", ondelete="SET NULL", use_alter=True, name="fk_groups_current_game_id"),
+        ForeignKey(
+            "games.id", ondelete="SET NULL", use_alter=True, name="fk_groups_current_game_id"
+        ),
         nullable=True,
     )
-    current_game_source: Mapped[str | None] = mapped_column(String, nullable=True)  # 'vote' | 'manual'
-    current_game_set_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    current_game_source: Mapped[str | None] = mapped_column(
+        String, nullable=True
+    )  # 'vote' | 'manual'
+    current_game_set_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     current_game_set_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     current_game_vote_id: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey("vote_sessions.id", ondelete="SET NULL", use_alter=True, name="fk_groups_current_game_vote_id"),
+        ForeignKey(
+            "vote_sessions.id",
+            ondelete="SET NULL",
+            use_alter=True,
+            name="fk_groups_current_game_vote_id",
+        ),
         nullable=True,
     )
     owner_user_id: Mapped[uuid.UUID | None] = mapped_column(

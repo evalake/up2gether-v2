@@ -34,9 +34,7 @@ def calculate_quorum(eligible_count: int, percent: int = 40) -> int:
     return max(1, math.ceil(eligible_count * percent / 100))
 
 
-def has_absolute_majority(
-    counts: dict[uuid.UUID, int], eligible_count: int
-) -> bool:
+def has_absolute_majority(counts: dict[uuid.UUID, int], eligible_count: int) -> bool:
     """True se algum candidato foi aprovado por mais da metade dos eleitores."""
     if eligible_count <= 0:
         return False
@@ -86,6 +84,7 @@ class StageAdvanceResult:
 
     Exatamente um de winner_id ou advance_ids eh nao-None.
     """
+
     winner_id: uuid.UUID | None
     advance_ids: list[uuid.UUID] | None
     counts: dict[uuid.UUID, int]
@@ -141,23 +140,17 @@ def advance_stage(
     if is_final:
         max_votes = max(counts.values()) if counts else 0
         if max_votes == 0:
-            return StageAdvanceResult(
-                winner_id=candidate_ids[0], advance_ids=None, counts=counts
-            )
+            return StageAdvanceResult(winner_id=candidate_ids[0], advance_ids=None, counts=counts)
         tied = [cid for cid in candidate_ids if counts[cid] == max_votes]
         if len(tied) == 1:
-            return StageAdvanceResult(
-                winner_id=tied[0], advance_ids=None, counts=counts
-            )
+            return StageAdvanceResult(winner_id=tied[0], advance_ids=None, counts=counts)
         tied.sort(
             key=lambda cid: (
                 -viability_by_id.get(cid, 0.0),
                 candidate_ids.index(cid),
             )
         )
-        return StageAdvanceResult(
-            winner_id=tied[0], advance_ids=None, counts=counts
-        )
+        return StageAdvanceResult(winner_id=tied[0], advance_ids=None, counts=counts)
 
     # stage intermediario: avanca top M = floor(N/2) (minimo 2),
     # desempate por seed determiniistico
@@ -166,9 +159,7 @@ def advance_stage(
         candidate_ids,
         key=lambda cid: (-counts[cid], _intermediate_tiebreak_key(cid, seed)),
     )
-    return StageAdvanceResult(
-        winner_id=None, advance_ids=ranked[:target_m], counts=counts
-    )
+    return StageAdvanceResult(winner_id=None, advance_ids=ranked[:target_m], counts=counts)
 
 
 @dataclass(frozen=True)

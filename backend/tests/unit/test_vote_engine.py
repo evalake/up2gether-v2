@@ -141,9 +141,7 @@ def test_advance_seed_determines_intermediate_tiebreak():
 def test_advance_final_uses_viability_for_tiebreak():
     a, b = _ids(2)
     ballots = [[a], [b]]  # empate 1x1
-    res = advance_stage(
-        [a, b], ballots, 2, {a: 10.0, b: 80.0}, seed=1, is_final=True
-    )
+    res = advance_stage([a, b], ballots, 2, {a: 10.0, b: 80.0}, seed=1, is_final=True)
     assert res.winner_id == b
     assert res.advance_ids is None
 

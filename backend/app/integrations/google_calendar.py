@@ -21,7 +21,12 @@ class GoogleCalendarClient(Protocol):
     async def exchange_code(self, code: str) -> dict: ...
     async def refresh(self, refresh_token: str) -> dict: ...
     async def create_event(
-        self, access_token: str, summary: str, start: datetime, duration_min: int, description: str | None = None
+        self,
+        access_token: str,
+        summary: str,
+        start: datetime,
+        duration_min: int,
+        description: str | None = None,
     ) -> dict: ...
 
 

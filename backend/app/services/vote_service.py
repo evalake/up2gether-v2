@@ -54,6 +54,7 @@ class VoteService:
         if m is None:
             if actor.is_sys_admin:
                 from app.models.group import GroupMembership
+
                 m = GroupMembership(group_id=group_id, user_id=actor.id, role=GroupRole.ADMIN)
             else:
                 raise _forbid("Not a member of this group")
@@ -119,9 +120,18 @@ class VoteService:
             g = await self.games.get_by_id(cid)
             if g:
                 cand_games.append(g)
-        fields = [{"name": g.name, "value": f"{g.player_min}+ jogadores", "inline": True} for g in cand_games[:9]]
+        fields = [
+            {"name": g.name, "value": f"{g.player_min}+ jogadores", "inline": True}
+            for g in cand_games[:9]
+        ]
         if len(data.candidate_game_ids) > 9:
-            fields.append({"name": "+ " + str(len(data.candidate_game_ids) - 9), "value": "outros candidatos", "inline": True})
+            fields.append(
+                {
+                    "name": "+ " + str(len(data.candidate_game_ids) - 9),
+                    "value": "outros candidatos",
+                    "inline": True,
+                }
+            )
         await notify_group(
             self.votes.db,
             group_id=group_id,
@@ -209,7 +219,9 @@ class VoteService:
     ) -> None:
         ballots = await self.votes.list_ballots(session.id, stage_id=stage.id)
         total_stages = session.total_stages or 1
-        is_final = force_final or stage.stage_number >= total_stages or len(stage.candidate_game_ids) <= 2
+        is_final = (
+            force_final or stage.stage_number >= total_stages or len(stage.candidate_game_ids) <= 2
+        )
         viability_map: dict[uuid.UUID, float] = {}
         if is_final:
             viability_map = await self._viability_map(
@@ -247,9 +259,7 @@ class VoteService:
         next_number = stage.stage_number + 1
         # duracao restante / stages restantes
         remaining_stages = max(1, total_stages - stage.stage_number)
-        remaining = (
-            (session.closes_at - now).total_seconds() if session.closes_at else 3600
-        )
+        remaining = (session.closes_at - now).total_seconds() if session.closes_at else 3600
         per_stage_seconds = max(3600, int(remaining / remaining_stages))
         next_stage = VoteStage(
             vote_session_id=session.id,
@@ -313,7 +323,13 @@ class VoteService:
             if g is None:
                 continue
             medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else f"{rank}º"
-            fields.append({"name": f"{medal} {g.name}", "value": f"{cnt} voto{'s' if cnt != 1 else ''}", "inline": True})
+            fields.append(
+                {
+                    "name": f"{medal} {g.name}",
+                    "value": f"{cnt} voto{'s' if cnt != 1 else ''}",
+                    "inline": True,
+                }
+            )
         await notify_group(
             self.votes.db,
             group_id=session.group_id,
@@ -329,7 +345,8 @@ class VoteService:
             webhook_description=(
                 f"**{winner_name}** venceu a votação **{session.title}** com "
                 f"{len(ballots)}/{session.eligible_voter_count} participantes na fase final."
-                if winner_name else f"Votação **{session.title}** encerrada sem vencedor."
+                if winner_name
+                else f"Votação **{session.title}** encerrada sem vencedor."
             ),
             webhook_fields=fields or None,
             webhook_image_url=winner_cover,
@@ -404,7 +421,8 @@ class VoteService:
             current_stage_number=s.current_stage_number,
             total_stages=s.total_stages,
             stages=[
-                VoteStageResponse.model_validate(st)
-                for st in (await self.votes.list_stages(s.id))
-            ] if s.current_stage_number else [],
+                VoteStageResponse.model_validate(st) for st in (await self.votes.list_stages(s.id))
+            ]
+            if s.current_stage_number
+            else [],
         )

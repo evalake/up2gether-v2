@@ -233,6 +233,7 @@ class GameRepository:
                 UserHardwareProfile.user_id.in_(user_ids)
             )
         )
+
         def _coerce(v: str) -> HardwareTier:
             # tolera "HardwareTier.MID" / "MID" / "mid"
             s = (v or "unknown").split(".")[-1].lower()
@@ -240,5 +241,6 @@ class GameRepository:
                 return HardwareTier(s)
             except ValueError:
                 return HardwareTier.UNKNOWN
+
         tier_map = {uid: tier for uid, tier in hw_result.all()}
         return [_coerce(tier_map.get(uid, "unknown")) for uid in user_ids]

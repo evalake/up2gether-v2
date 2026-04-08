@@ -3,6 +3,7 @@
 Roda 1x por dia. Se faltam <=5 dias pro fim do mes e nao existe ciclo
 nem tema definido pro mes corrente, abre o ciclo direto em VOTING.
 """
+
 from __future__ import annotations
 
 import calendar

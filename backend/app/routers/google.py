@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -37,8 +36,8 @@ async def google_callback(
 ) -> RedirectResponse:
     try:
         payload = decode_access_token(state)
-    except Exception:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "state invalido")
+    except Exception as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "state invalido") from e
     user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "state sem user")

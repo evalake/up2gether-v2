@@ -126,6 +126,7 @@ class ThemeService:
             await self.themes.delete_suggestions(existing.id)
             await self.themes.save()
             from app.services.notifications import notify_group
+
             await notify_group(
                 self.themes.db,
                 group_id=group_id,
@@ -151,6 +152,7 @@ class ThemeService:
         )
         await self.themes.add_cycle(cycle)
         from app.services.notifications import notify_group
+
         await notify_group(
             self.themes.db,
             group_id=group_id,
@@ -215,7 +217,9 @@ class ThemeService:
             s = await self.themes.get_suggestion(suggestion_id)
             if s is None or s.cycle_id != cycle_id:
                 raise _not_found("sugestao nao encontrada")
-            is_admin = actor.is_sys_admin or (m is not None and m.role in (GroupRole.ADMIN, GroupRole.MOD))
+            is_admin = actor.is_sys_admin or (
+                m is not None and m.role in (GroupRole.ADMIN, GroupRole.MOD)
+            )
             if s.user_id != actor.id and not is_admin:
                 raise _forbid("so admin/mod pode remover sugestao alheia")
         else:
@@ -280,8 +284,7 @@ class ThemeService:
         winners = [sid for sid, c in counts.items() if c == max_votes]
         if blocked_names and max_votes > 0:
             non_blocked = [
-                sid for sid in winners
-                if sug_by_id[sid].name.strip().lower() not in blocked_names
+                sid for sid in winners if sug_by_id[sid].name.strip().lower() not in blocked_names
             ]
             if non_blocked:
                 winners = non_blocked
@@ -293,7 +296,8 @@ class ThemeService:
                         continue
                     level = [sid for sid, cc in counts.items() if cc == c]
                     level_nb = [
-                        sid for sid in level
+                        sid
+                        for sid in level
                         if sug_by_id[sid].name.strip().lower() not in blocked_names
                     ]
                     if level_nb:
@@ -373,9 +377,14 @@ class ThemeService:
         cycle.decided_at = datetime.now(UTC)
         await self.themes.save()
         from app.services.notifications import notify_group
+
         tiebreak_label = ""
         if kind.startswith("tiebreak"):
-            tiebreak_label = " (desempate no cara-coroa)" if kind == "tiebreak_coin" else " (desempate na roleta)"
+            tiebreak_label = (
+                " (desempate no cara-coroa)"
+                if kind == "tiebreak_coin"
+                else " (desempate na roleta)"
+            )
         elif kind == "admin":
             tiebreak_label = " (decidido pelo admin)"
         await notify_group(
@@ -436,7 +445,9 @@ class ThemeService:
             opened_by=cycle.opened_by,
             winner_suggestion_id=cycle.winner_suggestion_id,
             tiebreak_kind=cycle.tiebreak_kind,
-            tied_suggestion_ids=[uuid.UUID(s) for s in cycle.tied_suggestion_ids] if cycle.tied_suggestion_ids else None,
+            tied_suggestion_ids=[uuid.UUID(s) for s in cycle.tied_suggestion_ids]
+            if cycle.tied_suggestion_ids
+            else None,
             decided_at=cycle.decided_at,
             suggestions=suggestion_responses,
             user_suggestion_id=user_suggestion,

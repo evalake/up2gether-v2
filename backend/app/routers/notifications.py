@@ -104,9 +104,7 @@ async def delete_notification(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
     await db.execute(
-        delete(Notification).where(
-            Notification.id == nid, Notification.user_id == actor.id
-        )
+        delete(Notification).where(Notification.id == nid, Notification.user_id == actor.id)
     )
     await db.commit()
     return {"ok": True}

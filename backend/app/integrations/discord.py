@@ -100,6 +100,7 @@ async def post_webhook_embed(
 ) -> None:
     """Best-effort POST pro Discord webhook. Silencia falhas — nao quebra o fluxo principal."""
     import logging
+
     log = logging.getLogger(__name__)
     if not webhook_url:
         return
@@ -118,7 +119,11 @@ async def post_webhook_embed(
         embed["thumbnail"] = {"url": thumbnail_url}
     if fields:
         embed["fields"] = [
-            {"name": f["name"][:256], "value": str(f["value"])[:1024], "inline": bool(f.get("inline", True))}
+            {
+                "name": f["name"][:256],
+                "value": str(f["value"])[:1024],
+                "inline": bool(f.get("inline", True)),
+            }
             for f in fields[:25]
         ]
     if footer:
@@ -129,5 +134,5 @@ async def post_webhook_embed(
             res = await client.post(webhook_url, json=payload)
         if res.status_code >= 300:
             log.warning("discord webhook returned %s: %s", res.status_code, res.text[:200])
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         log.warning("discord webhook post failed: %s", e)

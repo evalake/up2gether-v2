@@ -173,7 +173,9 @@ async def test_cycle_tiebreak_two_uses_coin(make_user, auth_headers, client):
     g = await _create_group(client, auth_headers(owner), guild="g-cycle-2")
     await _join(client, auth_headers(m1), "g-cycle-2")
 
-    cycle = (await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))).json()
+    cycle = (
+        await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))
+    ).json()
     cid = cycle["id"]
     last = None
     for u, name in ((owner, "A"), (m1, "B")):
@@ -185,10 +187,20 @@ async def test_cycle_tiebreak_two_uses_coin(make_user, auth_headers, client):
     sugs = last.json()["suggestions"]
     a = next(s["id"] for s in sugs if s["name"] == "A")
     b = next(s["id"] for s in sugs if s["name"] == "B")
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/vote", json={"suggestion_id": a}, headers=auth_headers(owner))
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/vote", json={"suggestion_id": b}, headers=auth_headers(m1))
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+        json={"suggestion_id": a},
+        headers=auth_headers(owner),
+    )
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+        json={"suggestion_id": b},
+        headers=auth_headers(m1),
+    )
 
-    r = await client.post(f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner))
+    r = await client.post(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner)
+    )
     body = r.json()
     assert body["phase"] == "decided"
     assert body["tiebreak_kind"] == "tiebreak_coin"
@@ -204,7 +216,9 @@ async def test_cycle_tiebreak_three_uses_roulette(make_user, auth_headers, clien
     await _join(client, auth_headers(m1), "g-cycle-3")
     await _join(client, auth_headers(m2), "g-cycle-3")
 
-    cycle = (await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))).json()
+    cycle = (
+        await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))
+    ).json()
     cid = cycle["id"]
     last = None
     for u, name in ((owner, "A"), (m1, "B"), (m2, "C")):
@@ -215,11 +229,27 @@ async def test_cycle_tiebreak_three_uses_roulette(make_user, auth_headers, clien
         )
     sugs = {s["name"]: s["id"] for s in last.json()["suggestions"]}
     # cada um vota numa diferente -> empate triplo
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/vote", json={"suggestion_id": sugs["A"]}, headers=auth_headers(owner))
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/vote", json={"suggestion_id": sugs["B"]}, headers=auth_headers(m1))
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/vote", json={"suggestion_id": sugs["C"]}, headers=auth_headers(m2))
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+        json={"suggestion_id": sugs["A"]},
+        headers=auth_headers(owner),
+    )
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+        json={"suggestion_id": sugs["B"]},
+        headers=auth_headers(m1),
+    )
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+        json={"suggestion_id": sugs["C"]},
+        headers=auth_headers(m2),
+    )
 
-    body = (await client.post(f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner))).json()
+    body = (
+        await client.post(
+            f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner)
+        )
+    ).json()
     assert body["tiebreak_kind"] == "tiebreak_roulette"
     assert len(body["tied_suggestion_ids"]) == 3
 
@@ -227,7 +257,9 @@ async def test_cycle_tiebreak_three_uses_roulette(make_user, auth_headers, clien
 async def test_cycle_single_suggestion_auto_decides(make_user, auth_headers, client):
     owner = await make_user(username="owner")
     g = await _create_group(client, auth_headers(owner), guild="g-cycle-4")
-    cycle = (await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))).json()
+    cycle = (
+        await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))
+    ).json()
     cid = cycle["id"]
     await client.put(
         f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion",
@@ -235,7 +267,9 @@ async def test_cycle_single_suggestion_auto_decides(make_user, auth_headers, cli
         headers=auth_headers(owner),
     )
     # com 1 sugestao, close finaliza sem tiebreak
-    r = await client.post(f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner))
+    r = await client.post(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner)
+    )
     body = r.json()
     assert r.status_code == 200, body
     assert body["phase"] == "decided"
@@ -248,11 +282,25 @@ async def test_suggestion_editable_anytime_while_open(make_user, auth_headers, c
     m1 = await make_user(username="m1")
     g = await _create_group(client, auth_headers(owner), guild="g-cycle-5")
     await _join(client, auth_headers(m1), "g-cycle-5")
-    cid = (await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))).json()["id"]
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion", json={"name": "X"}, headers=auth_headers(owner))
-    await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion", json={"name": "Y"}, headers=auth_headers(m1))
+    cid = (
+        await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))
+    ).json()["id"]
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion",
+        json={"name": "X"},
+        headers=auth_headers(owner),
+    )
+    await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion",
+        json={"name": "Y"},
+        headers=auth_headers(m1),
+    )
     # owner edita dnv: ok (substitui X -> Z)
-    r = await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion", json={"name": "Z"}, headers=auth_headers(owner))
+    r = await client.put(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion",
+        json={"name": "Z"},
+        headers=auth_headers(owner),
+    )
     assert r.status_code == 200
     names = {s["name"] for s in r.json()["suggestions"]}
     assert names == {"Z", "Y"}
@@ -263,15 +311,27 @@ async def test_force_decide_skips_flow(make_user, auth_headers, client):
     m1 = await make_user(username="m1")
     g = await _create_group(client, auth_headers(owner), guild="g-cycle-6")
     await _join(client, auth_headers(m1), "g-cycle-6")
-    cid = (await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))).json()["id"]
-    body = (await client.put(f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion", json={"name": "Forced"}, headers=auth_headers(m1))).json()
+    cid = (
+        await client.post(f"/api/groups/{g['id']}/themes/cycle", headers=auth_headers(owner))
+    ).json()["id"]
+    body = (
+        await client.put(
+            f"/api/groups/{g['id']}/themes/cycle/{cid}/suggestion",
+            json={"name": "Forced"},
+            headers=auth_headers(m1),
+        )
+    ).json()
     sid = body["suggestions"][0]["id"]
-    r = await client.post(f"/api/groups/{g['id']}/themes/cycle/{cid}/force/{sid}", headers=auth_headers(owner))
+    r = await client.post(
+        f"/api/groups/{g['id']}/themes/cycle/{cid}/force/{sid}", headers=auth_headers(owner)
+    )
     assert r.status_code == 200
     body = r.json()
     assert body["phase"] == "decided"
     assert body["winner_suggestion_id"] == sid
-    cur = (await client.get(f"/api/groups/{g['id']}/themes/current", headers=auth_headers(owner))).json()
+    cur = (
+        await client.get(f"/api/groups/{g['id']}/themes/current", headers=auth_headers(owner))
+    ).json()
     assert cur["decided_by"] == "admin"
 
 

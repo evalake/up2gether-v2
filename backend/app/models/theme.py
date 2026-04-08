@@ -42,7 +42,9 @@ class ThemeCycle(Base, TimestampMixin):
         ForeignKey("groups.id", ondelete="CASCADE"), nullable=False, index=True
     )
     month_year: Mapped[str] = mapped_column(String(7), nullable=False)
-    phase: Mapped[str] = mapped_column(String(20), nullable=False, default=ThemeCyclePhase.SUGGESTING)
+    phase: Mapped[str] = mapped_column(
+        String(20), nullable=False, default=ThemeCyclePhase.SUGGESTING
+    )
     opened_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )

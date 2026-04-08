@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import re
 from typing import Protocol
 
@@ -15,7 +16,7 @@ def _strip_html(s: str) -> str:
 
 # patterns: "1-4 players", "1 to 4 players", "up to 4 players", "4-player", "single player only"
 _PLAYER_PATTERNS = [
-    re.compile(r"(\d+)\s*[-–to]+\s*(\d+)\s*player", re.I),
+    re.compile(r"(\d+)\s*[-to]+\s*(\d+)\s*player", re.I),
     re.compile(r"up\s*to\s*(\d+)\s*player", re.I),
     re.compile(r"(\d+)\s*player\s*(?:co-?op|multiplayer|online|local)", re.I),
     re.compile(r"max(?:imum)?\s*of\s*(\d+)\s*player", re.I),
@@ -28,53 +29,118 @@ _PLAYER_PATTERNS = [
 # patterns rodam em ordem: high -> mid -> low.
 _GPU_HIGH_PATTERNS = [
     # nvidia rtx serie atual e semi-atual
-    r"rtx\s*[2345]0[5-9]\d",          # 2060+, 3060+, 4060+, 5060+
-    r"rtx\s*[2345]07\d", r"rtx\s*[2345]08\d", r"rtx\s*[2345]09\d",
-    r"rtx\s*20[6-9]\d", r"rtx\s*30[5-9]\d", r"rtx\s*40[5-9]\d", r"rtx\s*50[5-9]\d",
-    r"rtx\s*2060", r"rtx\s*2070", r"rtx\s*2080", r"rtx\s*2090",
-    r"rtx\s*3060", r"rtx\s*3070", r"rtx\s*3080", r"rtx\s*3090",
-    r"rtx\s*4060", r"rtx\s*4070", r"rtx\s*4080", r"rtx\s*4090",
-    r"rtx\s*5060", r"rtx\s*5070", r"rtx\s*5080", r"rtx\s*5090",
-    r"rtx\s*titan", r"titan\s*(rtx|v|xp)",
+    r"rtx\s*[2345]0[5-9]\d",  # 2060+, 3060+, 4060+, 5060+
+    r"rtx\s*[2345]07\d",
+    r"rtx\s*[2345]08\d",
+    r"rtx\s*[2345]09\d",
+    r"rtx\s*20[6-9]\d",
+    r"rtx\s*30[5-9]\d",
+    r"rtx\s*40[5-9]\d",
+    r"rtx\s*50[5-9]\d",
+    r"rtx\s*2060",
+    r"rtx\s*2070",
+    r"rtx\s*2080",
+    r"rtx\s*2090",
+    r"rtx\s*3060",
+    r"rtx\s*3070",
+    r"rtx\s*3080",
+    r"rtx\s*3090",
+    r"rtx\s*4060",
+    r"rtx\s*4070",
+    r"rtx\s*4080",
+    r"rtx\s*4090",
+    r"rtx\s*5060",
+    r"rtx\s*5070",
+    r"rtx\s*5080",
+    r"rtx\s*5090",
+    r"rtx\s*titan",
+    r"titan\s*(rtx|v|xp)",
     # nvidia gtx topo
-    r"gtx\s*1070", r"gtx\s*1080", r"gtx\s*1660\s*ti", r"gtx\s*titan",
+    r"gtx\s*1070",
+    r"gtx\s*1080",
+    r"gtx\s*1660\s*ti",
+    r"gtx\s*titan",
     # amd rx 6000/7000/9000
-    r"rx\s*6[6-9]\d\d", r"rx\s*7[6-9]\d\d", r"rx\s*9[6-9]\d\d",
-    r"rx\s*6700", r"rx\s*6800", r"rx\s*6900", r"rx\s*6950",
-    r"rx\s*7700", r"rx\s*7800", r"rx\s*7900",
-    r"radeon\s*vii", r"vega\s*(56|64)", r"rx\s*vega",
+    r"rx\s*6[6-9]\d\d",
+    r"rx\s*7[6-9]\d\d",
+    r"rx\s*9[6-9]\d\d",
+    r"rx\s*6700",
+    r"rx\s*6800",
+    r"rx\s*6900",
+    r"rx\s*6950",
+    r"rx\s*7700",
+    r"rx\s*7800",
+    r"rx\s*7900",
+    r"radeon\s*vii",
+    r"vega\s*(56|64)",
+    r"rx\s*vega",
     # workstation/profissional
-    r"quadro\s*(p|rtx|t)\d{3,4}", r"radeon\s*pro",
+    r"quadro\s*(p|rtx|t)\d{3,4}",
+    r"radeon\s*pro",
 ]
 _GPU_MID_PATTERNS = [
     # nvidia gtx mid
-    r"gtx\s*106\d", r"gtx\s*105\d", r"gtx\s*104\d",
-    r"gtx\s*165\d", r"gtx\s*166\d", r"gtx\s*1650", r"gtx\s*1660",
-    r"gtx\s*9[678]0", r"gtx\s*780", r"gtx\s*770",
+    r"gtx\s*106\d",
+    r"gtx\s*105\d",
+    r"gtx\s*104\d",
+    r"gtx\s*165\d",
+    r"gtx\s*166\d",
+    r"gtx\s*1650",
+    r"gtx\s*1660",
+    r"gtx\s*9[678]0",
+    r"gtx\s*780",
+    r"gtx\s*770",
     # rtx entry
-    r"rtx\s*20[3-5]\d", r"rtx\s*30[3-5]\d", r"rtx\s*40[3-5]\d",
-    r"rtx\s*2050", r"rtx\s*3050", r"rtx\s*4050",
+    r"rtx\s*20[3-5]\d",
+    r"rtx\s*30[3-5]\d",
+    r"rtx\s*40[3-5]\d",
+    r"rtx\s*2050",
+    r"rtx\s*3050",
+    r"rtx\s*4050",
     # amd rx mid
-    r"rx\s*[45]\d\d", r"rx\s*5[56]0", r"rx\s*570", r"rx\s*580", r"rx\s*590",
-    r"rx\s*460", r"rx\s*470", r"rx\s*480",
-    r"rx\s*64\d\d", r"rx\s*65\d\d", r"rx\s*66\d\d",
-    r"rx\s*6400", r"rx\s*6500", r"rx\s*6600",
-    r"rx\s*7600", r"r9\s*(270|280|285|290|380|390|fury|nano)",
-    r"hd\s*7[789]\d\d", r"hd\s*79\d\d",
+    r"rx\s*[45]\d\d",
+    r"rx\s*5[56]0",
+    r"rx\s*570",
+    r"rx\s*580",
+    r"rx\s*590",
+    r"rx\s*460",
+    r"rx\s*470",
+    r"rx\s*480",
+    r"rx\s*64\d\d",
+    r"rx\s*65\d\d",
+    r"rx\s*66\d\d",
+    r"rx\s*6400",
+    r"rx\s*6500",
+    r"rx\s*6600",
+    r"rx\s*7600",
+    r"r9\s*(270|280|285|290|380|390|fury|nano)",
+    r"hd\s*7[789]\d\d",
+    r"hd\s*79\d\d",
     # apple silicon (mid range)
-    r"m[12]\b", r"apple\s*m[12]",
+    r"m[12]\b",
+    r"apple\s*m[12]",
 ]
 _GPU_LOW_PATTERNS = [
     # nvidia low / legacy
-    r"gtx\s*[2-7]\d\d", r"gtx\s*4\d\d", r"gtx\s*3\d\d",
-    r"gt\s*[2-9]\d\d", r"gt\s*10[23]\d",
+    r"gtx\s*[2-7]\d\d",
+    r"gtx\s*4\d\d",
+    r"gtx\s*3\d\d",
+    r"gt\s*[2-9]\d\d",
+    r"gt\s*10[23]\d",
     r"geforce\s*[2-9]\d\d",
     # intel igpu
-    r"intel\s*hd", r"intel\s*uhd", r"intel\s*iris",
-    r"hd\s*graphics", r"uhd\s*graphics", r"iris\s*(xe|pro|plus)?",
+    r"intel\s*hd",
+    r"intel\s*uhd",
+    r"intel\s*iris",
+    r"hd\s*graphics",
+    r"uhd\s*graphics",
+    r"iris\s*(xe|pro|plus)?",
     # amd legacy / igpu
-    r"radeon\s*hd", r"hd\s*[456]\d\d\d", r"radeon\s*r[2-7]\b",
-    r"vega\s*[3-9]\b", r"vega\s*1\d\b",
+    r"radeon\s*hd",
+    r"hd\s*[456]\d\d\d",
+    r"radeon\s*r[2-7]\b",
+    r"vega\s*[3-9]\b",
+    r"vega\s*1\d\b",
 ]
 
 
@@ -98,26 +164,22 @@ def infer_hardware_tier(pc_requirements: dict | None) -> str:
     # ram: pega o maior numero de GB encontrado (recommended costuma estar la)
     ram_gb = 0
     for m in re.finditer(r"(\d{1,3})\s*gb\s*(?:of\s*)?(?:ram|memory|mem[óo]ria|system)", text):
-        try:
+        with contextlib.suppress(ValueError):
             ram_gb = max(ram_gb, int(m.group(1)))
-        except ValueError:
-            pass
 
     # vram: "4 gb vram", "8gb video"
     vram_gb = 0
     for m in re.finditer(r"(\d{1,2})\s*gb\s*(?:vram|video\s*memory|dedicated)", text):
-        try:
+        with contextlib.suppress(ValueError):
             vram_gb = max(vram_gb, int(m.group(1)))
-        except ValueError:
-            pass
 
     # storage grande tambem e indicativo (jogos AAA modernos)
     storage_gb = 0
-    for m in re.finditer(r"(\d{1,3})\s*gb\s*(?:available\s*space|hard\s*drive|storage|hd|ssd|disk)", text):
-        try:
+    for m in re.finditer(
+        r"(\d{1,3})\s*gb\s*(?:available\s*space|hard\s*drive|storage|hd|ssd|disk)", text
+    ):
+        with contextlib.suppress(ValueError):
             storage_gb = max(storage_gb, int(m.group(1)))
-        except ValueError:
-            pass
 
     has_high = _has_any(text, _GPU_HIGH_PATTERNS)
     has_mid = _has_any(text, _GPU_MID_PATTERNS)
@@ -267,7 +329,6 @@ class HttpSteamClient:
             hardware_tier=hw_tier,
         )
 
-
     OWNED_GAMES_URL = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/"
     RESOLVE_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
 
@@ -276,7 +337,9 @@ class HttpSteamClient:
 
         key = get_settings().steam_api_key
         if not key:
-            raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "STEAM_API_KEY nao configurada")
+            raise HTTPException(
+                status.HTTP_503_SERVICE_UNAVAILABLE, "STEAM_API_KEY nao configurada"
+            )
         async with httpx.AsyncClient(timeout=15) as client:
             res = await client.get(
                 self.OWNED_GAMES_URL,

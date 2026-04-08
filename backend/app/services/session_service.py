@@ -18,7 +18,7 @@ from app.schemas.session import (
     SessionResponse,
     SessionUpdate,
 )
-from app.services.notifications import notify, notify_group
+from app.services.notifications import notify_group
 
 
 def _forbid(d: str) -> HTTPException:
@@ -52,6 +52,7 @@ class PlaySessionService:
         if m is None:
             if actor.is_sys_admin:
                 from app.models.group import GroupMembership
+
                 m = GroupMembership(group_id=group_id, user_id=actor.id, role=GroupRole.ADMIN)
             else:
                 raise _forbid("Not a member of this group")
@@ -100,7 +101,9 @@ class PlaySessionService:
                     and google_int.refresh_token
                 ):
                     new_tokens = await gc.refresh(google_int.refresh_token)
-                    google_int.access_token = new_tokens.get("access_token", google_int.access_token)
+                    google_int.access_token = new_tokens.get(
+                        "access_token", google_int.access_token
+                    )
                     google_int.token_expires_at = datetime.now(UTC) + timedelta(
                         seconds=int(new_tokens.get("expires_in", 3600))
                     )
@@ -114,6 +117,7 @@ class PlaySessionService:
                 )
             except Exception:
                 import logging as _log
+
                 _log.getLogger(__name__).warning("google calendar sync falhou", exc_info=True)
         when = data.start_at.strftime("%d/%m %H:%M")
         fields = [

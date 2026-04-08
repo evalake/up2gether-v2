@@ -8,6 +8,7 @@ idempotente: pula jogos que ja existem no grupo (por steam_appid ou nome).
 busca detalhes direto da Steam e insere via SQLAlchemy cru (sem auth).
 tambem usado como mock data pra prod — essa lista e a base inicial.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -21,7 +22,6 @@ from app.domain.enums import GameStage, HardwareTier
 from app.integrations.steam import HttpSteamClient
 from app.models.game import Game
 from app.models.group import Group
-
 
 # lista base — nome e so referencia pro log, o que importa e o appid
 SEED_GAMES: list[tuple[str, int]] = [
@@ -93,7 +93,9 @@ async def run(group_id_arg: str | None) -> None:
         existing_appids = set(
             (
                 await db.execute(
-                    select(Game.steam_appid).where(Game.group_id == group_id, Game.steam_appid.is_not(None))
+                    select(Game.steam_appid).where(
+                        Game.group_id == group_id, Game.steam_appid.is_not(None)
+                    )
                 )
             )
             .scalars()

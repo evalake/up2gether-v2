@@ -38,7 +38,7 @@ def _load_vapid() -> tuple[str | None, str]:
     try:
         _VAPID_PRIVATE_KEY_CACHED = p.read_text().strip()
         _PUSH_AVAILABLE = True
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         log.warning("vapid key load failed: %s", e)
         _PUSH_AVAILABLE = False
     return _VAPID_PRIVATE_KEY_CACHED, settings.vapid_claims_email
@@ -114,7 +114,7 @@ async def notify(
                 dead.append(sub.id)
             else:
                 log.warning("webpush failed: %s", e)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             log.warning("webpush exception: %s", e)
     if dead:
         from sqlalchemy import delete as sql_delete
@@ -124,13 +124,13 @@ async def notify(
 
 # ---- cores por evento pro discord embed ----
 _EVENT_COLORS: dict[str, int] = {
-    "session.created": 0xFF6B35,       # laranja
-    "session.updated": 0xFFA94D,       # ambar
-    "session.reminder": 0xFFD93D,      # amarelo
-    "session.cancelled": 0xE63946,     # vermelho
-    "theme.cycle_opened": 0xB05CFF,    # magenta
-    "theme.suggestion_added": 0x9B7FD4, # roxo claro
-    "theme.decided": 0x06D6A0,         # verde
+    "session.created": 0xFF6B35,  # laranja
+    "session.updated": 0xFFA94D,  # ambar
+    "session.reminder": 0xFFD93D,  # amarelo
+    "session.cancelled": 0xE63946,  # vermelho
+    "theme.cycle_opened": 0xB05CFF,  # magenta
+    "theme.suggestion_added": 0x9B7FD4,  # roxo claro
+    "theme.decided": 0x06D6A0,  # verde
     "game_vote.opened": 0xFF6B35,
     "game_vote.closed": 0x06D6A0,
     "game_vote.ballot_cast": 0x4CC9F0,  # ciano
@@ -161,9 +161,9 @@ async def notify_group(
 
     kind = event. Se o grupo tem webhook_url, posta embed rico.
     """
-    from app.models.group import Group, GroupMembership
-    from app.integrations.discord import post_webhook_embed
     from app.core.config import get_settings
+    from app.integrations.discord import post_webhook_embed
+    from app.models.group import Group, GroupMembership
 
     # pega grupo + membros
     grp = await db.get(Group, group_id)
@@ -171,10 +171,14 @@ async def notify_group(
         return
     excluded = set(exclude_user_ids or [])
     members = (
-        await db.execute(
-            select(GroupMembership.user_id).where(GroupMembership.group_id == group_id)
+        (
+            await db.execute(
+                select(GroupMembership.user_id).where(GroupMembership.group_id == group_id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     user_ids = [uid for uid in members if uid not in excluded]
 
     # 1. in-app + push

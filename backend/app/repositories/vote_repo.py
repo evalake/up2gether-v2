@@ -73,11 +73,11 @@ class VoteRepository:
         result = await self.db.execute(q)
         return list(result.scalars().all())
 
-    async def count_ballots(
-        self, vote_id: uuid.UUID, stage_id: uuid.UUID | None = None
-    ) -> int:
-        q = select(func.count()).select_from(VoteBallot).where(
-            VoteBallot.vote_session_id == vote_id
+    async def count_ballots(self, vote_id: uuid.UUID, stage_id: uuid.UUID | None = None) -> int:
+        q = (
+            select(func.count())
+            .select_from(VoteBallot)
+            .where(VoteBallot.vote_session_id == vote_id)
         )
         if stage_id is not None:
             q = q.where(VoteBallot.stage_id == stage_id)
@@ -100,9 +100,7 @@ class VoteRepository:
         )
         return list(result.scalars().all())
 
-    async def get_stage(
-        self, vote_id: uuid.UUID, stage_number: int
-    ) -> VoteStage | None:
+    async def get_stage(self, vote_id: uuid.UUID, stage_number: int) -> VoteStage | None:
         result = await self.db.execute(
             select(VoteStage).where(
                 VoteStage.vote_session_id == vote_id,
