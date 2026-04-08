@@ -39,7 +39,7 @@ function GroupContext({ groupId }: { groupId: string }) {
   const me = useMe()
   const loc = useLocation()
   const sub = loc.pathname.replace(`/groups/${groupId}`, '') || ''
-  const isAdmin = group.data?.user_role === 'admin' || group.data?.user_role === 'mod' || !!me.data?.is_sys_admin
+  const isAdmin = group.data?.user_role === 'admin' || !!me.data?.is_sys_admin
   const nav = isAdmin ? [...GROUP_NAV, { label: 'admin', slug: '/admin' }] : GROUP_NAV
   return (
     <div className="border-t border-nerv-orange/15 px-3 py-3">
@@ -75,10 +75,22 @@ export function Shell({ children }: { children: ReactNode }) {
   const logout = useAuthStore((s) => s.logout)
   const params = useParams<{ id: string }>()
   const inGroup = /^\/groups\/[^/]+/.test(loc.pathname) ? params.id : undefined
+  const [navOpen, setNavOpen] = useState(false)
+
+  // fecha drawer ao navegar
+  useEffect(() => { setNavOpen(false) }, [loc.pathname])
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-nerv-orange/20 bg-nerv-panel/80 backdrop-blur-sm">
+      {navOpen && (
+        <div
+          onClick={() => setNavOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+        />
+      )}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col border-r border-nerv-orange/20 bg-nerv-panel/95 backdrop-blur-sm transition-transform md:static md:translate-x-0 ${navOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
         <Link to="/groups" className="flex items-center gap-3 border-b border-nerv-orange/20 p-4">
           <img src="/up2gether-mark.png" alt="" className="h-10 w-10 shrink-0 rounded-sm object-cover" />
           <div className="min-w-0">
@@ -139,11 +151,21 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="flex flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-40 flex items-center justify-between border-b border-nerv-orange/15 bg-nerv-panel/80 px-6 py-2.5 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-[11px] lowercase tracking-wider text-nerv-green">
-            <span className="inline-block h-1.5 w-1.5 rounded-full nerv-pulse" style={{ background: 'currentColor' }} />
-            online
+      <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-nerv-orange/15 bg-nerv-panel/80 px-4 py-2.5 backdrop-blur-sm md:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setNavOpen(true)}
+              aria-label="abrir menu"
+              className="flex h-8 w-8 items-center justify-center rounded-sm border border-nerv-orange/30 text-nerv-orange md:hidden"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div className="flex items-center gap-2 text-[11px] lowercase tracking-wider text-nerv-green">
+              <span className="inline-block h-1.5 w-1.5 rounded-full nerv-pulse" style={{ background: 'currentColor' }} />
+              online
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <NotificationBell />
@@ -157,7 +179,7 @@ export function Shell({ children }: { children: ReactNode }) {
           transition={{ duration: 0.25 }}
           className="flex-1 overflow-y-auto"
         >
-          <div className="mx-auto max-w-5xl px-8 py-8">
+          <div className="mx-auto max-w-5xl px-4 py-6 md:px-8 md:py-8">
             {children}
           </div>
         </motion.div>

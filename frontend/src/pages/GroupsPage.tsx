@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { useCreateGroup, useGroups } from '@/features/groups/hooks'
 import { fetchMyGuilds, type DiscordGuild } from '@/features/auth/api'
-import { api } from '@/lib/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -120,9 +119,6 @@ export function GroupsPage() {
   const { data, isLoading, error } = useGroups()
   const create = useCreateGroup()
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [pending, setPending] = useState<DiscordGuild | null>(null)
-  const [webhook, setWebhook] = useState('')
-  const [steam, setSteam] = useState('')
   const toast = useToast()
 
   const registered = useMemo(
@@ -130,38 +126,17 @@ export function GroupsPage() {
     [data],
   )
 
-  const onPickGuild = (g: DiscordGuild) => {
+  const onPickGuild = async (g: DiscordGuild) => {
     setPickerOpen(false)
-    setPending(g)
-    setWebhook('')
-    setSteam('')
-  }
-
-  const finishCreate = async () => {
-    if (!pending) return
     try {
-      // importa steam ANTES: assim o backend ja linka ownership dos games ao criar/entrar no grupo
-      if (steam.trim()) {
-        try {
-          const r = await api<{ owned_count: number; matched_count: number }>(
-            '/steam/library/import',
-            { method: 'POST', body: { steam_id_or_vanity: steam.trim() } },
-          )
-          toast.success(`steam: ${r.matched_count}/${r.owned_count} jogos vinculados`)
-        } catch (e) {
-          toast.error(e instanceof Error ? `steam: ${e.message}` : 'falha ao importar steam')
-          // continua mesmo assim, usuario pode linkar dps em settings
-        }
-      }
       await create.mutateAsync({
-        discord_guild_id: pending.id,
-        name: pending.name,
-        icon_url: guildIconUrl(pending),
-        discord_permissions: pending.permissions ?? null,
-        webhook_url: webhook.trim() || null,
+        discord_guild_id: g.id,
+        name: g.name,
+        icon_url: guildIconUrl(g),
+        discord_permissions: g.permissions ?? null,
+        webhook_url: null,
       })
-      toast.success(`${pending.name} registrado`)
-      setPending(null)
+      toast.success(`${g.name} registrado`)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'falha ao registrar grupo')
     }
@@ -191,54 +166,7 @@ export function GroupsPage() {
         registered={registered}
       />
 
-      {pending && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setPending(null)}>
-          <div className="w-full max-w-md rounded-sm border border-nerv-orange/30 bg-nerv-panel p-5" onClick={(e) => e.stopPropagation()}>
-            <div className="text-[10px] uppercase tracking-wider text-nerv-dim">novo grupo</div>
-            <div className="mt-1 font-display text-xl text-nerv-text">{pending.name}</div>
-            <div className="mt-4 text-[11px] uppercase tracking-wider text-nerv-dim">discord webhook (opcional)</div>
-            <input
-              autoFocus
-              value={webhook}
-              onChange={(e) => setWebhook(e.target.value)}
-              placeholder="https://discord.com/api/webhooks/..."
-              className="mt-1 h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus:border-nerv-orange focus:outline-none"
-            />
-            <p className="mt-2 text-[10px] text-nerv-dim">
-              cole o webhook do canal onde quer receber avisos de votacoes, sessoes e temas. da pra configurar depois.
-            </p>
-
-            <div className="mt-4 text-[11px] uppercase tracking-wider text-nerv-dim">steam (opcional)</div>
-            <input
-              value={steam}
-              onChange={(e) => setSteam(e.target.value)}
-              placeholder="seu nick, id64 ou url do perfil"
-              className="mt-1 h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus:border-nerv-orange focus:outline-none"
-            />
-            <p className="mt-2 text-[10px] text-nerv-dim">
-              importa sua biblioteca pra marcar automaticamente os jogos que ja sao seus nesse grupo. da pra fazer dps em settings.
-            </p>
-
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setPending(null)}
-                className="rounded-sm border border-nerv-line px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
-              >
-                cancelar
-              </button>
-              <button
-                onClick={finishCreate}
-                disabled={create.isPending}
-                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
-              >
-                {create.isPending ? 'criando...' : webhook.trim() ? 'criar' : 'criar sem webhook'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-wider text-nerv-dim">
+<div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-wider text-nerv-dim">
         <span><span className="text-nerv-orange tabular-nums">{total}</span> grupos</span>
         <span><span className="text-nerv-green tabular-nums">{totalMembers}</span> membros</span>
         <span><span className="text-nerv-amber tabular-nums">{totalGames}</span> jogos</span>

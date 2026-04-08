@@ -55,29 +55,19 @@ class GroupService:
         icon_url: str | None,
         webhook_url: str | None,
         actor: User,
-        discord_permissions: str | None = None,
+        discord_permissions: str | None = None,  # mantido pra compat, nao usado
     ) -> GroupResponse:
-        # ADMINISTRATOR=0x8, MANAGE_GUILD=0x20 -> owner/admin
-        is_priv = False
-        if discord_permissions:
-            try:
-                p = int(discord_permissions)
-                is_priv = bool(p & 0x8) or bool(p & 0x20)
-            except ValueError:
-                is_priv = False
+        # regra: o primeiro user que registra o guild vira ADMIN (owner).
+        # todos os proximos entram como MOD. o admin promove manualmente
+        # outros admins dps se quiser. discord perms nao elevam auto pq
+        # inflava o role de todo mundo que tinha manage_guild.
+        del discord_permissions
 
         existing = await self.repo.get_by_discord_guild_id(discord_guild_id)
         if existing is not None:
             membership = await self.repo.get_membership(existing.id, actor.id)
             if membership is None:
-                role = GroupRole.ADMIN if is_priv else GroupRole.MEMBER
-                await self.repo.add_member(existing, actor.id, role)
-            elif is_priv and membership.role == GroupRole.MEMBER:
-                await self.repo.update_role(existing.id, actor.id, GroupRole.ADMIN)
-            # se nao tem owner ainda e o cara tem perm, vira owner
-            if existing.owner_user_id is None and is_priv:
-                existing.owner_user_id = actor.id
-                await self.repo.db.commit()
+                await self.repo.add_member(existing, actor.id, GroupRole.MOD)
             await self._sync_steam_ownership(actor, existing.id)
             return GroupResponse.model_validate(existing)
 
