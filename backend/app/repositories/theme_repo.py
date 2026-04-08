@@ -118,6 +118,15 @@ class ThemeRepository:
         )
         return result.scalar_one_or_none()
 
+    async def delete_user_vote(self, cycle_id: uuid.UUID, user_id: uuid.UUID) -> None:
+        await self.db.execute(
+            sa_delete(ThemeVote).where(
+                ThemeVote.cycle_id == cycle_id,
+                ThemeVote.user_id == user_id,
+            )
+        )
+        await self.db.commit()
+
     async def upsert_vote(
         self, cycle_id: uuid.UUID, user_id: uuid.UUID, suggestion_id: uuid.UUID
     ) -> ThemeVote:

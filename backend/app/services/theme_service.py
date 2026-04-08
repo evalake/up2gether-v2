@@ -267,7 +267,12 @@ class ThemeService:
         s = await self.themes.get_suggestion(suggestion_id)
         if s is None or s.cycle_id != cycle_id:
             raise _not_found("sugestao nao encontrada")
-        await self.themes.upsert_vote(cycle_id, actor.id, suggestion_id)
+        # toggle: se ja ta votado na mesma sugestao, desmarca
+        existing = await self.themes.get_user_vote(cycle_id, actor.id)
+        if existing is not None and existing.suggestion_id == suggestion_id:
+            await self.themes.delete_user_vote(cycle_id, actor.id)
+        else:
+            await self.themes.upsert_vote(cycle_id, actor.id, suggestion_id)
         return await self._cycle_response(cycle, actor)
 
     async def close_cycle(
