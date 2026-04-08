@@ -217,7 +217,9 @@ class ThemeService:
             author = actor.discord_display_name or actor.discord_username or "alguem"
             fields = [{"name": "Sugerido por", "value": author, "inline": True}]
             if data.description:
-                fields.append({"name": "Descrição", "value": data.description[:200], "inline": False})
+                fields.append(
+                    {"name": "Descrição", "value": data.description[:200], "inline": False}
+                )
             await notify_group(
                 self.themes.db,
                 group_id=group_id,
@@ -225,7 +227,11 @@ class ThemeService:
                 title=f"Nova sugestão de tema: {data.name}",
                 body=f"{author} sugeriu {data.name}",
                 link=f"/groups/{group_id}/themes",
-                data={"cycle_id": str(cycle_id), "suggestion_id": str(sug_id), "group_id": str(group_id)},
+                data={
+                    "cycle_id": str(cycle_id),
+                    "suggestion_id": str(sug_id),
+                    "group_id": str(group_id),
+                },
                 exclude_user_ids=[actor.id],
                 webhook_description=(
                     f"**{data.name}** entrou no ciclo de **tema do mês**. "

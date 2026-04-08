@@ -54,7 +54,9 @@ async def me(
             try:
                 profile = await discord.fetch_user(integ.access_token)
                 current.discord_username = profile.get("username", current.discord_username)
-                current.discord_display_name = profile.get("global_name") or current.discord_username
+                current.discord_display_name = (
+                    profile.get("global_name") or current.discord_username
+                )
                 current.discord_avatar = profile.get("avatar")
                 current.discord_email = profile.get("email") or current.discord_email
                 integ.linked_at = datetime.now(UTC)
