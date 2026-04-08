@@ -1,0 +1,46 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import get_db
+from app.core.security import CurrentUser
+from app.schemas.user import (
+    HardwareResponse,
+    HardwareUpdate,
+    SettingsResponse,
+    SettingsUpdate,
+)
+from app.services.user_service import UserService
+
+router = APIRouter(tags=["users"])
+
+
+def get_user_service(db: Annotated[AsyncSession, Depends(get_db)]) -> UserService:
+    return UserService(db)
+
+
+@router.put("/users/hardware", response_model=HardwareResponse)
+async def update_hardware(
+    payload: HardwareUpdate,
+    actor: CurrentUser,
+    service: Annotated[UserService, Depends(get_user_service)],
+) -> HardwareResponse:
+    return await service.set_hardware(actor, payload)
+
+
+@router.get("/users/me/settings", response_model=SettingsResponse)
+async def get_my_settings(
+    actor: CurrentUser,
+    service: Annotated[UserService, Depends(get_user_service)],
+) -> SettingsResponse:
+    return await service.get_settings(actor)
+
+
+@router.patch("/users/me/settings", response_model=SettingsResponse)
+async def patch_my_settings(
+    payload: SettingsUpdate,
+    actor: CurrentUser,
+    service: Annotated[UserService, Depends(get_user_service)],
+) -> SettingsResponse:
+    return await service.update_settings(actor, payload)

@@ -1,0 +1,58 @@
+# env
+.env
+.env.*
+!.env.example
+*.pem
+*token.json*
+*credentials.json*
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# node
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# build
+build/
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# editors
+.idea/
+.vscode/
+.DS_Store
+
+# logs
+*-debug.log*
+dump.rdb
+
+# deploy
+.vercel
+.fly/
+
+# local-only (ferramentas, notas, rascunhos)
+.claude/
+CLAUDE.md
+.emergent/
+bugs/
+doc/
+examples/
+logos/
+scratch/
+notes/
+*.local.md

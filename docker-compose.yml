@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: up2gether-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: up2gether
+      POSTGRES_PASSWORD: up2gether
+      POSTGRES_DB: up2gether
+    ports:
+      - "55432:5432"
+    volumes:
+      - up2gether_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U up2gether"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  up2gether_pgdata:

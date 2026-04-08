@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: up2gether
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: setup python
+        run: uv python install 3.12
+
+      - name: sync deps
+        run: uv sync --all-extras --dev
+
+      - name: lint
+        run: uv run ruff check .
+
+      - name: format check
+        run: uv run ruff format --check .
+
+      - name: tests
+        run: uv run pytest -q
+        env:
+          JWT_SECRET: test-secret-that-is-long-enough-for-ci
+          DATABASE_URL: postgresql+asyncpg://placeholder/placeholder
+
+      - name: alembic head check
+        run: uv run alembic upgrade head
+        env:
+          JWT_SECRET: test-secret-that-is-long-enough-for-ci
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/up2gether
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: install
+        run: pnpm install --frozen-lockfile
+
+      - name: typecheck
+        run: pnpm typecheck
+
+      - name: tests
+        run: pnpm test
+
+      - name: build
+        run: pnpm build
