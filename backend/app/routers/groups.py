@@ -219,7 +219,10 @@ async def current_game_audit(
     derived_vote_id = grp.current_game_vote_id
     derived_set_at = grp.current_game_set_at
     derived_source = grp.current_game_source
-    if current_game_id is None:
+    # override manual tem prioridade. qualquer outra coisa (None ou "vote"): sempre
+    # re-deriva do ultimo vote fechado pra garantir que o highlight reflete o mais recente,
+    # inclusive depois de destravar um override.
+    if grp.current_game_source != "manual":
         last_vote = (
             await db.execute(
                 select(VoteSession)

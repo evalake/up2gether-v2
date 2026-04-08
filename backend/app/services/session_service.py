@@ -66,7 +66,7 @@ class PlaySessionService:
     async def create(
         self, group_id: uuid.UUID, data: SessionCreate, actor: User
     ) -> SessionResponse:
-        await self._require_admin_or_mod(group_id, actor)
+        await self._require_member(group_id, actor)
         game = await self.games.get_by_id(data.game_id)
         if game is None or game.group_id != group_id:
             raise _bad("Jogo nao pertence ao grupo")
@@ -162,10 +162,13 @@ class PlaySessionService:
         data: SessionUpdate,
         actor: User,
     ) -> SessionResponse:
-        await self._require_admin_or_mod(group_id, actor)
+        _, m = await self._require_member(group_id, actor)
         session = await self.sessions.get(session_id)
         if session is None or session.group_id != group_id:
             raise _not_found("Session not found")
+        is_staff = actor.is_sys_admin or m.role in (GroupRole.ADMIN, GroupRole.MOD)
+        if session.created_by != actor.id and not is_staff:
+            raise _forbid("so o criador, mod ou admin pode editar essa sessao")
         for field in (
             "title",
             "description",
@@ -181,10 +184,13 @@ class PlaySessionService:
         return await self._to_response(session, actor)
 
     async def delete(self, group_id: uuid.UUID, session_id: uuid.UUID, actor: User) -> None:
-        await self._require_admin_or_mod(group_id, actor)
+        _, m = await self._require_member(group_id, actor)
         session = await self.sessions.get(session_id)
         if session is None or session.group_id != group_id:
             raise _not_found("Session not found")
+        is_staff = actor.is_sys_admin or m.role in (GroupRole.ADMIN, GroupRole.MOD)
+        if session.created_by != actor.id and not is_staff:
+            raise _forbid("so o criador, mod ou admin pode deletar essa sessao")
         await self.sessions.delete(session)
 
     async def rsvp(

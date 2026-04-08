@@ -42,8 +42,9 @@ export function ThemesPage() {
   const toast = useToast()
 
   const [openHistory, setOpenHistory] = useState(false)
-  const isAdmin = group.data?.user_role === 'admin' || group.data?.user_role === 'mod' || !!me.data?.is_sys_admin
   const isSysAdmin = !!me.data?.is_sys_admin
+  const isAdmin = group.data?.user_role === 'admin' || isSysAdmin
+  const isStaff = isAdmin || group.data?.user_role === 'mod'
 
   // tiebreak animation
   const [showTiebreak, setShowTiebreak] = useState<null | { kind: string; tied: Suggestion[]; winner: Suggestion }>(null)
@@ -82,7 +83,7 @@ export function ThemesPage() {
           <h1 className="font-display text-3xl text-nerv-text">tema do mês</h1>
           <p className="mt-1 text-xs text-nerv-dim">um foco coletivo · qualquer um sugere, edita, vota e encerra</p>
         </div>
-        {!hasActive && (
+        {!hasActive && ((cycle.data ? isAdmin : isStaff)) && (
           <button
             onClick={onOpenCycle}
             disabled={openC.isPending}
@@ -98,13 +99,14 @@ export function ThemesPage() {
 
       {/* hero do tema decidido */}
       {current.data && (!cycle.data || cycle.data.phase === 'decided') && (
-        <CurrentThemeHero theme={current.data} onReopen={onOpenCycle} reopening={openC.isPending} />
+        <CurrentThemeHero theme={current.data} onReopen={onOpenCycle} reopening={openC.isPending} canReopen={isAdmin} />
       )}
 
       {/* ciclo ativo (voting) ou reaberto */}
       {cycle.data && cycle.data.phase !== 'cancelled' && cycle.data.phase !== 'decided' && (
         <CycleSection
           cycle={cycle.data}
+          isStaff={isStaff}
           isAdmin={isAdmin}
           isSysAdmin={isSysAdmin}
           meId={me.data?.id ?? null}
@@ -188,7 +190,7 @@ export function ThemesPage() {
                         <p className="mt-2 line-clamp-2 text-xs text-nerv-text/60">{t.description}</p>
                       )}
                     </div>
-                    {isAdmin && (
+                    {isStaff && (
                       <button
                         onClick={() => del.mutate(t.id)}
                         className="shrink-0 text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-nerv-dim hover:!text-nerv-red"
@@ -217,10 +219,12 @@ function CurrentThemeHero({
   theme,
   onReopen,
   reopening,
+  canReopen,
 }: {
   theme: { month_year: string; theme_name: string; description: string | null; image_url: string | null }
   onReopen: () => void
   reopening: boolean
+  canReopen: boolean
 }) {
   return (
     <motion.section
@@ -248,15 +252,17 @@ function CurrentThemeHero({
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-nerv-text/80">{theme.description}</p>
           )}
         </div>
-        <div className="shrink-0">
-          <button
-            onClick={onReopen}
-            disabled={reopening}
-            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-4 py-2 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
-          >
-            {reopening ? 'reabrindo' : 'reabrir e sobrescrever'}
-          </button>
-        </div>
+        {canReopen && (
+          <div className="shrink-0">
+            <button
+              onClick={onReopen}
+              disabled={reopening}
+              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-4 py-2 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+            >
+              {reopening ? 'reabrindo' : 'reabrir e sobrescrever'}
+            </button>
+          </div>
+        )}
       </div>
     </motion.section>
   )
@@ -264,6 +270,7 @@ function CurrentThemeHero({
 
 type CycleSectionProps = {
   cycle: Cycle
+  isStaff: boolean
   isAdmin: boolean
   isSysAdmin: boolean
   meId: string | null
@@ -276,7 +283,7 @@ type CycleSectionProps = {
   onCancel: () => Promise<void>
 }
 
-function CycleSection({ cycle, isAdmin, isSysAdmin, meId, onSubmitSuggestion, onDeleteSuggestion, onDeleteAny, onVote, onClose, onForce, onCancel }: CycleSectionProps) {
+function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubmitSuggestion, onDeleteSuggestion, onDeleteAny, onVote, onClose, onForce, onCancel }: CycleSectionProps) {
   const mySug = cycle.suggestions.find((s) => s.user_id === meId) ?? null
   const [editing, setEditing] = useState(!mySug)
   const [name, setName] = useState(mySug?.name ?? '')
@@ -312,7 +319,7 @@ function CycleSection({ cycle, isAdmin, isSysAdmin, meId, onSubmitSuggestion, on
           </div>
         </div>
         <div className="flex gap-2">
-          {cycle.suggestions.length > 0 && (
+          {cycle.suggestions.length > 0 && isStaff && (
             <button
               onClick={onClose}
               className="rounded-sm border border-nerv-green/50 bg-nerv-green/10 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-green transition-colors hover:bg-nerv-green/20"
@@ -320,12 +327,14 @@ function CycleSection({ cycle, isAdmin, isSysAdmin, meId, onSubmitSuggestion, on
               encerrar e decidir
             </button>
           )}
-          <button
-            onClick={onCancel}
-            className="rounded-sm border border-nerv-red/30 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
-          >
-            cancelar
-          </button>
+          {isAdmin && (
+            <button
+              onClick={onCancel}
+              className="rounded-sm border border-nerv-red/30 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
+            >
+              cancelar
+            </button>
+          )}
         </div>
       </div>
 
@@ -413,6 +422,7 @@ function CycleSection({ cycle, isAdmin, isSysAdmin, meId, onSubmitSuggestion, on
               s={s}
               cycle={cycle}
               meId={meId}
+              isStaff={isStaff}
               isAdmin={isAdmin}
               isSysAdmin={isSysAdmin}
               maxVotes={maxVotes}
@@ -427,10 +437,11 @@ function CycleSection({ cycle, isAdmin, isSysAdmin, meId, onSubmitSuggestion, on
   )
 }
 
-function SuggestionCard({ s, cycle, meId, isAdmin, maxVotes, onVote, onForce, onDelete }: {
+function SuggestionCard({ s, cycle, meId, isStaff, isAdmin, maxVotes, onVote, onForce, onDelete }: {
   s: Suggestion
   cycle: Cycle
   meId: string | null
+  isStaff: boolean
   isAdmin: boolean
   isSysAdmin: boolean
   maxVotes: number
@@ -500,14 +511,16 @@ function SuggestionCard({ s, cycle, meId, isAdmin, maxVotes, onVote, onForce, on
             >
               {voted ? '✓ votado' : 'votar'}
             </button>
-            <button
-              onClick={onForce}
-              title="forçar como vencedor"
-              className="rounded-sm border border-nerv-line px-2 py-1 text-[10px] text-nerv-dim transition-colors hover:border-nerv-amber/60 hover:text-nerv-amber"
-            >
-              ★
-            </button>
-            {(isMine || isAdmin) && (
+            {isAdmin && (
+              <button
+                onClick={onForce}
+                title="forçar como vencedor"
+                className="rounded-sm border border-nerv-line px-2 py-1 text-[10px] text-nerv-dim transition-colors hover:border-nerv-amber/60 hover:text-nerv-amber"
+              >
+                ★
+              </button>
+            )}
+            {(isMine || isStaff) && (
               <button
                 onClick={onDelete}
                 title="remover"

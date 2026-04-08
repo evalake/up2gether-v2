@@ -32,7 +32,36 @@ async def discord_callback(
 
 
 @router.get("/me", response_model=UserResponse)
-async def me(current: CurrentUser) -> UserResponse:
+async def me(
+    current: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    discord: Annotated[DiscordClient, Depends(get_discord_client)],
+) -> UserResponse:
+    # best-effort refresh do perfil do discord se o registro ta velho (>6h).
+    # usa o access_token salvo (vale ~7 dias). se falhar, silencia e retorna o cached.
+    import logging
+    from datetime import UTC, datetime, timedelta
+
+    from app.domain.enums import AuthProvider
+
+    integ = next(
+        (i for i in current.integrations if i.provider == AuthProvider.DISCORD),
+        None,
+    )
+    if integ and integ.access_token:
+        stale = integ.linked_at is None or integ.linked_at < datetime.now(UTC) - timedelta(hours=6)
+        if stale:
+            try:
+                profile = await discord.fetch_user(integ.access_token)
+                current.discord_username = profile.get("username", current.discord_username)
+                current.discord_display_name = profile.get("global_name") or current.discord_username
+                current.discord_avatar = profile.get("avatar")
+                current.discord_email = profile.get("email") or current.discord_email
+                integ.linked_at = datetime.now(UTC)
+                await db.commit()
+                await db.refresh(current)
+            except Exception as e:
+                logging.getLogger(__name__).info("discord profile refresh skipped: %s", e)
     return AuthService.to_response(current)
 
 

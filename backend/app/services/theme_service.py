@@ -60,6 +60,13 @@ class ThemeService:
         if m is None or m.role not in (GroupRole.ADMIN, GroupRole.MOD):
             raise _forbid("Admin or Mod role required")
 
+    async def _require_admin(self, group_id: uuid.UUID, actor: User):
+        if actor.is_sys_admin:
+            return
+        m = await self._require_member(group_id, actor)
+        if m is None or m.role != GroupRole.ADMIN:
+            raise _forbid("Admin role required")
+
     async def set_theme(self, group_id: uuid.UUID, data: ThemeCreate, actor: User) -> ThemeResponse:
         await self._require_admin_or_mod(group_id, actor)
         month = data.month_year or _current_month()
@@ -107,12 +114,14 @@ class ThemeService:
         return await self._cycle_response(cycle, actor)
 
     async def open_cycle(self, group_id: uuid.UUID, actor: User) -> CycleResponse:
-        # qualquer membro pode abrir/reiniciar um ciclo. Se ja existe ciclo pro mes,
-        # a gente reseta (limpa sugestoes, votos, vencedor) ao inves de criar um novo,
-        # pra respeitar a constraint unique (group_id, month_year).
-        await self._require_member(group_id, actor)
+        # criar ciclo novo: admin ou mod.
+        # reiniciar ciclo existente (reset): so admin, pq limpa sugestoes e votos.
         month = _current_month()
         existing = await self.themes.get_cycle_for_month(group_id, month)
+        if existing is not None:
+            await self._require_admin(group_id, actor)
+        else:
+            await self._require_admin_or_mod(group_id, actor)
         if existing is not None:
             # nulla winner FK antes de deletar as sugestoes, senao FK explode
             existing.winner_suggestion_id = None
@@ -264,7 +273,7 @@ class ThemeService:
     async def close_cycle(
         self, group_id: uuid.UUID, cycle_id: uuid.UUID, actor: User
     ) -> CycleResponse:
-        await self._require_member(group_id, actor)
+        await self._require_admin_or_mod(group_id, actor)
         cycle = await self._load_cycle(group_id, cycle_id)
         suggestions = await self.themes.list_suggestions(cycle_id)
         votes = await self.themes.list_votes(cycle_id)
@@ -318,7 +327,7 @@ class ThemeService:
         suggestion_id: uuid.UUID,
         actor: User,
     ) -> CycleResponse:
-        await self._require_member(group_id, actor)
+        await self._require_admin(group_id, actor)
         cycle = await self._load_cycle(group_id, cycle_id)
         s = await self.themes.get_suggestion(suggestion_id)
         if s is None or s.cycle_id != cycle_id:
@@ -328,7 +337,7 @@ class ThemeService:
     async def cancel_cycle(
         self, group_id: uuid.UUID, cycle_id: uuid.UUID, actor: User
     ) -> CycleResponse:
-        await self._require_member(group_id, actor)
+        await self._require_admin(group_id, actor)
         cycle = await self._load_cycle(group_id, cycle_id)
         cycle.phase = ThemeCyclePhase.CANCELLED
         await self.themes.save()
