@@ -189,6 +189,7 @@ class ThemeService:
         cycle = await self._load_cycle(group_id, cycle_id)
         # sem trava de fase: qualquer membro pode sugerir/editar a qualquer momento
         existing = await self.themes.get_user_suggestion(cycle_id, actor.id)
+        is_new = existing is None
         if existing:
             existing.name = data.name
             existing.description = data.description
@@ -210,6 +211,29 @@ class ThemeService:
             votes = await self.themes.list_votes(cycle_id)
             if not any(v.user_id == actor.id for v in votes):
                 await self.themes.upsert_vote(cycle_id, actor.id, sug_id)
+        if is_new:
+            from app.services.notifications import notify_group
+
+            author = actor.discord_display_name or actor.discord_username or "alguem"
+            fields = [{"name": "Sugerido por", "value": author, "inline": True}]
+            if data.description:
+                fields.append({"name": "Descrição", "value": data.description[:200], "inline": False})
+            await notify_group(
+                self.themes.db,
+                group_id=group_id,
+                event="theme.suggestion_created",
+                title=f"Nova sugestão de tema: {data.name}",
+                body=f"{author} sugeriu {data.name}",
+                link=f"/groups/{group_id}/themes",
+                data={"cycle_id": str(cycle_id), "suggestion_id": str(sug_id), "group_id": str(group_id)},
+                exclude_user_ids=[actor.id],
+                webhook_description=(
+                    f"**{data.name}** entrou no ciclo de **tema do mês**. "
+                    "Abre a plataforma pra votar ou mandar a sua."
+                ),
+                webhook_fields=fields,
+                webhook_image_url=data.image_url,
+            )
         return await self._cycle_response(cycle, actor)
 
     async def delete_suggestion(
