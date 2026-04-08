@@ -32,8 +32,8 @@ def _start():
     return (datetime.now(UTC) + timedelta(days=1)).isoformat()
 
 
-async def test_create_session_admin_only(make_user, auth_headers, client):
-    owner, g, game = await _setup(make_user, auth_headers, client, "g-sess-1")
+async def test_create_session_member_allowed(make_user, auth_headers, client):
+    _owner, g, game = await _setup(make_user, auth_headers, client, "g-sess-1")
     member = await make_user(username="m")
     await client.post(
         "/api/groups",
@@ -47,17 +47,11 @@ async def test_create_session_admin_only(make_user, auth_headers, client):
         "start_at": _start(),
         "duration_minutes": 120,
     }
+    # member pode criar sessao
     res = await client.post(
         f"/api/groups/{g['id']}/sessions",
         json=payload,
         headers=auth_headers(member),
-    )
-    assert res.status_code == 403
-
-    res = await client.post(
-        f"/api/groups/{g['id']}/sessions",
-        json=payload,
-        headers=auth_headers(owner),
     )
     assert res.status_code == 200, res.text
     body = res.json()

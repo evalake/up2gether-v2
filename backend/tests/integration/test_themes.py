@@ -141,8 +141,10 @@ async def test_cycle_full_flow_single_winner(make_user, auth_headers, client):
     indies_id = sug_ids["Indies"]
     souls_id = sug_ids["Souls"]
 
-    # 2 votam em Indies, 1 em Souls -> Indies ganha
-    for u, sid in ((owner, indies_id), (m1, indies_id), (m2, souls_id)):
+    # 2 votam em Indies, 1 em Souls -> Indies ganha.
+    # m1 ja auto-votou em Indies ao sugerir (sua propria sugestao), so falta
+    # owner votar em Indies e m2 em Souls.
+    for u, sid in ((owner, indies_id), (m2, souls_id)):
         rr = await client.put(
             f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
             json={"suggestion_id": sid},
@@ -187,16 +189,7 @@ async def test_cycle_tiebreak_two_uses_coin(make_user, auth_headers, client):
     sugs = last.json()["suggestions"]
     a = next(s["id"] for s in sugs if s["name"] == "A")
     b = next(s["id"] for s in sugs if s["name"] == "B")
-    await client.put(
-        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-        json={"suggestion_id": a},
-        headers=auth_headers(owner),
-    )
-    await client.put(
-        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-        json={"suggestion_id": b},
-        headers=auth_headers(m1),
-    )
+    # cada um ja auto-votou na propria sugestao ao sugerir -> empate 1x1
 
     r = await client.post(
         f"/api/groups/{g['id']}/themes/cycle/{cid}/close", headers=auth_headers(owner)
@@ -227,23 +220,8 @@ async def test_cycle_tiebreak_three_uses_roulette(make_user, auth_headers, clien
             json={"name": name},
             headers=auth_headers(u),
         )
-    sugs = {s["name"]: s["id"] for s in last.json()["suggestions"]}
-    # cada um vota numa diferente -> empate triplo
-    await client.put(
-        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-        json={"suggestion_id": sugs["A"]},
-        headers=auth_headers(owner),
-    )
-    await client.put(
-        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-        json={"suggestion_id": sugs["B"]},
-        headers=auth_headers(m1),
-    )
-    await client.put(
-        f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-        json={"suggestion_id": sugs["C"]},
-        headers=auth_headers(m2),
-    )
+    assert last is not None
+    # cada um ja auto-votou na propria sugestao ao sugerir -> empate triplo
 
     body = (
         await client.post(

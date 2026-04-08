@@ -58,16 +58,16 @@ class GroupService:
         discord_permissions: str | None = None,  # mantido pra compat, nao usado
     ) -> GroupResponse:
         # regra: o primeiro user que registra o guild vira ADMIN (owner).
-        # todos os proximos entram como MOD. o admin promove manualmente
-        # outros admins dps se quiser. discord perms nao elevam auto pq
-        # inflava o role de todo mundo que tinha manage_guild.
+        # todos os proximos entram como MEMBER. admin promove manualmente
+        # pra mod/admin dps. discord perms nao elevam auto pq inflava o
+        # role de todo mundo que tinha manage_guild.
         del discord_permissions
 
         existing = await self.repo.get_by_discord_guild_id(discord_guild_id)
         if existing is not None:
             membership = await self.repo.get_membership(existing.id, actor.id)
             if membership is None:
-                await self.repo.add_member(existing, actor.id, GroupRole.MOD)
+                await self.repo.add_member(existing, actor.id, GroupRole.MEMBER)
             await self._sync_steam_ownership(actor, existing.id)
             return GroupResponse.model_validate(existing)
 
