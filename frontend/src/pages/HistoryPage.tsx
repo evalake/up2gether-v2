@@ -5,6 +5,7 @@ import { useVotes } from '@/features/votes/hooks'
 import { useGames } from '@/features/games/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
 
 // historico derivado: votes fechados com vencedor, ordem desc.
@@ -79,9 +80,12 @@ export function HistoryPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 py-12 text-center text-xs text-nerv-dim">
-          {q ? `nada pra "${q}"` : 'nenhum game escolhido ainda'}
-        </div>
+        <EmptyState
+          tone="soft"
+          glyph="✧"
+          title={q ? `nada pra ${JSON.stringify(q)}` : 'nenhum capitulo ainda'}
+          hint={q ? 'tenta outro termo ou limpa a busca' : 'quando uma votação fechar com vencedor, vai aparecer aqui como um capitulo da timeline.'}
+        />
       ) : (
         <div className="space-y-2">
           {filtered.map((v, i) => {

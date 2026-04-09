@@ -12,6 +12,7 @@ import { SessionDetailModal } from '@/components/sessions/SessionDetailModal'
 import { useGroup } from '@/features/groups/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { steamCover } from '@/lib/steamCover'
 
@@ -163,6 +164,14 @@ export function SessionsPage() {
 
       {sessions.isLoading && <Loading />}
       {sessions.error && <ErrorBox error={sessions.error} />}
+
+      {!sessions.isLoading && (sessions.data?.length ?? 0) === 0 && (
+        <EmptyState
+          glyph="◈"
+          title="nada agendado ainda"
+          hint="toca num horário livre no calendário abaixo pra marcar a primeira sessão. o grupo inteiro é notificado."
+        />
+      )}
 
       {upcoming.length > 0 && (
         <div className="flex items-stretch gap-3">

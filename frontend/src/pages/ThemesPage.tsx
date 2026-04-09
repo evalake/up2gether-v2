@@ -19,6 +19,7 @@ import { useGroup } from '@/features/groups/hooks'
 import { useMe } from '@/features/auth/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { Avatar } from '@/components/nerv/Avatar'
 import type { Cycle, Suggestion } from '@/features/themes/api'
@@ -162,10 +163,11 @@ export function ThemesPage() {
       )}
 
       {!current.data && !cycle.data && (
-        <div className="rounded-sm border border-dashed border-nerv-line/60 bg-nerv-panel/20 p-10 text-center">
-          <div className="font-display text-xl text-nerv-dim">nenhum tema definido</div>
-          <p className="mt-2 text-xs text-nerv-dim">abra o ciclo pra começar a sugerir e votar</p>
-        </div>
+        <EmptyState
+          glyph="✦"
+          title="nenhum tema definido"
+          hint="abra o ciclo mensal pro grupo sugerir nomes e votar no tema do mês."
+        />
       )}
 
       {past.length > 0 && (

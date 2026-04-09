@@ -10,6 +10,7 @@ import {
 } from '@/features/votes/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
@@ -145,7 +146,11 @@ export function VotesPage() {
       {votes.error && <ErrorBox error={votes.error} />}
 
       {open.length === 0 && closed.length === 0 && !votes.isLoading && (
-        <p className="text-sm text-nerv-dim">nenhuma votação ainda. clique em "nova votação" pra começar.</p>
+        <EmptyState
+          glyph="▲"
+          title="nenhuma votação ainda"
+          hint="abre a primeira pro grupo decidir o que jogar. tudo que tem no acervo vira candidato."
+        />
       )}
 
       {open.length === 0 && closed.length > 0 && (
