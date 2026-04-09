@@ -289,8 +289,19 @@ async def current_game_audit(
         vote = await db.get(VoteSession, derived_vote_id)
         if vote:
             vote_title = vote.title
-            vote_ballots = vote.ballots_count
             vote_eligible = vote.eligible_voter_count
+            # ballots_count nao existe no model, conta ballots distintos do vote
+            from app.models.vote import VoteBallot as _VB
+
+            vote_ballots = int(
+                (
+                    await db.execute(
+                        select(func.count(func.distinct(_VB.user_id))).where(
+                            _VB.vote_session_id == vote.id
+                        )
+                    )
+                ).scalar_one()
+            )
             # conta approvals por candidate
             from app.models.vote import VoteBallot
 
