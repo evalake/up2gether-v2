@@ -78,16 +78,16 @@ export const archiveGame = (groupId: string, gameId: string) =>
   api<null>(`/groups/${groupId}/games/${gameId}`, { method: 'DELETE' })
 
 export const setInterest = (gameId: string, signal: InterestSignal) =>
-  api<null>(`/games/${gameId}/interest`, { method: 'PUT', body: { signal } })
+  api<Game>(`/games/${gameId}/interest`, { method: 'PUT', body: { signal } })
 
 export const joinRoster = (gameId: string) =>
-  api<null>(`/games/${gameId}/roster`, { method: 'POST' })
+  api<Game>(`/games/${gameId}/roster`, { method: 'POST' })
 
 export const leaveRoster = (gameId: string) =>
-  api<null>(`/games/${gameId}/roster`, { method: 'DELETE' })
+  api<Game>(`/games/${gameId}/roster`, { method: 'DELETE' })
 
 export const setOwnership = (gameId: string, owns: boolean) =>
-  api<null>(`/games/${gameId}/ownership`, { method: 'PUT', body: { owns } })
+  api<Game>(`/games/${gameId}/ownership`, { method: 'PUT', body: { owns } })
 
 export type GameOwner = {
   id: string

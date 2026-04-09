@@ -99,7 +99,7 @@ async def test_interest_signal_changes_score(make_user, auth_headers, client):
         json={"signal": "want"},
         headers=auth_headers(owner),
     )
-    assert res.status_code == 204
+    assert res.status_code == 200
 
     res = await client.get(
         f"/api/groups/{g['id']}/games/{created['id']}",
@@ -179,7 +179,7 @@ async def test_ownership_toggle(make_user, auth_headers, client):
         json={"owns": True},
         headers=auth_headers(owner),
     )
-    assert res.status_code == 204
+    assert res.status_code == 200
 
     res = await client.get(
         f"/api/groups/{g['id']}/games/{created['id']}",

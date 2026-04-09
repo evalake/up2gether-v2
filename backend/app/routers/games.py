@@ -75,32 +75,32 @@ async def archive_game(
     await service.archive(group_id, game_id, actor)
 
 
-@router.put("/games/{game_id}/interest", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/games/{game_id}/interest", response_model=GameWithViability)
 async def set_interest(
     game_id: uuid.UUID,
     payload: InterestSignalUpdate,
     actor: CurrentUser,
     service: Annotated[GameService, Depends(get_game_service)],
-) -> None:
-    await service.set_interest(game_id, payload.signal, actor)
+):
+    return await service.set_interest(game_id, payload.signal, actor)
 
 
-@router.post("/games/{game_id}/roster", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/games/{game_id}/roster", response_model=GameWithViability)
 async def join_roster(
     game_id: uuid.UUID,
     actor: CurrentUser,
     service: Annotated[GameService, Depends(get_game_service)],
-) -> None:
-    await service.join_roster(game_id, actor, "active", None)
+):
+    return await service.join_roster(game_id, actor, "active", None)
 
 
-@router.delete("/games/{game_id}/roster", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/games/{game_id}/roster", response_model=GameWithViability)
 async def leave_roster(
     game_id: uuid.UUID,
     actor: CurrentUser,
     service: Annotated[GameService, Depends(get_game_service)],
-) -> None:
-    await service.leave_roster(game_id, actor)
+):
+    return await service.leave_roster(game_id, actor)
 
 
 @router.get("/games/{game_id}/owners")
@@ -123,11 +123,11 @@ async def list_game_owners(
     ]
 
 
-@router.put("/games/{game_id}/ownership", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/games/{game_id}/ownership", response_model=GameWithViability)
 async def toggle_ownership(
     game_id: uuid.UUID,
     payload: OwnershipToggle,
     actor: CurrentUser,
     service: Annotated[GameService, Depends(get_game_service)],
-) -> None:
-    await service.toggle_ownership(game_id, payload.owns, actor)
+):
+    return await service.toggle_ownership(game_id, payload.owns, actor)

@@ -222,13 +222,16 @@ class GameService:
 
     # ---- interest / roster / ownership ----
 
-    async def set_interest(self, game_id: uuid.UUID, signal: InterestSignal, actor: User) -> None:
+    async def set_interest(
+        self, game_id: uuid.UUID, signal: InterestSignal, actor: User
+    ) -> GameWithViability:
         game = await self.games.get_by_id(game_id)
         if game is None:
             raise _not_found("Game not found")
         if (await self.groups.get_membership(game.group_id, actor.id)) is None:
             raise _forbid("Not a member of this group")
         await self.games.upsert_interest(game_id, actor.id, signal)
+        return await self._enrich(game, game.group_id, actor)
 
     async def join_roster(
         self,
@@ -236,27 +239,32 @@ class GameService:
         actor: User,
         participation_status: str,
         notes: str | None,
-    ) -> None:
+    ) -> GameWithViability:
         game = await self.games.get_by_id(game_id)
         if game is None:
             raise _not_found("Game not found")
         if (await self.groups.get_membership(game.group_id, actor.id)) is None:
             raise _forbid("Not a member of this group")
         await self.games.upsert_roster(game_id, actor.id, participation_status, notes)
+        return await self._enrich(game, game.group_id, actor)
 
-    async def leave_roster(self, game_id: uuid.UUID, actor: User) -> None:
+    async def leave_roster(self, game_id: uuid.UUID, actor: User) -> GameWithViability:
         game = await self.games.get_by_id(game_id)
         if game is None:
             raise _not_found("Game not found")
         await self.games.remove_from_roster(game_id, actor.id)
+        return await self._enrich(game, game.group_id, actor)
 
-    async def toggle_ownership(self, game_id: uuid.UUID, owns: bool, actor: User) -> None:
+    async def toggle_ownership(
+        self, game_id: uuid.UUID, owns: bool, actor: User
+    ) -> GameWithViability:
         game = await self.games.get_by_id(game_id)
         if game is None:
             raise _not_found("Game not found")
         if (await self.groups.get_membership(game.group_id, actor.id)) is None:
             raise _forbid("Not a member of this group")
         await self.games.set_ownership(actor.id, game_id, owns)
+        return await self._enrich(game, game.group_id, actor)
 
     # ---- helpers ----
 
