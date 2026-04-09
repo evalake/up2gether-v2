@@ -2,6 +2,7 @@
 
 ## Essencial / QoL
 - [ ] Histórico de games jogados (timeline/rewind mensal a partir de sessions + votes)
+- [ ] Audit completo de votes/themes/sessions: clicar num item e ver quem votou em que, candidatos, datas detalhadas, criador, timestamps de cada fase. Vale pro historico e pra sessao/tema atuais.
 - [ ] Web push notifications (app fechado, celular) -- prioridade 1
 - [ ] Dark/light toggle persistente
 - [ ] Empty states guiados (grupo vazio, primeira sessão, etc)
