@@ -160,9 +160,11 @@ async def set_current_game(
         grp.current_game_vote_id = None
     else:
         grp.current_game_id = None
-        grp.current_game_source = None
-        grp.current_game_set_at = None
-        grp.current_game_set_by = None
+        # "cleared" = unlock explicito, audit nao re-deriva do ultimo vote.
+        # so volta ao automatico quando um proximo vote fechar (vira "vote").
+        grp.current_game_source = "cleared"
+        grp.current_game_set_at = datetime.now(UTC)
+        grp.current_game_set_by = actor.id
         grp.current_game_vote_id = None
     await db.commit()
     await db.refresh(grp)
@@ -219,10 +221,33 @@ async def current_game_audit(
     derived_vote_id = grp.current_game_vote_id
     derived_set_at = grp.current_game_set_at
     derived_source = grp.current_game_source
-    # override manual tem prioridade. qualquer outra coisa (None ou "vote"): sempre
-    # re-deriva do ultimo vote fechado pra garantir que o highlight reflete o mais recente,
-    # inclusive depois de destravar um override.
-    if grp.current_game_source != "manual":
+    # "manual" e "cleared" sao overrides explicitos do admin, audit respeita.
+    # qualquer outra coisa (None ou "vote"): re-deriva do ultimo vote fechado
+    # pra refletir o mais recente mesmo se o _post_winner_effects nao tiver rodado.
+    if grp.current_game_source == "cleared":
+        return None
+    # se source=manual mas existe vote fechado DEPOIS do set_at, o vote ganha.
+    # assim uma votacao nova sempre supera um override manual antigo.
+    if grp.current_game_source == "manual" and grp.current_game_set_at is not None:
+        newer_vote = (
+            await db.execute(
+                select(VoteSession)
+                .where(
+                    VoteSession.group_id == group_id,
+                    VoteSession.status == "closed",
+                    VoteSession.winner_game_id.is_not(None),
+                    VoteSession.closed_at > grp.current_game_set_at,
+                )
+                .order_by(VoteSession.closed_at.desc())
+                .limit(1)
+            )
+        ).scalar_one_or_none()
+        if newer_vote is not None:
+            current_game_id = newer_vote.winner_game_id
+            derived_vote_id = newer_vote.id
+            derived_set_at = newer_vote.closed_at
+            derived_source = "vote"
+    if grp.current_game_source in (None, "vote"):
         last_vote = (
             await db.execute(
                 select(VoteSession)
