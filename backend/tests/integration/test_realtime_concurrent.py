@@ -49,7 +49,7 @@ async def test_concurrent_ballots_converge(make_user, auth_headers, client):
     vote = (
         await client.post(
             f"/api/groups/{g['id']}/votes",
-            json={"title": "x", "candidate_game_ids": [x["id"] for x in games]},
+            json={"title": "Pick", "candidate_game_ids": [x["id"] for x in games]},
             headers=auth_headers(owner),
         )
     ).json()
