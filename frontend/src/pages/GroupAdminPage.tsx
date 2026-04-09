@@ -53,6 +53,9 @@ export function GroupAdminPage() {
   const setCurrent = useSetCurrentGame(id)
   const games = useGames(id)
   const members = useMembers(id)
+  const allVotes = useVotes(id)
+  const allSessions = useSessions(id)
+  const allThemes = useThemes(id)
   const promote = usePromote(id)
   const demote = useDemote(id)
   const kick = useKick(id)
@@ -217,6 +220,9 @@ export function GroupAdminPage() {
         <OverviewCounters
           games={games.data?.filter((g) => !g.archived_at).length ?? 0}
           members={members.data?.length ?? 0}
+          votes={allVotes.data?.length ?? 0}
+          sessions={allSessions.data?.length ?? 0}
+          themes={allThemes.data?.length ?? 0}
           onJump={setTab}
         />
       )}
@@ -1244,15 +1250,21 @@ function TabPlaceholder({ label, note }: { label: string; note: string }) {
 }
 
 function OverviewCounters({
-  games, members, onJump,
+  games, members, votes, sessions, themes, onJump,
 }: {
   games: number
   members: number
+  votes: number
+  sessions: number
+  themes: number
   onJump: (t: AdminTab) => void
 }) {
   const cards: { key: AdminTab; label: string; value: number }[] = [
     { key: 'games', label: 'games', value: games },
     { key: 'members', label: 'membros', value: members },
+    { key: 'votes', label: 'votes', value: votes },
+    { key: 'sessions', label: 'sessoes', value: sessions },
+    { key: 'themes', label: 'temas', value: themes },
   ]
   return (
     <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
