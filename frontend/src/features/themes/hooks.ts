@@ -14,6 +14,7 @@ import {
   openCycle,
   startVoting,
   upsertSuggestion,
+  type Cycle,
   type SuggestionInput,
   type ThemeCreateInput,
 } from './api'
@@ -120,10 +121,40 @@ export function useStartVoting(groupId: string) {
 
 export function useCastVote(groupId: string) {
   const qc = useQueryClient()
+  const key = cycleKey(groupId)
   return useMutation({
     mutationFn: ({ cycleId, suggestionId }: { cycleId: string; suggestionId: string }) =>
       castVote(groupId, cycleId, suggestionId),
-    onSuccess: () => invalidateCycle(qc, groupId),
+    onMutate: async ({ suggestionId }) => {
+      await qc.cancelQueries({ queryKey: key })
+      const prev = qc.getQueryData<Cycle | null>(key)
+      if (prev) {
+        // toggle: se ja votou nessa sugestao, remove; senao troca
+        const current = prev.user_vote_suggestion_id
+        const next = current === suggestionId ? null : suggestionId
+        const suggestions = prev.suggestions.map((s) => {
+          let delta = 0
+          if (s.id === current) delta -= 1
+          if (s.id === next) delta += 1
+          return delta ? { ...s, vote_count: Math.max(0, s.vote_count + delta) } : s
+        })
+        const total_votes = Math.max(
+          0,
+          prev.total_votes + (current ? -1 : 0) + (next ? 1 : 0),
+        )
+        qc.setQueryData<Cycle | null>(key, {
+          ...prev,
+          suggestions,
+          user_vote_suggestion_id: next,
+          total_votes,
+        })
+      }
+      return { prev }
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev !== undefined) qc.setQueryData(key, ctx.prev)
+    },
+    onSuccess: (fresh) => qc.setQueryData(key, fresh),
   })
 }
 

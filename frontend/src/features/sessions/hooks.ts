@@ -4,6 +4,7 @@ import {
   deleteSession,
   listSessions,
   setRsvp,
+  type PlaySession,
   type SessionCreateInput,
   type SessionRsvp,
 } from './api'
@@ -37,9 +38,47 @@ export function useDeleteSession(groupId: string) {
 
 export function useSetRsvp(groupId: string) {
   const qc = useQueryClient()
+  const key = sessionsKey(groupId)
   return useMutation({
     mutationFn: (vars: { sessionId: string; status: SessionRsvp }) =>
       setRsvp(groupId, vars.sessionId, vars.status),
-    onSuccess: () => qc.invalidateQueries({ queryKey: sessionsKey(groupId) }),
+    onMutate: async (vars) => {
+      await qc.cancelQueries({ queryKey: key })
+      const prev = qc.getQueryData<PlaySession[]>(key)
+      if (prev) {
+        qc.setQueryData<PlaySession[]>(
+          key,
+          prev.map((s) => {
+            if (s.id !== vars.sessionId) return s
+            const old = s.user_rsvp
+            const counts = {
+              rsvp_yes: s.rsvp_yes,
+              rsvp_no: s.rsvp_no,
+              rsvp_maybe: s.rsvp_maybe,
+            }
+            if (old === 'yes') counts.rsvp_yes = Math.max(0, counts.rsvp_yes - 1)
+            if (old === 'no') counts.rsvp_no = Math.max(0, counts.rsvp_no - 1)
+            if (old === 'maybe') counts.rsvp_maybe = Math.max(0, counts.rsvp_maybe - 1)
+            if (vars.status === 'yes') counts.rsvp_yes += 1
+            if (vars.status === 'no') counts.rsvp_no += 1
+            if (vars.status === 'maybe') counts.rsvp_maybe += 1
+            return { ...s, user_rsvp: vars.status, ...counts }
+          }),
+        )
+      }
+      return { prev }
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(key, ctx.prev)
+    },
+    onSuccess: (fresh) => {
+      const cur = qc.getQueryData<PlaySession[]>(key)
+      if (cur) {
+        qc.setQueryData<PlaySession[]>(
+          key,
+          cur.map((s) => (s.id === fresh.id ? fresh : s)),
+        )
+      }
+    },
   })
 }
