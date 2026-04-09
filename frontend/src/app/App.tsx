@@ -15,6 +15,7 @@ import { PublicSessionPage } from '@/pages/PublicSessionPage'
 import { Navigate } from 'react-router-dom'
 import { RequireAuth } from './RequireAuth'
 import { Toaster } from '@/components/ui/Toaster'
+import { useRealtime } from '@/lib/realtime'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,9 +28,15 @@ const queryClient = new QueryClient({
   },
 })
 
+function RealtimeBoot() {
+  useRealtime()
+  return null
+}
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <RealtimeBoot />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />

@@ -187,6 +187,11 @@ class VoteService:
 
         await self.votes.upsert_ballot(vote_id, actor.id, list(approvals), stage_id=stage.id)
 
+        # realtime: notifica que o tally mudou
+        from app.services.realtime import get_broker
+
+        get_broker().publish(session.group_id, kind="game_vote.ballot_cast")
+
         # Auto-close stage: todos os eleitores votaram
         ballots_count = await self.votes.count_ballots(vote_id, stage_id=stage.id)
         if ballots_count >= session.eligible_voter_count:

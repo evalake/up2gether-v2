@@ -181,6 +181,14 @@ async def notify_group(
     )
     user_ids = [uid for uid in members if uid not in excluded]
 
+    # 0. realtime broadcast (sse) — fire and forget
+    try:
+        from app.services.realtime import get_broker
+
+        get_broker().publish(group_id, kind=event)
+    except Exception as e:
+        log.debug("realtime publish skipped: %s", e)
+
     # 1. in-app + push
     await notify(
         db,

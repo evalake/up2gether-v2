@@ -240,6 +240,10 @@ class ThemeService:
                 webhook_fields=fields,
                 webhook_image_url=data.image_url,
             )
+        else:
+            from app.services.realtime import get_broker
+
+            get_broker().publish(group_id, kind="theme.suggestion_updated")
         return await self._cycle_response(cycle, actor)
 
     async def delete_suggestion(
@@ -266,6 +270,9 @@ class ThemeService:
             if s is None:
                 raise _not_found("voce nao tem sugestao nesse ciclo")
         await self.themes.delete_suggestion(s)
+        from app.services.realtime import get_broker
+
+        get_broker().publish(group_id, kind="theme.suggestion_deleted")
         return await self._cycle_response(cycle, actor)
 
     async def start_voting(
@@ -303,6 +310,9 @@ class ThemeService:
             await self.themes.delete_user_vote(cycle_id, actor.id)
         else:
             await self.themes.upsert_vote(cycle_id, actor.id, suggestion_id)
+        from app.services.realtime import get_broker
+
+        get_broker().publish(group_id, kind="theme.vote_cast")
         return await self._cycle_response(cycle, actor)
 
     async def close_cycle(
