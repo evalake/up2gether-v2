@@ -54,6 +54,14 @@ export function useSetRsvp(groupId: string) {
       setRsvp(groupId, vars.sessionId, vars.status),
     onMutate: async (vars) => {
       await qc.cancelQueries({ queryKey: key })
+      const auditKey = ['groups', groupId, 'sessions', vars.sessionId, 'audit'] as const
+      const prevAudit = qc.getQueryData<{ session: PlaySession }>(auditKey)
+      if (prevAudit) {
+        qc.setQueryData(auditKey, {
+          ...prevAudit,
+          session: { ...prevAudit.session, user_rsvp: vars.status },
+        })
+      }
       const prev = qc.getQueryData<PlaySession[]>(key)
       if (prev) {
         qc.setQueryData<PlaySession[]>(
@@ -89,6 +97,9 @@ export function useSetRsvp(groupId: string) {
           cur.map((s) => (s.id === fresh.id ? fresh : s)),
         )
       }
+      qc.invalidateQueries({
+        queryKey: ['groups', groupId, 'sessions', fresh.id, 'audit'] as const,
+      })
     },
   })
 }

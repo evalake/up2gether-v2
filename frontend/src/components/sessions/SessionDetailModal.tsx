@@ -299,7 +299,7 @@ function Body({
         {canDelete && (
           <button
             onClick={onDelete}
-            className="ml-auto rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-red hover:text-nerv-red"
+            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-red hover:text-nerv-red"
           >
             remover
           </button>

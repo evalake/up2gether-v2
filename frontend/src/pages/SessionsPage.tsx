@@ -2,29 +2,20 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
-import { useMembers } from '@/features/groups/hooks'
+import type { Game } from '@/features/games/api'
 import {
   useCreateSession,
   useSessions,
-  useSetRsvp,
 } from '@/features/sessions/hooks'
-import type { PlaySession, SessionRsvp } from '@/features/sessions/api'
 import { SessionDetailModal } from '@/components/sessions/SessionDetailModal'
 import { useGroup } from '@/features/groups/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
-import { Avatar } from '@/components/nerv/Avatar'
 import { steamCover } from '@/lib/steamCover'
 
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 8) // 08..23
 const WEEKDAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
-const RSVPS: { v: SessionRsvp; label: string; tone: string }[] = [
-  { v: 'yes', label: 'vou', tone: 'text-nerv-green border-nerv-green/60' },
-  { v: 'maybe', label: 'talvez', tone: 'text-nerv-amber border-nerv-amber/60' },
-  { v: 'no', label: 'não', tone: 'text-nerv-red/80 border-nerv-red/40' },
-]
-
 const MAX_FUTURE_YEARS = 1
 
 function startOfWeek(d: Date): Date {
@@ -45,9 +36,7 @@ export function SessionsPage() {
   const { id = '' } = useParams()
   const sessions = useSessions(id)
   const games = useGames(id)
-  const members = useMembers(id)
   const create = useCreateSession(id)
-  const rsvp = useSetRsvp(id)
   const toast = useToast()
 
   const [weekAnchor, setWeekAnchor] = useState(() => startOfWeek(new Date()))
@@ -65,12 +54,6 @@ export function SessionsPage() {
   const group = useGroup(id)
   const canDelete =
     group.data?.user_role === 'admin' || group.data?.user_role === 'mod'
-
-  const memberName = (uid: string) => {
-    const m = members.data?.find((mb) => mb.user_id === uid)
-    return m?.user?.discord_display_name ?? m?.user?.discord_username ?? '?'
-  }
-  const memberAvatar = (uid: string) => members.data?.find((m) => m.user_id === uid)?.user ?? undefined
 
   const openDraft = (start: Date) => {
     if (start < new Date()) return
@@ -151,6 +134,42 @@ export function SessionsPage() {
 
       {sessions.isLoading && <Loading />}
       {sessions.error && <ErrorBox error={sessions.error} />}
+
+      {upcoming.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {upcoming.slice(0, 6).map((s) => {
+            const game = games.data?.find((g) => g.id === s.game_id)
+            const cover = game ? steamCover(game) : null
+            const st = new Date(s.start_at)
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => {
+                  setWeekAnchor(startOfWeek(st))
+                  setDetailId(s.id)
+                }}
+                className="group/chip flex shrink-0 items-center gap-2 overflow-hidden rounded-full border border-nerv-orange/25 bg-nerv-panel/50 pr-3 text-left transition-all hover:border-nerv-orange/60 hover:bg-nerv-panel"
+              >
+                {cover ? (
+                  <img src={cover} alt="" className="h-8 w-8 shrink-0 object-cover" />
+                ) : (
+                  <span className="grid h-8 w-8 shrink-0 place-items-center bg-nerv-orange/15 font-display text-xs text-nerv-orange/70">◈</span>
+                )}
+                <span className="flex min-w-0 flex-col leading-tight">
+                  <span className="max-w-[140px] truncate text-[11px] text-nerv-text group-hover/chip:text-nerv-orange">{s.title}</span>
+                  <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+                    {st.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })} · {String(st.getHours()).padStart(2, '0')}:{String(st.getMinutes()).padStart(2, '0')}
+                  </span>
+                </span>
+                {s.user_rsvp && (
+                  <span className={`ml-1 h-1.5 w-1.5 shrink-0 rounded-full ${s.user_rsvp === 'yes' ? 'bg-nerv-green' : s.user_rsvp === 'maybe' ? 'bg-nerv-amber' : 'bg-nerv-red/70'}`} />
+                )}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       <div className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30">
         <div className="grid min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)' }}>
@@ -271,25 +290,6 @@ export function SessionsPage() {
         </div>
       </div>
 
-      {upcoming.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-[11px] uppercase tracking-wider text-nerv-dim">próximas</h2>
-          <div className="space-y-2">
-            {upcoming.map((s) => (
-              <SessionCard
-                key={s.id}
-                s={s}
-                game={games.data?.find((g) => g.id === s.game_id)}
-                onRsvp={(v) => rsvp.mutate({ sessionId: s.id, status: v })}
-                onOpen={() => setDetailId(s.id)}
-                memberName={memberName}
-                memberAvatar={memberAvatar}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
       {past.length > 0 && (
         <section className="space-y-3">
           <button
@@ -337,89 +337,19 @@ export function SessionsPage() {
 
       <AnimatePresence>
         {draft && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setDraft(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm rounded-sm border border-nerv-orange/30 bg-nerv-panel p-5 shadow-[0_0_60px_rgba(255,102,0,0.12)]"
-            >
-              <div className="mb-4">
-                <div className="text-[10px] uppercase tracking-wider text-nerv-dim">agendar</div>
-                <div className="mt-1 font-display text-lg text-nerv-text">
-                  {draft.start.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-                </div>
-                <div className="text-sm text-nerv-orange">
-                  {draft.start.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <div className="mb-1 text-[10px] uppercase tracking-wider text-nerv-dim">jogo</div>
-                  <select
-                    value={gameId}
-                    onChange={(e) => setGameId(e.target.value)}
-                    className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-sm text-nerv-text focus:border-nerv-orange focus:outline-none"
-                  >
-                    <option value="">selecione...</option>
-                    {games.data?.map((g) => (
-                      <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <div className="mb-1 text-[10px] uppercase tracking-wider text-nerv-dim">titulo (opcional)</div>
-                  <input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="usa o nome do jogo se vazio"
-                    className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-sm text-nerv-text focus:border-nerv-orange focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <div className="mb-1 text-[10px] uppercase tracking-wider text-nerv-dim">duracao</div>
-                  <div className="flex gap-1">
-                    {[60, 120, 180, 240].map((m) => (
-                      <button
-                        key={m}
-                        onClick={() => setDuration(m)}
-                        className={`flex-1 rounded-sm border px-2 py-1.5 text-xs transition-all ${
-                          duration === m ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange' : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
-                        }`}
-                      >
-                        {m / 60}h
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 flex justify-end gap-2">
-                <button
-                  onClick={() => setDraft(null)}
-                  className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-line/70 hover:text-nerv-text"
-                >
-                  cancelar
-                </button>
-                <button
-                  onClick={onSave}
-                  disabled={!gameId || create.isPending}
-                  className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
-                >
-                  {create.isPending ? 'salvando...' : 'agendar'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
+          <SessionDraftModal
+            start={draft.start}
+            games={games.data ?? []}
+            gameId={gameId}
+            setGameId={setGameId}
+            title={title}
+            setTitle={setTitle}
+            duration={duration}
+            setDuration={setDuration}
+            onCancel={() => setDraft(null)}
+            onSave={onSave}
+            isPending={create.isPending}
+          />
         )}
       </AnimatePresence>
       <SessionDetailModal
@@ -432,114 +362,238 @@ export function SessionsPage() {
   )
 }
 
-const RSVP_RING: Record<SessionRsvp, string> = {
-  yes: 'ring-nerv-green/70',
-  maybe: 'ring-nerv-amber/70',
-  no: 'ring-nerv-red/40',
-}
-
-function RsvpAvatarRow({
-  rsvps,
-  status,
-  memberName,
-  memberAvatar,
+function SessionDraftModal({
+  start,
+  games,
+  gameId,
+  setGameId,
+  title,
+  setTitle,
+  duration,
+  setDuration,
+  onCancel,
+  onSave,
+  isPending,
 }: {
-  rsvps: PlaySession['rsvps']
-  status: SessionRsvp
-  memberName: (uid: string) => string
-  memberAvatar: (uid: string) => { discord_id?: string; discord_avatar?: string | null; role?: string } | undefined
+  start: Date
+  games: Game[]
+  gameId: string
+  setGameId: (v: string) => void
+  title: string
+  setTitle: (v: string) => void
+  duration: number
+  setDuration: (v: number) => void
+  onCancel: () => void
+  onSave: () => void
+  isPending: boolean
 }) {
-  const filtered = rsvps.filter((r) => r.status === status)
-  if (filtered.length === 0) return null
-  return (
-    <div className="flex -space-x-1.5">
-      {filtered.slice(0, 8).map((r) => {
-        const u = memberAvatar(r.user_id)
-        return (
-          <div key={r.user_id} className="group/av relative">
-            <Avatar
-              discordId={u?.discord_id}
-              hash={u?.discord_avatar}
-              name={memberName(r.user_id)}
-              size="xs"
-              className={`ring-2 ring-nerv-panel ${RSVP_RING[status]}`}
-            />
-            <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-sm border border-nerv-orange/30 bg-nerv-panel px-2 py-1 text-[10px] text-nerv-text opacity-0 shadow-lg transition-opacity group-hover/av:opacity-100">
-              <div className="font-medium">{memberName(r.user_id)}</div>
-              <div className="text-[9px] uppercase tracking-wider text-nerv-dim">
-                {status === 'yes' ? 'confirmado' : status === 'maybe' ? 'talvez' : 'fora'}
-              </div>
-            </div>
-          </div>
-        )
-      })}
-      {filtered.length > 8 && (
-        <span className="ml-2 text-[10px] text-nerv-dim">+{filtered.length - 8}</span>
-      )}
-    </div>
-  )
-}
+  const [query, setQuery] = useState('')
+  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+  const q = norm(query.trim())
+  const filtered = useMemo(() => {
+    if (!q) return games
+    return games.filter((g) => g.id === gameId || norm(g.name).includes(q))
+  }, [games, q, gameId])
+  const selected = games.find((g) => g.id === gameId) ?? null
+  const selectedCover = selected ? steamCover(selected) : null
+  const end = new Date(start.getTime() + duration * 60_000)
+  const hour = (d: Date) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
-function SessionCard({
-  s, game, onRsvp, onOpen, memberName, memberAvatar,
-}: {
-  s: PlaySession
-  game: ReturnType<typeof Object> | undefined
-  onRsvp: (v: SessionRsvp) => void
-  onOpen: () => void
-  memberName: (uid: string) => string
-  memberAvatar: (uid: string) => { discord_id?: string; discord_avatar?: string | null; role?: string } | undefined
-}) {
-  const start = new Date(s.start_at)
-  const cover = game ? steamCover(game as never) : null
-  const gameName = (game as { name?: string } | undefined)?.name
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
+
   return (
-    <div className="group/card flex gap-3 rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-3 transition-all hover:border-nerv-orange/40">
-      <button
-        type="button"
-        onClick={onOpen}
-        className="flex min-w-0 flex-1 gap-3 text-left"
+    <motion.div
+      key="draft-backdrop"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      onClick={onCancel}
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-md"
+    >
+      <motion.div
+        key="draft-panel"
+        initial={{ opacity: 0, scale: 0.94, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97, y: 6 }}
+        transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-xl overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
       >
-        {cover && <img src={cover} alt="" className="hidden h-24 w-36 shrink-0 rounded-sm object-cover sm:block" />}
-        <div className="min-w-0 flex-1">
-          <div className="min-w-0">
-            <div className="truncate text-sm font-medium text-nerv-text group-hover/card:text-nerv-orange">{s.title}</div>
-            {gameName && gameName !== s.title && (
-              <div className="truncate text-xs text-nerv-orange/80">{gameName}</div>
+        <button
+          onClick={onCancel}
+          aria-label="fechar"
+          className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+        </button>
+
+        <div className="relative h-36 w-full overflow-hidden">
+          <AnimatePresence mode="wait">
+            {selectedCover ? (
+              <motion.img
+                key={selectedCover}
+                src={selectedCover}
+                alt=""
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1.1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="absolute inset-0 h-full w-full object-cover blur-[2px]"
+              />
+            ) : (
+              <motion.div
+                key="placeholder"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-gradient-to-br from-nerv-orange/20 via-nerv-panel to-nerv-magenta/10"
+              />
             )}
-            <div className="mt-0.5 text-[11px] text-nerv-dim">
-              {start.toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-              {' · '}{s.duration_minutes / 60}h
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/70 to-nerv-panel/20" />
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="absolute inset-x-0 bottom-0 p-5"
+          >
+            <span className="mb-2 inline-block rounded-full border border-nerv-orange/40 bg-nerv-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange">
+              agendar
+            </span>
+            <h2 className="font-display text-2xl capitalize leading-tight text-nerv-text">
+              {start.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
+            </h2>
+            <div className="mt-0.5 font-mono text-[11px] text-nerv-orange/80">
+              {hour(start)} {'\u2192'} {hour(end)} · {duration / 60}h
             </div>
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] uppercase tracking-wider text-nerv-dim">
-            <span><span className="text-nerv-green tabular-nums">{s.rsvp_yes}</span> vao</span>
-            <span><span className="text-nerv-amber tabular-nums">{s.rsvp_maybe}</span> talvez</span>
-            <span><span className="text-nerv-red/70 tabular-nums">{s.rsvp_no}</span> fora</span>
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <RsvpAvatarRow rsvps={s.rsvps} status="yes" memberName={memberName} memberAvatar={memberAvatar} />
-            <RsvpAvatarRow rsvps={s.rsvps} status="maybe" memberName={memberName} memberAvatar={memberAvatar} />
-          </div>
+          </motion.div>
         </div>
-      </button>
-      <div className="flex shrink-0 flex-col gap-1.5 border-l border-nerv-orange/10 pl-3">
-        <div className="text-[9px] uppercase tracking-wider text-nerv-dim">você vai?</div>
-        {RSVPS.map((r) => {
-          const active = s.user_rsvp === r.v
-          return (
-            <button
-              key={r.v}
-              onClick={() => onRsvp(r.v)}
-              className={`w-20 rounded-sm border px-2 py-1 text-[10px] uppercase tracking-wider transition-all ${
-                active ? r.tone : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
-              }`}
-            >
-              {r.label}
-            </button>
-          )
-        })}
-      </div>
-    </div>
+
+        <div className="space-y-4 p-5">
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+          >
+            <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+              <span>jogo</span>
+              {selected && (
+                <span className="truncate text-nerv-orange/80">{selected.name}</span>
+              )}
+            </div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="buscar jogo..."
+              className="h-9 w-full rounded-md border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+            />
+            <div className="mt-2 max-h-56 overflow-y-auto rounded-md border border-nerv-line/30 bg-black/20">
+              {filtered.length === 0 ? (
+                <div className="py-6 text-center text-[11px] text-nerv-dim">
+                  nenhum jogo pra {JSON.stringify(query)}
+                </div>
+              ) : (
+                <div className="grid gap-1 p-1.5 sm:grid-cols-2">
+                  {filtered.map((g) => {
+                    const on = g.id === gameId
+                    const cover = steamCover(g)
+                    return (
+                      <motion.button
+                        key={g.id}
+                        type="button"
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setGameId(g.id)}
+                        className={`flex items-center gap-2 rounded-sm border px-2 py-1.5 text-left transition-all ${
+                          on
+                            ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
+                            : 'border-transparent text-nerv-text hover:border-nerv-orange/30 hover:bg-nerv-orange/5'
+                        }`}
+                      >
+                        {cover ? (
+                          <img src={cover} alt="" className="h-6 w-10 shrink-0 rounded-sm object-cover" />
+                        ) : (
+                          <div className="h-6 w-10 shrink-0 rounded-sm bg-nerv-line/30" />
+                        )}
+                        <span className="truncate text-[11px]">{g.name}</span>
+                      </motion.button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.16 }}
+          >
+            <div className="mb-1.5 text-[10px] uppercase tracking-wider text-nerv-dim">
+              titulo (opcional)
+            </div>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
+              className="h-9 w-full rounded-md border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+            />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="mb-1.5 text-[10px] uppercase tracking-wider text-nerv-dim">
+              duracao
+            </div>
+            <div className="flex gap-1.5">
+              {[60, 120, 180, 240].map((m) => {
+                const on = duration === m
+                return (
+                  <motion.button
+                    key={m}
+                    type="button"
+                    whileTap={{ scale: 0.94 }}
+                    onClick={() => setDuration(m)}
+                    className={`flex-1 rounded-md border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
+                      on
+                        ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
+                        : 'border-nerv-line/60 bg-black/20 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                    }`}
+                  >
+                    {m / 60}h
+                  </motion.button>
+                )
+              })}
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-nerv-line/30 px-5 py-3">
+          <button
+            onClick={onCancel}
+            className="rounded-sm border border-nerv-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+          >
+            cancelar
+          </button>
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={onSave}
+            disabled={!gameId || isPending}
+            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
+          >
+            {isPending ? 'salvando...' : 'agendar'}
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }
