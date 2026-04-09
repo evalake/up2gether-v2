@@ -16,7 +16,7 @@ export function useSessions(groupId: string) {
     queryKey: sessionsKey(groupId),
     queryFn: () => listSessions(groupId),
     enabled: !!groupId,
-    refetchInterval: 30_000,
+    refetchInterval: 15_000,
   })
 }
 

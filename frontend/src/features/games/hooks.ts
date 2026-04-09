@@ -28,7 +28,7 @@ export function useGames(groupId: string) {
     queryKey: gamesKey(groupId),
     queryFn: () => listGames(groupId),
     enabled: !!groupId,
-    refetchInterval: 60_000,
+    refetchInterval: 20_000,
   })
 }
 

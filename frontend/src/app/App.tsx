@@ -26,6 +26,9 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
+      // polling so roda na aba ativa. aba escondida = zero request.
+      // isso permite intervalos agressivos (10s) sem gastar bateria/rede.
+      refetchIntervalInBackground: false,
     },
   },
 })

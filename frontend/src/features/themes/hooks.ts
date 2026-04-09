@@ -29,6 +29,7 @@ export function useCurrentTheme(groupId: string) {
     queryKey: currentThemeKey(groupId),
     queryFn: () => getCurrentTheme(groupId),
     enabled: !!groupId,
+    refetchInterval: 30_000,
   })
 }
 
@@ -37,6 +38,7 @@ export function useThemes(groupId: string) {
     queryKey: themesKey(groupId),
     queryFn: () => listThemes(groupId),
     enabled: !!groupId,
+    refetchInterval: 60_000,
   })
 }
 
@@ -67,7 +69,7 @@ export function useCycle(groupId: string) {
     queryKey: cycleKey(groupId),
     queryFn: () => getCycle(groupId),
     enabled: !!groupId,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   })
 }
 
