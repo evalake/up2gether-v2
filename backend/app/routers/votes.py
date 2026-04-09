@@ -66,3 +66,16 @@ async def close_vote(
     service: Annotated[VoteService, Depends(get_vote_service)],
 ) -> VoteSessionResponse:
     return await service.close(group_id, vote_id, actor)
+
+
+@router.delete(
+    "/groups/{group_id}/votes/{vote_id}",
+    status_code=204,
+)
+async def delete_vote(
+    group_id: uuid.UUID,
+    vote_id: uuid.UUID,
+    actor: CurrentUser,
+    service: Annotated[VoteService, Depends(get_vote_service)],
+) -> None:
+    await service.delete(group_id, vote_id, actor)

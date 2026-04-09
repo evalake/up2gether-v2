@@ -58,3 +58,6 @@ export const submitBallot = (voteId: string, approvals: string[]) =>
 
 export const closeVote = (groupId: string, voteId: string) =>
   api<VoteSession>(`/groups/${groupId}/votes/${voteId}/close`, { method: 'POST' })
+
+export const deleteVote = (groupId: string, voteId: string) =>
+  api<null>(`/groups/${groupId}/votes/${voteId}`, { method: 'DELETE' })

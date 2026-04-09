@@ -203,6 +203,18 @@ class VoteService:
             return None
         return await self.votes.get_stage(session.id, session.current_stage_number)
 
+    async def delete(self, group_id: uuid.UUID, vote_id: uuid.UUID, actor: User) -> None:
+        await self._require_admin_or_mod(group_id, actor)
+        session = await self.votes.get(vote_id)
+        if session is None or session.group_id != group_id:
+            raise _not_found("Vote not found")
+        # cascata cobre stages e ballots; FKs em groups viram NULL
+        await self.votes.db.delete(session)
+        await self.votes.db.commit()
+        from app.services.realtime import get_broker
+
+        get_broker().publish(group_id, kind="current_game.changed")
+
     async def close(
         self, group_id: uuid.UUID, vote_id: uuid.UUID, actor: User
     ) -> VoteSessionResponse:

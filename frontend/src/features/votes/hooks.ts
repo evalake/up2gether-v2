@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   closeVote,
   createVote,
+  deleteVote,
   listVotes,
   submitBallot,
   type VoteCreateInput,
@@ -24,6 +25,17 @@ export function useCreateVote(groupId: string) {
   return useMutation({
     mutationFn: (input: VoteCreateInput) => createVote(groupId, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: votesKey(groupId) }),
+  })
+}
+
+export function useDeleteVote(groupId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (voteId: string) => deleteVote(groupId, voteId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: votesKey(groupId) })
+      qc.invalidateQueries({ queryKey: ['groups', groupId, 'current-game', 'audit'] })
+    },
   })
 }
 
