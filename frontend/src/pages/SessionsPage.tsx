@@ -5,12 +5,12 @@ import { useGames } from '@/features/games/hooks'
 import { useMembers } from '@/features/groups/hooks'
 import {
   useCreateSession,
-  useDeleteSession,
   useSessions,
   useSetRsvp,
 } from '@/features/sessions/hooks'
 import type { PlaySession, SessionRsvp } from '@/features/sessions/api'
-import { SessionAuditModal } from '@/components/sessions/SessionAuditModal'
+import { SessionDetailModal } from '@/components/sessions/SessionDetailModal'
+import { useGroup } from '@/features/groups/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
@@ -41,20 +41,12 @@ const addDays = (d: Date, n: number) => {
 const sameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 
-function googleCalendarUrl(title: string, start: Date, durationMin: number, details: string) {
-  const end = new Date(start.getTime() + durationMin * 60000)
-  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
-  const params = new URLSearchParams({ action: 'TEMPLATE', text: title, dates: `${fmt(start)}/${fmt(end)}`, details })
-  return `https://calendar.google.com/calendar/render?${params.toString()}`
-}
-
 export function SessionsPage() {
   const { id = '' } = useParams()
   const sessions = useSessions(id)
   const games = useGames(id)
   const members = useMembers(id)
   const create = useCreateSession(id)
-  const del = useDeleteSession(id)
   const rsvp = useSetRsvp(id)
   const toast = useToast()
 
@@ -69,17 +61,10 @@ export function SessionsPage() {
   const [gameId, setGameId] = useState('')
   const [duration, setDuration] = useState(120)
   const [openPast, setOpenPast] = useState(false)
-  const [highlightId, setHighlightId] = useState<string | null>(null)
-  const [auditId, setAuditId] = useState<string | null>(null)
-  const cardRefs = useMemo(() => new Map<string, HTMLDivElement>(), [])
-  const focusSession = (sid: string) => {
-    const el = cardRefs.get(sid)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      setHighlightId(sid)
-      setTimeout(() => setHighlightId((cur) => (cur === sid ? null : cur)), 1600)
-    }
-  }
+  const [detailId, setDetailId] = useState<string | null>(null)
+  const group = useGroup(id)
+  const canDelete =
+    group.data?.user_role === 'admin' || group.data?.user_role === 'mod'
 
   const memberName = (uid: string) => {
     const m = members.data?.find((mb) => mb.user_id === uid)
@@ -197,19 +182,29 @@ export function SessionsPage() {
                 return (
                   <div
                     key={`${h}-${i}`}
-                    className={`relative h-14 border-l border-t border-nerv-orange/5 ${
+                    className={`group/cell relative h-14 border-l border-t border-nerv-orange/5 ${
                       isPast ? 'bg-nerv-line/5' : ''
                     }`}
                   >
-                    {inSlot.length === 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => !isPast && openDraft(slot)}
+                      disabled={isPast}
+                      aria-label="novo horario"
+                      className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'hover:bg-nerv-orange/5' : ''}`}
+                    />
+                    {inSlot.length > 0 && !isPast && (
                       <button
                         type="button"
-                        onClick={() => !isPast && openDraft(slot)}
-                        disabled={isPast}
-                        className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : 'hover:bg-nerv-orange/5'}`}
-                      />
-                    ) : (
-                      <span className="absolute inset-x-0.5 top-0.5 bottom-0.5 flex gap-0.5">
+                        onClick={(e) => { e.stopPropagation(); openDraft(slot) }}
+                        aria-label="adicionar outra no mesmo horario"
+                        className="absolute right-0.5 top-0.5 z-20 hidden h-4 w-4 place-items-center rounded-full border border-nerv-orange/50 bg-nerv-panel text-[10px] leading-none text-nerv-orange hover:bg-nerv-orange hover:text-nerv-panel group-hover/cell:grid"
+                      >
+                        +
+                      </button>
+                    )}
+                    {inSlot.length > 0 && (
+                      <span className="absolute inset-x-0.5 top-0.5 bottom-0.5 z-10 flex gap-0.5">
                         {inSlot.map((s) => {
                           const game = games.data?.find((g) => g.id === s.game_id)
                           const cover = game ? steamCover(game) : null
@@ -219,7 +214,7 @@ export function SessionsPage() {
                             <button
                               key={s.id}
                               type="button"
-                              onClick={() => focusSession(s.id)}
+                              onClick={(e) => { e.stopPropagation(); setDetailId(s.id) }}
                               className={`group/slot relative flex min-w-0 flex-1 items-stretch overflow-hidden rounded-[3px] text-left shadow-sm ring-1 transition-all hover:scale-[1.02] hover:shadow-lg ${
                                 isPast
                                   ? 'bg-nerv-panel/60 ring-nerv-line/30'
@@ -286,16 +281,9 @@ export function SessionsPage() {
                 s={s}
                 game={games.data?.find((g) => g.id === s.game_id)}
                 onRsvp={(v) => rsvp.mutate({ sessionId: s.id, status: v })}
-                onDelete={() => del.mutate(s.id)}
-                onAudit={() => setAuditId(s.id)}
-                groupId={id}
+                onOpen={() => setDetailId(s.id)}
                 memberName={memberName}
                 memberAvatar={memberAvatar}
-                highlight={highlightId === s.id}
-                registerRef={(el) => {
-                  if (el) cardRefs.set(s.id, el)
-                  else cardRefs.delete(s.id)
-                }}
               />
             ))}
           </div>
@@ -319,7 +307,7 @@ export function SessionsPage() {
                 const cover = game ? steamCover(game) : null
                 const start = new Date(s.start_at)
                 return (
-                  <button key={s.id} type="button" onClick={() => setAuditId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-colors hover:border-nerv-orange/30">
+                  <button key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-colors hover:border-nerv-orange/30">
                     {cover ? (
                       <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" />
                     ) : (
@@ -434,13 +422,12 @@ export function SessionsPage() {
           </motion.div>
         )}
       </AnimatePresence>
-      {auditId && (
-        <SessionAuditModal
-          groupId={id}
-          sessionId={auditId}
-          onClose={() => setAuditId(null)}
-        />
-      )}
+      <SessionDetailModal
+        groupId={id}
+        sessionId={detailId}
+        canDelete={canDelete}
+        onClose={() => setDetailId(null)}
+      />
     </div>
   )
 }
@@ -494,87 +481,48 @@ function RsvpAvatarRow({
 }
 
 function SessionCard({
-  s, game, onRsvp, onDelete, onAudit, groupId: _groupId, memberName, memberAvatar, highlight, registerRef,
+  s, game, onRsvp, onOpen, memberName, memberAvatar,
 }: {
   s: PlaySession
   game: ReturnType<typeof Object> | undefined
   onRsvp: (v: SessionRsvp) => void
-  onDelete: () => void
-  onAudit: () => void
-  groupId: string
+  onOpen: () => void
   memberName: (uid: string) => string
   memberAvatar: (uid: string) => { discord_id?: string; discord_avatar?: string | null; role?: string } | undefined
-  highlight?: boolean
-  registerRef?: (el: HTMLDivElement | null) => void
 }) {
   const start = new Date(s.start_at)
   const cover = game ? steamCover(game as never) : null
   const gameName = (game as { name?: string } | undefined)?.name
-  const inviteUrl = `${window.location.origin}/share/sessions/${s.id}`
-  const [copied, setCopied] = useState(false)
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(inviteUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch {
-      // ignora
-    }
-  }
   return (
-    <div
-      ref={registerRef}
-      className={`flex gap-3 rounded-sm border bg-nerv-panel/30 p-3 transition-all ${
-        highlight
-          ? 'border-nerv-orange shadow-[0_0_30px_rgba(255,102,0,0.25)]'
-          : 'border-nerv-orange/15 hover:border-nerv-orange/40'
-      }`}
-    >
-      {cover && <img src={cover} alt="" className="hidden h-24 w-36 shrink-0 rounded-sm object-cover sm:block" />}
-      <div className="min-w-0 flex-1">
-        <div className="min-w-0">
-          <div className="truncate text-sm font-medium text-nerv-text">{s.title}</div>
-          {gameName && gameName !== s.title && (
-            <div className="truncate text-xs text-nerv-orange/80">{gameName}</div>
-          )}
-          <div className="mt-0.5 text-[11px] text-nerv-dim">
-            {start.toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-            {' · '}{s.duration_minutes / 60}h
+    <div className="group/card flex gap-3 rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-3 transition-all hover:border-nerv-orange/40">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex min-w-0 flex-1 gap-3 text-left"
+      >
+        {cover && <img src={cover} alt="" className="hidden h-24 w-36 shrink-0 rounded-sm object-cover sm:block" />}
+        <div className="min-w-0 flex-1">
+          <div className="min-w-0">
+            <div className="truncate text-sm font-medium text-nerv-text group-hover/card:text-nerv-orange">{s.title}</div>
+            {gameName && gameName !== s.title && (
+              <div className="truncate text-xs text-nerv-orange/80">{gameName}</div>
+            )}
+            <div className="mt-0.5 text-[11px] text-nerv-dim">
+              {start.toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+              {' · '}{s.duration_minutes / 60}h
+            </div>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] uppercase tracking-wider text-nerv-dim">
+            <span><span className="text-nerv-green tabular-nums">{s.rsvp_yes}</span> vao</span>
+            <span><span className="text-nerv-amber tabular-nums">{s.rsvp_maybe}</span> talvez</span>
+            <span><span className="text-nerv-red/70 tabular-nums">{s.rsvp_no}</span> fora</span>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <RsvpAvatarRow rsvps={s.rsvps} status="yes" memberName={memberName} memberAvatar={memberAvatar} />
+            <RsvpAvatarRow rsvps={s.rsvps} status="maybe" memberName={memberName} memberAvatar={memberAvatar} />
           </div>
         </div>
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] uppercase tracking-wider text-nerv-dim">
-          <span><span className="text-nerv-green tabular-nums">{s.rsvp_yes}</span> vao</span>
-          <span><span className="text-nerv-amber tabular-nums">{s.rsvp_maybe}</span> talvez</span>
-          <span><span className="text-nerv-red/70 tabular-nums">{s.rsvp_no}</span> fora</span>
-        </div>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <RsvpAvatarRow rsvps={s.rsvps} status="yes" memberName={memberName} memberAvatar={memberAvatar} />
-          <RsvpAvatarRow rsvps={s.rsvps} status="maybe" memberName={memberName} memberAvatar={memberAvatar} />
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-1 text-[10px] uppercase tracking-wider">
-          <button
-            onClick={onCopy}
-            title="copiar link de convite"
-            className={`rounded-sm border px-2 py-0.5 transition-all ${
-              copied
-                ? 'border-nerv-green/60 text-nerv-green'
-                : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange'
-            }`}
-          >
-            {copied ? 'copiado' : 'convite'}
-          </button>
-          <a
-            href={googleCalendarUrl(s.title, start, s.duration_minutes, gameName ?? '')}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-sm border border-nerv-line px-2 py-0.5 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange"
-          >
-            gcal
-          </a>
-          <button onClick={onAudit} className="ml-auto rounded-sm border border-nerv-line px-2 py-0.5 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange">audit</button>
-          <button onClick={onDelete} className="rounded-sm border border-nerv-line px-2 py-0.5 text-nerv-dim hover:border-nerv-red hover:text-nerv-red">remover</button>
-        </div>
-      </div>
+      </button>
       <div className="flex shrink-0 flex-col gap-1.5 border-l border-nerv-orange/10 pl-3">
         <div className="text-[9px] uppercase tracking-wider text-nerv-dim">você vai?</div>
         {RSVPS.map((r) => {
