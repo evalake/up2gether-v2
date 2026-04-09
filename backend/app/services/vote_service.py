@@ -304,18 +304,35 @@ class VoteService:
         ballots,
         winner_id: uuid.UUID,
     ) -> None:
+        # mesmo padrao do admin panel (routers/groups.set_current_game): mutar grp,
+        # commit, refresh. antes tinha guard de source=manual que travava votes, removido.
+        import logging as _lg
+
+        _vlog = _lg.getLogger(__name__)
+        db = self.votes.db
         grp = await self.groups.get_by_id(session.group_id)
-        # winner de vote sempre sobrescreve, mesmo se tinha manual lock:
-        # a votacao e decisao coletiva e supera override individual anterior.
         if grp is not None:
+            _vlog.info(
+                "vote winner applying to group current_game group=%s old_source=%s old_game=%s new=%s",
+                session.group_id,
+                grp.current_game_source,
+                grp.current_game_id,
+                winner_id,
+            )
             grp.current_game_id = winner_id
             grp.current_game_source = "vote"
             grp.current_game_set_at = datetime.now(UTC)
             grp.current_game_set_by = None
             grp.current_game_vote_id = session.id
-            await self.votes.save()
-            # sinal explicito pro client invalidar o audit na hora.
-            # game_vote.closed ja dispara isso tb, mas ter os dois e defensivo.
+            db.add(grp)
+            await db.commit()
+            await db.refresh(grp)
+            _vlog.info(
+                "vote winner persisted group=%s source=%s game=%s",
+                session.group_id,
+                grp.current_game_source,
+                grp.current_game_id,
+            )
             from app.services.realtime import get_broker
 
             get_broker().publish(session.group_id, kind="current_game.changed")
