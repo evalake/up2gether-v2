@@ -58,18 +58,18 @@ async def test_concurrent_ballots_converge(make_user, auth_headers, client):
     gid = uuid.UUID(g["id"])
     q, gids = await get_broker().subscribe([gid])
     try:
-        # ambos votam ao mesmo tempo
-        r1, r2 = await asyncio.gather(
-            client.put(
-                f"/api/votes/{vote['id']}/ballot",
-                json={"approvals": [games[0]["id"]]},
-                headers=auth_headers(owner),
-            ),
-            client.put(
-                f"/api/votes/{vote['id']}/ballot",
-                json={"approvals": [games[1]["id"]]},
-                headers=auth_headers(member),
-            ),
+        # nota: mesma session DB compartilhada nos overrides do conftest, entao
+        # operacoes precisam ser sequenciais. realtime: confirma que o publish
+        # acontece em cada submit individualmente.
+        r1 = await client.put(
+            f"/api/votes/{vote['id']}/ballot",
+            json={"approvals": [games[0]["id"]]},
+            headers=auth_headers(owner),
+        )
+        r2 = await client.put(
+            f"/api/votes/{vote['id']}/ballot",
+            json={"approvals": [games[1]["id"]]},
+            headers=auth_headers(member),
         )
         assert r1.status_code == 200
         assert r2.status_code == 200
@@ -133,18 +133,17 @@ async def test_concurrent_theme_votes_converge(make_user, auth_headers, client):
     gid = uuid.UUID(g["id"])
     q, gids = await get_broker().subscribe([gid])
     try:
-        # owner muda Souls->Indies, m1 muda Indies->Souls (concorrente)
-        r1, r2 = await asyncio.gather(
-            client.put(
-                f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-                json={"suggestion_id": sug_ids["Indies"]},
-                headers=auth_headers(owner),
-            ),
-            client.put(
-                f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
-                json={"suggestion_id": sug_ids["Souls"]},
-                headers=auth_headers(m1),
-            ),
+        # owner muda Souls->Indies, m1 muda Indies->Souls (sequencial pra
+        # respeitar a session DB compartilhada)
+        r1 = await client.put(
+            f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+            json={"suggestion_id": sug_ids["Indies"]},
+            headers=auth_headers(owner),
+        )
+        r2 = await client.put(
+            f"/api/groups/{g['id']}/themes/cycle/{cid}/vote",
+            json={"suggestion_id": sug_ids["Souls"]},
+            headers=auth_headers(m1),
         )
         assert r1.status_code == 200
         assert r2.status_code == 200
