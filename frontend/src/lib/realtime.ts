@@ -30,8 +30,16 @@ function invalidateForKind(qc: ReturnType<typeof useQueryClient>, msg: Msg) {
   if (k.startsWith('game.')) {
     qc.invalidateQueries({ queryKey: ['groups', gid, 'games'] })
   }
-  // sempre cutuca notificacoes (qualquer evento gera in-app)
-  qc.invalidateQueries({ queryKey: ['notifications'] })
+  // notificacoes so em eventos que viram Notification row (notify_group fez)
+  // events granulares (ballot_cast, vote_cast) nao criam in-app row
+  if (
+    !k.endsWith('.ballot_cast') &&
+    !k.endsWith('.vote_cast') &&
+    !k.endsWith('.suggestion_updated') &&
+    !k.endsWith('.suggestion_deleted')
+  ) {
+    qc.invalidateQueries({ queryKey: ['notifications'] })
+  }
 }
 
 export function useRealtime() {

@@ -66,7 +66,7 @@ export function useCycle(groupId: string) {
     queryKey: cycleKey(groupId),
     queryFn: () => getCycle(groupId),
     enabled: !!groupId,
-    refetchInterval: 3_000,
+    refetchInterval: 30_000,
   })
 }
 

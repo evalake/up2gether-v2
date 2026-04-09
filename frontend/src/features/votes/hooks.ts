@@ -8,7 +8,7 @@ export function useVotes(groupId: string) {
     queryKey: votesKey(groupId),
     queryFn: () => listVotes(groupId),
     enabled: !!groupId,
-    refetchInterval: 3_000,
+    refetchInterval: 30_000,
   })
 }
 
