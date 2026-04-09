@@ -82,11 +82,14 @@ export function useRealtime() {
       if (stopped) return
       const url = `${BASE}/events/stream?token=${encodeURIComponent(token)}`
       es = new EventSource(url)
+      es.onopen = () => {
+        console.info('[realtime] SSE connected')
+      }
       es.onmessage = (ev) => {
         try {
           const msg = JSON.parse(ev.data) as Msg
           if (!msg || !msg.kind) return
-          // ignora tudo que nao for momento grande. poll cuida do resto.
+          if (msg.kind === 'connected') return
           if (!BIG_KINDS.has(msg.kind)) return
           invalidateForKind(qc, msg)
         } catch {
@@ -94,6 +97,7 @@ export function useRealtime() {
         }
       }
       es.onerror = () => {
+        console.warn('[realtime] SSE error, reconnecting in 3s')
         es?.close()
         es = null
         if (stopped) return

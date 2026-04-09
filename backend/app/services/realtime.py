@@ -64,10 +64,22 @@ def get_broker() -> Broker:
 
 async def event_stream(
     q: asyncio.Queue[dict[str, Any]],
-    heartbeat_seconds: float = 20.0,
+    heartbeat_seconds: float = 5.0,
 ) -> AsyncIterator[str]:
-    """Yields SSE-formatted strings. Heartbeat keepalive pra firewalls/proxies."""
+    """Yields SSE-formatted strings.
+
+    - Padding inicial de 2KB: alguns proxies (Cloudflare, Fly edge, nginx)
+      buffering stream ate encher N bytes. Mandar 2KB de comentario na
+      conexao forca o primeiro flush e destrava o pipeline.
+    - Heartbeat curto (5s): se o proxy tiver buffer por tempo, mantem dados
+      fluindo. Tambem serve pra derrubar conexao morta rapido.
+    """
     import json
+
+    # padding anti-buffering. SSE comment = linha comecando com ':'
+    yield ":" + (" " * 2048) + "\n\n"
+    # marca de conexao aberta, confirma pro client que o stream ta ativo
+    yield "data: {\"kind\":\"connected\"}\n\n"
 
     try:
         while True:
@@ -75,7 +87,6 @@ async def event_stream(
                 msg = await asyncio.wait_for(q.get(), timeout=heartbeat_seconds)
                 yield f"data: {json.dumps(msg)}\n\n"
             except TimeoutError:
-                # ping keepalive
                 yield ": ping\n\n"
     except asyncio.CancelledError:
         return
