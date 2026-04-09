@@ -13,7 +13,6 @@ import {
   type Game,
   type GameCreateInput,
   type GameUpdateInput,
-  type GameViability,
   type InterestSignal,
 } from './api'
 
@@ -100,16 +99,10 @@ function syncGameFromServer(
   qc.setQueryData<Game>(gameKey(groupId, fresh.id), fresh)
 }
 
-// recomputa interest_score local pra viability bar mexer na hora.
-// formula do server: want=1.0, ok=0.5, pass=0.0, normalizado pelo total de membros.
-// nao sei o total aqui, entao uso (want + 0.5*ok) / (want+ok+pass) * 100 como
-// aproximacao. depois o refetch do server corrige.
-function recalcInterest(v: GameViability): GameViability {
-  const total = v.interest_want_count + v.interest_ok_count + v.interest_pass_count
-  if (total === 0) return v
-  const score = ((v.interest_want_count + 0.5 * v.interest_ok_count) / total) * 100
-  return { ...v, interest_score: score }
-}
+// NAO recomputamos viability_score otimista: a formula do server mistura
+// price/hardware/interest com pesos e normalizacoes que nao temos aqui, entao
+// qualquer aproximacao da um flash ate o server responder. deixamos o numero
+// grande parado ate o retorno (~50ms) e so mexemos nos counts crus.
 
 export function useSetInterest(groupId: string) {
   const qc = useQueryClient()
@@ -129,13 +122,7 @@ export function useSetInterest(groupId: string) {
         if (vars.signal === 'want') v.interest_want_count += 1
         if (vars.signal === 'ok') v.interest_ok_count += 1
         if (vars.signal === 'pass') v.interest_pass_count += 1
-        const rec = recalcInterest(v)
-        // viability_score = media ponderada de price/hardware/interest.
-        // sem os pesos exatos fica dificil, so ajusto interest_score e deixo
-        // o viability_score com um delta proporcional pra sentir movimento.
-        const delta = rec.interest_score - g.viability.interest_score
-        rec.viability_score = Math.max(0, Math.min(100, g.viability.viability_score + delta / 3))
-        return { ...g, user_interest: vars.signal, viability: rec }
+        return { ...g, user_interest: vars.signal, viability: v }
       })
     },
     onError: (_e, vars, ctx) => restoreGame(qc, groupId, vars.gameId, ctx),
