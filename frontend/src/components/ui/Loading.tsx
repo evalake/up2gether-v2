@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
 
-type Props = { label?: string; size?: 'sm' | 'md' }
+type Props = { label?: string; size?: 'sm' | 'md'; inline?: boolean }
 
-export function Loading({ label = 'sincronizando', size = 'md' }: Props) {
+export function Loading({ label = 'sincronizando', size = 'md', inline = false }: Props) {
   const dim = size === 'sm' ? 18 : 28
-  return (
+  const inner = (
     <div className="flex items-center gap-3 text-sm text-nerv-orange/90">
       <motion.span
         className="relative grid place-items-center"
@@ -31,6 +31,10 @@ export function Loading({ label = 'sincronizando', size = 'md' }: Props) {
         {label}
       </motion.span>
     </div>
+  )
+  if (inline) return inner
+  return (
+    <div className="flex min-h-[50vh] w-full items-center justify-center">{inner}</div>
   )
 }
 
