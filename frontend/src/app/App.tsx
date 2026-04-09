@@ -15,9 +15,10 @@ import { PublicSessionPage } from '@/pages/PublicSessionPage'
 import { Navigate } from 'react-router-dom'
 import { RequireAuth } from './RequireAuth'
 import { Toaster } from '@/components/ui/Toaster'
-// SSE desligado: estava causando lag perceptivel em prod (refetch storm em cada evento).
-// mutations agora sao otimistas e polls (30-60s) sincronizam entre users.
-// import { useRealtime } from '@/lib/realtime'
+// SSE religado em modo seletivo: so "momentos grandes" (vote opened/closed,
+// phase advanced, theme decided, session created) disparam refetch. granular
+// fica com o poll.
+import { useRealtime } from '@/lib/realtime'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,9 +34,15 @@ const queryClient = new QueryClient({
   },
 })
 
+function RealtimeBoot() {
+  useRealtime()
+  return null
+}
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <RealtimeBoot />
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
