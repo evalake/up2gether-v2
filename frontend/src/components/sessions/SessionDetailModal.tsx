@@ -120,7 +120,7 @@ function Body({
     [start, session.duration_minutes],
   )
   const countdown = relFuture(start.getTime() - Date.now())
-  const isPast = end < new Date()
+  const isPast = start < new Date()
 
   const yes = rsvps.filter((r) => r.status === 'yes')
   const maybe = rsvps.filter((r) => r.status === 'maybe')

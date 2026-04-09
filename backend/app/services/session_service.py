@@ -208,6 +208,11 @@ class PlaySessionService:
         session = await self.sessions.get(session_id)
         if session is None or session.group_id != group_id:
             raise _not_found("Session not found")
+        start = session.start_at
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=UTC)
+        if start <= datetime.now(UTC):
+            raise _forbid("sessao ja comecou, rsvp travado")
         await self.sessions.upsert_rsvp(session_id, actor.id, rsvp_status)
         return await self._to_response(session, actor)
 

@@ -14,7 +14,8 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { steamCover } from '@/lib/steamCover'
 
-const HOURS = Array.from({ length: 16 }, (_, i) => i + 8) // 08..23
+const PRIME_HOURS = Array.from({ length: 8 }, (_, i) => i + 16) // 16..23
+const FULL_HOURS = Array.from({ length: 16 }, (_, i) => i + 8) // 08..23
 const WEEKDAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
 const MAX_FUTURE_YEARS = 1
 
@@ -51,6 +52,21 @@ export function SessionsPage() {
   const [duration, setDuration] = useState(120)
   const [openPast, setOpenPast] = useState(false)
   const [detailId, setDetailId] = useState<string | null>(null)
+  const [fullDay, setFullDay] = useState(false)
+  const HOURS = useMemo(() => {
+    if (fullDay) return FULL_HOURS
+    // auto-expand se tiver sessao fora do prime
+    const extras = new Set<number>()
+    for (const s of sessions.data ?? []) {
+      const h = new Date(s.start_at).getHours()
+      const d = new Date(s.start_at)
+      if (d >= weekAnchor && d < addDays(weekAnchor, 7) && (h < 16 || h > 23)) {
+        extras.add(h)
+      }
+    }
+    if (extras.size === 0) return PRIME_HOURS
+    return Array.from(new Set([...PRIME_HOURS, ...extras])).sort((a, b) => a - b)
+  }, [fullDay, sessions.data, weekAnchor])
   const group = useGroup(id)
   const canDelete =
     group.data?.user_role === 'admin' || group.data?.user_role === 'mod'
@@ -129,6 +145,13 @@ export function SessionsPage() {
           >
             hoje
           </button>
+          <button
+            onClick={() => setFullDay((v) => !v)}
+            title={fullDay ? 'mostrar so prime time' : 'mostrar dia todo'}
+            className={`ml-1 rounded-full px-3 h-7 text-[10px] uppercase tracking-wider transition-colors ${fullDay ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:bg-nerv-orange/10 hover:text-nerv-orange'}`}
+          >
+            {fullDay ? 'dia todo' : 'prime'}
+          </button>
         </div>
       </header>
 
@@ -171,8 +194,8 @@ export function SessionsPage() {
         </div>
       )}
 
-      <div className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30">
-        <div className="grid min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)' }}>
+      <div className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30" style={{ height: 'calc(100vh - 260px)', minHeight: 420 }}>
+        <div className="grid h-full min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${HOURS.length}, minmax(0, 1fr))` }}>
           <div className="border-b border-nerv-orange/10" />
           {WEEKDAYS.map((wd, i) => {
             const day = addDays(weekAnchor, i)
@@ -201,7 +224,7 @@ export function SessionsPage() {
                 return (
                   <div
                     key={`${h}-${i}`}
-                    className={`group/cell relative h-14 border-l border-t border-nerv-orange/5 ${
+                    className={`group/cell relative min-h-[44px] border-l border-t border-nerv-orange/5 ${
                       isPast ? 'bg-nerv-line/5' : ''
                     }`}
                   >
