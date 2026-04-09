@@ -1240,15 +1240,6 @@ function ThemesTab({ groupId }: { groupId: string }) {
   )
 }
 
-function TabPlaceholder({ label, note }: { label: string; note: string }) {
-  return (
-    <section className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-8 text-center">
-      <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">{label}</div>
-      <div className="mt-2 text-xs text-nerv-dim/80">{note}</div>
-    </section>
-  )
-}
-
 function OverviewCounters({
   games, members, votes, sessions, themes, onJump,
 }: {
