@@ -23,6 +23,19 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { Avatar } from '@/components/nerv/Avatar'
 
+type AdminTab = 'overview' | 'games' | 'votes' | 'sessions' | 'themes' | 'members' | 'config' | 'danger'
+
+const TABS: { key: AdminTab; label: string; ownerOnly?: boolean }[] = [
+  { key: 'overview', label: 'overview' },
+  { key: 'games', label: 'games' },
+  { key: 'votes', label: 'votes' },
+  { key: 'sessions', label: 'sessoes' },
+  { key: 'themes', label: 'temas' },
+  { key: 'members', label: 'membros' },
+  { key: 'config', label: 'config' },
+  { key: 'danger', label: 'perigo', ownerOnly: true },
+]
+
 export function GroupAdminPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
@@ -41,6 +54,7 @@ export function GroupAdminPage() {
   const [gameSearch, setGameSearch] = useState('')
   const toast = useToast()
   const [confirmKind, setConfirmKind] = useState<null | 'reset' | 'destroy'>(null)
+  const [tab, setTab] = useState<AdminTab>('overview')
 
   if (group.isLoading) return <Loading />
   if (group.error) return <ErrorBox error={group.error} />
@@ -98,6 +112,25 @@ export function GroupAdminPage() {
         </Link>
       </header>
 
+      <div className="flex flex-wrap gap-1 border-b border-nerv-line/30 pb-1">
+        {TABS.filter((t) => !t.ownerOnly || isOwner).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`rounded-t-sm border-b-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+              tab === t.key
+                ? t.key === 'danger'
+                  ? 'border-nerv-red text-nerv-red'
+                  : 'border-nerv-orange text-nerv-orange'
+                : 'border-transparent text-nerv-dim hover:text-nerv-text'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'overview' && (
       <section className="rounded-sm border border-nerv-green/20 bg-nerv-green/5 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -173,7 +206,30 @@ export function GroupAdminPage() {
           )}
         </div>
       </section>
+      )}
 
+      {tab === 'overview' && (
+        <OverviewCounters
+          games={games.data?.filter((g) => !g.archived_at).length ?? 0}
+          members={members.data?.length ?? 0}
+          onJump={setTab}
+        />
+      )}
+
+      {tab === 'games' && (
+        <TabPlaceholder label="games" note="em breve: listar, buscar, apagar e editar jogos do grupo" />
+      )}
+      {tab === 'votes' && (
+        <TabPlaceholder label="votes" note="em breve: listar historico, fechar, apagar votacoes" />
+      )}
+      {tab === 'sessions' && (
+        <TabPlaceholder label="sessoes" note="em breve: listar sessoes passadas e futuras, editar e apagar" />
+      )}
+      {tab === 'themes' && (
+        <TabPlaceholder label="temas" note="em breve: listar ciclos e temas, apagar e cancelar" />
+      )}
+
+      {tab === 'config' && (
       <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -208,9 +264,11 @@ export function GroupAdminPage() {
           </button>
         </div>
       </section>
+      )}
 
-      <WebhookSection groupId={group.data.id} current={group.data.webhook_url} />
+      {tab === 'config' && <WebhookSection groupId={group.data.id} current={group.data.webhook_url} />}
 
+      {tab === 'members' && (
       <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
         <div className="flex items-center justify-between">
           <div>
@@ -289,8 +347,9 @@ export function GroupAdminPage() {
           })}
         </div>
       </section>
+      )}
 
-      {isOwner && (
+      {tab === 'danger' && isOwner && (
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -438,6 +497,42 @@ function WebhookSection({ groupId, current }: { groupId: string; current: string
           </div>
         </div>
       )}
+    </section>
+  )
+}
+
+function TabPlaceholder({ label, note }: { label: string; note: string }) {
+  return (
+    <section className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-8 text-center">
+      <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">{label}</div>
+      <div className="mt-2 text-xs text-nerv-dim/80">{note}</div>
+    </section>
+  )
+}
+
+function OverviewCounters({
+  games, members, onJump,
+}: {
+  games: number
+  members: number
+  onJump: (t: AdminTab) => void
+}) {
+  const cards: { key: AdminTab; label: string; value: number }[] = [
+    { key: 'games', label: 'games', value: games },
+    { key: 'members', label: 'membros', value: members },
+  ]
+  return (
+    <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      {cards.map((c) => (
+        <button
+          key={c.key}
+          onClick={() => onJump(c.key)}
+          className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-4 text-left transition-colors hover:border-nerv-orange/40"
+        >
+          <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">{c.label}</div>
+          <div className="mt-1 font-display text-2xl tabular-nums text-nerv-text">{c.value}</div>
+        </button>
+      ))}
     </section>
   )
 }
