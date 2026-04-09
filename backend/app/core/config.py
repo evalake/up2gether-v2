@@ -45,7 +45,8 @@ class Settings(BaseSettings):
 
     # web push
     vapid_public_key: str = ""
-    vapid_private_key_file: str = ""
+    vapid_private_key: str = ""  # PEM direto como env (preferencia em prod)
+    vapid_private_key_file: str = ""  # fallback: caminho de arquivo (dev)
     vapid_claims_email: str = "mailto:admin@up2gether.app"
 
 

@@ -26,6 +26,12 @@ def _load_vapid() -> tuple[str | None, str]:
     settings = get_settings()
     if _VAPID_PRIVATE_KEY_CACHED is not None:
         return _VAPID_PRIVATE_KEY_CACHED, settings.vapid_claims_email
+    # prioridade: env var direto (prod/Fly), depois arquivo (dev local)
+    if settings.vapid_private_key:
+        # fly secret vem com \n literal as vezes, normaliza
+        _VAPID_PRIVATE_KEY_CACHED = settings.vapid_private_key.replace("\\n", "\n").strip()
+        _PUSH_AVAILABLE = True
+        return _VAPID_PRIVATE_KEY_CACHED, settings.vapid_claims_email
     if not settings.vapid_private_key_file:
         _PUSH_AVAILABLE = False
         return None, settings.vapid_claims_email
