@@ -455,6 +455,13 @@ function DraftModal({
   onCreate: () => void
   isPending: boolean
 }) {
+  const [query, setQuery] = useState('')
+  const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+  const q = norm(query.trim())
+  // selecionados sempre aparecem primeiro, mesmo se nao batem com a busca
+  const filtered = q
+    ? games.filter((g) => picked.includes(g.id) || norm(g.name).includes(q))
+    : games
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -481,12 +488,24 @@ function DraftModal({
             className="mt-1 h-9 w-full rounded-sm border-0 border-b border-nerv-line/40 bg-transparent px-0 text-base text-nerv-text focus:border-nerv-orange focus:outline-none"
           />
         </div>
+        <div className="border-b border-nerv-orange/10 px-5 py-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="buscar jogo..."
+            className="h-8 w-full rounded-sm border border-nerv-line/30 bg-black/20 px-2 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+          />
+        </div>
         <div className="max-h-80 overflow-y-auto px-5 py-3">
-          <div className="mb-2 text-[10px] uppercase tracking-wider text-nerv-dim">
-            candidatos · {picked.length} selecionados {picked.length < 2 && '(minimo 2)'}
+          <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+            <span>candidatos · {picked.length} selecionados {picked.length < 2 && '(minimo 2)'}</span>
+            {q && <span>{filtered.length} match{filtered.length === 1 ? '' : 'es'}</span>}
           </div>
+          {filtered.length === 0 ? (
+            <div className="py-6 text-center text-[11px] text-nerv-dim">nenhum jogo pra "{query}"</div>
+          ) : (
           <div className="grid gap-1.5 sm:grid-cols-2">
-            {games.map((g) => {
+            {filtered.map((g) => {
               const on = picked.includes(g.id)
               const cover = steamCover(g)
               return (
@@ -504,6 +523,7 @@ function DraftModal({
               )
             })}
           </div>
+          )}
         </div>
         <div className="flex items-center justify-end gap-2 border-t border-nerv-orange/15 bg-black/30 px-5 py-3">
           <button

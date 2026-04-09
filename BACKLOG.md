@@ -5,6 +5,7 @@
 - [ ] Web push notifications (app fechado, celular) -- prioridade 1
 - [ ] Dark/light toggle persistente
 - [ ] Empty states guiados (grupo vazio, primeira sessão, etc)
+- [ ] Busca por nome no seletor de candidatos da votação (filtro live, destaque do match)
 
 ## Engajamento
 - [ ] Stats pessoais (horas jogadas, votos, sugestões do mês)
