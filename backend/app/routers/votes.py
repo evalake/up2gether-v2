@@ -9,7 +9,7 @@ from app.core.security import CurrentUser
 from app.repositories.game_repo import GameRepository
 from app.repositories.group_repo import GroupRepository
 from app.repositories.vote_repo import VoteRepository
-from app.schemas.vote import BallotSubmit, VoteSessionCreate, VoteSessionResponse
+from app.schemas.vote import BallotSubmit, VoteAuditResponse, VoteSessionCreate, VoteSessionResponse
 from app.services.vote_service import VoteService
 
 router = APIRouter(tags=["votes"])
@@ -36,6 +36,16 @@ async def list_votes(
     service: Annotated[VoteService, Depends(get_vote_service)],
 ) -> list[VoteSessionResponse]:
     return await service.list_for_group(group_id, actor)
+
+
+@router.get("/groups/{group_id}/votes/{vote_id}/audit", response_model=VoteAuditResponse)
+async def vote_audit(
+    group_id: uuid.UUID,
+    vote_id: uuid.UUID,
+    actor: CurrentUser,
+    service: Annotated[VoteService, Depends(get_vote_service)],
+) -> VoteAuditResponse:
+    return await service.audit(group_id, vote_id, actor)
 
 
 @router.get("/groups/{group_id}/votes/{vote_id}", response_model=VoteSessionResponse)

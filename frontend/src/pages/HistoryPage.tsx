@@ -5,6 +5,7 @@ import { useVotes } from '@/features/votes/hooks'
 import { useGames } from '@/features/games/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
 
 // historico derivado: votes fechados com vencedor, ordem desc.
 // nao captura override manual pq n temos log disso ainda. TODO: dps
@@ -14,6 +15,7 @@ export function HistoryPage() {
   const votes = useVotes(id)
   const games = useGames(id)
   const [q, setQ] = useState('')
+  const [auditId, setAuditId] = useState<string | null>(null)
 
   if (group.isLoading || votes.isLoading || games.isLoading) return <Loading />
   if (group.error) return <ErrorBox error={group.error} />
@@ -92,11 +94,12 @@ export function HistoryPage() {
             })
             const isLatest = i === 0 && !q
             return (
-              <div
+              <button
                 key={v.id}
-                className={`flex items-center gap-4 rounded-sm border p-4 transition-colors ${
+                onClick={() => setAuditId(v.id)}
+                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-colors ${
                   isLatest
-                    ? 'border-nerv-green/40 bg-nerv-green/5'
+                    ? 'border-nerv-green/40 bg-nerv-green/5 hover:border-nerv-green/60'
                     : 'border-nerv-line/40 bg-nerv-panel/20 hover:border-nerv-orange/30'
                 }`}
               >
@@ -111,18 +114,9 @@ export function HistoryPage() {
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    {g ? (
-                      <Link
-                        to={`/groups/${id}/games/${g.id}`}
-                        className="truncate font-display text-lg text-nerv-text hover:text-nerv-orange"
-                      >
-                        {g.name}
-                      </Link>
-                    ) : (
-                      <span className="truncate font-display text-lg text-nerv-dim">
-                        {v.winner_game_id ? '(jogo removido)' : '(sem vencedor)'}
-                      </span>
-                    )}
+                    <span className={`truncate font-display text-lg ${g ? 'text-nerv-text' : 'text-nerv-dim'}`}>
+                      {g ? g.name : v.winner_game_id ? '(jogo removido)' : '(sem vencedor)'}
+                    </span>
                     {isLatest && (
                       <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-green">
                         atual
@@ -133,13 +127,21 @@ export function HistoryPage() {
                     {v.title}
                   </div>
                   <div className="mt-1 font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
-                    {dt} · {v.ballots_count} voto{v.ballots_count === 1 ? '' : 's'}
+                    {dt} · {v.ballots_count} voto{v.ballots_count === 1 ? '' : 's'} · audit →
                   </div>
                 </div>
-              </div>
+              </button>
             )
           })}
         </div>
+      )}
+
+      {auditId && (
+        <VoteAuditModal
+          groupId={id}
+          voteId={auditId}
+          onClose={() => setAuditId(null)}
+        />
       )}
     </div>
   )

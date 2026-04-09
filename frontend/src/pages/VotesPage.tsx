@@ -13,6 +13,7 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
+import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
 
 type VoteRow = NonNullable<ReturnType<typeof useVotes>['data']>[number]
 
@@ -28,6 +29,7 @@ export function VotesPage() {
   const [picked, setPicked] = useState<string[]>([])
   const [openHistory, setOpenHistory] = useState(false)
   const [reveal, setReveal] = useState<{ vote: VoteRow; game: Game } | null>(null)
+  const [auditId, setAuditId] = useState<string | null>(null)
   const toast = useToast()
 
   const togglePick = (gid: string) =>
@@ -162,6 +164,7 @@ export function VotesPage() {
               gameOf={gameOf}
               onApprove={(gid) => onApprove(v.id, gid, v.your_approvals)}
               onClose={() => onClose(v)}
+              onAudit={() => setAuditId(v.id)}
             />
           ))}
         </section>
@@ -183,9 +186,10 @@ export function VotesPage() {
                 const winner = v.winner_game_id ? gameOf(v.winner_game_id) : null
                 const cover = winner ? steamCover(winner) : null
                 return (
-                  <div
+                  <button
                     key={v.id}
-                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 transition-colors hover:border-nerv-orange/40"
+                    onClick={() => setAuditId(v.id)}
+                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-colors hover:border-nerv-orange/40"
                   >
                     {cover ? (
                       <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover" />
@@ -206,9 +210,10 @@ export function VotesPage() {
                       <div className="mt-2 flex items-center gap-3 text-[10px] uppercase tracking-wider text-nerv-dim">
                         <span><span className="text-nerv-text tabular-nums">{v.ballots_count}</span>/{v.eligible_voter_count} votos</span>
                         <span>{v.candidate_game_ids.length} candidatos</span>
+                        <span className="text-nerv-orange">audit →</span>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 )
               })}
             </div>
@@ -231,6 +236,14 @@ export function VotesPage() {
         )}
       </AnimatePresence>
 
+      {auditId && (
+        <VoteAuditModal
+          groupId={id}
+          voteId={auditId}
+          onClose={() => setAuditId(null)}
+        />
+      )}
+
       <AnimatePresence>
         {reveal && (
           <WinnerReveal
@@ -248,12 +261,13 @@ export function VotesPage() {
 }
 
 function VoteCard({
-  v, gameOf, onApprove, onClose,
+  v, gameOf, onApprove, onClose, onAudit,
 }: {
   v: VoteRow
   gameOf: (gid: string) => Game | undefined
   onApprove: (gid: string) => void
   onClose: () => void
+  onAudit: () => void
 }) {
   const tallies = v.tallies ?? {}
   const totalVotes = Object.values(tallies).reduce((a, b) => a + b, 0)
@@ -289,12 +303,20 @@ function VoteCard({
           </div>
           <div className="mt-1 truncate text-lg text-nerv-text">{v.title}</div>
         </div>
-        <button
-          onClick={onClose}
-          className="rounded-sm border border-nerv-red/30 px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red"
-        >
-          encerrar
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onAudit}
+            className="rounded-sm border border-nerv-line px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/60 hover:text-nerv-orange"
+          >
+            audit
+          </button>
+          <button
+            onClick={onClose}
+            className="rounded-sm border border-nerv-red/30 px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red"
+          >
+            encerrar
+          </button>
+        </div>
       </div>
 
       {/* participation strip */}

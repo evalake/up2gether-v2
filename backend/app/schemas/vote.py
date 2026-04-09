@@ -56,3 +56,35 @@ class VoteSessionResponse(BaseModel):
 
 class BallotSubmit(BaseModel):
     approvals: list[uuid.UUID]
+
+
+class VoteAuditVoter(BaseModel):
+    user_id: uuid.UUID
+    discord_id: str | None
+    display_name: str
+    avatar_url: str | None
+    approvals: list[uuid.UUID]
+    stage_id: uuid.UUID | None
+    stage_number: int | None
+    submitted_at: datetime
+
+
+class VoteAuditGame(BaseModel):
+    id: uuid.UUID
+    name: str
+    cover_url: str | None
+
+
+class VoteAuditCreator(BaseModel):
+    id: uuid.UUID | None
+    discord_id: str | None = None
+    display_name: str | None
+    avatar_url: str | None
+
+
+class VoteAuditResponse(BaseModel):
+    session: VoteSessionResponse
+    creator: VoteAuditCreator
+    games: list[VoteAuditGame]
+    voters: list[VoteAuditVoter]
+    non_voters: list[VoteAuditCreator]  # mesmo shape, reaproveita

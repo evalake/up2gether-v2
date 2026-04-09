@@ -61,3 +61,38 @@ export const closeVote = (groupId: string, voteId: string) =>
 
 export const deleteVote = (groupId: string, voteId: string) =>
   api<null>(`/groups/${groupId}/votes/${voteId}`, { method: 'DELETE' })
+
+export type VoteAuditVoter = {
+  user_id: string
+  discord_id: string | null
+  display_name: string
+  avatar_url: string | null
+  approvals: string[]
+  stage_id: string | null
+  stage_number: number | null
+  submitted_at: string
+}
+
+export type VoteAuditGame = {
+  id: string
+  name: string
+  cover_url: string | null
+}
+
+export type VoteAuditPerson = {
+  id: string | null
+  discord_id: string | null
+  display_name: string | null
+  avatar_url: string | null
+}
+
+export type VoteAudit = {
+  session: VoteSession
+  creator: VoteAuditPerson
+  games: VoteAuditGame[]
+  voters: VoteAuditVoter[]
+  non_voters: VoteAuditPerson[]
+}
+
+export const getVoteAudit = (groupId: string, voteId: string) =>
+  api<VoteAudit>(`/groups/${groupId}/votes/${voteId}/audit`)

@@ -3,6 +3,7 @@ import {
   closeVote,
   createVote,
   deleteVote,
+  getVoteAudit,
   listVotes,
   submitBallot,
   type VoteCreateInput,
@@ -91,6 +92,15 @@ export function useSubmitBallot(groupId: string) {
       if (ctx?.prev) qc.setQueryData(key, ctx.prev)
     },
     onSuccess: (updated) => applyVoteResponse(qc, groupId, updated),
+  })
+}
+
+export function useVoteAudit(groupId: string, voteId: string | null) {
+  return useQuery({
+    queryKey: ['groups', groupId, 'votes', voteId, 'audit'] as const,
+    queryFn: () => getVoteAudit(groupId, voteId!),
+    enabled: !!groupId && !!voteId,
+    staleTime: 5_000,
   })
 }
 
