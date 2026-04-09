@@ -10,6 +10,7 @@ import { GameDetailPage } from '@/pages/GameDetailPage'
 import { VotesPage } from '@/pages/VotesPage'
 import { ThemesPage } from '@/pages/ThemesPage'
 import { SessionsPage } from '@/pages/SessionsPage'
+import { HistoryPage } from '@/pages/HistoryPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { PublicSessionPage } from '@/pages/PublicSessionPage'
 import { Navigate } from 'react-router-dom'
@@ -102,6 +103,14 @@ export function App() {
             element={
               <RequireAuth>
                 <ThemesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/groups/:id/history"
+            element={
+              <RequireAuth>
+                <HistoryPage />
               </RequireAuth>
             }
           />

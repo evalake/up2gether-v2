@@ -621,6 +621,12 @@ function CurrentGameHero({
                 votação completa
               </button>
             )}
+            <button
+              onClick={() => navigate(`/groups/${groupId}/history`)}
+              className="rounded-sm border border-nerv-dim/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/50 hover:text-nerv-orange"
+            >
+              histórico
+            </button>
             {isAdmin && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/admin`)}
