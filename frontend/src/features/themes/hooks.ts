@@ -10,6 +10,8 @@ import {
   forceDecide,
   getCurrentTheme,
   getCycle,
+  getThemeAudit,
+  getThemeCycleAudit,
   listThemes,
   openCycle,
   startVoting,
@@ -182,5 +184,22 @@ export function useCancelCycle(groupId: string) {
   return useMutation({
     mutationFn: (cycleId: string) => cancelCycle(groupId, cycleId),
     onSuccess: () => invalidateCycle(qc, groupId),
+  })
+}
+
+export function useThemeAudit(
+  groupId: string,
+  target: { themeId?: string | null; cycleId?: string | null },
+) {
+  const themeId = target.themeId ?? null
+  const cycleId = target.cycleId ?? null
+  return useQuery({
+    queryKey: ['groups', groupId, 'themes', 'audit', { themeId, cycleId }] as const,
+    queryFn: () =>
+      themeId
+        ? getThemeAudit(groupId, themeId)
+        : getThemeCycleAudit(groupId, cycleId!),
+    enabled: !!groupId && (!!themeId || !!cycleId),
+    staleTime: 5_000,
   })
 }

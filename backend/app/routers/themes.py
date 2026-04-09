@@ -11,6 +11,7 @@ from app.repositories.theme_repo import ThemeRepository
 from app.schemas.theme import (
     CycleResponse,
     SuggestionCreate,
+    ThemeAuditResponse,
     ThemeCreate,
     ThemeResponse,
     VoteCast,
@@ -50,6 +51,29 @@ async def list_themes(
     service: Annotated[ThemeService, Depends(get_theme_service)],
 ) -> list[ThemeResponse]:
     return await service.list_history(group_id, actor)
+
+
+@router.get("/groups/{group_id}/themes/{theme_id}/audit", response_model=ThemeAuditResponse)
+async def theme_audit(
+    group_id: uuid.UUID,
+    theme_id: uuid.UUID,
+    actor: CurrentUser,
+    service: Annotated[ThemeService, Depends(get_theme_service)],
+) -> ThemeAuditResponse:
+    return await service.audit(group_id, actor, theme_id=theme_id)
+
+
+@router.get(
+    "/groups/{group_id}/themes/cycle/{cycle_id}/audit",
+    response_model=ThemeAuditResponse,
+)
+async def theme_cycle_audit(
+    group_id: uuid.UUID,
+    cycle_id: uuid.UUID,
+    actor: CurrentUser,
+    service: Annotated[ThemeService, Depends(get_theme_service)],
+) -> ThemeAuditResponse:
+    return await service.audit(group_id, actor, cycle_id=cycle_id)
 
 
 @router.delete("/groups/{group_id}/themes/{theme_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -98,3 +98,34 @@ export const forceDecide = (groupId: string, cycleId: string, suggestionId: stri
 
 export const cancelCycle = (groupId: string, cycleId: string) =>
   api<Cycle>(`/groups/${groupId}/themes/cycle/${cycleId}/cancel`, { method: 'POST' })
+
+export type ThemeAuditPerson = {
+  id: string | null
+  discord_id: string | null
+  display_name: string | null
+  avatar_url: string | null
+}
+
+export type ThemeAuditVote = {
+  user_id: string
+  discord_id: string | null
+  display_name: string
+  avatar_url: string | null
+  suggestion_id: string
+}
+
+export type ThemeAudit = {
+  theme: Theme | null
+  cycle: Cycle | null
+  opener: ThemeAuditPerson | null
+  decided_by: ThemeAuditPerson | null
+  votes: ThemeAuditVote[]
+  non_voters: ThemeAuditPerson[]
+  non_suggesters: ThemeAuditPerson[]
+}
+
+export const getThemeAudit = (groupId: string, themeId: string) =>
+  api<ThemeAudit>(`/groups/${groupId}/themes/${themeId}/audit`)
+
+export const getThemeCycleAudit = (groupId: string, cycleId: string) =>
+  api<ThemeAudit>(`/groups/${groupId}/themes/cycle/${cycleId}/audit`)

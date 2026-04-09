@@ -57,6 +57,31 @@ class VoteCast(BaseModel):
     suggestion_id: uuid.UUID
 
 
+class ThemeAuditPerson(BaseModel):
+    id: uuid.UUID | None
+    discord_id: str | None = None
+    display_name: str | None
+    avatar_url: str | None
+
+
+class ThemeAuditVote(BaseModel):
+    user_id: uuid.UUID
+    discord_id: str | None
+    display_name: str
+    avatar_url: str | None
+    suggestion_id: uuid.UUID
+
+
+class ThemeAuditResponse(BaseModel):
+    theme: "ThemeResponse | None"
+    cycle: "CycleResponse | None"
+    opener: ThemeAuditPerson | None
+    decided_by: ThemeAuditPerson | None
+    votes: list[ThemeAuditVote]
+    non_voters: list[ThemeAuditPerson]
+    non_suggesters: list[ThemeAuditPerson]
+
+
 class CycleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -73,3 +98,5 @@ class CycleResponse(BaseModel):
     user_suggestion_id: uuid.UUID | None = None
     user_vote_suggestion_id: uuid.UUID | None = None
     total_votes: int = 0
+
+ThemeAuditResponse.model_rebuild()

@@ -16,6 +16,9 @@ from app.schemas.theme import (
     CycleResponse,
     SuggestionCreate,
     SuggestionResponse,
+    ThemeAuditPerson,
+    ThemeAuditResponse,
+    ThemeAuditVote,
     ThemeCreate,
     ThemeResponse,
 )
@@ -93,6 +96,112 @@ class ThemeService:
         await self._require_member(group_id, actor)
         themes = await self.themes.list_for_group(group_id)
         return [ThemeResponse.model_validate(t) for t in themes]
+
+    async def audit(
+        self,
+        group_id: uuid.UUID,
+        actor: User,
+        *,
+        theme_id: uuid.UUID | None = None,
+        cycle_id: uuid.UUID | None = None,
+    ) -> ThemeAuditResponse:
+        await self._require_member(group_id, actor)
+
+        theme_obj: MonthlyTheme | None = None
+        cycle_obj: ThemeCycle | None = None
+
+        if theme_id is not None:
+            themes = await self.themes.list_for_group(group_id)
+            theme_obj = next((t for t in themes if t.id == theme_id), None)
+            if theme_obj is None:
+                raise _not_found("Theme not found")
+            cycle_obj = await self.themes.get_cycle_for_month(group_id, theme_obj.month_year)
+        elif cycle_id is not None:
+            cycle_obj = await self.themes.get_cycle(cycle_id)
+            if cycle_obj is None or cycle_obj.group_id != group_id:
+                raise _not_found("Cycle not found")
+            theme_obj = await self.themes.get_for_month(group_id, cycle_obj.month_year)
+        else:
+            raise _bad("theme_id ou cycle_id obrigatorio")
+
+        from app.models.user import User as UserModel
+
+        suggestions = (
+            await self.themes.list_suggestions(cycle_obj.id) if cycle_obj else []
+        )
+        votes = await self.themes.list_votes(cycle_obj.id) if cycle_obj else []
+
+        user_ids: set[uuid.UUID] = set()
+        for s in suggestions:
+            user_ids.add(s.user_id)
+        for v in votes:
+            user_ids.add(v.user_id)
+        if cycle_obj and cycle_obj.opened_by:
+            user_ids.add(cycle_obj.opened_by)
+        if theme_obj and theme_obj.created_by:
+            user_ids.add(theme_obj.created_by)
+        members = await self.groups.list_members(group_id)
+        member_user_ids = [m.user_id for m in members]
+        user_ids.update(member_user_ids)
+
+        users_by_id: dict[uuid.UUID, UserModel] = {}
+        if user_ids:
+            rows = await self.themes.db.execute(
+                select(UserModel).where(UserModel.id.in_(list(user_ids)))
+            )
+            for u in rows.scalars().all():
+                users_by_id[u.id] = u
+
+        def _person(uid: uuid.UUID | None) -> ThemeAuditPerson:
+            if uid is None or uid not in users_by_id:
+                return ThemeAuditPerson(
+                    id=uid, discord_id=None, display_name=None, avatar_url=None
+                )
+            u = users_by_id[uid]
+            return ThemeAuditPerson(
+                id=u.id,
+                discord_id=u.discord_id,
+                display_name=u.discord_display_name or u.discord_username,
+                avatar_url=u.discord_avatar,
+            )
+
+        vote_list: list[ThemeAuditVote] = []
+        voted_ids: set[uuid.UUID] = set()
+        for v in votes:
+            u = users_by_id.get(v.user_id)
+            voted_ids.add(v.user_id)
+            vote_list.append(
+                ThemeAuditVote(
+                    user_id=v.user_id,
+                    discord_id=u.discord_id if u else None,
+                    display_name=(u.discord_display_name or u.discord_username)
+                    if u
+                    else "(removido)",
+                    avatar_url=u.discord_avatar if u else None,
+                    suggestion_id=v.suggestion_id,
+                )
+            )
+
+        suggester_ids = {s.user_id for s in suggestions}
+        non_voters = [_person(uid) for uid in member_user_ids if uid not in voted_ids]
+        non_suggesters = [
+            _person(uid) for uid in member_user_ids if uid not in suggester_ids
+        ]
+
+        cycle_resp = (
+            await self._cycle_response(cycle_obj, actor) if cycle_obj else None
+        )
+        theme_resp = ThemeResponse.model_validate(theme_obj) if theme_obj else None
+
+        return ThemeAuditResponse(
+            theme=theme_resp,
+            cycle=cycle_resp,
+            opener=_person(cycle_obj.opened_by) if cycle_obj else None,
+            decided_by=_person(theme_obj.created_by) if theme_obj else None,
+            votes=vote_list,
+            non_voters=non_voters,
+            non_suggesters=non_suggesters,
+        )
 
     async def delete(self, group_id: uuid.UUID, theme_id: uuid.UUID, actor: User) -> None:
         await self._require_admin_or_mod(group_id, actor)

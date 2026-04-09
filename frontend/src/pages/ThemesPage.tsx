@@ -22,6 +22,7 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { Avatar } from '@/components/nerv/Avatar'
 import type { Cycle, Suggestion } from '@/features/themes/api'
+import { ThemeAuditModal } from '@/components/themes/ThemeAuditModal'
 
 export function ThemesPage() {
   const { id = '' } = useParams()
@@ -42,6 +43,9 @@ export function ThemesPage() {
   const toast = useToast()
 
   const [openHistory, setOpenHistory] = useState(false)
+  const [auditTarget, setAuditTarget] = useState<
+    { themeId?: string; cycleId?: string } | null
+  >(null)
   const isSysAdmin = !!me.data?.is_sys_admin
   const isAdmin = group.data?.user_role === 'admin' || isSysAdmin
   const isStaff = isAdmin || group.data?.user_role === 'mod'
@@ -104,6 +108,15 @@ export function ThemesPage() {
 
       {/* ciclo ativo (voting) ou reaberto */}
       {cycle.data && cycle.data.phase !== 'cancelled' && cycle.data.phase !== 'decided' && (
+        <>
+        <div className="flex justify-end">
+          <button
+            onClick={() => setAuditTarget({ cycleId: cycle.data!.id })}
+            className="rounded-sm border border-nerv-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange"
+          >
+            audit
+          </button>
+        </div>
         <CycleSection
           cycle={cycle.data}
           isStaff={isStaff}
@@ -145,6 +158,7 @@ export function ThemesPage() {
             catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
           }}
         />
+        </>
       )}
 
       {!current.data && !cycle.data && (
@@ -167,9 +181,11 @@ export function ThemesPage() {
           {openHistory && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {past.map((t) => (
-                <div
+                <button
+                  type="button"
+                  onClick={() => setAuditTarget({ themeId: t.id })}
                   key={t.id}
-                  className="group relative overflow-hidden rounded-sm border border-nerv-line/50 bg-nerv-panel/30 transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40"
+                  className="group relative overflow-hidden rounded-sm border border-nerv-line/50 bg-nerv-panel/30 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40"
                 >
                   {t.image_url && (
                     <div className="relative h-28 w-full overflow-hidden">
@@ -191,15 +207,17 @@ export function ThemesPage() {
                       )}
                     </div>
                     {isStaff && (
-                      <button
-                        onClick={() => del.mutate(t.id)}
-                        className="shrink-0 text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-nerv-dim hover:!text-nerv-red"
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => { e.stopPropagation(); del.mutate(t.id) }}
+                        className="shrink-0 cursor-pointer text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-nerv-dim hover:!text-nerv-red"
                       >
                         remover
-                      </button>
+                      </span>
                     )}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -211,6 +229,14 @@ export function ThemesPage() {
           <TiebreakOverlay data={showTiebreak} onClose={() => setShowTiebreak(null)} />
         )}
       </AnimatePresence>
+      {auditTarget && (
+        <ThemeAuditModal
+          groupId={id}
+          themeId={auditTarget.themeId}
+          cycleId={auditTarget.cycleId}
+          onClose={() => setAuditTarget(null)}
+        />
+      )}
     </div>
   )
 }
