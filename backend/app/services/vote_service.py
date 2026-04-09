@@ -305,7 +305,9 @@ class VoteService:
         winner_id: uuid.UUID,
     ) -> None:
         grp = await self.groups.get_by_id(session.group_id)
-        if grp is not None and grp.current_game_source != "manual":
+        # winner de vote sempre sobrescreve, mesmo se tinha manual lock:
+        # a votacao e decisao coletiva e supera override individual anterior.
+        if grp is not None:
             grp.current_game_id = winner_id
             grp.current_game_source = "vote"
             grp.current_game_set_at = datetime.now(UTC)
