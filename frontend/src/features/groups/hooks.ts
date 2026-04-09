@@ -76,6 +76,8 @@ export function useCurrentGameAudit(groupId: string) {
     queryKey: ['groups', groupId, 'current-game', 'audit'],
     queryFn: () => getCurrentGameAudit(groupId),
     enabled: !!groupId,
+    refetchInterval: 5_000,
+    staleTime: 2_000,
   })
 }
 

@@ -312,6 +312,11 @@ class VoteService:
             grp.current_game_set_by = None
             grp.current_game_vote_id = session.id
             await self.votes.save()
+            # sinal explicito pro client invalidar o audit na hora.
+            # game_vote.closed ja dispara isso tb, mas ter os dois e defensivo.
+            from app.services.realtime import get_broker
+
+            get_broker().publish(session.group_id, kind="current_game.changed")
 
         winner = await self.games.get_by_id(winner_id)
         winner_name = winner.name if winner else None
