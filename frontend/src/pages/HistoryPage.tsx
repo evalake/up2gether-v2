@@ -23,8 +23,10 @@ export function HistoryPage() {
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
   const query = norm(q.trim())
 
+  // inclui qualquer vote nao-aberto (closed, archived). se n tem winner, mostra
+  // como "sem vencedor" ao inves de sumir
   const chapters = (votes.data ?? [])
-    .filter((v) => v.status === 'closed' && v.winner_game_id)
+    .filter((v) => v.status !== 'open')
     .slice()
     .sort((a, b) => {
       const at = a.closed_at ?? a.created_at
@@ -34,7 +36,7 @@ export function HistoryPage() {
 
   const filtered = query
     ? chapters.filter((v) => {
-        const g = gameById(v.winner_game_id!)
+        const g = v.winner_game_id ? gameById(v.winner_game_id) : null
         return (
           (g && norm(g.name).includes(query)) ||
           norm(v.title).includes(query)
@@ -81,7 +83,7 @@ export function HistoryPage() {
       ) : (
         <div className="space-y-2">
           {filtered.map((v, i) => {
-            const g = gameById(v.winner_game_id!)
+            const g = v.winner_game_id ? gameById(v.winner_game_id) : null
             const when = v.closed_at ?? v.created_at
             const dt = new Date(when).toLocaleDateString('pt-BR', {
               day: '2-digit',
@@ -118,7 +120,7 @@ export function HistoryPage() {
                       </Link>
                     ) : (
                       <span className="truncate font-display text-lg text-nerv-dim">
-                        (jogo removido)
+                        {v.winner_game_id ? '(jogo removido)' : '(sem vencedor)'}
                       </span>
                     )}
                     {isLatest && (
