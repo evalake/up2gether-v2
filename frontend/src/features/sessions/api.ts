@@ -55,3 +55,36 @@ export const rsvpSession = setRsvp
 
 export const sessionIcsUrl = (groupId: string, sessionId: string) =>
   `/api/groups/${groupId}/sessions/${sessionId}/calendar.ics`
+
+export type SessionAuditPerson = {
+  id: string | null
+  discord_id: string | null
+  display_name: string | null
+  avatar_url: string | null
+}
+
+export type SessionAuditRsvp = {
+  user_id: string
+  discord_id: string | null
+  display_name: string
+  avatar_url: string | null
+  status: SessionRsvp
+  updated_at: string
+}
+
+export type SessionAuditGame = {
+  id: string
+  name: string
+  cover_url: string | null
+}
+
+export type SessionAudit = {
+  session: PlaySession
+  creator: SessionAuditPerson
+  game: SessionAuditGame | null
+  rsvps: SessionAuditRsvp[]
+  non_respondents: SessionAuditPerson[]
+}
+
+export const getSessionAudit = (groupId: string, sessionId: string) =>
+  api<SessionAudit>(`/groups/${groupId}/sessions/${sessionId}/audit`)

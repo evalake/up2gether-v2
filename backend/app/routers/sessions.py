@@ -11,6 +11,7 @@ from app.repositories.group_repo import GroupRepository
 from app.repositories.session_repo import SessionRepository
 from app.schemas.session import (
     RsvpUpdate,
+    SessionAuditResponse,
     SessionCreate,
     SessionResponse,
     SessionUpdate,
@@ -43,6 +44,19 @@ async def list_sessions(
     service: Annotated[PlaySessionService, Depends(get_session_service)],
 ) -> list[SessionResponse]:
     return await service.list_for_group(group_id, actor)
+
+
+@router.get(
+    "/groups/{group_id}/sessions/{session_id}/audit",
+    response_model=SessionAuditResponse,
+)
+async def session_audit(
+    group_id: uuid.UUID,
+    session_id: uuid.UUID,
+    actor: CurrentUser,
+    service: Annotated[PlaySessionService, Depends(get_session_service)],
+) -> SessionAuditResponse:
+    return await service.audit(group_id, session_id, actor)
 
 
 @router.get("/groups/{group_id}/sessions/{session_id}", response_model=SessionResponse)

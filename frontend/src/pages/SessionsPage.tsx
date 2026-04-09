@@ -10,6 +10,7 @@ import {
   useSetRsvp,
 } from '@/features/sessions/hooks'
 import type { PlaySession, SessionRsvp } from '@/features/sessions/api'
+import { SessionAuditModal } from '@/components/sessions/SessionAuditModal'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
@@ -69,6 +70,7 @@ export function SessionsPage() {
   const [duration, setDuration] = useState(120)
   const [openPast, setOpenPast] = useState(false)
   const [highlightId, setHighlightId] = useState<string | null>(null)
+  const [auditId, setAuditId] = useState<string | null>(null)
   const cardRefs = useMemo(() => new Map<string, HTMLDivElement>(), [])
   const focusSession = (sid: string) => {
     const el = cardRefs.get(sid)
@@ -285,6 +287,7 @@ export function SessionsPage() {
                 game={games.data?.find((g) => g.id === s.game_id)}
                 onRsvp={(v) => rsvp.mutate({ sessionId: s.id, status: v })}
                 onDelete={() => del.mutate(s.id)}
+                onAudit={() => setAuditId(s.id)}
                 groupId={id}
                 memberName={memberName}
                 memberAvatar={memberAvatar}
@@ -316,7 +319,7 @@ export function SessionsPage() {
                 const cover = game ? steamCover(game) : null
                 const start = new Date(s.start_at)
                 return (
-                  <div key={s.id} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 transition-colors hover:border-nerv-orange/30">
+                  <button key={s.id} type="button" onClick={() => setAuditId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-colors hover:border-nerv-orange/30">
                     {cover ? (
                       <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" />
                     ) : (
@@ -336,7 +339,7 @@ export function SessionsPage() {
                         <span className="ml-auto text-nerv-dim/70">{s.duration_minutes / 60}h</span>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 )
               })}
             </div>
@@ -431,6 +434,13 @@ export function SessionsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      {auditId && (
+        <SessionAuditModal
+          groupId={id}
+          sessionId={auditId}
+          onClose={() => setAuditId(null)}
+        />
+      )}
     </div>
   )
 }
@@ -484,12 +494,13 @@ function RsvpAvatarRow({
 }
 
 function SessionCard({
-  s, game, onRsvp, onDelete, groupId: _groupId, memberName, memberAvatar, highlight, registerRef,
+  s, game, onRsvp, onDelete, onAudit, groupId: _groupId, memberName, memberAvatar, highlight, registerRef,
 }: {
   s: PlaySession
   game: ReturnType<typeof Object> | undefined
   onRsvp: (v: SessionRsvp) => void
   onDelete: () => void
+  onAudit: () => void
   groupId: string
   memberName: (uid: string) => string
   memberAvatar: (uid: string) => { discord_id?: string; discord_avatar?: string | null; role?: string } | undefined
@@ -560,7 +571,8 @@ function SessionCard({
           >
             gcal
           </a>
-          <button onClick={onDelete} className="ml-auto rounded-sm border border-nerv-line px-2 py-0.5 text-nerv-dim hover:border-nerv-red hover:text-nerv-red">remover</button>
+          <button onClick={onAudit} className="ml-auto rounded-sm border border-nerv-line px-2 py-0.5 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange">audit</button>
+          <button onClick={onDelete} className="rounded-sm border border-nerv-line px-2 py-0.5 text-nerv-dim hover:border-nerv-red hover:text-nerv-red">remover</button>
         </div>
       </div>
       <div className="flex shrink-0 flex-col gap-1.5 border-l border-nerv-orange/10 pl-3">

@@ -57,3 +57,33 @@ class SessionResponse(BaseModel):
     rsvp_maybe: int = 0
     user_rsvp: SessionRsvp | None = None
     rsvps: list[RsvpResponse] = []
+
+
+class SessionAuditPerson(BaseModel):
+    id: uuid.UUID | None
+    discord_id: str | None = None
+    display_name: str | None
+    avatar_url: str | None
+
+
+class SessionAuditRsvp(BaseModel):
+    user_id: uuid.UUID
+    discord_id: str | None
+    display_name: str
+    avatar_url: str | None
+    status: SessionRsvp
+    updated_at: datetime
+
+
+class SessionAuditGame(BaseModel):
+    id: uuid.UUID
+    name: str
+    cover_url: str | None
+
+
+class SessionAuditResponse(BaseModel):
+    session: SessionResponse
+    creator: SessionAuditPerson
+    game: SessionAuditGame | None
+    rsvps: list[SessionAuditRsvp]
+    non_respondents: list[SessionAuditPerson]

@@ -14,6 +14,10 @@ from app.repositories.group_repo import GroupRepository
 from app.repositories.session_repo import SessionRepository
 from app.schemas.session import (
     RsvpResponse,
+    SessionAuditGame,
+    SessionAuditPerson,
+    SessionAuditResponse,
+    SessionAuditRsvp,
     SessionCreate,
     SessionResponse,
     SessionUpdate,
@@ -226,6 +230,88 @@ class PlaySessionService:
         ev.add("dtstamp", datetime.now(UTC))
         cal.add_component(ev)
         return cal.to_ical()
+
+    async def audit(
+        self, group_id: uuid.UUID, session_id: uuid.UUID, actor: User
+    ) -> SessionAuditResponse:
+        await self._require_member(group_id, actor)
+        session = await self.sessions.get(session_id)
+        if session is None or session.group_id != group_id:
+            raise _not_found("Session not found")
+
+        session_resp = await self._to_response(session, actor)
+        rows = await self.sessions.list_rsvps(session.id)
+
+        from sqlalchemy import select as _sel
+
+        from app.models.game import Game as GameModel
+        from app.models.user import User as UserModel
+
+        user_ids: set[uuid.UUID] = {r.user_id for r in rows}
+        if session.created_by:
+            user_ids.add(session.created_by)
+        members = await self.groups.list_members(group_id)
+        member_user_ids = [m.user_id for m in members]
+        user_ids.update(member_user_ids)
+
+        users_by_id: dict[uuid.UUID, User] = {}
+        if user_ids:
+            urows = await self.sessions.db.execute(
+                _sel(UserModel).where(UserModel.id.in_(list(user_ids)))
+            )
+            for u in urows.scalars().all():
+                users_by_id[u.id] = u
+
+        def _person(uid: uuid.UUID | None) -> SessionAuditPerson:
+            if uid is None or uid not in users_by_id:
+                return SessionAuditPerson(
+                    id=uid, discord_id=None, display_name=None, avatar_url=None
+                )
+            u = users_by_id[uid]
+            return SessionAuditPerson(
+                id=u.id,
+                discord_id=u.discord_id,
+                display_name=u.discord_display_name or u.discord_username,
+                avatar_url=u.discord_avatar,
+            )
+
+        game_obj: SessionAuditGame | None = None
+        grow = await self.sessions.db.execute(
+            _sel(GameModel).where(GameModel.id == session.game_id)
+        )
+        g = grow.scalar_one_or_none()
+        if g is not None:
+            game_obj = SessionAuditGame(id=g.id, name=g.name, cover_url=g.cover_url)
+
+        rsvps: list[SessionAuditRsvp] = []
+        responded: set[uuid.UUID] = set()
+        for r in sorted(rows, key=lambda x: x.updated_at, reverse=True):
+            u = users_by_id.get(r.user_id)
+            responded.add(r.user_id)
+            rsvps.append(
+                SessionAuditRsvp(
+                    user_id=r.user_id,
+                    discord_id=u.discord_id if u else None,
+                    display_name=(u.discord_display_name or u.discord_username)
+                    if u
+                    else "(removido)",
+                    avatar_url=u.discord_avatar if u else None,
+                    status=SessionRsvp(r.status),
+                    updated_at=r.updated_at,
+                )
+            )
+
+        non_respondents = [
+            _person(uid) for uid in member_user_ids if uid not in responded
+        ]
+
+        return SessionAuditResponse(
+            session=session_resp,
+            creator=_person(session.created_by),
+            game=game_obj,
+            rsvps=rsvps,
+            non_respondents=non_respondents,
+        )
 
     # ---- helpers ----
 

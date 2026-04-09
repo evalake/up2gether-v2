@@ -2,12 +2,22 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createSession,
   deleteSession,
+  getSessionAudit,
   listSessions,
   setRsvp,
   type PlaySession,
   type SessionCreateInput,
   type SessionRsvp,
 } from './api'
+
+export function useSessionAudit(groupId: string, sessionId: string | null) {
+  return useQuery({
+    queryKey: ['groups', groupId, 'sessions', sessionId, 'audit'] as const,
+    queryFn: () => getSessionAudit(groupId, sessionId!),
+    enabled: !!groupId && !!sessionId,
+    staleTime: 5_000,
+  })
+}
 
 export const sessionsKey = (groupId: string) => ['groups', groupId, 'sessions'] as const
 
