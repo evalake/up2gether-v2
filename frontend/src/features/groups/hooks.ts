@@ -13,6 +13,7 @@ import {
   syncDiscord,
   getCurrentGameAudit,
   setCurrentGame,
+  getGroupPresence,
   type GroupCreateInput,
   type GroupRole,
 } from './api'
@@ -31,6 +32,16 @@ export function useGroup(id: string) {
 
 export function useMembers(id: string) {
   return useQuery({ queryKey: membersKey(id), queryFn: () => listMembers(id), enabled: !!id })
+}
+
+export function useGroupPresence(id: string) {
+  return useQuery({
+    queryKey: ['groups', id, 'presence'] as const,
+    queryFn: () => getGroupPresence(id),
+    enabled: !!id,
+    refetchInterval: 25_000,
+    staleTime: 15_000,
+  })
 }
 
 export function useCreateGroup() {

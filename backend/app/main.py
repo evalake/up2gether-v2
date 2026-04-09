@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.jobs.theme_cycle_cron import auto_open_theme_cycles
+from app.services.discord_presence import PresenceBot, set_bot
 from app.routers import (
     auth,
     events,
@@ -32,10 +33,18 @@ async def lifespan(_: FastAPI):
     # roda todo dia 9h UTC; abre ciclo de tema se faltam <=5 dias pro fim do mes
     scheduler.add_job(auto_open_theme_cycles, CronTrigger(hour=9, minute=0))
     scheduler.start()
+
+    settings = get_settings()
+    bot = PresenceBot(settings.discord_bot_token)
+    set_bot(bot)
+    await bot.start()
+
     try:
         yield
     finally:
         scheduler.shutdown(wait=False)
+        await bot.stop()
+        set_bot(None)
 
 
 def create_app() -> FastAPI:

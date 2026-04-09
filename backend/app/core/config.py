@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     discord_client_id: str = ""
     discord_client_secret: str = ""
     discord_redirect_uri: str = ""
+    discord_bot_token: str = ""
 
     # steam
     steam_api_key: str = ""

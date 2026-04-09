@@ -25,6 +25,8 @@ from app.schemas.group import (
     PromoteRequest,
     WebhookUpdate,
 )
+from app.models.group import Group
+from app.services.discord_presence import get_bot
 from app.services.group_service import GroupService
 
 router = APIRouter(prefix="/groups", tags=["groups"])
@@ -74,6 +76,32 @@ async def list_members(
     service: Annotated[GroupService, Depends(get_group_service)],
 ) -> list[GroupMembershipResponse]:
     return await service.list_members(group_id, actor)
+
+
+@router.get("/{group_id}/presence")
+async def get_group_presence(
+    group_id: uuid.UUID,
+    actor: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict[str, str]:
+    """Retorna {discord_user_id: status} pros membros online do guild.
+
+    Vazio se o bot nao tiver conectado ou se o guild nao tiver o bot.
+    Membros nao listados sao considerados offline no frontend.
+    """
+    # valida que o actor ta no grupo
+    row = await db.execute(select(Group).where(Group.id == group_id))
+    group = row.scalar_one_or_none()
+    if group is None:
+        raise HTTPException(status_code=404, detail="grupo nao encontrado")
+    bot = get_bot()
+    if bot is None:
+        return {}
+    try:
+        guild_id = int(group.discord_guild_id)
+    except (TypeError, ValueError):
+        return {}
+    return bot.guild_presences(guild_id)
 
 
 @router.put("/{group_id}/webhook", status_code=status.HTTP_204_NO_CONTENT)

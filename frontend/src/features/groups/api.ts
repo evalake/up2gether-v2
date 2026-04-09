@@ -126,3 +126,7 @@ export const updateWebhook = (groupId: string, webhook_url: string | null) =>
     method: 'PUT',
     body: { webhook_url },
   })
+
+export type PresenceStatus = 'online' | 'idle' | 'dnd' | 'offline'
+export const getGroupPresence = (groupId: string) =>
+  api<Record<string, PresenceStatus>>(`/groups/${groupId}/presence`)
