@@ -101,21 +101,34 @@ class GameService:
                 from app.models.game import SteamGameOwnership
 
                 members = await self.groups.list_members(group_id)
+                # filtra users que tem o appid na lista de owned
+                candidate_users = []
                 for mem in members:
                     u = mem.user
                     if u is None:
                         continue
                     owned = (u.settings or {}).get("steam_owned_appids") or []
                     if game.steam_appid in owned:
-                        existing = (
+                        candidate_users.append(u)
+
+                if candidate_users:
+                    # batch: pega ownerships existentes de uma vez
+                    cand_ids = [u.id for u in candidate_users]
+                    existing_rows = (
+                        (
                             await self.games.db.execute(
                                 _select(SteamGameOwnership).where(
-                                    SteamGameOwnership.user_id == u.id,
                                     SteamGameOwnership.game_id == game.id,
+                                    SteamGameOwnership.user_id.in_(cand_ids),
                                 )
                             )
-                        ).scalar_one_or_none()
-                        if existing is None:
+                        )
+                        .scalars()
+                        .all()
+                    )
+                    already_owned = {o.user_id for o in existing_rows}
+                    for u in candidate_users:
+                        if u.id not in already_owned:
                             self.games.db.add(
                                 SteamGameOwnership(user_id=u.id, game_id=game.id, manual=False)
                             )
@@ -159,10 +172,15 @@ class GameService:
         return await self._enrich(game, group_id, actor)
 
     async def list_for_group(
-        self, group_id: uuid.UUID, actor: User, include_archived: bool
+        self,
+        group_id: uuid.UUID,
+        actor: User,
+        include_archived: bool,
+        limit: int = 100,
+        offset: int = 0,
     ) -> list[GameWithViability]:
         await self._require_member(group_id, actor)
-        games = await self.games.list_for_group(group_id, include_archived)
+        games = await self.games.list_for_group(group_id, include_archived, limit, offset)
         out: list[GameWithViability] = []
         for g in games:
             out.append(await self._enrich(g, group_id, actor))

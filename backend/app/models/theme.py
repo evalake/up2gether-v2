@@ -81,7 +81,7 @@ class ThemeVote(Base, TimestampMixin):
         ForeignKey("theme_cycles.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     suggestion_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("theme_suggestions.id", ondelete="CASCADE"), nullable=False

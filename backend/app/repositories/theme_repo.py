@@ -22,11 +22,15 @@ class ThemeRepository:
         )
         return result.scalar_one_or_none()
 
-    async def list_for_group(self, group_id: uuid.UUID) -> list[MonthlyTheme]:
+    async def list_for_group(
+        self, group_id: uuid.UUID, limit: int = 50, offset: int = 0
+    ) -> list[MonthlyTheme]:
         result = await self.db.execute(
             select(MonthlyTheme)
             .where(MonthlyTheme.group_id == group_id)
             .order_by(MonthlyTheme.month_year.desc())
+            .limit(limit)
+            .offset(offset)
         )
         return list(result.scalars().all())
 

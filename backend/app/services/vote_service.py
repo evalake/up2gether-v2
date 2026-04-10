@@ -5,8 +5,10 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
+from sqlalchemy import select
 
 from app.domain.enums import GroupRole, HardwareTier, InterestSignal, VoteStatus
+from app.models.game import Game
 from app.models.user import User
 from app.models.vote import VoteSession, VoteStage
 from app.repositories.game_repo import GameRepository
@@ -123,11 +125,15 @@ class VoteService:
         )
         await self.votes.add_stage(stage1)
         # notifica todos os membros do grupo + webhook discord
-        cand_games = []
-        for cid in data.candidate_game_ids[:10]:
-            g = await self.games.get_by_id(cid)
-            if g:
-                cand_games.append(g)
+        cand_games = (
+            (
+                await self.votes.db.execute(
+                    select(Game).where(Game.id.in_(data.candidate_game_ids[:10]))
+                )
+            )
+            .scalars()
+            .all()
+        )
         fields = [
             {"name": g.name, "value": f"{g.player_min}+ jogadores", "inline": True}
             for g in cand_games[:9]
@@ -159,9 +165,11 @@ class VoteService:
         )
         return await self._to_response(session, actor)
 
-    async def list_for_group(self, group_id: uuid.UUID, actor: User) -> list[VoteSessionResponse]:
+    async def list_for_group(
+        self, group_id: uuid.UUID, actor: User, limit: int = 50, offset: int = 0
+    ) -> list[VoteSessionResponse]:
         await self._require_member(group_id, actor)
-        sessions = await self.votes.list_for_group(group_id)
+        sessions = await self.votes.list_for_group(group_id, limit, offset)
         return [await self._to_response(s, actor) for s in sessions]
 
     async def get(

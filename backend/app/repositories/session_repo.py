@@ -15,11 +15,15 @@ class SessionRepository:
     async def get(self, session_id: uuid.UUID) -> PlaySession | None:
         return await self.db.get(PlaySession, session_id)
 
-    async def list_for_group(self, group_id: uuid.UUID) -> list[PlaySession]:
+    async def list_for_group(
+        self, group_id: uuid.UUID, limit: int = 50, offset: int = 0
+    ) -> list[PlaySession]:
         result = await self.db.execute(
             select(PlaySession)
             .where(PlaySession.group_id == group_id)
             .order_by(PlaySession.start_at.asc())
+            .limit(limit)
+            .offset(offset)
         )
         return list(result.scalars().all())
 

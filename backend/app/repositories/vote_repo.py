@@ -15,11 +15,15 @@ class VoteRepository:
     async def get(self, vote_id: uuid.UUID) -> VoteSession | None:
         return await self.db.get(VoteSession, vote_id)
 
-    async def list_for_group(self, group_id: uuid.UUID) -> list[VoteSession]:
+    async def list_for_group(
+        self, group_id: uuid.UUID, limit: int = 50, offset: int = 0
+    ) -> list[VoteSession]:
         result = await self.db.execute(
             select(VoteSession)
             .where(VoteSession.group_id == group_id)
             .order_by(VoteSession.created_at.desc())
+            .limit(limit)
+            .offset(offset)
         )
         return list(result.scalars().all())
 

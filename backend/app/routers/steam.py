@@ -181,18 +181,30 @@ async def import_library(
     )
     matched_appids: list[int] = []
     now = datetime.now(UTC)
+
+    # batch: pega todos os ownerships existentes de uma vez
+    game_ids = [g.id for g in matches]
+    existing_ownerships: dict = {}
+    if game_ids:
+        rows = (
+            (
+                await db.execute(
+                    select(SteamGameOwnership).where(
+                        SteamGameOwnership.user_id == actor.id,
+                        SteamGameOwnership.game_id.in_(game_ids),
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        existing_ownerships = {o.game_id: o for o in rows}
+
     for g in matches:
         data = owned_by_appid.get(g.steam_appid or -1, {})
         pt_forever = int(data.get("playtime_forever", 0) or 0)
         pt_2w = int(data.get("playtime_2weeks", 0) or 0)
-        existing_own = (
-            await db.execute(
-                select(SteamGameOwnership).where(
-                    SteamGameOwnership.user_id == actor.id,
-                    SteamGameOwnership.game_id == g.id,
-                )
-            )
-        ).scalar_one_or_none()
+        existing_own = existing_ownerships.get(g.id)
         if existing_own:
             existing_own.playtime_forever_minutes = pt_forever
             existing_own.playtime_2weeks_minutes = pt_2w

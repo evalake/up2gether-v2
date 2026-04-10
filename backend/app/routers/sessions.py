@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -42,8 +42,10 @@ async def list_sessions(
     group_id: uuid.UUID,
     actor: CurrentUser,
     service: Annotated[PlaySessionService, Depends(get_session_service)],
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
 ) -> list[SessionResponse]:
-    return await service.list_for_group(group_id, actor)
+    return await service.list_for_group(group_id, actor, limit, offset)
 
 
 @router.get(

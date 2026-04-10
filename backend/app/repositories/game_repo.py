@@ -46,12 +46,16 @@ class GameRepository:
         return result.scalar_one_or_none()
 
     async def list_for_group(
-        self, group_id: uuid.UUID, include_archived: bool = False
+        self,
+        group_id: uuid.UUID,
+        include_archived: bool = False,
+        limit: int = 100,
+        offset: int = 0,
     ) -> list[Game]:
         stmt = select(Game).where(Game.group_id == group_id)
         if not include_archived:
             stmt = stmt.where(Game.archived_at.is_(None))
-        stmt = stmt.order_by(Game.created_at.desc())
+        stmt = stmt.order_by(Game.created_at.desc()).limit(limit).offset(offset)
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 

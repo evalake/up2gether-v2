@@ -92,9 +92,11 @@ class ThemeService:
         theme = await self.themes.get_for_month(group_id, _current_month())
         return ThemeResponse.model_validate(theme) if theme else None
 
-    async def list_history(self, group_id: uuid.UUID, actor: User) -> list[ThemeResponse]:
+    async def list_history(
+        self, group_id: uuid.UUID, actor: User, limit: int = 50, offset: int = 0
+    ) -> list[ThemeResponse]:
         await self._require_member(group_id, actor)
-        themes = await self.themes.list_for_group(group_id)
+        themes = await self.themes.list_for_group(group_id, limit, offset)
         return [ThemeResponse.model_validate(t) for t in themes]
 
     async def audit(

@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -49,8 +49,10 @@ async def list_themes(
     group_id: uuid.UUID,
     actor: CurrentUser,
     service: Annotated[ThemeService, Depends(get_theme_service)],
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
 ) -> list[ThemeResponse]:
-    return await service.list_history(group_id, actor)
+    return await service.list_history(group_id, actor, limit, offset)
 
 
 @router.get("/groups/{group_id}/themes/{theme_id}/audit", response_model=ThemeAuditResponse)

@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -34,8 +34,10 @@ async def list_votes(
     group_id: uuid.UUID,
     actor: CurrentUser,
     service: Annotated[VoteService, Depends(get_vote_service)],
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
 ) -> list[VoteSessionResponse]:
-    return await service.list_for_group(group_id, actor)
+    return await service.list_for_group(group_id, actor, limit, offset)
 
 
 @router.get("/groups/{group_id}/votes/{vote_id}/audit", response_model=VoteAuditResponse)

@@ -147,9 +147,11 @@ class PlaySessionService:
         )
         return await self._to_response(session, actor)
 
-    async def list_for_group(self, group_id: uuid.UUID, actor: User) -> list[SessionResponse]:
+    async def list_for_group(
+        self, group_id: uuid.UUID, actor: User, limit: int = 50, offset: int = 0
+    ) -> list[SessionResponse]:
         await self._require_member(group_id, actor)
-        sessions = await self.sessions.list_for_group(group_id)
+        sessions = await self.sessions.list_for_group(group_id, limit, offset)
         return [await self._to_response(s, actor) for s in sessions]
 
     async def get(self, group_id: uuid.UUID, session_id: uuid.UUID, actor: User) -> SessionResponse:

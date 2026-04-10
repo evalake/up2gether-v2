@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -40,8 +40,10 @@ async def list_games(
     actor: CurrentUser,
     service: Annotated[GameService, Depends(get_game_service)],
     include_archived: bool = False,
+    limit: int = Query(100, ge=1, le=200),
+    offset: int = Query(0, ge=0),
 ) -> list[GameWithViability]:
-    return await service.list_for_group(group_id, actor, include_archived)
+    return await service.list_for_group(group_id, actor, include_archived, limit, offset)
 
 
 @router.get("/groups/{group_id}/games/{game_id}", response_model=GameWithViability)
