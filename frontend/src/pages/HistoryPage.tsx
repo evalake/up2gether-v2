@@ -69,6 +69,7 @@ export function HistoryPage() {
 
       <div className="flex items-center gap-2">
         <input
+          aria-label="buscar historico"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="buscar por jogo ou titulo da votacao..."

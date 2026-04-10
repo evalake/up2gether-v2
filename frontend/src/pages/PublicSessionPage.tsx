@@ -6,6 +6,7 @@ import { useMe } from '@/features/auth/hooks'
 import { rsvpSession } from '@/features/sessions/api'
 import { discordLoginUrl } from '@/features/auth/api'
 import { useToast } from '@/components/ui/toast'
+import { Loading } from '@/components/ui/Loading'
 
 type PublicCard = {
   id: string
@@ -50,7 +51,7 @@ export function PublicSessionPage() {
   if (!data) {
     return (
       <div className="grid min-h-screen place-items-center bg-nerv-bg">
-        <div className="text-xs text-nerv-dim">carregando...</div>
+        <Loading />
       </div>
     )
   }

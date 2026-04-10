@@ -86,6 +86,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <input
+          aria-label="buscar jogo"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="buscar jogo..."

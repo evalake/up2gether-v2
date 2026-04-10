@@ -217,7 +217,7 @@ function PushNotificationsSection() {
       <p className="mb-3 text-xs text-nerv-text/70">
         receba notificações do navegador quando tiver votação nova, sessão agendada ou ciclo de tema aberto.
       </p>
-      {state === 'loading' && <div className="text-[11px] text-nerv-dim">carregando...</div>}
+      {state === 'loading' && <Loading />}
       {state === 'unsupported' && <div className="text-[11px] text-nerv-dim">navegador não suporta push</div>}
       {state === 'denied' && <div className="text-[11px] text-nerv-red/80">permissão bloqueada. libere nas configs do navegador.</div>}
       {(state === 'on' || state === 'off') && (

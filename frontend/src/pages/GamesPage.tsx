@@ -246,6 +246,7 @@ export function GamesPage() {
                     <img src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" />
                   )}
                   <input
+                    aria-label="buscar na steam"
                     value={steamQ}
                     onChange={(e) => setSteamQ(e.target.value)}
                     placeholder={form.name ? form.name : 'buscar na steam pra autopreencher...'}
@@ -401,6 +402,7 @@ export function GamesPage() {
         <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <input
+            aria-label="buscar jogo"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="buscar..."

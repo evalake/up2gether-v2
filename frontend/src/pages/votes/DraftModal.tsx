@@ -63,10 +63,11 @@ export function DraftModal({
         </div>
         <div className="border-b border-nerv-orange/10 px-5 py-2">
           <input
+            aria-label="buscar jogo"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="buscar jogo..."
-            className="h-8 w-full rounded-sm border border-nerv-line/30 bg-black/20 px-2 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+            className="h-9 w-full rounded-sm border border-nerv-line/30 bg-black/20 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
           />
         </div>
         <div className="max-h-80 overflow-y-auto px-5 py-3">

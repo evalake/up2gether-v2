@@ -6,6 +6,7 @@ import type { SessionRsvp } from '@/features/sessions/api'
 import { Avatar } from '@/components/nerv/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { useToast } from '@/components/ui/toast'
 
 type Props = {
   groupId: string
@@ -115,6 +116,7 @@ function Body({
   onDelete: () => void
   canDelete?: boolean
 }) {
+  const toast = useToast()
   const { session, game, creator, rsvps, non_respondents } = data
   const start = useMemo(() => new Date(session.start_at), [session.start_at])
   const end = useMemo(
@@ -286,7 +288,10 @@ function Body({
               await navigator.clipboard.writeText(
                 `${window.location.origin}/share/sessions/${session.id}`,
               )
-            } catch {}
+              toast.success('link copiado')
+            } catch {
+              toast.error('falha ao copiar')
+            }
           }}
           className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange"
         >

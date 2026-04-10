@@ -130,6 +130,7 @@ export function SessionDraftModal({
               )}
             </div>
             <input
+              aria-label="buscar jogo"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="buscar jogo..."
