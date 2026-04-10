@@ -10,7 +10,7 @@ from app.core.database import get_db
 from app.core.security import CurrentUser
 from app.domain.enums import AuthProvider, InterestSignal
 from app.integrations.discord import DiscordClient, get_discord_client
-from app.models.game import Game, InterestSignalRow, SteamGameOwnership
+from app.models.game import Game, InterestSignalRow, SteamGameOwnership, SteamProfile
 from app.models.group import Group, GroupMembership
 from app.models.session import PlaySession, SessionRsvpRow
 from app.models.user import User
@@ -263,6 +263,96 @@ async def get_member_profile(
         for sid, title, start, gname, gcover, rstatus, created_by in recent_rows
     ]
 
+    # ---- steam bloco ----
+    steam_profile_row = (
+        await db.execute(select(SteamProfile).where(SteamProfile.user_id == target_user_id))
+    ).scalar_one_or_none()
+    steam_block: dict | None = None
+    if steam_profile_row:
+        # top 5 jogos do grupo mais jogados pelo membro
+        top_played_rows = (
+            await db.execute(
+                select(
+                    Game.id,
+                    Game.name,
+                    Game.cover_url,
+                    SteamGameOwnership.playtime_forever_minutes,
+                    SteamGameOwnership.playtime_2weeks_minutes,
+                )
+                .join(SteamGameOwnership, SteamGameOwnership.game_id == Game.id)
+                .where(
+                    Game.group_id == group_id,
+                    SteamGameOwnership.user_id == target_user_id,
+                    SteamGameOwnership.playtime_forever_minutes > 0,
+                )
+                .order_by(SteamGameOwnership.playtime_forever_minutes.desc())
+                .limit(5)
+            )
+        ).all()
+        total_hours = (
+            int(
+                (
+                    await db.execute(
+                        select(
+                            func.coalesce(func.sum(SteamGameOwnership.playtime_forever_minutes), 0)
+                        )
+                        .join(Game, Game.id == SteamGameOwnership.game_id)
+                        .where(
+                            Game.group_id == group_id,
+                            SteamGameOwnership.user_id == target_user_id,
+                        )
+                    )
+                ).scalar_one()
+                or 0
+            )
+            // 60
+        )
+        hours_2w = (
+            int(
+                (
+                    await db.execute(
+                        select(
+                            func.coalesce(func.sum(SteamGameOwnership.playtime_2weeks_minutes), 0)
+                        )
+                        .join(Game, Game.id == SteamGameOwnership.game_id)
+                        .where(
+                            Game.group_id == group_id,
+                            SteamGameOwnership.user_id == target_user_id,
+                        )
+                    )
+                ).scalar_one()
+                or 0
+            )
+            // 60
+        )
+        steam_block = {
+            "steam_id": steam_profile_row.steam_id,
+            "persona_name": steam_profile_row.persona_name,
+            "avatar_url": steam_profile_row.avatar_url,
+            "profile_url": steam_profile_row.profile_url,
+            "steam_level": steam_profile_row.steam_level,
+            "country_code": steam_profile_row.country_code,
+            "account_created_at": steam_profile_row.account_created_at.isoformat()
+            if steam_profile_row.account_created_at
+            else None,
+            "group_total_hours": total_hours,
+            "group_hours_2weeks": hours_2w,
+            "top_played": [
+                {
+                    "game_id": str(gid),
+                    "name": name,
+                    "cover_url": cover,
+                    "hours": int(pt_forever // 60),
+                    "hours_2weeks": round(pt_2w / 60, 1),
+                }
+                for gid, name, cover, pt_forever, pt_2w in top_played_rows
+            ],
+            "recent_games": steam_profile_row.recent_games or [],
+            "last_synced_at": steam_profile_row.last_synced_at.isoformat()
+            if steam_profile_row.last_synced_at
+            else None,
+        }
+
     return {
         "user": {
             "id": str(user.id),
@@ -283,6 +373,7 @@ async def get_member_profile(
         },
         "top_wants": top_wants,
         "recent_sessions": recent_sessions,
+        "steam": steam_block,
     }
 
 
@@ -568,6 +659,40 @@ async def current_game_audit(
             )
         ).scalar_one()
     )
+    # playtime leaderboard do jogo atual, restrito aos membros do grupo
+    lb_rows = (
+        await db.execute(
+            select(
+                User.id,
+                User.discord_id,
+                User.discord_display_name,
+                User.discord_username,
+                User.discord_avatar,
+                SteamGameOwnership.playtime_forever_minutes,
+                SteamGameOwnership.playtime_2weeks_minutes,
+            )
+            .join(SteamGameOwnership, SteamGameOwnership.user_id == User.id)
+            .join(GroupMembership, GroupMembership.user_id == User.id)
+            .where(
+                SteamGameOwnership.game_id == game.id,
+                GroupMembership.group_id == group_id,
+                SteamGameOwnership.playtime_forever_minutes > 0,
+            )
+            .order_by(SteamGameOwnership.playtime_forever_minutes.desc())
+            .limit(10)
+        )
+    ).all()
+    playtime_lb = [
+        {
+            "user_id": str(uid),
+            "discord_id": did,
+            "name": dname or dusr,
+            "avatar": davatar,
+            "hours": int(pt // 60),
+            "hours_2weeks": round(pt2w / 60, 1),
+        }
+        for uid, did, dname, dusr, davatar, pt, pt2w in lb_rows
+    ]
     return CurrentGameAudit(
         game_id=game.id,
         name=game.name,
@@ -591,6 +716,7 @@ async def current_game_audit(
         interest_nope_count=interest_map.get(InterestSignal.PASS.value, 0),
         owners_count=owners,
         sessions_count=sessions,
+        playtime_leaderboard=playtime_lb,
     )
 
 

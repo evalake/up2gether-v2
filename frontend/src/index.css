@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-nerv-bg: #050507;
-  --color-nerv-panel: #0a0a0f;
-  --color-nerv-line: #1a1a25;
-  --color-nerv-text: #e8e8f0;
-  --color-nerv-dim: #6a6a7a;
+  --color-nerv-bg: #0b0b14;
+  --color-nerv-panel: #14141f;
+  --color-nerv-line: #262636;
+  --color-nerv-text: #ecebf2;
+  --color-nerv-dim: #7c7c8e;
   --color-nerv-orange: #ff6600;
   --color-nerv-orange-dim: #993d00;
   --color-nerv-green: #00ff66;
@@ -25,17 +25,19 @@
    LCL, acento ambar, texto creme. Mesma legibilidade do NERV pq continua dark-base. */
 html[data-theme="lcl"] {
   color-scheme: dark;
-  --color-nerv-bg: #1a0608;
-  --color-nerv-panel: #260b0f;
-  --color-nerv-line: #3d171c;
-  --color-nerv-text: #f5e0d5;
-  --color-nerv-dim: #a88878;
-  --color-nerv-orange: #ffb347;
-  --color-nerv-orange-dim: #8a5a1a;
-  --color-nerv-green: #7ac74f;
-  --color-nerv-magenta: #ff6b9d;
-  --color-nerv-amber: #ffd166;
-  --color-nerv-red: #ff4545;
+  /* base hue 355 burgundy, accent ambar 38 (complementar quente),
+     text cream 30 (analogo quente), pontuais frios pra contraste */
+  --color-nerv-bg: #170609;
+  --color-nerv-panel: #220c11;
+  --color-nerv-line: #401a22;
+  --color-nerv-text: #f6ece1;
+  --color-nerv-dim: #b8998a;
+  --color-nerv-orange: #ffc23d;
+  --color-nerv-orange-dim: #8a5e15;
+  --color-nerv-green: #5fcc8d;
+  --color-nerv-magenta: #f570a0;
+  --color-nerv-amber: #ffd866;
+  --color-nerv-red: #f24d4d;
 }
 
 html[data-theme="lcl"] body {

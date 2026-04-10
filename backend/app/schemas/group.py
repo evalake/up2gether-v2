@@ -90,6 +90,7 @@ class CurrentGameAudit(BaseModel):
     interest_nope_count: int = 0
     owners_count: int = 0
     sessions_count: int = 0
+    playtime_leaderboard: list[dict] = []  # [{user_id, name, hours, hours_2weeks, avatar}]
 
 
 class PromoteRequest(BaseModel):

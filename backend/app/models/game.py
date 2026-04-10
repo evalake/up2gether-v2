@@ -12,7 +12,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -102,6 +102,34 @@ class SteamGameOwnership(Base):
         ForeignKey("games.id", ondelete="CASCADE"), nullable=False, index=True
     )
     manual: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    playtime_forever_minutes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    playtime_2weeks_minutes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, nullable=False
     )
+
+
+class SteamProfile(Base):
+    """Snapshot do perfil Steam publico de um user. Atualizado via sync."""
+
+    __tablename__ = "steam_profiles"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+    )
+    steam_id: Mapped[str] = mapped_column(String, nullable=False)
+    persona_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    real_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    profile_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    country_code: Mapped[str | None] = mapped_column(String, nullable=True)
+    steam_level: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    account_created_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    # snapshot dos recentes (inclui jogos que nao estao na lib do grupo)
+    # [{appid, name, playtime_2weeks_minutes, playtime_forever_minutes, img_icon_url}]
+    recent_games: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
+    last_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

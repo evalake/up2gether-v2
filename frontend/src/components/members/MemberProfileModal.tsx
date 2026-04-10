@@ -91,7 +91,7 @@ export function MemberProfileModal({ groupId, userId, onClose }: Props) {
 }
 
 function Body({ data }: { data: NonNullable<ReturnType<typeof useMemberProfile>['data']> }) {
-  const { user, role, joined_at, is_sys_admin, stats, top_wants, recent_sessions } = data
+  const { user, role, joined_at, is_sys_admin, stats, top_wants, recent_sessions, steam } = data
   const displayName = user.discord_display_name ?? user.discord_username
 
   return (
@@ -185,7 +185,83 @@ function Body({ data }: { data: NonNullable<ReturnType<typeof useMemberProfile>[
           </section>
         )}
 
-        {top_wants.length === 0 && recent_sessions.length === 0 && (
+        {steam && (
+          <section className="rounded-sm border border-nerv-orange/15 bg-black/20 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-nerv-orange/80">
+                  <path d="M12 2C6.5 2 2 6.5 2 12c0 4.6 3.1 8.5 7.4 9.7l3-4.3c-.2-.5-.3-1-.3-1.5 0-1.2.5-2.3 1.3-3.1l-2-4.5c-2.1 0-3.9 1.7-3.9 3.9 0 .7.2 1.4.6 2l1.4-.6c.3-.6.9-1 1.6-1 1 0 1.9.9 1.9 1.9s-.8 1.9-1.9 1.9c-.1 0-.2 0-.3-.1l-1.4.6c.6.8 1.5 1.3 2.6 1.3 1.8 0 3.3-1.5 3.3-3.3 0-.1 0-.3-.1-.4l4.2-3c1.7 0 3-1.3 3-3s-1.3-3-3-3c-1.6 0-3 1.3-3 3v.2l-4.1 3c-.5-.2-1.1-.4-1.7-.4l-2.1-4.5c.9-.4 1.9-.7 3-.7 4 0 7.2 3.2 7.2 7.2s-3.2 7.2-7.2 7.2c-3.4 0-6.2-2.3-7-5.5L2.9 14c.5 4.5 4.4 8 9.1 8 5.5 0 10-4.5 10-10S17.5 2 12 2z"/>
+                </svg>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-nerv-orange/80">steam</span>
+                {steam.persona_name && (
+                  <a href={steam.profile_url ?? undefined} target="_blank" rel="noreferrer" className="truncate text-[11px] text-nerv-text hover:text-nerv-orange">
+                    {steam.persona_name}
+                  </a>
+                )}
+              </div>
+              {steam.steam_level != null && (
+                <div className="rounded-sm border border-nerv-green/30 bg-nerv-green/10 px-1.5 py-0.5 font-mono text-[9px] text-nerv-green">
+                  lvl {steam.steam_level}
+                </div>
+              )}
+            </div>
+
+            <div className="mb-3 grid grid-cols-2 gap-1.5">
+              <div className="rounded-sm border border-nerv-orange/15 bg-black/30 px-2 py-1.5">
+                <div className="font-mono text-sm tabular-nums text-nerv-orange">{steam.group_total_hours}h</div>
+                <div className="text-[9px] uppercase tracking-wider text-nerv-dim">total no grupo</div>
+              </div>
+              <div className="rounded-sm border border-nerv-orange/15 bg-black/30 px-2 py-1.5">
+                <div className="font-mono text-sm tabular-nums text-nerv-amber">{steam.group_hours_2weeks}h</div>
+                <div className="text-[9px] uppercase tracking-wider text-nerv-dim">ultimas 2 semanas</div>
+              </div>
+            </div>
+
+            {steam.top_played.length > 0 && (
+              <div className="mb-3">
+                <div className="mb-1.5 text-[9px] uppercase tracking-wider text-nerv-dim">mais jogados</div>
+                <ul className="space-y-1">
+                  {steam.top_played.map((g) => (
+                    <li key={g.game_id} className="flex items-center gap-2">
+                      <div className="h-6 w-6 shrink-0 overflow-hidden rounded-sm border border-nerv-orange/15 bg-black/40">
+                        {g.cover_url ? <img src={g.cover_url} alt="" className="h-full w-full object-cover" /> : null}
+                      </div>
+                      <span className="min-w-0 flex-1 truncate text-[11px] text-nerv-text">{g.name}</span>
+                      <span className="font-mono text-[10px] tabular-nums text-nerv-orange">{g.hours}h</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {steam.recent_games.length > 0 && (
+              <div>
+                <div className="mb-1.5 text-[9px] uppercase tracking-wider text-nerv-dim">jogando agora (2 sem)</div>
+                <ul className="space-y-1">
+                  {steam.recent_games.slice(0, 5).map((g) => (
+                    <li key={g.appid} className="flex items-center gap-2">
+                      {g.img_icon_url ? (
+                        <img
+                          src={`https://media.steampowered.com/steamcommunity/public/images/apps/${g.appid}/${g.img_icon_url}.jpg`}
+                          alt=""
+                          className="h-5 w-5 shrink-0 rounded-sm border border-nerv-orange/15"
+                        />
+                      ) : (
+                        <div className="h-5 w-5 shrink-0 rounded-sm border border-nerv-orange/15 bg-black/40" />
+                      )}
+                      <span className="min-w-0 flex-1 truncate text-[11px] text-nerv-text">{g.name}</span>
+                      <span className="font-mono text-[10px] tabular-nums text-nerv-amber">
+                        {Math.round(g.playtime_2weeks_minutes / 60 * 10) / 10}h
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+        )}
+
+        {top_wants.length === 0 && recent_sessions.length === 0 && !steam && (
           <div className="rounded-sm border border-dashed border-nerv-orange/15 p-4 text-center text-[11px] text-nerv-dim">
             sem atividade recente
           </div>

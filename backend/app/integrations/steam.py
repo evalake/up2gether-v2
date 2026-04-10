@@ -255,7 +255,16 @@ class SteamGameDetails(dict):
 
 
 class OwnedGame(dict):
-    """{appid, name, playtime_forever}"""
+    """{appid, name, playtime_forever, playtime_2weeks, img_icon_url}"""
+
+
+class PlayerSummary(dict):
+    """{steam_id, persona_name, real_name, avatar_url, profile_url, country_code,
+    time_created, persona_state, game_extra_info, game_id}"""
+
+
+class RecentGame(dict):
+    """{appid, name, playtime_2weeks, playtime_forever, img_icon_url}"""
 
 
 class SteamClient(Protocol):
@@ -331,6 +340,9 @@ class HttpSteamClient:
 
     OWNED_GAMES_URL = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/"
     RESOLVE_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
+    SUMMARIES_URL = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/"
+    LEVEL_URL = "https://api.steampowered.com/IPlayerService/GetSteamLevel/v1/"
+    RECENT_URL = "https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/"
 
     async def get_owned_games(self, steam_id: str) -> list[OwnedGame]:
         from app.core.config import get_settings
@@ -360,6 +372,74 @@ class HttpSteamClient:
                 appid=g.get("appid"),
                 name=g.get("name"),
                 playtime_forever=g.get("playtime_forever", 0),
+                playtime_2weeks=g.get("playtime_2weeks", 0),
+                img_icon_url=g.get("img_icon_url"),
+            )
+            for g in games
+            if g.get("appid")
+        ]
+
+    async def get_player_summary(self, steam_id: str) -> PlayerSummary | None:
+        from app.core.config import get_settings
+
+        key = get_settings().steam_api_key
+        if not key:
+            return None
+        async with httpx.AsyncClient(timeout=10) as client:
+            res = await client.get(self.SUMMARIES_URL, params={"key": key, "steamids": steam_id})
+        if res.status_code != 200:
+            return None
+        players = ((res.json() or {}).get("response") or {}).get("players") or []
+        if not players:
+            return None
+        p = players[0]
+        return PlayerSummary(
+            steam_id=p.get("steamid"),
+            persona_name=p.get("personaname"),
+            real_name=p.get("realname"),
+            avatar_url=p.get("avatarfull") or p.get("avatarmedium") or p.get("avatar"),
+            profile_url=p.get("profileurl"),
+            country_code=p.get("loccountrycode"),
+            time_created=p.get("timecreated"),
+            persona_state=p.get("personastate"),
+            game_extra_info=p.get("gameextrainfo"),
+            game_id=p.get("gameid"),
+        )
+
+    async def get_steam_level(self, steam_id: str) -> int | None:
+        from app.core.config import get_settings
+
+        key = get_settings().steam_api_key
+        if not key:
+            return None
+        async with httpx.AsyncClient(timeout=10) as client:
+            res = await client.get(self.LEVEL_URL, params={"key": key, "steamid": steam_id})
+        if res.status_code != 200:
+            return None
+        r = (res.json() or {}).get("response") or {}
+        lvl = r.get("player_level")
+        return int(lvl) if lvl is not None else None
+
+    async def get_recently_played(self, steam_id: str) -> list[RecentGame]:
+        from app.core.config import get_settings
+
+        key = get_settings().steam_api_key
+        if not key:
+            return []
+        async with httpx.AsyncClient(timeout=10) as client:
+            res = await client.get(
+                self.RECENT_URL, params={"key": key, "steamid": steam_id, "count": 10}
+            )
+        if res.status_code != 200:
+            return []
+        games = ((res.json() or {}).get("response") or {}).get("games") or []
+        return [
+            RecentGame(
+                appid=g.get("appid"),
+                name=g.get("name"),
+                playtime_2weeks=g.get("playtime_2weeks", 0),
+                playtime_forever=g.get("playtime_forever", 0),
+                img_icon_url=g.get("img_icon_url"),
             )
             for g in games
             if g.get("appid")

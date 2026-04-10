@@ -110,6 +110,14 @@ export type CurrentGameAudit = {
   interest_nope_count: number
   owners_count: number
   sessions_count: number
+  playtime_leaderboard: {
+    user_id: string
+    discord_id: string | null
+    name: string
+    avatar: string | null
+    hours: number
+    hours_2weeks: number
+  }[]
 }
 
 export const getCurrentGameAudit = (id: string) =>
@@ -159,6 +167,20 @@ export type MemberProfile = {
     rsvp_status: string | null
     hosted: boolean
   }[]
+  steam: {
+    steam_id: string
+    persona_name: string | null
+    avatar_url: string | null
+    profile_url: string | null
+    steam_level: number | null
+    country_code: string | null
+    account_created_at: string | null
+    group_total_hours: number
+    group_hours_2weeks: number
+    top_played: { game_id: string; name: string; cover_url: string | null; hours: number; hours_2weeks: number }[]
+    recent_games: { appid: number; name: string; playtime_2weeks_minutes: number; playtime_forever_minutes: number; img_icon_url: string | null }[]
+    last_synced_at: string | null
+  } | null
 }
 
 export const getMemberProfile = (groupId: string, userId: string) =>
