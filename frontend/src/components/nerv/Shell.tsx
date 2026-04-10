@@ -25,25 +25,16 @@ const GROUP_NAV = [
 function ThemeToggle() {
   const mode = useThemeStore((s) => s.mode)
   const toggle = useThemeStore((s) => s.toggle)
-  const isDark = mode === 'dark'
   return (
     <button
       type="button"
       onClick={toggle}
-      title={isDark ? 'modo claro' : 'modo escuro'}
+      title={mode === 'nerv' ? 'mudar pra lcl' : 'mudar pra nerv'}
       aria-label="trocar tema"
-      className="grid h-7 w-7 place-items-center rounded-sm border border-nerv-orange/30 text-nerv-orange transition-all hover:border-nerv-orange hover:bg-nerv-orange/10"
+      className="flex items-center gap-1.5 rounded-sm border border-nerv-orange/30 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-nerv-orange transition-all hover:border-nerv-orange hover:bg-nerv-orange/10"
     >
-      {isDark ? (
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-        </svg>
-      ) : (
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-      )}
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${mode === 'nerv' ? 'bg-nerv-orange' : 'bg-nerv-amber'}`} />
+      {mode}
     </button>
   )
 }
