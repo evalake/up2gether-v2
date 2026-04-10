@@ -104,10 +104,10 @@ export function HistoryPage() {
               <button
                 key={v.id}
                 onClick={() => setAuditId(v.id)}
-                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-colors ${
+                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-all ${
                   isLatest
-                    ? 'border-nerv-green/40 bg-nerv-green/5 hover:border-nerv-green/60'
-                    : 'border-nerv-line/40 bg-nerv-panel/20 hover:border-nerv-orange/30'
+                    ? 'border-nerv-green/40 bg-nerv-green/5 hover:border-nerv-green/60 hover:bg-nerv-green/10'
+                    : 'border-nerv-line/40 bg-nerv-panel/20 hover:border-nerv-orange/40 hover:bg-nerv-panel/40'
                 }`}
               >
                 {g?.cover_url ? (

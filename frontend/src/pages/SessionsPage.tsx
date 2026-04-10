@@ -359,7 +359,7 @@ export function SessionsPage() {
                 const cover = game ? steamCover(game) : null
                 const start = new Date(s.start_at)
                 return (
-                  <button key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-colors hover:border-nerv-orange/30">
+                  <button key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:border-nerv-orange/40 hover:bg-nerv-panel/50">
                     {cover ? (
                       <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" />
                     ) : (

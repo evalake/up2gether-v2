@@ -99,8 +99,9 @@ export function VotesPage() {
     }
   }
 
-  // detecta auto-close e dispara reveal
+  // detecta auto-close (quorum ou admin) e dispara reveal
   const seenClosedRef = useRef<Set<string>>(new Set())
+  const pendingRevealRef = useRef<{ vote: VoteRow; game: Game } | null>(null)
   useEffect(() => {
     if (!votes.data) return
     if (seenClosedRef.current.size === 0) {
@@ -112,13 +113,25 @@ export function VotesPage() {
       if (seenClosedRef.current.has(v.id)) continue
       seenClosedRef.current.add(v.id)
       const winner = v.winner_game_id ? gameOf(v.winner_game_id) : null
-      if (winner && !reveal) {
-        setReveal({ vote: v, game: winner })
+      if (winner) {
+        if (!reveal) {
+          setReveal({ vote: v, game: winner })
+        } else {
+          pendingRevealRef.current = { vote: v, game: winner }
+        }
         break
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [votes.data])
+
+  // quando fecha o reveal atual, mostra o pendente se tiver
+  useEffect(() => {
+    if (!reveal && pendingRevealRef.current) {
+      setReveal(pendingRevealRef.current)
+      pendingRevealRef.current = null
+    }
+  }, [reveal])
 
   const { open, closed } = useMemo(() => {
     const all = votes.data ?? []
@@ -195,7 +208,7 @@ export function VotesPage() {
                   <button
                     key={v.id}
                     onClick={() => setAuditId(v.id)}
-                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-colors hover:border-nerv-orange/40"
+                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:border-nerv-orange/40 hover:bg-nerv-panel/50"
                   >
                     {cover ? (
                       <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover" />
