@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,6 +26,7 @@ from app.schemas.group import (
     PromoteRequest,
     WebhookUpdate,
 )
+from app.services.auto_resync import maybe_resync_discord_guild, maybe_resync_steam
 from app.services.discord_presence import get_bot
 from app.services.group_service import GroupService
 
@@ -64,9 +65,13 @@ async def list_groups(
 async def get_group(
     group_id: uuid.UUID,
     actor: CurrentUser,
+    bg: BackgroundTasks,
     service: Annotated[GroupService, Depends(get_group_service)],
 ) -> GroupWithStats:
-    return await service.get_for_user(group_id, actor)
+    out = await service.get_for_user(group_id, actor)
+    # refresh oportunista do guild visual em background
+    maybe_resync_discord_guild(bg, group_id)
+    return out
 
 
 @router.get("/{group_id}/members", response_model=list[GroupMembershipResponse])
@@ -109,6 +114,7 @@ async def get_member_profile(
     group_id: uuid.UUID,
     target_user_id: uuid.UUID,
     actor: CurrentUser,
+    bg: BackgroundTasks,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
     """Perfil estilo discord: info basica + stats + atividade recente do membro no grupo.
@@ -267,6 +273,12 @@ async def get_member_profile(
     steam_profile_row = (
         await db.execute(select(SteamProfile).where(SteamProfile.user_id == target_user_id))
     ).scalar_one_or_none()
+    # agenda refresh oportunista pro target (TTL=6h)
+    maybe_resync_steam(
+        bg,
+        target_user_id,
+        steam_profile_row.last_synced_at if steam_profile_row else None,
+    )
     steam_block: dict | None = None
     if steam_profile_row:
         # top 5 jogos do grupo mais jogados pelo membro

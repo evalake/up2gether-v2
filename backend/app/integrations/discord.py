@@ -71,6 +71,23 @@ class HttpDiscordClient:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, "Failed to fetch Discord guilds")
         return list(res.json())
 
+    async def fetch_guild_as_bot(self, guild_id: str) -> dict | None:
+        """GET /guilds/{id} usando bot token. Retorna name/icon/banner/splash/description.
+
+        Usado pra refresh oportunista em background sem precisar de oauth do user.
+        """
+        settings = get_settings()
+        if not settings.discord_bot_token:
+            return None
+        url = f"https://discord.com/api/v10/guilds/{guild_id}?with_counts=true"
+        async with httpx.AsyncClient(timeout=10) as client:
+            res = await client.get(
+                url, headers={"Authorization": f"Bot {settings.discord_bot_token}"}
+            )
+        if res.status_code != 200:
+            return None
+        return dict(res.json())
+
     async def fetch_guild_preview(self, access_token: str, guild_id: str) -> dict | None:
         # /preview funciona pra guilds do user e pra discoveraveis
         # retorna banner, splash, discovery_splash, description, emojis, features
