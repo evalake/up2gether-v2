@@ -57,7 +57,7 @@ export function MemberProfileModal({ groupId, userId, onClose }: Props) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
         >
           <motion.div
             key="panel"
@@ -66,7 +66,7 @@ export function MemberProfileModal({ groupId, userId, onClose }: Props) {
             exit={{ opacity: 0, scale: 0.97, y: 6 }}
             transition={{ type: 'spring', stiffness: 340, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
+            className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
           >
             <button
               onClick={onClose}
@@ -95,7 +95,7 @@ function Body({ data }: { data: NonNullable<ReturnType<typeof useMemberProfile>[
   const displayName = user.discord_display_name ?? user.discord_username
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+    <div>
       {/* banner */}
       <div className="relative h-20 bg-gradient-to-br from-nerv-orange/25 via-nerv-orange/5 to-transparent">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(255,102,0,0.15),transparent_60%)]" />
