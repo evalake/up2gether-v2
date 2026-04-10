@@ -73,8 +73,8 @@ class ThemeAuditVote(BaseModel):
 
 
 class ThemeAuditResponse(BaseModel):
-    theme: "ThemeResponse | None"
-    cycle: "CycleResponse | None"
+    theme: "ThemeResponse | None"  # noqa: UP037
+    cycle: "CycleResponse | None"  # noqa: UP037
     opener: ThemeAuditPerson | None
     decided_by: ThemeAuditPerson | None
     votes: list[ThemeAuditVote]

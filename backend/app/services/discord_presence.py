@@ -6,6 +6,7 @@ Se DISCORD_BOT_TOKEN nao tiver setado, vira no-op (endpoints retornam vazio).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 from typing import Literal
 
@@ -99,10 +100,8 @@ class PresenceBot:
                 log.exception("erro fechando client")
         if self._task:
             self._task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError, Exception):
                 await self._task
-            except (asyncio.CancelledError, Exception):
-                pass
 
 
 _bot: PresenceBot | None = None
