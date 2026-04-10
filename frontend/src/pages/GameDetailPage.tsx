@@ -245,7 +245,7 @@ export function GameDetailPage() {
               <button
                 onClick={saveEdit}
                 disabled={update.isPending || !edit.name}
-                className="rounded-sm border border-nerv-orange bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/20 disabled:opacity-40"
+                className="rounded-sm border border-nerv-orange bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/20 disabled:opacity-40"
               >
                 {update.isPending ? 'salvando...' : 'salvar'}
               </button>

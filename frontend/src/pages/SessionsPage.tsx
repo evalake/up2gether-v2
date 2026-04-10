@@ -311,7 +311,7 @@ export function SessionsPage() {
                       onClick={() => !isPast && openDraft(slot)}
                       disabled={isPast}
                       aria-label="novo horario"
-                      className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'hover:bg-nerv-orange/5' : ''}`}
+                      className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'transition-colors hover:bg-nerv-orange/5' : ''}`}
                     />
                     {inSlot.length > 0 && !isPast && (
                       <button

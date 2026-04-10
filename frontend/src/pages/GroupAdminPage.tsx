@@ -175,7 +175,7 @@ export function GroupAdminPage() {
                 }
               }}
               disabled={setCurrent.isPending}
-              className="shrink-0 rounded-sm border border-nerv-red/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red hover:bg-nerv-red/10 disabled:opacity-40"
+              className="shrink-0 rounded-sm border border-nerv-red/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10 disabled:opacity-40"
             >
               destravar
             </button>
@@ -206,7 +206,7 @@ export function GroupAdminPage() {
                         toast.error(e instanceof Error ? e.message : 'falha')
                       }
                     }}
-                    className="flex w-full items-center gap-2 border-b border-nerv-line/20 px-2 py-1.5 text-left text-xs text-nerv-text hover:bg-nerv-green/10"
+                    className="flex w-full items-center gap-2 border-b border-nerv-line/20 px-2 py-1.5 text-left text-xs text-nerv-text transition-colors hover:bg-nerv-green/10"
                   >
                     {g.cover_url && <img src={g.cover_url} alt="" className="h-6 w-10 rounded-sm object-cover" />}
                     <span className="truncate">{g.name}</span>
@@ -263,7 +263,7 @@ export function GroupAdminPage() {
               }
             }}
             disabled={sync.isPending}
-            className="shrink-0 rounded-sm border border-nerv-orange/60 bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/20 disabled:opacity-40"
+            className="shrink-0 rounded-sm border border-nerv-orange/60 bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/20 disabled:opacity-40"
           >
             {sync.isPending ? 'sincronizando...' : 'sincronizar'}
           </button>
@@ -367,13 +367,13 @@ export function GroupAdminPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmKind('reset')}
-                className="rounded-sm border border-nerv-amber/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-amber hover:bg-nerv-amber/10"
+                className="rounded-sm border border-nerv-amber/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-amber transition-colors hover:bg-nerv-amber/10"
               >
                 Resetar Dados
               </button>
               <button
                 onClick={() => setConfirmKind('destroy')}
-                className="rounded-sm border border-nerv-red/50 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red hover:bg-nerv-red/10"
+                className="rounded-sm border border-nerv-red/50 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10"
               >
                 Excluir Servidor
               </button>

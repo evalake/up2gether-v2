@@ -109,7 +109,7 @@ export function DraftModal({
           <button
             onClick={onCreate}
             disabled={isPending || !title || picked.length < 2}
-            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
+            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
           >
             {isPending ? 'criando...' : 'criar'}
           </button>

@@ -64,7 +64,7 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
             <button
               onClick={save}
               disabled={mut.isPending}
-              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
+              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
             >
               {mut.isPending ? 'salvando...' : 'salvar'}
             </button>
@@ -78,7 +78,7 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
               <button
                 onClick={clear}
                 disabled={mut.isPending}
-                className="ml-auto rounded-sm border border-nerv-red/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red hover:bg-nerv-red/10 disabled:opacity-40"
+                className="ml-auto rounded-sm border border-nerv-red/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10 disabled:opacity-40"
               >
                 remover
               </button>

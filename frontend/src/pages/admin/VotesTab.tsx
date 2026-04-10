@@ -123,7 +123,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
         {selected.size > 0 && (
           <button
             onClick={() => setBulkConfirm(true)}
-            className="rounded-sm border border-nerv-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-red hover:bg-nerv-red/10"
+            className="rounded-sm border border-nerv-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10"
           >
             apagar {selected.size}
           </button>

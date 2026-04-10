@@ -123,7 +123,7 @@ export function PublicSessionPage() {
                       className={`rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-colors ${
                         active
                           ? `border-nerv-${color} bg-nerv-${color}/20 text-nerv-${color}`
-                          : `border-nerv-${color}/40 text-nerv-${color}/80 hover:bg-nerv-${color}/10`
+                          : `border-nerv-${color}/40 text-nerv-${color}/80 transition-colors hover:bg-nerv-${color}/10`
                       } disabled:opacity-40`}
                     >
                       {rsvping === s ? '...' : active ? `✓ ${label}` : label}
