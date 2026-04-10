@@ -123,6 +123,10 @@ async def _resync_discord_guild(group_id: uuid.UUID) -> None:
             if data:
                 _apply_guild_visuals(grp, data)
                 await db.commit()
+                # notifica clients conectados via SSE
+                from app.services.realtime import get_broker
+
+                get_broker().publish(group_id, kind="group.visuals_updated")
     except Exception:
         pass
 

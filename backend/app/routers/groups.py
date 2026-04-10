@@ -789,6 +789,10 @@ async def sync_discord_visuals(
     _apply_guild_visuals(grp, guild_data)
     await db.commit()
     await db.refresh(grp)
+    # notifica clients SSE
+    from app.services.realtime import get_broker
+
+    get_broker().publish(group_id, kind="group.visuals_updated")
     return grp
 
 

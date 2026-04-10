@@ -33,6 +33,7 @@ const BIG_KINDS = new Set([
   'theme.decided',
   'session.created',
   'current_game.changed',
+  'group.visuals_updated',
 ])
 
 function invalidateForKind(qc: ReturnType<typeof useQueryClient>, msg: Msg) {
@@ -62,6 +63,11 @@ function invalidateForKind(qc: ReturnType<typeof useQueryClient>, msg: Msg) {
 
   if (k === 'session.created') {
     qc.invalidateQueries({ queryKey: ['groups', gid, 'sessions'] })
+  }
+
+  if (k === 'group.visuals_updated') {
+    qc.invalidateQueries({ queryKey: ['groups', gid] })
+    qc.invalidateQueries({ queryKey: ['groups'] })
   }
 
   // todos os momentos grandes viram notificacao in-app, entao refresca o sino

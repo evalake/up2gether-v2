@@ -76,8 +76,12 @@ class HttpDiscordClient:
 
         Usado pra refresh oportunista em background sem precisar de oauth do user.
         """
+        import logging
+
+        log = logging.getLogger(__name__)
         settings = get_settings()
         if not settings.discord_bot_token:
+            log.warning("discord_bot_token nao configurado, skip fetch_guild_as_bot")
             return None
         url = f"https://discord.com/api/v10/guilds/{guild_id}?with_counts=true"
         async with httpx.AsyncClient(timeout=10) as client:
@@ -85,8 +89,19 @@ class HttpDiscordClient:
                 url, headers={"Authorization": f"Bot {settings.discord_bot_token}"}
             )
         if res.status_code != 200:
+            log.warning(
+                "fetch_guild_as_bot %s => %s: %s", guild_id, res.status_code, res.text[:300]
+            )
             return None
-        return dict(res.json())
+        data = dict(res.json())
+        log.info(
+            "fetch_guild_as_bot %s ok: icon=%s banner=%s splash=%s",
+            guild_id,
+            data.get("icon"),
+            data.get("banner"),
+            data.get("splash"),
+        )
+        return data
 
     async def fetch_guild_preview(self, access_token: str, guild_id: str) -> dict | None:
         # /preview funciona pra guilds do user e pra discoveraveis
