@@ -1,7 +1,7 @@
 """add index on theme_votes.user_id
 
 Revision ID: b1c4e8f23a56
-Revises: f5a2fcb7932f
+Revises: a3c5f1e90211
 Create Date: 2026-04-09
 """
 
@@ -11,7 +11,7 @@ from typing import Union
 from alembic import op
 
 revision: str = 'b1c4e8f23a56'
-down_revision: Union[str, Sequence[str], None] = 'f5a2fcb7932f'
+down_revision: Union[str, Sequence[str], None] = 'a3c5f1e90211'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
