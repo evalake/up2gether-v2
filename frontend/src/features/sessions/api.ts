@@ -53,9 +53,6 @@ export const setRsvp = (groupId: string, sessionId: string, status: SessionRsvp)
 
 export const rsvpSession = setRsvp
 
-export const sessionIcsUrl = (groupId: string, sessionId: string) =>
-  `/api/groups/${groupId}/sessions/${sessionId}/calendar.ics`
-
 export type SessionAuditPerson = {
   id: string | null
   discord_id: string | null

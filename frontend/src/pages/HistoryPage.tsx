@@ -61,9 +61,9 @@ export function HistoryPage() {
         </div>
         <Link
           to={`/groups/${id}`}
-          className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/50 hover:text-nerv-orange"
+          className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
         >
-          Voltar
+          ← voltar
         </Link>
       </header>
 

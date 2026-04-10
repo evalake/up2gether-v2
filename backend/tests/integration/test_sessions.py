@@ -145,30 +145,6 @@ async def test_update_and_delete_session(make_user, auth_headers, client):
     assert res.status_code == 404
 
 
-async def test_ics_export(make_user, auth_headers, client):
-    owner, g, game = await _setup(make_user, auth_headers, client, "g-sess-4")
-    s = (
-        await client.post(
-            f"/api/groups/{g['id']}/sessions",
-            json={
-                "game_id": game["id"],
-                "title": "Calendar event",
-                "start_at": _start(),
-            },
-            headers=auth_headers(owner),
-        )
-    ).json()
-
-    res = await client.get(
-        f"/api/groups/{g['id']}/sessions/{s['id']}/calendar.ics",
-        headers=auth_headers(owner),
-    )
-    assert res.status_code == 200
-    assert res.headers["content-type"].startswith("text/calendar")
-    body = res.text
-    assert "BEGIN:VCALENDAR" in body
-    assert "Calendar event" in body
-    assert "END:VCALENDAR" in body
 
 
 async def test_session_403_for_non_member(make_user, auth_headers, client):

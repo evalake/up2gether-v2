@@ -40,8 +40,8 @@ export function PublicSessionPage() {
         <div>
           <div className="font-display text-3xl text-nerv-red">404</div>
           <p className="mt-2 text-sm text-nerv-dim">sessão não encontrada ou foi removida</p>
-          <Link to="/" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-nerv-orange hover:underline">
-            voltar
+          <Link to="/" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange">
+            ← voltar
           </Link>
         </div>
       </div>

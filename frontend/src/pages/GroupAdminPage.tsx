@@ -77,8 +77,8 @@ export function GroupAdminPage() {
       <div className="space-y-4">
         <h1 className="font-display text-2xl text-nerv-text">Painel do Admin</h1>
         <p className="text-sm text-nerv-dim">Voce nao tem permissao pra acessar esse painel.</p>
-        <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-nerv-orange hover:underline">
-          voltar pro grupo
+        <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange">
+          ← voltar
         </Link>
       </div>
     )
@@ -114,9 +114,9 @@ export function GroupAdminPage() {
         </div>
         <Link
           to={`/groups/${id}`}
-          className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/50 hover:text-nerv-orange"
+          className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
         >
-          Voltar
+          ← voltar
         </Link>
       </header>
 

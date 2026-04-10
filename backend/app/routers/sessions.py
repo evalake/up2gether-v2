@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -106,12 +106,4 @@ async def rsvp_session(
     return await service.rsvp(group_id, session_id, payload.status, actor)
 
 
-@router.get("/groups/{group_id}/sessions/{session_id}/calendar.ics")
-async def session_ics(
-    group_id: uuid.UUID,
-    session_id: uuid.UUID,
-    actor: CurrentUser,
-    service: Annotated[PlaySessionService, Depends(get_session_service)],
-) -> Response:
-    body = await service.ics(group_id, session_id, actor)
-    return Response(content=body, media_type="text/calendar")
+

@@ -161,31 +161,31 @@ export function CurrentGameHero({
             <span><span className="tabular-nums text-nerv-magenta">{audit.sessions_count}</span> sessões</span>
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-wider">
             <button
               onClick={() => navigate(`/groups/${groupId}/games/${audit.game_id}`)}
-              className="rounded-sm border border-nerv-green/50 bg-nerv-green/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-green hover:bg-nerv-green/20"
+              className="text-nerv-green hover:text-nerv-green/70"
             >
-              detalhes do jogo →
+              detalhes do jogo
             </button>
             {audit.vote_id && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/votes`)}
-                className="rounded-sm border border-nerv-dim/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/50 hover:text-nerv-orange"
+                className="text-nerv-dim hover:text-nerv-orange"
               >
-                votação completa
+                votacao
               </button>
             )}
             <button
               onClick={() => navigate(`/groups/${groupId}/history`)}
-              className="rounded-sm border border-nerv-dim/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/50 hover:text-nerv-orange"
+              className="text-nerv-dim hover:text-nerv-orange"
             >
-              histórico
+              historico
             </button>
             {isAdmin && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/admin`)}
-                className="rounded-sm border border-nerv-amber/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-amber hover:bg-nerv-amber/10"
+                className="text-nerv-amber hover:text-nerv-amber/70"
               >
                 {isManual ? 'gerenciar override' : 'travar manualmente'}
               </button>

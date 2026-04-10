@@ -440,23 +440,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/groups/{group_id}/sessions/{session_id}/calendar.ics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Session Ics */
-        get: operations["session_ics_api_groups__group_id__sessions__session_id__calendar_ics_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/users/hardware": {
         parameters: {
             query?: never;
@@ -2303,38 +2286,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    session_ics_api_groups__group_id__sessions__session_id__calendar_ics_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                group_id: string;
-                session_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

@@ -280,12 +280,6 @@ function Body({
 
       {/* footer */}
       <div className="flex items-center gap-2 border-t border-nerv-line/30 px-5 py-3">
-        <a
-          href={`/api/groups/${session.group_id}/sessions/${session.id}/calendar.ics`}
-          className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange"
-        >
-          .ics
-        </a>
         <button
           onClick={async () => {
             try {

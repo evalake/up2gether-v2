@@ -4,7 +4,6 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
-from icalendar import Calendar, Event
 
 from app.domain.enums import GroupRole, SessionRsvp
 from app.models.session import PlaySession
@@ -217,26 +216,6 @@ class PlaySessionService:
             raise _forbid("sessao ja comecou, rsvp travado")
         await self.sessions.upsert_rsvp(session_id, actor.id, rsvp_status)
         return await self._to_response(session, actor)
-
-    async def ics(self, group_id: uuid.UUID, session_id: uuid.UUID, actor: User) -> bytes:
-        await self._require_member(group_id, actor)
-        session = await self.sessions.get(session_id)
-        if session is None or session.group_id != group_id:
-            raise _not_found("Session not found")
-
-        cal = Calendar()
-        cal.add("prodid", "-//up2gether//EN")
-        cal.add("version", "2.0")
-        ev = Event()
-        ev.add("uid", str(session.id))
-        ev.add("summary", session.title)
-        if session.description:
-            ev.add("description", session.description)
-        ev.add("dtstart", session.start_at)
-        ev.add("dtend", session.start_at + timedelta(minutes=session.duration_minutes))
-        ev.add("dtstamp", datetime.now(UTC))
-        cal.add_component(ev)
-        return cal.to_ical()
 
     async def audit(
         self, group_id: uuid.UUID, session_id: uuid.UUID, actor: User
