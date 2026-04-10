@@ -113,27 +113,15 @@ async def _resync_discord_guild(group_id: uuid.UUID) -> None:
             grp = (await db.execute(select(Group).where(Group.id == group_id))).scalar_one_or_none()
             if not grp or not grp.discord_guild_id:
                 return
+            from app.routers.groups import _apply_guild_visuals
+
             client = HttpDiscordClient()
             try:
-                preview = await client.fetch_guild_as_bot(grp.discord_guild_id)
+                data = await client.fetch_guild_as_bot(grp.discord_guild_id)
             except Exception:
-                preview = None
-            if preview:
-                if preview.get("name"):
-                    grp.name = preview["name"]
-                icon_hash = preview.get("icon")
-                if icon_hash:
-                    ext = "gif" if str(icon_hash).startswith("a_") else "png"
-                    grp.icon_url = f"https://cdn.discordapp.com/icons/{grp.discord_guild_id}/{icon_hash}.{ext}?size=512"
-                banner_hash = preview.get("banner")
-                if banner_hash:
-                    ext = "gif" if str(banner_hash).startswith("a_") else "png"
-                    grp.banner_url = f"https://cdn.discordapp.com/banners/{grp.discord_guild_id}/{banner_hash}.{ext}?size=1024"
-                splash_hash = preview.get("splash") or preview.get("discovery_splash")
-                if splash_hash:
-                    grp.splash_url = f"https://cdn.discordapp.com/splashes/{grp.discord_guild_id}/{splash_hash}.png?size=1024"
-                if preview.get("description"):
-                    grp.description = preview["description"]
+                data = None
+            if data:
+                _apply_guild_visuals(grp, data)
                 await db.commit()
     except Exception:
         pass

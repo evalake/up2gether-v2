@@ -732,6 +732,26 @@ async def current_game_audit(
     )
 
 
+def _apply_guild_visuals(grp: Group, data: dict) -> None:
+    """Aplica dados visuais do Discord (qualquer fonte) no model do grupo."""
+    gid = grp.discord_guild_id
+    if data.get("name"):
+        grp.name = data["name"]
+    icon_hash = data.get("icon")
+    if icon_hash:
+        ext = "gif" if str(icon_hash).startswith("a_") else "png"
+        grp.icon_url = f"https://cdn.discordapp.com/icons/{gid}/{icon_hash}.{ext}?size=512"
+    banner_hash = data.get("banner")
+    if banner_hash:
+        ext = "gif" if str(banner_hash).startswith("a_") else "png"
+        grp.banner_url = f"https://cdn.discordapp.com/banners/{gid}/{banner_hash}.{ext}?size=1024"
+    splash_hash = data.get("splash") or data.get("discovery_splash")
+    if splash_hash:
+        grp.splash_url = f"https://cdn.discordapp.com/splashes/{gid}/{splash_hash}.png?size=1024"
+    if data.get("description"):
+        grp.description = data["description"]
+
+
 @router.post("/{group_id}/sync-discord", response_model=GroupResponse)
 async def sync_discord_visuals(
     group_id: uuid.UUID,
@@ -747,34 +767,26 @@ async def sync_discord_visuals(
     membership = await repo.get_membership(group_id, actor.id)
     if membership is None and not actor.is_sys_admin:
         raise HTTPException(403, "not a member")
-    integ = next(
-        (i for i in actor.integrations if i.provider == AuthProvider.DISCORD),
-        None,
-    )
-    if integ is None or not integ.access_token:
-        raise HTTPException(400, "discord not linked")
-    # re-fetch lista de guilds pra pegar icon atualizado
-    guilds = await discord.fetch_guilds(integ.access_token)
-    match = next((g for g in guilds if str(g.get("id")) == grp.discord_guild_id), None)
-    if match:
-        icon_hash = match.get("icon")
-        if icon_hash:
-            ext = "gif" if str(icon_hash).startswith("a_") else "png"
-            grp.icon_url = f"https://cdn.discordapp.com/icons/{grp.discord_guild_id}/{icon_hash}.{ext}?size=512"
-        if match.get("name"):
-            grp.name = match["name"]
-    # tenta /preview pra banner/splash/description (so funciona em guilds discoveraveis ou com bot)
-    preview = await discord.fetch_guild_preview(integ.access_token, grp.discord_guild_id)
-    if preview:
-        banner_hash = preview.get("banner")
-        splash_hash = preview.get("splash") or preview.get("discovery_splash")
-        if banner_hash:
-            ext = "gif" if str(banner_hash).startswith("a_") else "png"
-            grp.banner_url = f"https://cdn.discordapp.com/banners/{grp.discord_guild_id}/{banner_hash}.{ext}?size=1024"
-        if splash_hash:
-            grp.splash_url = f"https://cdn.discordapp.com/splashes/{grp.discord_guild_id}/{splash_hash}.png?size=1024"
-        if preview.get("description"):
-            grp.description = preview["description"]
+    # tenta bot token primeiro (GET /guilds/{id} retorna banner/icon/splash/desc completos)
+    # /preview via OAuth do user NAO retorna banner, so funciona em guilds discoveraveis
+    guild_data = await discord.fetch_guild_as_bot(grp.discord_guild_id)
+    if not guild_data:
+        # fallback: user OAuth (guilds list + preview)
+        integ = next(
+            (i for i in actor.integrations if i.provider == AuthProvider.DISCORD),
+            None,
+        )
+        if integ and integ.access_token:
+            guilds = await discord.fetch_guilds(integ.access_token)
+            match = next((g for g in guilds if str(g.get("id")) == grp.discord_guild_id), None)
+            if match:
+                guild_data = match
+            preview = await discord.fetch_guild_preview(integ.access_token, grp.discord_guild_id)
+            if preview:
+                guild_data = {**(guild_data or {}), **preview}
+    if not guild_data:
+        raise HTTPException(400, "nao conseguiu puxar dados do discord")
+    _apply_guild_visuals(grp, guild_data)
     await db.commit()
     await db.refresh(grp)
     return grp
