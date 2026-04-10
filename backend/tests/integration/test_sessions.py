@@ -145,8 +145,6 @@ async def test_update_and_delete_session(make_user, auth_headers, client):
     assert res.status_code == 404
 
 
-
-
 async def test_session_403_for_non_member(make_user, auth_headers, client):
     owner, g, game = await _setup(make_user, auth_headers, client, "g-sess-5")
     s = (

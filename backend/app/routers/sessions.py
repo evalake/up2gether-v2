@@ -105,5 +105,3 @@ async def rsvp_session(
 ) -> SessionResponse:
     return await service.rsvp(group_id, session_id, payload.status, actor)
 
-
-
