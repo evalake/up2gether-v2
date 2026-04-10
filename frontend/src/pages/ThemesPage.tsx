@@ -93,7 +93,7 @@ export function ThemesPage() {
           <button
             onClick={onOpenCycle}
             disabled={openC.isPending}
-            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-4 py-2 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
           >
             {openC.isPending ? 'abrindo' : decided ? 'reabrir e sobrescrever' : current.data ? 'iniciar novo ciclo' : 'iniciar ciclo'}
           </button>
@@ -286,7 +286,7 @@ function CurrentThemeHero({
             <button
               onClick={onReopen}
               disabled={reopening}
-              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-4 py-2 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
             >
               {reopening ? 'reabrindo' : 'reabrir e sobrescrever'}
             </button>

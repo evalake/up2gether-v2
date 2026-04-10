@@ -236,14 +236,14 @@ export function GameDetailPage() {
             <div className="flex justify-end gap-2 pt-1">
               <button
                 onClick={() => setEditing(false)}
-                className="rounded-sm border border-nerv-line px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40"
+                className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40"
               >
                 cancelar
               </button>
               <button
                 onClick={saveEdit}
                 disabled={update.isPending || !edit.name}
-                className="rounded-sm border border-nerv-orange bg-nerv-orange/10 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/20 disabled:opacity-40"
+                className="rounded-sm border border-nerv-orange bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/20 disabled:opacity-40"
               >
                 {update.isPending ? 'salvando...' : 'salvar'}
               </button>

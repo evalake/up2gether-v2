@@ -57,7 +57,7 @@ export function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubm
           {cycle.suggestions.length > 0 && isStaff && (
             <button
               onClick={onClose}
-              className="rounded-sm border border-nerv-green/50 bg-nerv-green/10 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-green transition-colors hover:bg-nerv-green/20"
+              className="rounded-sm border border-nerv-green/50 bg-nerv-green/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-green transition-colors hover:bg-nerv-green/20"
             >
               encerrar e decidir
             </button>
@@ -65,7 +65,7 @@ export function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubm
           {isAdmin && (
             <button
               onClick={onCancel}
-              className="rounded-sm border border-nerv-red/30 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
+              className="rounded-sm border border-nerv-red/30 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
             >
               cancelar
             </button>
@@ -139,7 +139,7 @@ export function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubm
               <button
                 onClick={submit}
                 disabled={!name.trim()}
-                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[10px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
               >
                 salvar
               </button>

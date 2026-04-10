@@ -133,9 +133,9 @@ export function SessionDraftModal({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="buscar jogo..."
-              className="h-9 w-full rounded-md border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
             />
-            <div className="mt-2 max-h-56 overflow-y-auto rounded-md border border-nerv-line/30 bg-black/20">
+            <div className="mt-2 max-h-56 overflow-y-auto rounded-sm border border-nerv-line/30 bg-black/20">
               {filtered.length === 0 ? (
                 <div className="py-6 text-center text-[11px] text-nerv-dim">
                   nenhum jogo pra {JSON.stringify(query)}
@@ -183,7 +183,7 @@ export function SessionDraftModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
-              className="h-9 w-full rounded-md border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
             />
           </motion.div>
 
@@ -204,7 +204,7 @@ export function SessionDraftModal({
                     type="button"
                     whileTap={{ scale: 0.94 }}
                     onClick={() => setDuration(m)}
-                    className={`flex-1 rounded-md border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
+                    className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
                       on
                         ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
                         : 'border-nerv-line/60 bg-black/20 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
@@ -221,7 +221,7 @@ export function SessionDraftModal({
         <div className="flex items-center justify-end gap-2 border-t border-nerv-line/30 px-5 py-3">
           <button
             onClick={onCancel}
-            className="rounded-sm border border-nerv-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
           >
             cancelar
           </button>
@@ -229,7 +229,7 @@ export function SessionDraftModal({
             whileTap={{ scale: 0.96 }}
             onClick={onSave}
             disabled={!gameId || isPending}
-            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
+            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange hover:bg-nerv-orange/25 disabled:opacity-40"
           >
             {isPending ? 'salvando...' : 'agendar'}
           </motion.button>

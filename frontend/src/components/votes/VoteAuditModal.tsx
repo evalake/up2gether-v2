@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useVoteAudit } from '@/features/votes/hooks'
 import { Avatar } from '@/components/nerv/Avatar'
 import { Loading } from '@/components/ui/Loading'
@@ -30,38 +31,52 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  if (!voteId) return null
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        className="my-8 w-full max-w-3xl rounded-sm border border-nerv-orange/30 bg-nerv-panel shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-nerv-line/40 px-5 py-3">
-          <div className="text-[11px] uppercase tracking-wider text-nerv-orange">
-            Audit da votacao
-          </div>
-          <button
-            onClick={onClose}
-            className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+    <AnimatePresence>
+      {voteId && (
+        <motion.div
+          key="backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          onClick={onClose}
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-md"
+        >
+          <motion.div
+            key="panel"
+            role="dialog"
+            aria-modal="true"
+            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 6 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative my-8 w-full max-w-3xl overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
           >
-            fechar [esc]
-          </button>
-        </div>
+            <button
+              onClick={onClose}
+              aria-label="fechar"
+              className="absolute right-3 top-3 z-20 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            </button>
 
-        <div className="max-h-[80vh] overflow-y-auto p-5">
-          {audit.isLoading && <Loading />}
-          {audit.error && <ErrorBox error={audit.error} />}
-          {audit.data && <AuditBody data={audit.data} />}
-        </div>
-      </div>
-    </div>
+            <div className="border-b border-nerv-line/40 px-5 py-3">
+              <div className="text-[11px] uppercase tracking-wider text-nerv-orange">
+                Audit da votacao
+              </div>
+            </div>
+
+            <div className="max-h-[80vh] overflow-y-auto p-5">
+              {audit.isLoading && <Loading />}
+              {audit.error && <ErrorBox error={audit.error} />}
+              {audit.data && <AuditBody data={audit.data} />}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 

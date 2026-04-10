@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
@@ -32,6 +32,12 @@ function GuildPickerModal({
     enabled: open,
     staleTime: 60_000,
   })
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
   const [q, setQ] = useState('')
   const filtered = useMemo(
     () => (guilds.data ?? []).filter((g) => g.name.toLowerCase().includes(q.toLowerCase())),
@@ -45,16 +51,25 @@ function GuildPickerModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+            role="dialog"
+            aria-modal="true"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md overflow-hidden rounded-sm border border-nerv-orange/40 bg-nerv-panel shadow-[0_0_60px_rgba(255,102,0,0.15)]"
+            className="relative w-full max-w-md overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
           >
+            <button
+              onClick={onClose}
+              aria-label="fechar"
+              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            </button>
             <div className="border-b border-nerv-orange/20 px-4 py-3">
               <div className="font-display text-sm uppercase tracking-wider text-nerv-text">
                 selecione um server do discord

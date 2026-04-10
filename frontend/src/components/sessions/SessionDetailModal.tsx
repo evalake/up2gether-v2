@@ -244,7 +244,7 @@ function Body({
                     key={v}
                     whileTap={{ scale: 0.94 }}
                     onClick={() => onRsvp(v)}
-                    className={`flex-1 rounded-md border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
+                    className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
                       active
                         ? tone
                         : 'border-nerv-line/60 bg-black/20 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'

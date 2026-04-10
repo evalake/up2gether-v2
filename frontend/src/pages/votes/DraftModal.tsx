@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { steamCover } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
@@ -15,6 +15,11 @@ export function DraftModal({
   onCreate: () => void
   isPending: boolean
 }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
   const [query, setQuery] = useState('')
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
   const q = norm(query.trim())
@@ -27,16 +32,25 @@ export function DraftModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onCancel}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97 }}
         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        role="dialog"
+        aria-modal="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg overflow-hidden rounded-sm border border-nerv-orange/30 bg-nerv-panel shadow-[0_0_60px_rgba(255,102,0,0.12)]"
+        className="relative w-full max-w-lg overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
       >
+        <button
+          onClick={onCancel}
+          aria-label="fechar"
+          className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+        </button>
         <div className="border-b border-nerv-orange/15 px-5 py-4">
           <div className="text-[10px] uppercase tracking-wider text-nerv-dim">nova votação</div>
           <input

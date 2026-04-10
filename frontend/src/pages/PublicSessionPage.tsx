@@ -78,7 +78,7 @@ export function PublicSessionPage() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md overflow-hidden rounded-md border border-nerv-orange/25 bg-nerv-panel/60 shadow-2xl backdrop-blur-sm"
+        className="w-full max-w-md overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel/60 shadow-2xl backdrop-blur-sm"
       >
         <div className="border-b border-nerv-orange/15 px-5 py-3">
           <div className="text-[10px] uppercase tracking-wider text-nerv-dim">{data.group_name}</div>
