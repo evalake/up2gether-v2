@@ -104,4 +104,3 @@ async def rsvp_session(
     service: Annotated[PlaySessionService, Depends(get_session_service)],
 ) -> SessionResponse:
     return await service.rsvp(group_id, session_id, payload.status, actor)
-
