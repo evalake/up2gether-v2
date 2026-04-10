@@ -7,10 +7,12 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
+import { useTitle } from '@/lib/useTitle'
 
 // historico derivado: votes fechados com vencedor, ordem desc.
 // nao captura override manual pq n temos log disso ainda
 export function HistoryPage() {
+  useTitle('historico')
   const { id = '' } = useParams()
   const group = useGroup(id)
   const votes = useVotes(id)

@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/nerv/Button'
 import { steamCover } from '@/lib/steamCover'
+import { useTitle } from '@/lib/useTitle'
 import { SteamThumb } from '@/components/SteamThumb'
 import { SIGNALS, STAGE_COLOR, STAGE_VALUES, TIERS } from '@/lib/constants'
 
@@ -97,6 +98,7 @@ function ChipInput({ label, value, onChange, max, placeholder }: {
 }
 
 export function GamesPage() {
+  useTitle('biblioteca')
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const games = useGames(id)

@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/toast'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
 import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
+import { useTitle } from '@/lib/useTitle'
 import { VoteCard, LastClosedPreview } from './votes/VoteCard'
 import { DraftModal } from './votes/DraftModal'
 import { WinnerReveal } from './votes/WinnerReveal'
@@ -22,6 +23,7 @@ import { WinnerReveal } from './votes/WinnerReveal'
 type VoteRow = NonNullable<ReturnType<typeof useVotes>['data']>[number]
 
 export function VotesPage() {
+  useTitle('votacoes')
   const { id = '' } = useParams()
   const votes = useVotes(id)
   const games = useGames(id)

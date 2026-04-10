@@ -27,6 +27,7 @@ import { VotesTab } from './admin/VotesTab'
 import { SessionsTab } from './admin/SessionsTab'
 import { ThemesTab } from './admin/ThemesTab'
 import { WebhookSection } from './admin/WebhookSection'
+import { useTitle } from '@/lib/useTitle'
 
 type AdminTab = 'overview' | 'games' | 'votes' | 'sessions' | 'themes' | 'members' | 'config' | 'danger'
 
@@ -46,6 +47,7 @@ export function GroupAdminPage() {
   const navigate = useNavigate()
   const me = useMe()
   const group = useGroup(id)
+  useTitle(group.data ? `admin · ${group.data.name}` : undefined)
   const del = useDeleteGroup()
   const purge = usePurgeGroup()
   const sync = useSyncDiscord()

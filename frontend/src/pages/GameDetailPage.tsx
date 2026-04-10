@@ -20,10 +20,12 @@ import { formatPlayers } from '@/lib/players'
 import { steamGetDetails } from '@/features/steam/api'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import { SIGNALS, STAGES, TIERS } from '@/lib/constants'
+import { useTitle } from '@/lib/useTitle'
 
 export function GameDetailPage() {
   const { id = '', gameId = '' } = useParams()
   const game = useGame(id, gameId)
+  useTitle(game.data?.name)
   const owners = useGameOwners(gameId)
   const setInt = useSetInterest(id)
   const toggleOwn = useToggleOwnership(id)

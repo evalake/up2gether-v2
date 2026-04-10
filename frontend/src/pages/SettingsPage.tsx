@@ -9,6 +9,7 @@ import { Button } from '@/components/nerv/Button'
 import { KanjiLabel } from '@/components/nerv/KanjiLabel'
 import { Avatar } from '@/components/nerv/Avatar'
 import { api } from '@/lib/api'
+import { useTitle } from '@/lib/useTitle'
 
 const TIERS: { id: HardwareTier; label: string; hint: string }[] = [
   { id: 'low', label: 'low', hint: 'integrada / notebook básico' },
@@ -52,6 +53,7 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
 }
 
 export function SettingsPage() {
+  useTitle('config')
   const me = useMe()
   const settings = useMySettings()
   const patch = usePatchSettings()

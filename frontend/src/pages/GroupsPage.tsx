@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/nerv/Button'
 import { KanjiLabel } from '@/components/nerv/KanjiLabel'
+import { useTitle } from '@/lib/useTitle'
 
 function guildIconUrl(g: DiscordGuild): string | null {
   return g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128` : null
@@ -132,6 +133,7 @@ function GuildPickerModal({
 }
 
 export function GroupsPage() {
+  useTitle('grupos')
   const { data, isLoading, error } = useGroups()
   const create = useCreateGroup()
   const [pickerOpen, setPickerOpen] = useState(false)

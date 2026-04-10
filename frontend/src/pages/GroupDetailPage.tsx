@@ -22,6 +22,7 @@ import { useToast } from '@/components/ui/toast'
 import { Avatar } from '@/components/nerv/Avatar'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 import type { GameStage } from '@/features/games/api'
+import { useTitle } from '@/lib/useTitle'
 import { CurrentGameHero } from './group-detail/CurrentGameHero'
 import { DeckTile } from './group-detail/DeckTile'
 
@@ -62,6 +63,7 @@ export function GroupDetailPage() {
   const navigate = useNavigate()
   const me = useMe()
   const group = useGroup(id)
+  useTitle(group.data?.name)
   const members = useMembers(id)
   const games = useGames(id)
   const votes = useVotes(id)

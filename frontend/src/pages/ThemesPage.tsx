@@ -24,9 +24,11 @@ import { useToast } from '@/components/ui/toast'
 import type { Suggestion } from '@/features/themes/api'
 import { ThemeAuditModal } from '@/components/themes/ThemeAuditModal'
 import { CycleSection } from './themes/CycleSection'
+import { useTitle } from '@/lib/useTitle'
 import { TiebreakOverlay } from './themes/TiebreakOverlay'
 
 export function ThemesPage() {
+  useTitle('tema do mes')
   const { id = '' } = useParams()
   const me = useMe()
   const group = useGroup(id)

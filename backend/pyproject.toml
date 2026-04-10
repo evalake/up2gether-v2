@@ -19,7 +19,6 @@ dependencies = [
     "pywebpush>=2.0.1",
     "python-socketio>=5.12.1",
     "python-dateutil>=2.9.0",
-    "icalendar>=6.1.0",
     "google-api-python-client>=2.156.0",
     "google-auth>=2.37.0",
     "google-auth-oauthlib>=1.2.1",

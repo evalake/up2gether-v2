@@ -13,6 +13,7 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { steamCover } from '@/lib/steamCover'
+import { useTitle } from '@/lib/useTitle'
 import { SlotStack } from './sessions/SlotStack'
 import { SessionDraftModal } from './sessions/SessionDraftModal'
 
@@ -75,6 +76,7 @@ export function SessionsPage() {
     return Array.from(new Set([...PRIME_HOURS, ...extras])).sort((a, b) => a - b)
   }, [fullDay, sessions.data, weekAnchor])
   const group = useGroup(id)
+  useTitle(group.data ? `sessoes · ${group.data.name}` : undefined)
   const canDelete =
     group.data?.user_role === 'admin' || group.data?.user_role === 'mod'
 
