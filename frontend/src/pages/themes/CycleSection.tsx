@@ -193,7 +193,7 @@ function SuggestionCard({ s, cycle, meId, isStaff, isAdmin, maxVotes, onVote, on
       className={`group relative overflow-hidden rounded-sm border bg-nerv-panel/40 transition-all ${
         voted
           ? 'border-nerv-magenta/70 ring-1 ring-nerv-magenta/30'
-          : 'border-nerv-line/40 hover:-translate-y-0.5 hover:border-nerv-orange/40'
+          : 'border-nerv-line/40 hover:-translate-y-0.5 transition-colors hover:border-nerv-orange/40'
       }`}
     >
       {s.image_url && (
@@ -240,7 +240,7 @@ function SuggestionCard({ s, cycle, meId, isStaff, isAdmin, maxVotes, onVote, on
               className={`rounded-sm border px-2.5 py-1 text-[10px] uppercase tracking-wider transition-colors ${
                 voted
                   ? 'border-nerv-magenta bg-nerv-magenta/20 text-nerv-magenta'
-                  : 'border-nerv-line text-nerv-dim hover:border-nerv-magenta/60 hover:text-nerv-magenta'
+                  : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-magenta/60 hover:text-nerv-magenta'
               }`}
             >
               {voted ? '✓ votado' : 'votar'}

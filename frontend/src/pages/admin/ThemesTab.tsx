@@ -100,7 +100,7 @@ export function ThemesTab({ groupId }: { groupId: string }) {
             </div>
             {cancelConfirm ? (
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setCancelConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">cancelar</button>
+                <button onClick={() => setCancelConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
                 <button onClick={doCancel} disabled={cancel.isPending} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40">
                   sim, cancelar ciclo
                 </button>
@@ -136,7 +136,7 @@ export function ThemesTab({ groupId }: { groupId: string }) {
             className="h-8 min-w-[180px] flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus:border-nerv-orange focus:outline-none"
           />
           {filtered.length > 0 && (
-            <button onClick={toggleAll} className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">
+            <button onClick={toggleAll} className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">
               {selected.size === filtered.length ? 'limpar' : 'tudo'}
             </button>
           )}
@@ -151,7 +151,7 @@ export function ThemesTab({ groupId }: { groupId: string }) {
           <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
             <p className="text-xs text-nerv-red">apagar {selected.size} tema{selected.size === 1 ? '' : 's'}?</p>
             <div className="flex shrink-0 gap-2">
-              <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">cancelar</button>
+              <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
               <button onClick={deleteBulk} disabled={del.isPending} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40">
                 sim, apagar
               </button>
@@ -183,7 +183,7 @@ export function ThemesTab({ groupId }: { groupId: string }) {
                       <button onClick={() => deleteOne(t.id)} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-2 py-1 font-mono text-[10px] text-nerv-red">confirmar</button>
                     </div>
                   ) : (
-                    <button onClick={() => setPendingDelete(t.id)} className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red">
+                    <button onClick={() => setPendingDelete(t.id)} className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red">
                       apagar
                     </button>
                   )}

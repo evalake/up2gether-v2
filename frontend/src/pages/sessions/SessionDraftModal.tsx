@@ -155,7 +155,7 @@ export function SessionDraftModal({
                         className={`flex items-center gap-2 rounded-sm border px-2 py-1.5 text-left transition-all ${
                           on
                             ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                            : 'border-transparent text-nerv-text hover:border-nerv-orange/30 hover:bg-nerv-orange/5'
+                            : 'border-transparent text-nerv-text transition-colors hover:border-nerv-orange/30 hover:bg-nerv-orange/5'
                         }`}
                       >
                         {cover ? (
@@ -208,7 +208,7 @@ export function SessionDraftModal({
                     className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
                       on
                         ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
-                        : 'border-nerv-line/60 bg-black/20 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                        : 'border-nerv-line/60 bg-black/20 text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
                     }`}
                   >
                     {m / 60}h
@@ -222,7 +222,7 @@ export function SessionDraftModal({
         <div className="flex items-center justify-end gap-2 border-t border-nerv-line/30 px-5 py-3">
           <button
             onClick={onCancel}
-            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
           >
             cancelar
           </button>

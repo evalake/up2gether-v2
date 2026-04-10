@@ -124,13 +124,13 @@ export function GameDetailPage() {
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3 text-[11px] uppercase tracking-wider text-nerv-dim">
-        <Link to={`/groups/${id}/games`} className="text-nerv-dim/70 hover:text-nerv-orange">biblioteca</Link>
+        <Link to={`/groups/${id}/games`} className="text-nerv-dim/70 transition-colors hover:text-nerv-orange">biblioteca</Link>
         <div className="flex gap-3">
           {g.steam_appid && (
-            <button onClick={refreshFromSteam} className="hover:text-nerv-orange">atualizar da steam</button>
+            <button onClick={refreshFromSteam} className="transition-colors hover:text-nerv-orange">atualizar da steam</button>
           )}
           {canManage && (
-            <button onClick={editing ? () => setEditing(false) : startEdit} className="hover:text-nerv-orange">
+            <button onClick={editing ? () => setEditing(false) : startEdit} className="transition-colors hover:text-nerv-orange">
               {editing ? 'cancelar' : 'editar'}
             </button>
           )}
@@ -147,7 +147,7 @@ export function GameDetailPage() {
                 }
               }}
               disabled={archive.isPending}
-              className="text-nerv-red/80 hover:text-nerv-red disabled:opacity-40"
+              className="text-nerv-red/80 transition-colors hover:text-nerv-red disabled:opacity-40"
             >
               {archive.isPending ? 'removendo...' : 'remover'}
             </button>
@@ -194,7 +194,7 @@ export function GameDetailPage() {
                 type="button"
                 onClick={() => setEdit({ ...edit, is_free: !edit.is_free })}
                 className={`col-span-3 h-8 rounded-sm border text-[10px] uppercase tracking-wider ${
-                  edit.is_free ? 'border-nerv-green bg-nerv-green/10 text-nerv-green' : 'border-nerv-line text-nerv-dim hover:border-nerv-green/40'
+                  edit.is_free ? 'border-nerv-green bg-nerv-green/10 text-nerv-green' : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-green/40'
                 }`}
               >
                 {edit.is_free ? '✓ free' : 'free?'}
@@ -228,7 +228,7 @@ export function GameDetailPage() {
                   className={`h-8 flex-1 rounded-sm border text-[10px] uppercase tracking-wider transition-all ${
                     edit.min_hardware_tier === t
                       ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                      : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                      : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                   }`}
                 >
                   hw: {t}
@@ -238,7 +238,7 @@ export function GameDetailPage() {
             <div className="flex justify-end gap-2 pt-1">
               <button
                 onClick={() => setEditing(false)}
-                className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40"
+                className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/40"
               >
                 cancelar
               </button>
@@ -387,7 +387,7 @@ export function GameDetailPage() {
                       className={`flex-1 rounded-sm border px-2 py-1.5 text-[10px] uppercase tracking-wider transition-all ${
                         g.user_interest === s.value
                           ? `${s.color} bg-current/10`
-                          : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                          : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                       }`}
                     >
                       {s.label}
@@ -400,7 +400,7 @@ export function GameDetailPage() {
                 className={`w-full rounded-sm border px-2 py-2 text-xs uppercase tracking-wider transition-all ${
                   g.user_owns_game
                     ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
-                    : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                    : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                 }`}
               >
                 {g.user_owns_game ? '✓ você tem este jogo' : 'marcar como tenho'}
@@ -418,7 +418,7 @@ export function GameDetailPage() {
                   className={`w-full rounded-sm border px-3 py-1.5 text-left text-xs uppercase tracking-wider transition-all ${
                     g.stage === s.value
                       ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                      : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                      : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                   }`}
                 >
                   {s.label}

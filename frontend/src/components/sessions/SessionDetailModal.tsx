@@ -249,7 +249,7 @@ function Body({
                     className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
                       active
                         ? tone
-                        : 'border-nerv-line/60 bg-black/20 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                        : 'border-nerv-line/60 bg-black/20 text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
                     }`}
                   >
                     {label}
@@ -293,14 +293,14 @@ function Body({
               toast.error('falha ao copiar')
             }
           }}
-          className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange"
+          className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-orange"
         >
           convite
         </button>
         {canDelete && (
           <button
             onClick={onDelete}
-            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-red hover:text-nerv-red"
+            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red hover:text-nerv-red"
           >
             remover
           </button>

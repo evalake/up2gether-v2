@@ -196,7 +196,7 @@ function Body({ data }: { data: NonNullable<ReturnType<typeof useMemberProfile>[
                 </svg>
                 <span className="font-mono text-[10px] uppercase tracking-wider text-nerv-orange/80">steam</span>
                 {steam.persona_name && (
-                  <a href={steam.profile_url ?? undefined} target="_blank" rel="noreferrer" className="truncate text-[11px] text-nerv-text hover:text-nerv-orange">
+                  <a href={steam.profile_url ?? undefined} target="_blank" rel="noreferrer" className="truncate text-[11px] text-nerv-text transition-colors hover:text-nerv-orange">
                     {steam.persona_name}
                   </a>
                 )}

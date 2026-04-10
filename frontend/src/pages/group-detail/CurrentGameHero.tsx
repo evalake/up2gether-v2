@@ -164,28 +164,28 @@ export function CurrentGameHero({
           <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-wider">
             <button
               onClick={() => navigate(`/groups/${groupId}/games/${audit.game_id}`)}
-              className="text-nerv-green hover:text-nerv-green/70"
+              className="text-nerv-green transition-colors hover:text-nerv-green/70"
             >
               detalhes do jogo
             </button>
             {audit.vote_id && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/votes`)}
-                className="text-nerv-dim hover:text-nerv-orange"
+                className="text-nerv-dim transition-colors hover:text-nerv-orange"
               >
                 votacao
               </button>
             )}
             <button
               onClick={() => navigate(`/groups/${groupId}/history`)}
-              className="text-nerv-dim hover:text-nerv-orange"
+              className="text-nerv-dim transition-colors hover:text-nerv-orange"
             >
               historico
             </button>
             {isAdmin && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/admin`)}
-                className="text-nerv-amber hover:text-nerv-amber/70"
+                className="text-nerv-amber transition-colors hover:text-nerv-amber/70"
               >
                 {isManual ? 'gerenciar override' : 'travar manualmente'}
               </button>

@@ -64,13 +64,13 @@ export function VoteCard({
         <div className="flex gap-2">
           <button
             onClick={onAudit}
-            className="rounded-sm border border-nerv-line px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/60 hover:text-nerv-orange"
+            className="rounded-sm border border-nerv-line px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
           >
             audit
           </button>
           <button
             onClick={onClose}
-            className="rounded-sm border border-nerv-red/30 px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red"
+            className="rounded-sm border border-nerv-red/30 px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
           >
             encerrar
           </button>
@@ -113,7 +113,7 @@ export function VoteCard({
                   ? 'border-nerv-magenta shadow-[0_0_22px_rgba(255,0,102,0.18)]'
                   : leading
                   ? 'border-nerv-orange/80 shadow-[0_0_18px_rgba(255,102,0,0.15)]'
-                  : 'border-nerv-line hover:border-nerv-orange/50'
+                  : 'border-nerv-line transition-colors hover:border-nerv-orange/50'
               }`}
             >
               {cover ? (
@@ -173,7 +173,7 @@ export function VoteCard({
         if (!eliminated.length) return null
         return (
           <details className="group rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-2">
-            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">
+            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">
               eliminados nas fases anteriores ({eliminated.length})
             </summary>
             <div className="mt-2 flex flex-wrap gap-1.5">

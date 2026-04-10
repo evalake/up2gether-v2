@@ -95,7 +95,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
         {filtered.length > 0 && (
           <button
             onClick={toggleAll}
-            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
           >
             {selected.size === filtered.length ? 'limpar' : 'tudo'}
           </button>
@@ -116,7 +116,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
             apagar {selected.size} jogo{selected.size === 1 ? '' : 's'}? nao da pra desfazer.
           </p>
           <div className="flex shrink-0 gap-2">
-            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">
+            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">
               cancelar
             </button>
             <button
@@ -162,7 +162,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
                   <div className="flex shrink-0 gap-1">
                     <button
                       onClick={() => setPendingDelete(null)}
-                      className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:text-nerv-text"
+                      className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-text"
                     >
                       cancelar
                     </button>
@@ -176,7 +176,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
                 ) : (
                   <button
                     onClick={() => setPendingDelete(g.id)}
-                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red"
+                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
                   >
                     apagar
                   </button>

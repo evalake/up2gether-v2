@@ -71,7 +71,7 @@ export function NotificationBell() {
                 {unread > 0 && (
                   <button
                     onClick={() => mark.mutate(undefined)}
-                    className="text-[9px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+                    className="text-[9px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
                   >
                     marcar todas
                   </button>

@@ -41,7 +41,7 @@ export function PublicSessionPage() {
         <div>
           <div className="font-display text-3xl text-nerv-red">404</div>
           <p className="mt-2 text-sm text-nerv-dim">sessão não encontrada ou foi removida</p>
-          <Link to="/" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange">
+          <Link to="/" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">
             ← voltar
           </Link>
         </div>
@@ -133,7 +133,7 @@ export function PublicSessionPage() {
               </div>
               <Link
                 to={`/groups/${data.group_id}/sessions`}
-                className="block text-center text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+                className="block text-center text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
               >
                 ver no app →
               </Link>

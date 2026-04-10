@@ -318,7 +318,7 @@ export function SessionsPage() {
                         type="button"
                         onClick={(e) => { e.stopPropagation(); openDraft(slot) }}
                         aria-label="adicionar outra no mesmo horario"
-                        className="absolute right-0.5 top-0.5 z-20 hidden h-4 w-4 place-items-center rounded-full border border-nerv-orange/50 bg-nerv-panel text-[10px] leading-none text-nerv-orange hover:bg-nerv-orange hover:text-nerv-panel group-hover/cell:grid"
+                        className="absolute right-0.5 top-0.5 z-20 hidden h-4 w-4 place-items-center rounded-full border border-nerv-orange/50 bg-nerv-panel text-[10px] leading-none text-nerv-orange hover:bg-nerv-orange transition-colors hover:text-nerv-panel group-hover/cell:grid"
                       >
                         +
                       </button>
@@ -346,7 +346,7 @@ export function SessionsPage() {
         <section className="space-y-3">
           <button
             onClick={() => setOpenPast((v) => !v)}
-            className="flex items-center gap-2 text-xs uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+            className="flex items-center gap-2 text-xs uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
           >
             <span>{openPast ? '−' : '+'}</span>
             <span>histórico</span>

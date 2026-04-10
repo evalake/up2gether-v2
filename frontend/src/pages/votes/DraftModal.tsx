@@ -88,7 +88,7 @@ export function DraftModal({
                   type="button"
                   onClick={() => togglePick(g.id)}
                   className={`flex items-center gap-2 rounded-sm border px-2 py-1.5 text-left transition-all ${
-                    on ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange' : 'border-nerv-line text-nerv-text hover:border-nerv-orange/40'
+                    on ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange' : 'border-nerv-line text-nerv-text transition-colors hover:border-nerv-orange/40'
                   }`}
                 >
                   {cover && <img src={cover} alt="" className="h-6 w-10 shrink-0 rounded-sm object-cover" />}
@@ -102,7 +102,7 @@ export function DraftModal({
         <div className="flex items-center justify-end gap-2 border-t border-nerv-orange/15 bg-black/30 px-5 py-3">
           <button
             onClick={onCancel}
-            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
           >
             cancelar
           </button>

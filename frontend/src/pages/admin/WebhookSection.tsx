@@ -46,7 +46,7 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
         {!editing && (
           <button
             onClick={() => { setValue(current ?? ''); setEditing(true) }}
-            className="shrink-0 rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/50 hover:text-nerv-orange"
+            className="shrink-0 rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/50 hover:text-nerv-orange"
           >
             Editar
           </button>
@@ -70,7 +70,7 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
             </button>
             <button
               onClick={() => { setEditing(false); setValue(current ?? '') }}
-              className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim hover:border-nerv-line/70 hover:text-nerv-text"
+              className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-line/70 hover:text-nerv-text"
             >
               cancelar
             </button>

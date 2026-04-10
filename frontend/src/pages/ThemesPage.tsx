@@ -116,7 +116,7 @@ export function ThemesPage() {
         <div className="flex justify-end">
           <button
             onClick={() => setAuditTarget({ cycleId: cycle.data!.id })}
-            className="rounded-sm border border-nerv-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-orange"
+            className="rounded-sm border border-nerv-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-orange"
           >
             audit
           </button>

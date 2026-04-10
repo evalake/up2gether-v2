@@ -409,7 +409,7 @@ export function GroupDetailPage() {
                   className="min-w-0 flex-1 text-left"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm text-nerv-text hover:text-nerv-orange">{name}</span>
+                    <span className="truncate text-sm text-nerv-text transition-colors hover:text-nerv-orange">{name}</span>
                     {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange">você</span>}
                   </div>
                   <div className={`font-mono text-[9px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
@@ -419,7 +419,7 @@ export function GroupDetailPage() {
                     {m.role !== 'admin' && (
                       <button
                         onClick={() => promote.mutate({ userId: m.user_id, role: m.role === 'mod' ? 'admin' : 'mod' })}
-                        className="font-mono text-[10px] text-nerv-dim hover:text-nerv-green"
+                        className="font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-green"
                         title="promover"
                       >
                         ↑
@@ -428,7 +428,7 @@ export function GroupDetailPage() {
                     {m.role !== 'member' && (
                       <button
                         onClick={() => demote.mutate(m.user_id)}
-                        className="font-mono text-[10px] text-nerv-dim hover:text-nerv-amber"
+                        className="font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-amber"
                         title="rebaixar"
                       >
                         ↓
@@ -438,7 +438,7 @@ export function GroupDetailPage() {
                       onClick={() => {
                         if (confirm(`remover ${name} do grupo?`)) kick.mutate(m.user_id)
                       }}
-                      className="font-mono text-[10px] text-nerv-dim hover:text-nerv-red"
+                      className="font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-red"
                       title="remover"
                     >
                       ×

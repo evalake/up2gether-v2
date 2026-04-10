@@ -63,7 +63,7 @@ export function HistoryPage() {
         </div>
         <Link
           to={`/groups/${id}`}
-          className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+          className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
         >
           ← voltar
         </Link>
@@ -106,8 +106,8 @@ export function HistoryPage() {
                 onClick={() => setAuditId(v.id)}
                 className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-all ${
                   isLatest
-                    ? 'border-nerv-green/40 bg-nerv-green/5 hover:border-nerv-green/60 hover:bg-nerv-green/10'
-                    : 'border-nerv-line/40 bg-nerv-panel/20 hover:border-nerv-orange/40 hover:bg-nerv-panel/40'
+                    ? 'border-nerv-green/40 bg-nerv-green/5 transition-colors hover:border-nerv-green/60 hover:bg-nerv-green/10'
+                    : 'border-nerv-line/40 bg-nerv-panel/20 transition-colors hover:border-nerv-orange/40 hover:bg-nerv-panel/40'
                 }`}
               >
                 {g?.cover_url ? (

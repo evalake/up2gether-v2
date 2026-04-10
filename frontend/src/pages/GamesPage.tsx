@@ -81,7 +81,7 @@ function ChipInput({ label, value, onChange, max, placeholder }: {
         {value.map((t) => (
           <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-nerv-orange/40 bg-nerv-orange/10 px-2 py-0.5 text-[11px] text-nerv-orange">
             {t}
-            <button type="button" onClick={() => onChange(value.filter((x) => x !== t))} className="hover:text-nerv-red">×</button>
+            <button type="button" onClick={() => onChange(value.filter((x) => x !== t))} className="transition-colors hover:text-nerv-red">×</button>
           </span>
         ))}
         <input
@@ -227,7 +227,7 @@ export function GamesPage() {
         <div>
           <h1 className="font-display text-3xl text-nerv-text">biblioteca</h1>
           <p className="mt-1 text-xs text-nerv-dim">
-            <Link to={`/groups/${id}`} className="text-nerv-dim/70 hover:text-nerv-orange">grupo</Link>
+            <Link to={`/groups/${id}`} className="text-nerv-dim/70 transition-colors hover:text-nerv-orange">grupo</Link>
             {' · '}{games.data?.length ?? 0} jogos
           </p>
         </div>
@@ -308,7 +308,7 @@ export function GamesPage() {
                   className={`col-span-2 h-8 rounded-sm border text-[10px] uppercase tracking-wider transition-all ${
                     form.is_free
                       ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
-                      : 'border-nerv-line text-nerv-dim hover:border-nerv-green/40'
+                      : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-green/40'
                   }`}
                 >
                   {form.is_free ? '✓ free' : 'free?'}
@@ -347,7 +347,7 @@ export function GamesPage() {
                       className={`h-8 flex-1 rounded-sm border text-[10px] uppercase tracking-wider transition-all ${
                         form.min_hardware_tier === t
                           ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                          : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                          : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                       }`}
                     >
                       hw: {t}
@@ -381,7 +381,7 @@ export function GamesPage() {
                 <button
                   type="button"
                   onClick={() => setShowAdvanced((v) => !v)}
-                  className="text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+                  className="text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
                 >
                   {showAdvanced ? '− menos opções' : '+ mais opções'}
                 </button>
@@ -419,7 +419,7 @@ export function GamesPage() {
                 className={`rounded-sm border px-2 py-1 text-[10px] uppercase tracking-wider transition-all ${
                   active
                     ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                    : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                    : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                 }`}
               >
                 {s}
@@ -429,7 +429,7 @@ export function GamesPage() {
           {(stageFilter.size > 0 || genreFilter.size > 0 || search) && (
             <button
               onClick={() => { setStageFilter(new Set()); setGenreFilter(new Set()); setSearch('') }}
-              className="text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+              className="text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
             >
               limpar
             </button>
@@ -450,7 +450,7 @@ export function GamesPage() {
                   className={`rounded-full border px-2.5 py-0.5 text-[10px] transition-all ${
                     active
                       ? 'border-nerv-magenta/60 bg-nerv-magenta/10 text-nerv-magenta'
-                      : 'border-nerv-line/50 text-nerv-dim hover:border-nerv-magenta/40 hover:text-nerv-magenta/80'
+                      : 'border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-magenta/40 hover:text-nerv-magenta/80'
                   }`}
                 >
                   {g}
@@ -537,7 +537,7 @@ export function GamesPage() {
                         className={`flex-1 rounded-sm border px-1 py-1 text-[9px] uppercase tracking-wider transition-all ${
                           g.user_interest === s.value
                             ? `${s.color} bg-current/10`
-                            : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                            : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
                         }`}
                       >
                         {s.label}
@@ -549,7 +549,7 @@ export function GamesPage() {
                     className={`mt-1.5 w-full rounded-sm border px-2 py-1 text-[9px] uppercase tracking-wider transition-all ${
                       g.user_owns_game
                         ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
-                        : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                        : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                     }`}
                   >
                     {g.user_owns_game ? '✓ na biblioteca' : 'marcar como tenho'}

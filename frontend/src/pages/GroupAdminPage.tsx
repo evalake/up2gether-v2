@@ -79,7 +79,7 @@ export function GroupAdminPage() {
       <div className="space-y-4">
         <h1 className="font-display text-2xl text-nerv-text">Painel do Admin</h1>
         <p className="text-sm text-nerv-dim">Voce nao tem permissao pra acessar esse painel.</p>
-        <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange">
+        <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">
           ← voltar
         </Link>
       </div>
@@ -116,7 +116,7 @@ export function GroupAdminPage() {
         </div>
         <Link
           to={`/groups/${id}`}
-          className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+          className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
         >
           ← voltar
         </Link>
@@ -132,7 +132,7 @@ export function GroupAdminPage() {
                 ? t.key === 'danger'
                   ? 'border-nerv-red text-nerv-red'
                   : 'border-nerv-orange text-nerv-orange'
-                : 'border-transparent text-nerv-dim hover:text-nerv-text'
+                : 'border-transparent text-nerv-dim transition-colors hover:text-nerv-text'
             }`}
           >
             {t.label}
@@ -320,7 +320,7 @@ export function GroupAdminPage() {
                           }
                           promote.mutate({ userId: m.user_id, role: next })
                         }}
-                        className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-green/60 hover:text-nerv-green"
+                        className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-green/60 hover:text-nerv-green"
                         title={m.role === 'mod' ? 'promover pra admin' : 'promover pra mod'}
                       >
                         {m.role === 'mod' ? 'admin' : 'mod'}
@@ -329,7 +329,7 @@ export function GroupAdminPage() {
                     {m.role !== 'member' && (
                       <button
                         onClick={() => demote.mutate(m.user_id)}
-                        className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-amber/60 hover:text-nerv-amber"
+                        className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-amber/60 hover:text-nerv-amber"
                         title="rebaixar"
                       >
                         -
@@ -339,7 +339,7 @@ export function GroupAdminPage() {
                       onClick={() => {
                         if (confirm(`remover ${name} do grupo?`)) kick.mutate(m.user_id)
                       }}
-                      className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red"
+                      className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
                       title="remover do grupo"
                     >
                       x
@@ -385,7 +385,7 @@ export function GroupAdminPage() {
                 Apaga jogos, votacoes, temas e sessoes. Mantem grupo e membros. Tem certeza?
               </p>
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">cancelar</button>
+                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
                 <button
                   onClick={onReset}
                   disabled={purge.isPending}
@@ -402,7 +402,7 @@ export function GroupAdminPage() {
                 Apaga o servidor e tudo dentro. Nao da pra desfazer. Tem certeza?
               </p>
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">cancelar</button>
+                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
                 <button
                   onClick={onDelete}
                   disabled={del.isPending}

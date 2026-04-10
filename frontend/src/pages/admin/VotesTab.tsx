@@ -115,7 +115,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
         {filtered.length > 0 && (
           <button
             onClick={toggleAll}
-            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text"
+            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
           >
             {selected.size === filtered.length ? 'limpar' : 'tudo'}
           </button>
@@ -136,7 +136,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
             apagar {selected.size} votacao{selected.size === 1 ? '' : 'es'}? nao da pra desfazer.
           </p>
           <div className="flex shrink-0 gap-2">
-            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim hover:text-nerv-text">cancelar</button>
+            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
             <button
               onClick={deleteBulk}
               disabled={del.isPending}
@@ -181,7 +181,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
                 {v.status === 'open' && !confirming && (
                   <button
                     onClick={() => forceClose(v.id)}
-                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-amber/60 hover:text-nerv-amber"
+                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-amber/60 hover:text-nerv-amber"
                   >
                     encerrar
                   </button>
@@ -194,7 +194,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
                 ) : (
                   <button
                     onClick={() => setPendingDelete(v.id)}
-                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim hover:border-nerv-red/60 hover:text-nerv-red"
+                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
                   >
                     apagar
                   </button>

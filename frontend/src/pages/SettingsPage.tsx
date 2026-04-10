@@ -149,7 +149,7 @@ export function SettingsPage() {
                 className={`rounded-sm border px-2 py-2 text-left transition-all ${
                   hwTier === t.id
                     ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                    : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                    : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
                 }`}
               >
                 <div className="text-xs uppercase tracking-wider">{t.label}</div>
@@ -285,7 +285,7 @@ function SteamLibrarySection() {
           href="https://steamcommunity.com/my/profile"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-9 items-center rounded-sm border border-nerv-line px-3 text-[10px] uppercase tracking-wider text-nerv-dim hover:border-nerv-orange/60 hover:text-nerv-orange"
+          className="inline-flex h-9 items-center rounded-sm border border-nerv-line px-3 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
         >
           Abrir Meu Perfil
         </a>

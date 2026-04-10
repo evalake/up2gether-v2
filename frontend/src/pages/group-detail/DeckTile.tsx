@@ -20,9 +20,9 @@ export function DeckTile({
   children: React.ReactNode
 }) {
   const borderTone = {
-    orange: 'border-nerv-orange/25 hover:border-nerv-orange/60',
-    magenta: 'border-nerv-magenta/25 hover:border-nerv-magenta/60',
-    amber: 'border-nerv-amber/25 hover:border-nerv-amber/60',
+    orange: 'border-nerv-orange/25 transition-colors hover:border-nerv-orange/60',
+    magenta: 'border-nerv-magenta/25 transition-colors hover:border-nerv-magenta/60',
+    amber: 'border-nerv-amber/25 transition-colors hover:border-nerv-amber/60',
   }[tone]
   const labelTone = {
     orange: 'text-nerv-orange',

@@ -193,7 +193,7 @@ export function VotesPage() {
         <section className="space-y-3">
           <button
             onClick={() => setOpenHistory((x) => !x)}
-            className="flex items-center gap-2 text-xs uppercase tracking-wider text-nerv-dim hover:text-nerv-orange"
+            className="flex items-center gap-2 text-xs uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
           >
             <span>{openHistory ? '−' : '+'}</span>
             <span>histórico</span>
