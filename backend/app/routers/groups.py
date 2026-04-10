@@ -11,9 +11,10 @@ from app.core.security import CurrentUser
 from app.domain.enums import AuthProvider, InterestSignal
 from app.integrations.discord import DiscordClient, get_discord_client
 from app.models.game import Game
+from app.models.group import Group
 from app.models.session import PlaySession
 from app.models.user import User
-from app.models.vote import VoteSession
+from app.models.vote import VoteBallot, VoteSession
 from app.repositories.group_repo import GroupRepository
 from app.schemas.group import (
     CurrentGameAudit,
@@ -25,7 +26,6 @@ from app.schemas.group import (
     PromoteRequest,
     WebhookUpdate,
 )
-from app.models.group import Group
 from app.services.discord_presence import get_bot
 from app.services.group_service import GroupService
 
@@ -319,20 +319,16 @@ async def current_game_audit(
             vote_title = vote.title
             vote_eligible = vote.eligible_voter_count
             # ballots_count nao existe no model, conta ballots distintos do vote
-            from app.models.vote import VoteBallot as _VB
-
             vote_ballots = int(
                 (
                     await db.execute(
-                        select(func.count(func.distinct(_VB.user_id))).where(
-                            _VB.vote_session_id == vote.id
+                        select(func.count(func.distinct(VoteBallot.user_id))).where(
+                            VoteBallot.vote_session_id == vote.id
                         )
                     )
                 ).scalar_one()
             )
             # conta approvals por candidate
-            from app.models.vote import VoteBallot
-
             ballots_rows = (
                 (await db.execute(select(VoteBallot).where(VoteBallot.vote_session_id == vote.id)))
                 .scalars()
