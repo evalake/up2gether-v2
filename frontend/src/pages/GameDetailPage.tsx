@@ -10,7 +10,7 @@ import {
 } from '@/features/games/hooks'
 import { useGroup } from '@/features/groups/hooks'
 import { useMe } from '@/features/auth/hooks'
-import type { GameStage, HardwareTier, InterestSignal } from '@/features/games/api'
+import type { GameStage, HardwareTier } from '@/features/games/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EnergyBar } from '@/components/nerv/EnergyBar'
@@ -19,22 +19,7 @@ import { useToast } from '@/components/ui/toast'
 import { formatPlayers } from '@/lib/players'
 import { steamGetDetails } from '@/features/steam/api'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
-
-const SIGNALS: { value: InterestSignal; label: string; color: string }[] = [
-  { value: 'want', label: 'quero', color: 'border-nerv-green text-nerv-green' },
-  { value: 'ok', label: 'topo', color: 'border-nerv-amber text-nerv-amber' },
-  { value: 'pass', label: 'passo', color: 'border-nerv-dim text-nerv-dim' },
-]
-
-const TIERS: HardwareTier[] = ['low', 'mid', 'high', 'unknown']
-
-const STAGES: { value: GameStage; label: string }[] = [
-  { value: 'exploring', label: 'explorando' },
-  { value: 'campaign', label: 'campanha' },
-  { value: 'endgame', label: 'endgame' },
-  { value: 'paused', label: 'pausado' },
-  { value: 'abandoned', label: 'abandonado' },
-]
+import { SIGNALS, STAGES, TIERS } from '@/lib/constants'
 
 export function GameDetailPage() {
   const { id = '', gameId = '' } = useParams()

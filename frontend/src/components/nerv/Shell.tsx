@@ -103,6 +103,7 @@ export function Shell({ children }: { children: ReactNode }) {
       {navOpen && (
         <div
           onClick={() => setNavOpen(false)}
+          aria-label="fechar menu"
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
         />
       )}
@@ -119,7 +120,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         </Link>
 
-        <nav className="flex-1 overflow-y-auto py-2">
+        <nav aria-label="navegacao principal" className="flex-1 overflow-y-auto py-2">
           {TOP_NAV.map((item) => {
             const active = loc.pathname === item.to || loc.pathname.startsWith(item.to + '/')
             return (
@@ -162,6 +163,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
           <button
             onClick={logout}
+            aria-label="sair da conta"
             className="mt-3 w-full rounded-sm border border-nerv-red/30 px-2 py-1.5 text-[10px] uppercase tracking-wider text-nerv-red/80 transition-all hover:border-nerv-red hover:bg-nerv-red hover:text-nerv-bg"
           >
             disconnect

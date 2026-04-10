@@ -9,7 +9,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
 
 // historico derivado: votes fechados com vencedor, ordem desc.
-// nao captura override manual pq n temos log disso ainda. TODO: dps
+// nao captura override manual pq n temos log disso ainda
 export function HistoryPage() {
   const { id = '' } = useParams()
   const group = useGroup(id)

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { POLL } from '@/lib/constants'
 import {
   clearNotifications,
   deleteNotification,
@@ -13,7 +14,7 @@ export function useNotifications() {
   return useQuery({
     queryKey: notificationsKey,
     queryFn: listNotifications,
-    refetchInterval: 30_000,
+    refetchInterval: POLL.LAZY,
     staleTime: 5_000,
   })
 }

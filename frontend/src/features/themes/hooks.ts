@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { POLL } from '@/lib/constants'
 import {
   cancelCycle,
   castVote,
@@ -31,7 +32,7 @@ export function useCurrentTheme(groupId: string) {
     queryKey: currentThemeKey(groupId),
     queryFn: () => getCurrentTheme(groupId),
     enabled: !!groupId,
-    refetchInterval: 30_000,
+    refetchInterval: POLL.LAZY,
   })
 }
 
@@ -40,7 +41,7 @@ export function useThemes(groupId: string) {
     queryKey: themesKey(groupId),
     queryFn: () => listThemes(groupId),
     enabled: !!groupId,
-    refetchInterval: 60_000,
+    refetchInterval: POLL.VERY_LAZY,
   })
 }
 
@@ -71,7 +72,7 @@ export function useCycle(groupId: string) {
     queryKey: cycleKey(groupId),
     queryFn: () => getCycle(groupId),
     enabled: !!groupId,
-    refetchInterval: 10_000,
+    refetchInterval: POLL.ACTIVE,
   })
 }
 

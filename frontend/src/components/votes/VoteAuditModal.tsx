@@ -38,6 +38,8 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
         className="my-8 w-full max-w-3xl rounded-sm border border-nerv-orange/30 bg-nerv-panel shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >

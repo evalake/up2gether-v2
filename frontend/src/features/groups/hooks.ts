@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { POLL } from '@/lib/constants'
 import {
   createGroup,
   deleteGroup,
@@ -40,7 +41,7 @@ export function useGroupPresence(id: string) {
     queryKey: ['groups', id, 'presence'] as const,
     queryFn: () => getGroupPresence(id).catch(() => ({})),
     enabled: !!id,
-    refetchInterval: 60_000,
+    refetchInterval: POLL.VERY_LAZY,
     staleTime: 45_000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -103,7 +104,7 @@ export function useCurrentGameAudit(groupId: string) {
     queryKey: ['groups', groupId, 'current-game', 'audit'],
     queryFn: () => getCurrentGameAudit(groupId),
     enabled: !!groupId,
-    refetchInterval: 5_000,
+    refetchInterval: POLL.FAST,
     staleTime: 2_000,
   })
 }

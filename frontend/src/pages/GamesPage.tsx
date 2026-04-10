@@ -7,7 +7,7 @@ import {
   useSetInterest,
   useToggleOwnership,
 } from '@/features/games/hooks'
-import type { HardwareTier, InterestSignal } from '@/features/games/api'
+import type { HardwareTier } from '@/features/games/api'
 import { steamSearch, steamGetDetails, type SteamSearchItem } from '@/features/steam/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -16,24 +16,7 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/nerv/Button'
 import { steamCover } from '@/lib/steamCover'
 import { SteamThumb } from '@/components/SteamThumb'
-
-
-const SIGNALS: { value: InterestSignal; label: string; color: string }[] = [
-  { value: 'want', label: 'quero', color: 'text-nerv-green border-nerv-green' },
-  { value: 'ok', label: 'topo', color: 'text-nerv-amber border-nerv-amber' },
-  { value: 'pass', label: 'passo', color: 'text-nerv-dim border-nerv-line' },
-]
-
-const STAGE_COLOR: Record<string, string> = {
-  exploring: 'text-nerv-amber',
-  campaign: 'text-nerv-green',
-  endgame: 'text-nerv-orange',
-  paused: 'text-nerv-dim',
-  abandoned: 'text-nerv-red',
-}
-
-const STAGES = ['exploring', 'campaign', 'endgame', 'paused', 'abandoned']
-const TIERS: HardwareTier[] = ['low', 'mid', 'high', 'unknown']
+import { SIGNALS, STAGE_COLOR, STAGE_VALUES, TIERS } from '@/lib/constants'
 
 type FormState = {
   name: string
@@ -423,7 +406,7 @@ export function GamesPage() {
             placeholder="buscar..."
             className="rounded-sm border border-nerv-line bg-black/40 px-3 py-1 text-xs focus:border-nerv-orange focus:outline-none"
           />
-          {STAGES.map((s) => {
+          {STAGE_VALUES.map((s) => {
             const active = stageFilter.has(s)
             return (
               <button

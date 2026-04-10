@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { POLL } from '@/lib/constants'
 import {
   createSession,
   deleteSession,
@@ -26,7 +27,7 @@ export function useSessions(groupId: string) {
     queryKey: sessionsKey(groupId),
     queryFn: () => listSessions(groupId),
     enabled: !!groupId,
-    refetchInterval: 15_000,
+    refetchInterval: POLL.MEDIUM,
   })
 }
 

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { POLL } from '@/lib/constants'
 import {
   closeVote,
   createVote,
@@ -17,7 +18,7 @@ export function useVotes(groupId: string) {
     queryKey: votesKey(groupId),
     queryFn: () => listVotes(groupId),
     enabled: !!groupId,
-    refetchInterval: 10_000,
+    refetchInterval: POLL.ACTIVE,
   })
 }
 
