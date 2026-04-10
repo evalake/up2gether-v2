@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   useGroup,
   useLeaveGroup,
-  useGroupPresence,
   useMembers,
   usePromote,
   useDemote,
@@ -62,7 +61,6 @@ export function GroupDetailPage() {
   const me = useMe()
   const group = useGroup(id)
   const members = useMembers(id)
-  const presence = useGroupPresence(id)
   const games = useGames(id)
   const votes = useVotes(id)
   const sessions = useSessions(id)
@@ -392,7 +390,7 @@ export function GroupDetailPage() {
                 transition={{ duration: 0.3, delay: 0.35 + i * 0.03 }}
                 className="group flex items-center gap-3 rounded-sm border border-nerv-line/40 bg-nerv-panel/20 px-3 py-2.5 transition-all hover:border-nerv-orange/40"
               >
-                <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" presence={m.user?.discord_id ? (presence.data?.[m.user.discord_id] ?? 'offline') : undefined} />
+                <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm text-nerv-text">{name}</span>

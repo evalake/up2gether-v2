@@ -89,7 +89,7 @@ export function Shell({ children }: { children: ReactNode }) {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 flex-col border-r border-nerv-orange/20 bg-nerv-panel/95 backdrop-blur-sm transition-transform md:static md:translate-x-0 ${navOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[13.5rem] shrink-0 flex-col border-r border-nerv-orange/20 bg-nerv-panel/95 backdrop-blur-sm transition-transform md:static md:translate-x-0 ${navOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <Link to="/groups" className="flex items-center gap-3 border-b border-nerv-orange/20 p-4">
           <img src="/up2gether-mark.png" alt="" className="h-10 w-10 shrink-0 rounded-sm object-cover" />

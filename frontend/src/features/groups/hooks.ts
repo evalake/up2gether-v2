@@ -37,10 +37,13 @@ export function useMembers(id: string) {
 export function useGroupPresence(id: string) {
   return useQuery({
     queryKey: ['groups', id, 'presence'] as const,
-    queryFn: () => getGroupPresence(id),
+    queryFn: () => getGroupPresence(id).catch(() => ({})),
     enabled: !!id,
-    refetchInterval: 25_000,
-    staleTime: 15_000,
+    refetchInterval: 60_000,
+    staleTime: 45_000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: false,
   })
 }
 
