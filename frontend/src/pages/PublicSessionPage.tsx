@@ -14,7 +14,10 @@ type PublicCard = {
   start_at: string
   duration_minutes: number
   game_name: string | null
+  game_cover_url: string | null
   group_name: string
+  group_icon_url: string | null
+  group_splash_url: string | null
   rsvp_yes: number
   rsvp_maybe: number
 }
@@ -78,13 +81,30 @@ export function PublicSessionPage() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md overflow-hidden rounded-md border border-nerv-orange/25 bg-nerv-panel/60 shadow-2xl backdrop-blur-sm"
+        className="relative w-full max-w-md overflow-hidden rounded-md border border-nerv-orange/25 bg-nerv-panel/60 shadow-2xl backdrop-blur-sm"
       >
-        <div className="border-b border-nerv-orange/15 px-5 py-3">
-          <div className="text-[10px] uppercase tracking-wider text-nerv-dim">{data.group_name}</div>
+        {/* splash ou game cover como background */}
+        {(data.group_splash_url || data.game_cover_url) && (
+          <div className="pointer-events-none absolute inset-0">
+            <img
+              src={data.group_splash_url || data.game_cover_url || ''}
+              alt=""
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+              className="h-full w-full object-cover opacity-15"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/80 to-nerv-panel/40" />
+          </div>
+        )}
+        <div className="relative border-b border-nerv-orange/15 px-5 py-3">
+          <div className="flex items-center gap-2">
+            {data.group_icon_url && (
+              <img src={data.group_icon_url} alt="" className="h-5 w-5 rounded-sm" />
+            )}
+            <div className="text-[10px] uppercase tracking-wider text-nerv-dim">{data.group_name}</div>
+          </div>
           <div className="mt-0.5 text-[10px] uppercase tracking-wider text-nerv-orange">convite de sessão</div>
         </div>
-        <div className="space-y-4 px-5 py-6">
+        <div className="relative space-y-4 px-5 py-6">
           <div>
             <h1 className="font-display text-2xl text-nerv-text">{data.title}</h1>
             {data.game_name && data.game_name !== data.title && (
@@ -146,7 +166,7 @@ export function PublicSessionPage() {
             </a>
           )}
         </div>
-        <div className="border-t border-nerv-orange/10 px-5 py-2 text-center text-[9px] uppercase tracking-[0.2em] text-nerv-dim">
+        <div className="relative border-t border-nerv-orange/10 px-5 py-2 text-center text-[9px] uppercase tracking-[0.2em] text-nerv-dim">
           up2gether
         </div>
       </motion.div>
