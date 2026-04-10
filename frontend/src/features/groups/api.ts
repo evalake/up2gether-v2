@@ -130,3 +130,36 @@ export const updateWebhook = (groupId: string, webhook_url: string | null) =>
 export type PresenceStatus = 'online' | 'idle' | 'dnd' | 'offline'
 export const getGroupPresence = (groupId: string) =>
   api<Record<string, PresenceStatus>>(`/groups/${groupId}/presence`)
+
+export type MemberProfile = {
+  user: {
+    id: string
+    discord_id: string
+    discord_username: string
+    discord_display_name: string | null
+    discord_avatar: string | null
+  }
+  role: GroupRole
+  joined_at: string | null
+  is_sys_admin: boolean
+  stats: {
+    sessions_hosted: number
+    sessions_rsvp_going: number
+    votes_cast: number
+    games_owned: number
+    games_wanted: number
+  }
+  top_wants: { game_id: string; name: string; cover_url: string | null }[]
+  recent_sessions: {
+    id: string
+    title: string
+    start_at: string | null
+    game_name: string
+    game_cover_url: string | null
+    rsvp_status: string | null
+    hosted: boolean
+  }[]
+}
+
+export const getMemberProfile = (groupId: string, userId: string) =>
+  api<MemberProfile>(`/groups/${groupId}/members/${userId}/profile`)

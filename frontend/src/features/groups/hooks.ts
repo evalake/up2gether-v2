@@ -14,6 +14,7 @@ import {
   getCurrentGameAudit,
   setCurrentGame,
   getGroupPresence,
+  getMemberProfile,
   type GroupCreateInput,
   type GroupRole,
 } from './api'
@@ -41,6 +42,18 @@ export function useGroupPresence(id: string) {
     enabled: !!id,
     refetchInterval: 60_000,
     staleTime: 45_000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: false,
+  })
+}
+
+export function useMemberProfile(groupId: string, userId: string | null) {
+  return useQuery({
+    queryKey: ['groups', groupId, 'members', userId, 'profile'] as const,
+    queryFn: () => getMemberProfile(groupId, userId as string),
+    enabled: !!groupId && !!userId,
+    staleTime: 60_000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     retry: false,

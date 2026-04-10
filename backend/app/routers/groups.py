@@ -10,9 +10,9 @@ from app.core.database import get_db
 from app.core.security import CurrentUser
 from app.domain.enums import AuthProvider, InterestSignal
 from app.integrations.discord import DiscordClient, get_discord_client
-from app.models.game import Game
-from app.models.group import Group
-from app.models.session import PlaySession
+from app.models.game import Game, InterestSignalRow, SteamGameOwnership
+from app.models.group import Group, GroupMembership
+from app.models.session import PlaySession, SessionRsvpRow
 from app.models.user import User
 from app.models.vote import VoteBallot, VoteSession
 from app.repositories.group_repo import GroupRepository
@@ -102,6 +102,188 @@ async def get_group_presence(
     except (TypeError, ValueError):
         return {}
     return bot.guild_presences(guild_id)
+
+
+@router.get("/{group_id}/members/{target_user_id}/profile")
+async def get_member_profile(
+    group_id: uuid.UUID,
+    target_user_id: uuid.UUID,
+    actor: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    """Perfil estilo discord: info basica + stats + atividade recente do membro no grupo.
+
+    Escopo 100% restrito ao grupo. Lazy, so chamado ao abrir o modal.
+    """
+    # actor tem que ser membro do grupo
+    actor_mem = (
+        await db.execute(
+            select(GroupMembership).where(
+                GroupMembership.group_id == group_id,
+                GroupMembership.user_id == actor.id,
+            )
+        )
+    ).scalar_one_or_none()
+    if actor_mem is None and not actor.is_sys_admin:
+        raise HTTPException(status_code=403, detail="nao e membro do grupo")
+
+    target_mem = (
+        await db.execute(
+            select(GroupMembership).where(
+                GroupMembership.group_id == group_id,
+                GroupMembership.user_id == target_user_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if target_mem is None:
+        raise HTTPException(status_code=404, detail="membro nao encontrado")
+
+    user = (await db.execute(select(User).where(User.id == target_user_id))).scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail="usuario nao encontrado")
+
+    # stats
+    sessions_hosted = int(
+        (
+            await db.execute(
+                select(func.count(PlaySession.id)).where(
+                    PlaySession.group_id == group_id,
+                    PlaySession.created_by == target_user_id,
+                )
+            )
+        ).scalar_one()
+    )
+    sessions_rsvp_going = int(
+        (
+            await db.execute(
+                select(func.count(SessionRsvpRow.id))
+                .join(PlaySession, PlaySession.id == SessionRsvpRow.session_id)
+                .where(
+                    PlaySession.group_id == group_id,
+                    SessionRsvpRow.user_id == target_user_id,
+                    SessionRsvpRow.status == "going",
+                )
+            )
+        ).scalar_one()
+    )
+    votes_cast = int(
+        (
+            await db.execute(
+                select(func.count(func.distinct(VoteBallot.vote_session_id)))
+                .join(VoteSession, VoteSession.id == VoteBallot.vote_session_id)
+                .where(
+                    VoteSession.group_id == group_id,
+                    VoteBallot.user_id == target_user_id,
+                )
+            )
+        ).scalar_one()
+    )
+    games_owned = int(
+        (
+            await db.execute(
+                select(func.count(SteamGameOwnership.id))
+                .join(Game, Game.id == SteamGameOwnership.game_id)
+                .where(
+                    Game.group_id == group_id,
+                    SteamGameOwnership.user_id == target_user_id,
+                )
+            )
+        ).scalar_one()
+    )
+    games_wanted = int(
+        (
+            await db.execute(
+                select(func.count(InterestSignalRow.id))
+                .join(Game, Game.id == InterestSignalRow.game_id)
+                .where(
+                    Game.group_id == group_id,
+                    InterestSignalRow.user_id == target_user_id,
+                    InterestSignalRow.signal == InterestSignal.WANT.value,
+                )
+            )
+        ).scalar_one()
+    )
+
+    # top 5 wants com nome/cover
+    want_rows = (
+        await db.execute(
+            select(Game.id, Game.name, Game.cover_url)
+            .join(InterestSignalRow, InterestSignalRow.game_id == Game.id)
+            .where(
+                Game.group_id == group_id,
+                InterestSignalRow.user_id == target_user_id,
+                InterestSignalRow.signal == InterestSignal.WANT.value,
+                Game.archived_at.is_(None),
+            )
+            .order_by(InterestSignalRow.updated_at.desc())
+            .limit(5)
+        )
+    ).all()
+    top_wants = [
+        {"game_id": str(gid), "name": name, "cover_url": cover} for gid, name, cover in want_rows
+    ]
+
+    # ultimas 5 sessoes que o user hospedou ou ta indo
+    recent_rows = (
+        await db.execute(
+            select(
+                PlaySession.id,
+                PlaySession.title,
+                PlaySession.start_at,
+                Game.name,
+                Game.cover_url,
+                SessionRsvpRow.status,
+                PlaySession.created_by,
+            )
+            .join(Game, Game.id == PlaySession.game_id)
+            .outerjoin(
+                SessionRsvpRow,
+                (SessionRsvpRow.session_id == PlaySession.id)
+                & (SessionRsvpRow.user_id == target_user_id),
+            )
+            .where(
+                PlaySession.group_id == group_id,
+                (PlaySession.created_by == target_user_id)
+                | (SessionRsvpRow.user_id == target_user_id),
+            )
+            .order_by(PlaySession.start_at.desc())
+            .limit(5)
+        )
+    ).all()
+    recent_sessions = [
+        {
+            "id": str(sid),
+            "title": title,
+            "start_at": start.isoformat() if start else None,
+            "game_name": gname,
+            "game_cover_url": gcover,
+            "rsvp_status": rstatus,
+            "hosted": created_by == target_user_id,
+        }
+        for sid, title, start, gname, gcover, rstatus, created_by in recent_rows
+    ]
+
+    return {
+        "user": {
+            "id": str(user.id),
+            "discord_id": user.discord_id,
+            "discord_username": user.discord_username,
+            "discord_display_name": user.discord_display_name,
+            "discord_avatar": user.discord_avatar,
+        },
+        "role": target_mem.role,
+        "joined_at": target_mem.joined_at.isoformat() if target_mem.joined_at else None,
+        "is_sys_admin": user.is_sys_admin,
+        "stats": {
+            "sessions_hosted": sessions_hosted,
+            "sessions_rsvp_going": sessions_rsvp_going,
+            "votes_cast": votes_cast,
+            "games_owned": games_owned,
+            "games_wanted": games_wanted,
+        },
+        "top_wants": top_wants,
+        "recent_sessions": recent_sessions,
+    }
 
 
 @router.put("/{group_id}/webhook", status_code=status.HTTP_204_NO_CONTENT)
@@ -362,8 +544,6 @@ async def current_game_audit(
             tied = [cid for cid, c in tally_map.items() if c == top_approvals]
             vote_was_tiebreak = len(tied) > 1
     # interest signals
-    from app.models.game import InterestSignalRow, SteamGameOwnership
-
     interest_rows = (
         await db.execute(
             select(InterestSignalRow.signal, func.count())

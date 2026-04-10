@@ -20,6 +20,7 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { Avatar } from '@/components/nerv/Avatar'
+import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 import type { GameStage } from '@/features/games/api'
 import type { CurrentGameAudit } from '@/features/groups/api'
 
@@ -72,6 +73,7 @@ export function GroupDetailPage() {
   const kick = useKick(id)
   const toast = useToast()
   const qc = useQueryClient()
+  const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
   // tick em tempo real pro countdown + refetch periodico de tudo que muda
   const [now, setNow] = useState(() => new Date())
@@ -390,14 +392,25 @@ export function GroupDetailPage() {
                 transition={{ duration: 0.3, delay: 0.35 + i * 0.03 }}
                 className="group flex items-center gap-3 rounded-sm border border-nerv-line/40 bg-nerv-panel/20 px-3 py-2.5 transition-all hover:border-nerv-orange/40"
               >
-                <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
-                <div className="min-w-0 flex-1">
+                <button
+                  type="button"
+                  onClick={() => setProfileUserId(m.user_id)}
+                  className="shrink-0 rounded-full transition-transform hover:scale-105"
+                  title="ver perfil"
+                >
+                  <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProfileUserId(m.user_id)}
+                  className="min-w-0 flex-1 text-left"
+                >
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm text-nerv-text">{name}</span>
+                    <span className="truncate text-sm text-nerv-text hover:text-nerv-orange">{name}</span>
                     {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange">você</span>}
                   </div>
                   <div className={`font-mono text-[9px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
-                </div>
+                </button>
                 {isAdmin && !isMe && (
                   <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                     {m.role !== 'admin' && (
@@ -434,6 +447,7 @@ export function GroupDetailPage() {
           })}
         </div>
       </motion.section>
+      <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
   )
 }
