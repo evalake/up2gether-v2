@@ -24,6 +24,7 @@ from app.routers import (
     votes,
 )
 from app.services.discord_presence import PresenceBot, set_bot
+from app.services.realtime import get_broker
 
 
 @asynccontextmanager
@@ -39,9 +40,14 @@ async def lifespan(_: FastAPI):
     set_bot(bot)
     await bot.start()
 
+    # SSE broker via Postgres LISTEN/NOTIFY (funciona cross-machine)
+    broker = get_broker()
+    await broker.start_listening()
+
     try:
         yield
     finally:
+        await broker.stop()
         scheduler.shutdown(wait=False)
         await bot.stop()
         set_bot(None)
