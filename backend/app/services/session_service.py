@@ -306,9 +306,7 @@ class PlaySessionService:
                 )
             )
 
-        non_respondents = [
-            _person(uid) for uid in member_user_ids if uid not in responded
-        ]
+        non_respondents = [_person(uid) for uid in member_user_ids if uid not in responded]
 
         return SessionAuditResponse(
             session=session_resp,

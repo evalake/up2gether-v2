@@ -3,6 +3,7 @@
 Abre uma conexao gateway persistente e escuta presence_update.
 Se DISCORD_BOT_TOKEN nao tiver setado, vira no-op (endpoints retornam vazio).
 """
+
 from __future__ import annotations
 
 import asyncio

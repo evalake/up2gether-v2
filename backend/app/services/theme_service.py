@@ -126,9 +126,7 @@ class ThemeService:
 
         from app.models.user import User as UserModel
 
-        suggestions = (
-            await self.themes.list_suggestions(cycle_obj.id) if cycle_obj else []
-        )
+        suggestions = await self.themes.list_suggestions(cycle_obj.id) if cycle_obj else []
         votes = await self.themes.list_votes(cycle_obj.id) if cycle_obj else []
 
         user_ids: set[uuid.UUID] = set()
@@ -154,9 +152,7 @@ class ThemeService:
 
         def _person(uid: uuid.UUID | None) -> ThemeAuditPerson:
             if uid is None or uid not in users_by_id:
-                return ThemeAuditPerson(
-                    id=uid, discord_id=None, display_name=None, avatar_url=None
-                )
+                return ThemeAuditPerson(id=uid, discord_id=None, display_name=None, avatar_url=None)
             u = users_by_id[uid]
             return ThemeAuditPerson(
                 id=u.id,
@@ -184,13 +180,9 @@ class ThemeService:
 
         suggester_ids = {s.user_id for s in suggestions}
         non_voters = [_person(uid) for uid in member_user_ids if uid not in voted_ids]
-        non_suggesters = [
-            _person(uid) for uid in member_user_ids if uid not in suggester_ids
-        ]
+        non_suggesters = [_person(uid) for uid in member_user_ids if uid not in suggester_ids]
 
-        cycle_resp = (
-            await self._cycle_response(cycle_obj, actor) if cycle_obj else None
-        )
+        cycle_resp = await self._cycle_response(cycle_obj, actor) if cycle_obj else None
         theme_resp = ThemeResponse.model_validate(theme_obj) if theme_obj else None
 
         return ThemeAuditResponse(

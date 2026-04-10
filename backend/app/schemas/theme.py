@@ -99,4 +99,5 @@ class CycleResponse(BaseModel):
     user_vote_suggestion_id: uuid.UUID | None = None
     total_votes: int = 0
 
+
 ThemeAuditResponse.model_rebuild()

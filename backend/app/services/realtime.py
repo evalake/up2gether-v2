@@ -79,7 +79,7 @@ async def event_stream(
     # padding anti-buffering. SSE comment = linha comecando com ':'
     yield ":" + (" " * 2048) + "\n\n"
     # marca de conexao aberta, confirma pro client que o stream ta ativo
-    yield "data: {\"kind\":\"connected\"}\n\n"
+    yield 'data: {"kind":"connected"}\n\n'
 
     try:
         while True:

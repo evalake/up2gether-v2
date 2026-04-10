@@ -213,9 +213,7 @@ class VoteService:
 
         def _creator(uid: uuid.UUID | None) -> VoteAuditCreator:
             if uid is None or uid not in users_by_id:
-                return VoteAuditCreator(
-                    id=uid, discord_id=None, display_name=None, avatar_url=None
-                )
+                return VoteAuditCreator(id=uid, discord_id=None, display_name=None, avatar_url=None)
             u = users_by_id[uid]
             return VoteAuditCreator(
                 id=u.id,
@@ -240,9 +238,7 @@ class VoteService:
                 _sel(GameModel).where(GameModel.id.in_(list(all_cand_ids)))
             )
             for g in grows.scalars().all():
-                games_list.append(
-                    VoteAuditGame(id=g.id, name=g.name, cover_url=g.cover_url)
-                )
+                games_list.append(VoteAuditGame(id=g.id, name=g.name, cover_url=g.cover_url))
 
         voters: list[VoteAuditVoter] = []
         voted_user_ids: set[uuid.UUID] = set()
