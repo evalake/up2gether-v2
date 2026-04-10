@@ -8,7 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.jobs.theme_cycle_cron import auto_open_theme_cycles
-from app.services.discord_presence import PresenceBot, set_bot
 from app.routers import (
     auth,
     events,
@@ -24,6 +23,7 @@ from app.routers import (
     users,
     votes,
 )
+from app.services.discord_presence import PresenceBot, set_bot
 
 
 @asynccontextmanager
