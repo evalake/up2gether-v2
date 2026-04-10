@@ -24,33 +24,48 @@ from app.routers import (
     votes,
 )
 from app.services.discord_presence import PresenceBot, set_bot
+from app.services.leader import LeaderElection
 from app.services.realtime import get_broker
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     configure_logging()
-    scheduler = AsyncIOScheduler(timezone="UTC")
-    # roda todo dia 9h UTC; abre ciclo de tema se faltam <=5 dias pro fim do mes
-    scheduler.add_job(auto_open_theme_cycles, CronTrigger(hour=9, minute=0))
-    scheduler.start()
-
     settings = get_settings()
-    bot = PresenceBot(settings.discord_bot_token)
-    set_bot(bot)
-    await bot.start()
 
     # SSE broker via Postgres LISTEN/NOTIFY (funciona cross-machine)
     broker = get_broker()
     await broker.start_listening()
 
-    try:
-        yield
-    finally:
-        await broker.stop()
+    # leader election: so 1 machine roda bot + scheduler
+    scheduler = AsyncIOScheduler(timezone="UTC")
+    scheduler.add_job(auto_open_theme_cycles, CronTrigger(hour=9, minute=0))
+    bot = PresenceBot(settings.discord_bot_token)
+    leader = LeaderElection()
+
+    async def on_promote():
+        scheduler.start()
+        set_bot(bot)
+        await bot.start()
+
+    async def on_demote():
         scheduler.shutdown(wait=False)
         await bot.stop()
         set_bot(None)
+
+    leader.on_promote(on_promote)
+    leader.on_demote(on_demote)
+    await leader.start()
+
+    try:
+        yield
+    finally:
+        await leader.stop()
+        await broker.stop()
+        if leader.is_leader:
+            scheduler.shutdown(wait=False)
+            await bot.stop()
+            set_bot(None)
 
 
 def create_app() -> FastAPI:
