@@ -134,42 +134,27 @@ class GroupService:
         out: list[GroupWithStats] = []
         for group, membership in rows:
             member_count = await self.repo.count_members(group.id)
-            out.append(
-                GroupWithStats(
-                    id=group.id,
-                    name=group.name,
-                    discord_guild_id=group.discord_guild_id,
-                    icon_url=group.icon_url,
-                    owner_user_id=group.owner_user_id,
-                    webhook_url=group.webhook_url,
-                    budget_max=group.budget_max,
-                    typical_party_size=group.typical_party_size,
-                    created_at=group.created_at,
-                    member_count=member_count,
-                    game_count=0,  # TODO Fase 3
-                    active_vote_sessions=0,  # TODO Fase 4
-                    user_role=GroupRole(membership.role),
-                )
+            item = GroupWithStats.model_validate(group, from_attributes=True).model_copy(
+                update={
+                    "member_count": member_count,
+                    "game_count": 0,
+                    "active_vote_sessions": 0,
+                    "user_role": GroupRole(membership.role),
+                }
             )
+            out.append(item)
         return out
 
     async def get_for_user(self, group_id: uuid.UUID, actor: User) -> GroupWithStats:
         group, membership = await self._require_membership(group_id, actor)
         member_count = await self.repo.count_members(group.id)
-        return GroupWithStats(
-            id=group.id,
-            name=group.name,
-            discord_guild_id=group.discord_guild_id,
-            icon_url=group.icon_url,
-            owner_user_id=group.owner_user_id,
-            webhook_url=group.webhook_url,
-            budget_max=group.budget_max,
-            typical_party_size=group.typical_party_size,
-            created_at=group.created_at,
-            member_count=member_count,
-            game_count=0,
-            active_vote_sessions=0,
-            user_role=GroupRole(membership.role),
+        return GroupWithStats.model_validate(group, from_attributes=True).model_copy(
+            update={
+                "member_count": member_count,
+                "game_count": 0,
+                "active_vote_sessions": 0,
+                "user_role": GroupRole(membership.role),
+            }
         )
 
     async def list_members(self, group_id: uuid.UUID, actor: User) -> list[GroupMembershipResponse]:
