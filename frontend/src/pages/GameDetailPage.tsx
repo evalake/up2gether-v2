@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   useArchiveGame,
   useGame,
@@ -157,8 +158,9 @@ export function GameDetailPage() {
         </div>
       </header>
 
+      <AnimatePresence>
       {editing && (
-        <section className="rounded-sm border border-nerv-orange/20 bg-nerv-panel/30 p-5">
+        <motion.section initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/30 p-5">
           <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">editar jogo</div>
           <div className="space-y-3">
             <input
@@ -253,8 +255,9 @@ export function GameDetailPage() {
               </button>
             </div>
           </div>
-        </section>
+        </motion.section>
       )}
+      </AnimatePresence>
 
       {/* Hero */}
       <div className="relative overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/30">

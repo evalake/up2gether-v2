@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useGames, useArchiveGame } from '@/features/games/hooks'
 import type { Game } from '@/features/games/api'
 import { Loading } from '@/components/ui/Loading'
@@ -110,7 +111,9 @@ export function GamesTab({ groupId }: { groupId: string }) {
         )}
       </div>
 
+      <AnimatePresence>
       {bulkConfirm && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
         <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
           <p className="text-xs text-nerv-red">
             apagar {selected.size} jogo{selected.size === 1 ? '' : 's'}? nao da pra desfazer.
@@ -128,7 +131,9 @@ export function GamesTab({ groupId }: { groupId: string }) {
             </button>
           </div>
         </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {filtered.length === 0 ? (
         <div className="mt-4 py-6 text-center text-[11px] text-nerv-dim">

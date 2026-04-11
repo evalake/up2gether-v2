@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   useCreateGame,
   useGames,
@@ -256,8 +256,9 @@ export function GamesPage() {
                   />
                   {(steamLoading || filling) && <span className="text-[10px] text-nerv-dim">...</span>}
                 </div>
+                <AnimatePresence>
                 {steamHits.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-sm border border-nerv-orange/40 bg-nerv-panel shadow-lg">
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }} className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-sm border border-nerv-orange/40 bg-nerv-panel shadow-lg">
                     {steamHits.map((it) => (
                       <button
                         key={it.appid}
@@ -272,12 +273,15 @@ export function GamesPage() {
                         </div>
                       </button>
                     ))}
-                  </div>
+                  </motion.div>
                 )}
+                </AnimatePresence>
               </div>
 
               {/* Linha 1: nome + appid + price + f2p */}
+              <AnimatePresence>
               {showAdvanced && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3 overflow-hidden">
               <div className="grid grid-cols-12 gap-2">
                 <input
                   value={form.name}
@@ -314,10 +318,8 @@ export function GamesPage() {
                   {form.is_free ? '✓ free' : 'free?'}
                 </button>
               </div>
-              )}
 
               {/* Linha 2: players min/max + hardware tier inline */}
-              {showAdvanced && (
               <div className="grid grid-cols-12 gap-2">
                 <div className="col-span-3 flex items-center gap-1 rounded-sm border border-nerv-line bg-black/40 px-2 h-8">
                   <span className="text-[10px] uppercase text-nerv-dim">players</span>
@@ -355,10 +357,8 @@ export function GamesPage() {
                   ))}
                 </div>
               </div>
-              )}
 
               {/* Description compacta */}
-              {showAdvanced && (
               <textarea
                 value={form.description}
                 maxLength={2000}
@@ -367,15 +367,15 @@ export function GamesPage() {
                 placeholder="descricao (opcional)"
                 className="w-full rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs focus:border-nerv-orange focus:outline-none"
               />
-              )}
 
               {/* Chips em uma linha */}
-              {showAdvanced && (
               <div className="grid grid-cols-2 gap-2">
                 <ChipInput label="gêneros" value={form.genres} onChange={(v) => setForm({ ...form, genres: v })} max={10} placeholder="FPS, RPG..." />
                 <ChipInput label="tags" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} max={20} placeholder="Co-op..." />
               </div>
+              </motion.div>
               )}
+              </AnimatePresence>
 
               <div className="flex items-center justify-between gap-2 pt-1">
                 <button

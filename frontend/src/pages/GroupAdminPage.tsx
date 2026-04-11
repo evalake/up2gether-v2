@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   useGroup,
   useDeleteGroup,
@@ -141,6 +141,16 @@ export function GroupAdminPage() {
           </button>
         ))}
       </div>
+
+      <AnimatePresence mode="wait">
+      <motion.div
+        key={tab}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.18 }}
+        className="space-y-6"
+      >
 
       {tab === 'overview' && (
       <section className="rounded-sm border border-nerv-green/20 bg-nerv-green/5 p-5">
@@ -386,7 +396,9 @@ export function GroupAdminPage() {
               </button>
             </div>
           </div>
+          <AnimatePresence>
           {confirmKind === 'reset' && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
             <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-amber/30 bg-black/30 p-3">
               <p className="text-xs text-nerv-amber">
                 Apaga jogos, votacoes, temas e sessoes. Mantem grupo e membros. Tem certeza?
@@ -402,8 +414,10 @@ export function GroupAdminPage() {
                 </button>
               </div>
             </div>
+            </motion.div>
           )}
           {confirmKind === 'destroy' && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
             <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
               <p className="text-xs text-nerv-red">
                 Apaga o servidor e tudo dentro. Nao da pra desfazer. Tem certeza?
@@ -419,9 +433,14 @@ export function GroupAdminPage() {
                 </button>
               </div>
             </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </motion.section>
       )}
+
+      </motion.div>
+      </AnimatePresence>
       <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
   )

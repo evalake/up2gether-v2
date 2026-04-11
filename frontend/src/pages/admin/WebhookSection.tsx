@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { groupKey } from '@/features/groups/hooks'
 import { updateWebhook } from '@/features/groups/api'
@@ -52,7 +53,9 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
           </button>
         )}
       </div>
+      <AnimatePresence>
       {editing && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
         <div className="mt-3 space-y-2">
           <input
             value={value}
@@ -85,7 +88,9 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
             )}
           </div>
         </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </section>
   )
 }
