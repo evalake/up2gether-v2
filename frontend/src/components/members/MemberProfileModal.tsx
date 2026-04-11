@@ -171,7 +171,7 @@ function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<type
             <h4 className="mb-2 text-[10px] uppercase tracking-wider text-nerv-dim">sessoes recentes</h4>
             <ul className="space-y-1.5">
               {recent_sessions.map((s) => (
-                <li key={s.id} className="flex items-center gap-2 rounded-sm border border-nerv-orange/10 bg-black/20 px-2 py-1.5">
+                <li key={s.id} className="flex items-center gap-2 rounded-sm border border-nerv-orange/10 bg-black/20 px-2 py-1.5 transition-colors hover:border-nerv-orange/30 hover:bg-black/30">
                   <div className="h-8 w-8 shrink-0 overflow-hidden rounded-sm border border-nerv-orange/15 bg-black/40">
                     {s.game_cover_url ? (
                       <img src={s.game_cover_url} alt="" className="h-full w-full object-cover" />

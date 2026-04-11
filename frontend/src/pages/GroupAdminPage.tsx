@@ -28,6 +28,7 @@ import { SessionsTab } from './admin/SessionsTab'
 import { ThemesTab } from './admin/ThemesTab'
 import { WebhookSection } from './admin/WebhookSection'
 import { useTitle } from '@/lib/useTitle'
+import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 
 type AdminTab = 'overview' | 'games' | 'votes' | 'sessions' | 'themes' | 'members' | 'config' | 'danger'
 
@@ -65,6 +66,7 @@ export function GroupAdminPage() {
   const toast = useToast()
   const [confirmKind, setConfirmKind] = useState<null | 'reset' | 'destroy'>(null)
   const [tab, setTab] = useState<AdminTab>('overview')
+  const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
   if (group.isLoading) return <Loading />
   if (group.error) return <ErrorBox error={group.error} />
@@ -149,7 +151,10 @@ export function GroupAdminPage() {
               Por padrao, o game da vez vira o vencedor da ultima votacao. Aqui voce pode travar manualmente, destravar ou trocar a qualquer momento.
             </p>
             {currentGame.data ? (
-              <div className="mt-3 flex items-center gap-3">
+              <Link
+                to={`/groups/${id}/games/${currentGame.data.game_id}`}
+                className="mt-3 flex items-center gap-3 transition-opacity hover:opacity-80"
+              >
                 {currentGame.data.cover_url && (
                   <img src={currentGame.data.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-14 w-24 rounded-sm border border-nerv-green/30 object-cover" />
                 )}
@@ -159,7 +164,7 @@ export function GroupAdminPage() {
                     {currentGame.data.source === 'manual' ? 'travado manual' : 'definido por votacao'}
                   </div>
                 </div>
-              </div>
+              </Link>
             ) : (
               <div className="mt-3 text-[11px] text-nerv-dim">Nenhum game atual definido.</div>
             )}
@@ -299,15 +304,17 @@ export function GroupAdminPage() {
               m.role === 'admin' ? 'text-nerv-orange' : m.role === 'mod' ? 'text-nerv-amber' : 'text-nerv-dim'
             return (
               <div key={m.id} className="flex items-center gap-3 py-3">
-                <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
-                <div className="min-w-0 flex-1">
+                <button type="button" onClick={() => setProfileUserId(m.user_id)} className="shrink-0 transition-transform hover:scale-105" title="ver perfil">
+                  <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
+                </button>
+                <button type="button" onClick={() => setProfileUserId(m.user_id)} className="min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm text-nerv-text">{name}</span>
+                    <span className="truncate text-sm text-nerv-text transition-colors hover:text-nerv-orange">{name}</span>
                     {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange">voce</span>}
                     {isTargetOwner && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-magenta">dono</span>}
                   </div>
                   <div className={`font-mono text-[9px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
-                </div>
+                </button>
                 {canEdit && canTouchThisRole && (
                   <div className="flex shrink-0 gap-1">
                     {m.role !== 'admin' && (
@@ -415,6 +422,7 @@ export function GroupAdminPage() {
           )}
         </motion.section>
       )}
+      <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
   )
 }

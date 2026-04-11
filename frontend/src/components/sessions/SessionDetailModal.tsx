@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { useSessionAudit } from '@/features/sessions/hooks'
 import { useSetRsvp, useDeleteSession } from '@/features/sessions/hooks'
@@ -7,6 +7,7 @@ import { Avatar } from '@/components/nerv/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
+import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 
 type Props = {
   groupId: string
@@ -87,6 +88,7 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
             {audit.data && (
               <Body
                 data={audit.data}
+                groupId={groupId}
                 canDelete={canDelete}
                 onRsvp={(v) =>
                   rsvp.mutate({ sessionId: audit.data!.session.id, status: v })
@@ -107,16 +109,19 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
 
 function Body({
   data,
+  groupId,
   onRsvp,
   onDelete,
   canDelete,
 }: {
   data: NonNullable<ReturnType<typeof useSessionAudit>['data']>
+  groupId: string
   onRsvp: (v: SessionRsvp) => void
   onDelete: () => void
   canDelete?: boolean
 }) {
   const toast = useToast()
+  const [profileUserId, setProfileUserId] = useState<string | null>(null)
   const { session, game, creator, rsvps, non_respondents } = data
   const start = useMemo(() => new Date(session.start_at), [session.start_at])
   const end = useMemo(
@@ -199,11 +204,15 @@ function Body({
           <span>{hourLine(start)} → {hourLine(end)}</span>
         </div>
         {creator.display_name && (
-          <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => creator.id && setProfileUserId(creator.id)}
+            className="ml-auto flex items-center gap-1.5 transition-colors hover:text-nerv-orange"
+          >
             <span className="text-nerv-dim/70">por</span>
             <Avatar discordId={creator.discord_id} hash={creator.avatar_url} name={creator.display_name} size="xs" />
             <span className="text-nerv-text/80">{creator.display_name}</span>
-          </div>
+          </button>
         )}
       </motion.div>
 
@@ -267,15 +276,15 @@ function Body({
           animate="animate"
           className="space-y-3"
         >
-          <Group title="bora" tone="text-nerv-green" people={yes} pop={pop} />
+          <Group title="bora" tone="text-nerv-green" people={yes} pop={pop} onClickMember={setProfileUserId} />
           {maybe.length > 0 && (
-            <Group title="talvez" tone="text-nerv-amber" people={maybe} pop={pop} />
+            <Group title="talvez" tone="text-nerv-amber" people={maybe} pop={pop} onClickMember={setProfileUserId} />
           )}
           {no.length > 0 && (
-            <Group title="nao rola" tone="text-red-400/80" people={no} pop={pop} />
+            <Group title="nao rola" tone="text-red-400/80" people={no} pop={pop} onClickMember={setProfileUserId} />
           )}
           {non_respondents.length > 0 && (
-            <GroupMuted title="silenciosos" people={non_respondents} pop={pop} />
+            <GroupMuted title="silenciosos" people={non_respondents} pop={pop} onClickMember={setProfileUserId} />
           )}
         </motion.div>
       </div>
@@ -306,6 +315,7 @@ function Body({
           </button>
         )}
       </div>
+      <MemberProfileModal groupId={groupId} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
   )
 }
@@ -323,11 +333,13 @@ function Group({
   tone,
   people,
   pop,
+  onClickMember,
 }: {
   title: string
   tone: string
   people: Person[]
   pop: Variants
+  onClickMember: (userId: string) => void
 }) {
   if (people.length === 0) {
     return (
@@ -345,23 +357,28 @@ function Group({
         {title} <span className="tabular-nums">{people.length}</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
-        {people.map((p, i) => (
-          <motion.div
-            key={(p.user_id ?? p.id ?? i) + title}
-            variants={pop}
-            className="flex items-center gap-1.5 rounded-full border border-nerv-line/40 bg-black/20 px-2 py-1"
-          >
-            <Avatar
-              discordId={p.discord_id}
-              hash={p.avatar_url}
-              name={p.display_name}
-              size="xs"
-            />
-            <span className="text-[11px] text-nerv-text/80">
-              {p.display_name ?? '?'}
-            </span>
-          </motion.div>
-        ))}
+        {people.map((p, i) => {
+          const uid = p.user_id ?? p.id
+          return (
+            <motion.button
+              key={(uid ?? i) + title}
+              variants={pop}
+              type="button"
+              onClick={() => uid && onClickMember(uid)}
+              className="flex items-center gap-1.5 rounded-full border border-nerv-line/40 bg-black/20 px-2 py-1 transition-colors hover:border-nerv-orange/40 hover:bg-black/30"
+            >
+              <Avatar
+                discordId={p.discord_id}
+                hash={p.avatar_url}
+                name={p.display_name}
+                size="xs"
+              />
+              <span className="text-[11px] text-nerv-text/80">
+                {p.display_name ?? '?'}
+              </span>
+            </motion.button>
+          )
+        })}
       </div>
     </div>
   )
@@ -371,10 +388,12 @@ function GroupMuted({
   title,
   people,
   pop,
+  onClickMember,
 }: {
   title: string
   people: Person[]
   pop: Variants
+  onClickMember: (userId: string) => void
 }) {
   return (
     <div>
@@ -382,20 +401,26 @@ function GroupMuted({
         {title} <span className="tabular-nums">{people.length}</span>
       </div>
       <div className="flex flex-wrap gap-1">
-        {people.map((p, i) => (
-          <motion.div
-            key={(p.id ?? i) + 'mute'}
-            variants={pop}
-            title={p.display_name ?? '?'}
-          >
-            <Avatar
-              discordId={p.discord_id}
-              hash={p.avatar_url}
-              name={p.display_name}
-              size="xs"
-            />
-          </motion.div>
-        ))}
+        {people.map((p, i) => {
+          const uid = p.id
+          return (
+            <motion.button
+              key={(uid ?? i) + 'mute'}
+              variants={pop}
+              type="button"
+              title={p.display_name ?? '?'}
+              onClick={() => uid && onClickMember(uid)}
+              className="transition-transform hover:scale-110"
+            >
+              <Avatar
+                discordId={p.discord_id}
+                hash={p.avatar_url}
+                name={p.display_name}
+                size="xs"
+              />
+            </motion.button>
+          )
+        })}
       </div>
     </div>
   )
