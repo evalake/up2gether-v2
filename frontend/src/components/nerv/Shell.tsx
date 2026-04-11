@@ -75,7 +75,7 @@ function GroupContext({ groupId }: { groupId: string }) {
               className={`block rounded-sm border-l-2 px-2 py-1.5 text-xs lowercase transition-all ${
                 active
                   ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                  : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
+                  : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:bg-nerv-orange/5 hover:text-nerv-text'
               }`}
             >
               {item.label}
@@ -130,7 +130,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 className={`block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-all ${
                   active && !inGroup
                     ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                    : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
+                    : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:bg-nerv-orange/5 hover:text-nerv-text'
                 }`}
               >
                 {item.label}

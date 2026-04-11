@@ -148,7 +148,7 @@ function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<type
                 <Link
                   key={w.game_id}
                   to={`/groups/${groupId}/games/${w.game_id}`}
-                  className="shrink-0 w-20 transition-opacity hover:opacity-80"
+                  className="shrink-0 w-20 transition-transform hover:scale-105"
                   title={w.name}
                   onClick={onNavigate}
                 >

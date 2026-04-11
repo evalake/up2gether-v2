@@ -183,14 +183,20 @@ export function ThemesPage() {
             <span>histórico</span>
             <span className="tabular-nums text-nerv-orange">{past.length}</span>
           </button>
+          <AnimatePresence>
           {openHistory && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="grid gap-4 overflow-hidden sm:grid-cols-2 lg:grid-cols-3"
+            >
               {past.map((t) => (
                 <button
                   type="button"
                   onClick={() => setAuditTarget({ themeId: t.id })}
                   key={t.id}
-                  className="group relative overflow-hidden rounded-sm border border-nerv-line/50 bg-nerv-panel/30 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40"
+                  className="group relative overflow-hidden rounded-sm border border-nerv-line/50 bg-nerv-panel/30 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:shadow-lg hover:shadow-black/20"
                 >
                   {t.image_url && (
                     <div className="relative h-28 w-full overflow-hidden">
@@ -224,8 +230,9 @@ export function ThemesPage() {
                   </div>
                 </button>
               ))}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </section>
       )}
 

@@ -480,7 +480,7 @@ export function GamesPage() {
             >
               <div
                 onClick={() => navigate(`/groups/${id}/games/${g.id}`)}
-                className="group relative cursor-pointer overflow-hidden rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 transition-colors hover:border-nerv-orange/50"
+                className="group relative cursor-pointer overflow-hidden rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 transition-all hover:-translate-y-0.5 hover:border-nerv-orange/50 hover:shadow-lg hover:shadow-black/20"
               >
                 {cover ? (
                   <div className="relative h-32 overflow-hidden">
