@@ -104,16 +104,17 @@ export function HistoryPage() {
               <button
                 key={v.id}
                 onClick={() => setAuditId(v.id)}
-                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-all ${
+                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 ${
                   isLatest
-                    ? 'border-nerv-green/40 bg-nerv-green/5 transition-colors hover:border-nerv-green/60 hover:bg-nerv-green/10'
-                    : 'border-nerv-line/40 bg-nerv-panel/20 transition-colors hover:border-nerv-orange/40 hover:bg-nerv-panel/40'
+                    ? 'border-nerv-green/40 bg-nerv-green/5 hover:border-nerv-green/60 hover:bg-nerv-green/10'
+                    : 'border-nerv-line/40 bg-nerv-panel/20 hover:border-nerv-orange/40 hover:bg-nerv-panel/40'
                 }`}
               >
                 {g?.cover_url ? (
                   <img
                     src={g.cover_url}
                     alt=""
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                     className="h-16 w-28 shrink-0 rounded-sm border border-nerv-line object-cover"
                   />
                 ) : (

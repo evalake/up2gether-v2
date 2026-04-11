@@ -21,6 +21,7 @@ import { steamGetDetails } from '@/features/steam/api'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import { SIGNALS, STAGES, TIERS } from '@/lib/constants'
 import { useTitle } from '@/lib/useTitle'
+import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 
 export function GameDetailPage() {
   const { id = '', gameId = '' } = useParams()
@@ -40,6 +41,7 @@ export function GameDetailPage() {
     group.data?.user_role === 'admin' ||
     group.data?.user_role === 'mod'
   const [editing, setEditing] = useState(false)
+  const [profileUserId, setProfileUserId] = useState<string | null>(null)
   const [edit, setEdit] = useState({
     name: '',
     description: '',
@@ -435,12 +437,17 @@ export function GameDetailPage() {
             )}
             <div className="space-y-1.5">
               {owners.data?.map((o) => (
-                <div key={o.id} className="flex items-center gap-2 rounded-sm border border-nerv-line bg-black/30 px-2 py-1.5 transition-colors hover:border-nerv-orange/40 hover:bg-black/40" title={o.discord_display_name ?? o.discord_username}>
+                <button
+                  key={o.id}
+                  onClick={() => setProfileUserId(o.id)}
+                  className="flex w-full items-center gap-2 rounded-sm border border-nerv-line bg-black/30 px-2 py-1.5 text-left transition-colors hover:border-nerv-orange/40 hover:bg-black/40"
+                  title={o.discord_display_name ?? o.discord_username}
+                >
                   <Avatar discordId={o.discord_id} hash={o.discord_avatar} name={o.discord_display_name ?? o.discord_username} size="sm" />
                   <span className="truncate text-xs text-nerv-text">
                     {o.discord_display_name ?? o.discord_username}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </section>
@@ -459,6 +466,7 @@ export function GameDetailPage() {
           </section>
         </div>
       </div>
+      <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
   )
 }

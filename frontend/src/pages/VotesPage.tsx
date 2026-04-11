@@ -214,10 +214,10 @@ export function VotesPage() {
                   <button
                     key={v.id}
                     onClick={() => setAuditId(v.id)}
-                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:border-nerv-orange/40 hover:bg-nerv-panel/50"
+                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:bg-nerv-panel/50 hover:shadow-lg hover:shadow-black/20"
                   >
                     {cover ? (
-                      <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover" />
+                      <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-20 w-32 shrink-0 rounded-sm object-cover" />
                     ) : (
                       <div className="h-20 w-32 shrink-0 rounded-sm bg-nerv-line/20" />
                     )}

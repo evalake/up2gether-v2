@@ -148,7 +148,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
                   className="h-3.5 w-3.5 shrink-0 accent-nerv-orange"
                 />
                 {g.cover_url ? (
-                  <img src={g.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" />
+                  <img src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-8 w-14 shrink-0 rounded-sm object-cover" />
                 ) : (
                   <div className="h-8 w-14 shrink-0 rounded-sm bg-nerv-line/20" />
                 )}

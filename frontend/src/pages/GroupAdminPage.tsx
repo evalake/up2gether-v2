@@ -151,7 +151,7 @@ export function GroupAdminPage() {
             {currentGame.data ? (
               <div className="mt-3 flex items-center gap-3">
                 {currentGame.data.cover_url && (
-                  <img src={currentGame.data.cover_url} alt="" className="h-14 w-24 rounded-sm border border-nerv-green/30 object-cover" />
+                  <img src={currentGame.data.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-14 w-24 rounded-sm border border-nerv-green/30 object-cover" />
                 )}
                 <div className="min-w-0">
                   <div className="truncate font-display text-base text-nerv-text">{currentGame.data.name}</div>
@@ -208,7 +208,7 @@ export function GroupAdminPage() {
                     }}
                     className="flex w-full items-center gap-2 border-b border-nerv-line/20 px-2 py-1.5 text-left text-xs text-nerv-text transition-colors hover:bg-nerv-green/10"
                   >
-                    {g.cover_url && <img src={g.cover_url} alt="" className="h-6 w-10 rounded-sm object-cover" />}
+                    {g.cover_url && <img src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 rounded-sm object-cover" />}
                     <span className="truncate">{g.name}</span>
                   </button>
                 ))}
@@ -442,7 +442,7 @@ function OverviewCounters({
         <button
           key={c.key}
           onClick={() => onJump(c.key)}
-          className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-4 text-left transition-colors hover:border-nerv-orange/40"
+          className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-4 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:shadow-lg hover:shadow-black/20"
         >
           <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">{c.label}</div>
           <div className="mt-1 font-display text-2xl tabular-nums text-nerv-text">{c.value}</div>

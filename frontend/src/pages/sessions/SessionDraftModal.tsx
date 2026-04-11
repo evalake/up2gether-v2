@@ -159,7 +159,7 @@ export function SessionDraftModal({
                         }`}
                       >
                         {cover ? (
-                          <img src={cover} alt="" className="h-6 w-10 shrink-0 rounded-sm object-cover" />
+                          <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 shrink-0 rounded-sm object-cover" />
                         ) : (
                           <div className="h-6 w-10 shrink-0 rounded-sm bg-nerv-line/30" />
                         )}

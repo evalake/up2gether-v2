@@ -75,7 +75,7 @@ export function TiebreakOverlay({ data, onClose }: { data: { kind: string; tied:
           >
             {data.winner.image_url && (
               <div className="h-32 w-full overflow-hidden">
-                <img src={data.winner.image_url} alt="" className="h-full w-full object-cover" />
+                <img src={data.winner.image_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-full w-full object-cover" />
               </div>
             )}
             <div className="p-5">
