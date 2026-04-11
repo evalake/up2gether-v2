@@ -81,7 +81,7 @@ function ChipInput({ label, value, onChange, max, placeholder }: {
         {value.map((t) => (
           <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-nerv-orange/40 bg-nerv-orange/10 px-2 py-0.5 text-[11px] text-nerv-orange">
             {t}
-            <button type="button" onClick={() => onChange(value.filter((x) => x !== t))} className="transition-colors hover:text-nerv-red">×</button>
+            <button type="button" onClick={() => onChange(value.filter((x) => x !== t))} title="remover filtro" className="transition-colors hover:text-nerv-red">×</button>
           </span>
         ))}
         <input
@@ -238,14 +238,14 @@ export function GamesPage() {
 
       {showForm && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="rounded-sm border border-nerv-orange/20 bg-nerv-panel/30 p-5">
+          <div className="rounded-sm border border-nerv-orange/30 bg-nerv-panel/40 p-5 shadow-lg shadow-black/20">
             <div className="mb-4 text-[11px] uppercase tracking-wider text-nerv-dim">novo jogo</div>
             <form onSubmit={onSubmit} className="space-y-4">
               {/* Steam search compacto */}
               <div className="relative">
                 <div className="flex items-center gap-2 rounded-sm border border-nerv-orange/30 bg-black/40 px-2">
                   {form.cover_url && (
-                    <img src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" />
+                    <img src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   )}
                   <input
                     aria-label="buscar na steam"

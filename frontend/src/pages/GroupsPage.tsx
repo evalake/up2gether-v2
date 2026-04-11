@@ -102,7 +102,7 @@ function GuildPickerModal({
                     className="flex w-full items-center gap-3 border-b border-nerv-line/60 px-4 py-2.5 text-left transition-colors hover:bg-nerv-orange/10 disabled:opacity-40 disabled:hover:bg-transparent"
                   >
                     {url ? (
-                      <img src={url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" />
+                      <img src={url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 font-display text-sm text-nerv-orange">
                         {g.name.charAt(0).toUpperCase()}

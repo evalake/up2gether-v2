@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMemberProfile } from '@/features/groups/hooks'
 import { Avatar } from '@/components/nerv/Avatar'
@@ -84,7 +85,7 @@ export function MemberProfileModal({ groupId, userId, onClose }: Props) {
             {profile.error && (
               <div className="p-6"><ErrorBox error={profile.error} /></div>
             )}
-            {profile.data && <Body data={profile.data} />}
+            {profile.data && <Body data={profile.data} groupId={groupId} onNavigate={onClose} />}
           </motion.div>
         </motion.div>
       )}
@@ -92,7 +93,7 @@ export function MemberProfileModal({ groupId, userId, onClose }: Props) {
   )
 }
 
-function Body({ data }: { data: NonNullable<ReturnType<typeof useMemberProfile>['data']> }) {
+function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<typeof useMemberProfile>['data']>; groupId: string; onNavigate: () => void }) {
   const { user, role, joined_at, is_sys_admin, stats, top_wants, recent_sessions, steam } = data
   const displayName = user.discord_display_name ?? user.discord_username
 
@@ -144,16 +145,22 @@ function Body({ data }: { data: NonNullable<ReturnType<typeof useMemberProfile>[
             <h4 className="mb-2 text-[10px] uppercase tracking-wider text-nerv-dim">quer jogar</h4>
             <div className="flex gap-2 overflow-x-auto pb-1">
               {top_wants.map((w) => (
-                <div key={w.game_id} className="shrink-0 w-20">
+                <Link
+                  key={w.game_id}
+                  to={`/groups/${groupId}/games/${w.game_id}`}
+                  className="shrink-0 w-20 transition-opacity hover:opacity-80"
+                  title={w.name}
+                  onClick={onNavigate}
+                >
                   <div className="aspect-[3/4] overflow-hidden rounded-sm border border-nerv-orange/15 bg-black/40">
                     {w.cover_url ? (
-                      <img src={w.cover_url} alt="" className="h-full w-full object-cover" />
+                      <img src={w.cover_url} alt="" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
                       <div className="grid h-full place-items-center text-[9px] text-nerv-dim">sem capa</div>
                     )}
                   </div>
                   <div className="mt-1 truncate text-[10px] text-nerv-dim">{w.name}</div>
-                </div>
+                </Link>
               ))}
             </div>
           </section>

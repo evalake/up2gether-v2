@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
 import {
   useCreateSession,
@@ -136,6 +136,7 @@ export function SessionsPage() {
           <button
             onClick={() => setWeekAnchor(addDays(weekAnchor, -7))}
             aria-label="semana anterior"
+            title="semana anterior"
             className="grid h-7 w-7 place-items-center rounded-full hover:bg-nerv-orange/10 hover:text-nerv-orange transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
@@ -144,6 +145,7 @@ export function SessionsPage() {
           <button
             onClick={() => setWeekAnchor(addDays(weekAnchor, 7))}
             aria-label="próxima semana"
+            title="proxima semana"
             className="grid h-7 w-7 place-items-center rounded-full hover:bg-nerv-orange/10 hover:text-nerv-orange transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
@@ -311,8 +313,13 @@ export function SessionsPage() {
                       onClick={() => !isPast && openDraft(slot)}
                       disabled={isPast}
                       aria-label="novo horario"
-                      className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'transition-colors hover:bg-nerv-orange/5' : ''}`}
-                    />
+                      title={isPast ? undefined : 'agendar sessao'}
+                      className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'group/empty transition-colors hover:bg-nerv-orange/5' : ''}`}
+                    >
+                      {!isPast && inSlot.length === 0 && (
+                        <span className="absolute inset-0 grid place-items-center text-nerv-orange/0 transition-colors group-hover/empty:text-nerv-orange/30 text-lg">+</span>
+                      )}
+                    </button>
                     {inSlot.length > 0 && !isPast && (
                       <button
                         type="button"
@@ -352,8 +359,14 @@ export function SessionsPage() {
             <span>histórico</span>
             <span className="text-nerv-orange tabular-nums">{past.length}</span>
           </button>
+          <AnimatePresence>
           {openPast && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="grid gap-3 overflow-hidden sm:grid-cols-2"
+            >
               {past.map((s) => {
                 const game = games.data?.find((g) => g.id === s.game_id)
                 const cover = game ? steamCover(game) : null
@@ -361,7 +374,7 @@ export function SessionsPage() {
                 return (
                   <button key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:border-nerv-orange/40 hover:bg-nerv-panel/50">
                     {cover ? (
-                      <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" />
+                      <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
                       <div className="h-20 w-32 shrink-0 rounded-sm bg-nerv-line/20" />
                     )}
@@ -382,8 +395,9 @@ export function SessionsPage() {
                   </button>
                 )
               })}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </section>
       )}
 

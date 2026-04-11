@@ -234,7 +234,7 @@ export function GroupDetailPage() {
           {!isSoleAdmin && (
             <button
               onClick={onLeave}
-              className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-red"
+              className="rounded-sm border border-nerv-line/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/40 hover:text-nerv-red"
             >
               sair do grupo
             </button>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
 import {
   useCloseVote,
@@ -199,8 +199,14 @@ export function VotesPage() {
             <span>histórico</span>
             <span className="text-nerv-orange tabular-nums">{closed.length}</span>
           </button>
+          <AnimatePresence>
           {openHistory && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="grid gap-3 overflow-hidden sm:grid-cols-2"
+            >
               {closed.map((v) => {
                 const winner = v.winner_game_id ? gameOf(v.winner_game_id) : null
                 const cover = winner ? steamCover(winner) : null
@@ -235,8 +241,9 @@ export function VotesPage() {
                   </button>
                 )
               })}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </section>
       )}
 

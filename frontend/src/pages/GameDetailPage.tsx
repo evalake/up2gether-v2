@@ -325,7 +325,7 @@ export function GameDetailPage() {
               <EnergyBar label="HARDWARE" value={v.hardware_fit_percent} color="amber" />
               <EnergyBar label="INTEREST" value={v.interest_score} color="magenta" />
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[10px] uppercase tracking-wider text-nerv-dim">
+            <div className="mt-4 grid grid-cols-3 gap-3 text-center text-[10px] uppercase tracking-wider text-nerv-dim">
               <div className="rounded-sm border border-nerv-line bg-black/30 p-2">
                 <div className="text-nerv-green text-base">{v.interest_want_count}</div>quero
               </div>
@@ -435,7 +435,7 @@ export function GameDetailPage() {
             )}
             <div className="space-y-1.5">
               {owners.data?.map((o) => (
-                <div key={o.id} className="flex items-center gap-2 rounded-sm border border-nerv-line bg-black/30 px-2 py-1.5">
+                <div key={o.id} className="flex items-center gap-2 rounded-sm border border-nerv-line bg-black/30 px-2 py-1.5 transition-colors hover:border-nerv-orange/40 hover:bg-black/40" title={o.discord_display_name ?? o.discord_username}>
                   <Avatar discordId={o.discord_id} hash={o.discord_avatar} name={o.discord_display_name ?? o.discord_username} size="sm" />
                   <span className="truncate text-xs text-nerv-text">
                     {o.discord_display_name ?? o.discord_username}

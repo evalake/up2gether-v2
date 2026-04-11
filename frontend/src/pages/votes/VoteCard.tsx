@@ -64,13 +64,15 @@ export function VoteCard({
         <div className="flex gap-2">
           <button
             onClick={onAudit}
-            className="rounded-sm border border-nerv-line px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
+            title="ver detalhes da votacao"
+            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
           >
             audit
           </button>
           <button
             onClick={onClose}
-            className="rounded-sm border border-nerv-red/30 px-3 py-1 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
+            title="encerrar votacao manualmente"
+            className="rounded-sm border border-nerv-red/40 bg-nerv-red/5 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red/80 transition-colors hover:border-nerv-red/60 hover:bg-nerv-red/10 hover:text-nerv-red"
           >
             encerrar
           </button>

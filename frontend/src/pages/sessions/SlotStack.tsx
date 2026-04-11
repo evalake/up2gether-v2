@@ -35,7 +35,7 @@ export function SlotStack({
       >
         {cover ? (
           <span className="relative block w-[40%] shrink-0 overflow-hidden">
-            <img src={cover} alt="" className={`h-full w-full object-cover ${isPast ? 'opacity-40 grayscale' : 'opacity-90'}`} />
+            <img src={cover} alt="" className={`h-full w-full object-cover ${isPast ? 'opacity-60 grayscale-[50%]' : 'opacity-90'}`} />
             <span className="absolute inset-0 bg-gradient-to-r from-transparent to-nerv-panel/60" />
           </span>
         ) : (
