@@ -419,7 +419,7 @@ export function GroupDetailPage() {
                     {m.role !== 'admin' && (
                       <button
                         onClick={() => promote.mutate({ userId: m.user_id, role: m.role === 'mod' ? 'admin' : 'mod' })}
-                        className="font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-green"
+                        className="rounded px-1 py-0.5 font-mono text-[10px] text-nerv-dim transition-all hover:bg-nerv-green/15 hover:text-nerv-green"
                         title="promover"
                       >
                         ↑
@@ -428,7 +428,7 @@ export function GroupDetailPage() {
                     {m.role !== 'member' && (
                       <button
                         onClick={() => demote.mutate(m.user_id)}
-                        className="font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-amber"
+                        className="rounded px-1 py-0.5 font-mono text-[10px] text-nerv-dim transition-all hover:bg-nerv-amber/15 hover:text-nerv-amber"
                         title="rebaixar"
                       >
                         ↓
@@ -438,7 +438,7 @@ export function GroupDetailPage() {
                       onClick={() => {
                         if (confirm(`remover ${name} do grupo?`)) kick.mutate(m.user_id)
                       }}
-                      className="font-mono text-[10px] text-nerv-dim transition-colors hover:text-nerv-red"
+                      className="rounded px-1 py-0.5 font-mono text-[10px] text-nerv-dim transition-all hover:bg-nerv-red/15 hover:text-nerv-red"
                       title="remover"
                     >
                       ×

@@ -150,7 +150,9 @@ export function VotesPage() {
         </div>
         <button
           onClick={() => setDraft(true)}
-          className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25"
+          disabled={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2}
+          title={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2 ? 'precisa de pelo menos 2 jogos ativos' : undefined}
+          className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:cursor-not-allowed disabled:opacity-40"
         >
           nova votação
         </button>

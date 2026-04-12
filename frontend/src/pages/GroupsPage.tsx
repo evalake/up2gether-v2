@@ -198,6 +198,7 @@ export function GroupsPage() {
         <EmptyState
           title="nenhum grupo ainda"
           hint="cria o primeiro pra começar a coordenar sessões"
+          action={<Button onClick={() => setPickerOpen(true)}>+ adicionar server</Button>}
         />
       )}
 

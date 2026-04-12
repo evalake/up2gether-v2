@@ -388,8 +388,9 @@ export function GameDetailPage() {
                   {SIGNALS.map((s) => (
                     <button
                       key={s.value}
+                      disabled={setInt.isPending}
                       onClick={() => setInt.mutate({ gameId: g.id, signal: s.value })}
-                      className={`flex-1 rounded-sm border px-2 py-1.5 text-[10px] uppercase tracking-wider transition-all ${
+                      className={`flex-1 rounded-sm border px-2 py-1.5 text-[10px] uppercase tracking-wider transition-all disabled:opacity-40 ${
                         g.user_interest === s.value
                           ? `${s.color} bg-current/10`
                           : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
@@ -401,8 +402,9 @@ export function GameDetailPage() {
                 </div>
               </div>
               <button
+                disabled={toggleOwn.isPending}
                 onClick={() => toggleOwn.mutate({ gameId: g.id, owns: !g.user_owns_game })}
-                className={`w-full rounded-sm border px-2 py-2 text-xs uppercase tracking-wider transition-all ${
+                className={`w-full rounded-sm border px-2 py-2 text-xs uppercase tracking-wider transition-all disabled:opacity-40 ${
                   g.user_owns_game
                     ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
                     : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'

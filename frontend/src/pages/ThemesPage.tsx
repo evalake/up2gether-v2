@@ -218,14 +218,13 @@ export function ThemesPage() {
                       )}
                     </div>
                     {isStaff && (
-                      <span
-                        role="button"
-                        tabIndex={0}
+                      <button
+                        type="button"
                         onClick={(e) => { e.stopPropagation(); del.mutate(t.id) }}
-                        className="shrink-0 cursor-pointer text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-nerv-dim hover:!text-nerv-red"
+                        className="shrink-0 text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-nerv-dim hover:!text-nerv-red"
                       >
                         remover
-                      </span>
+                      </button>
                     )}
                   </div>
                 </button>
