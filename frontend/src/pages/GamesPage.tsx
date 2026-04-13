@@ -202,36 +202,38 @@ export function GamesPage() {
     }
   }
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name) return
-    try {
-      const created = await create.mutateAsync({
-        name: form.name,
-        steam_appid: form.steam_appid ? Number(form.steam_appid) : null,
-        cover_url: form.cover_url || null,
-        description: form.description || null,
-        is_free: form.is_free,
-        price_current: form.is_free ? 0 : form.price_current ? Number(form.price_current) : null,
-        genres: form.genres,
-        tags: form.tags,
-        player_min: form.player_min,
-        player_max: form.player_max,
-        min_hardware_tier: form.min_hardware_tier,
-        developer: form.developer,
-        release_date: form.release_date,
-        metacritic_score: form.metacritic_score,
-        price_original: form.price_original,
-        discount_percent: form.discount_percent,
-        source: form.source,
-      })
-      setForm(emptyForm)
-      setShowForm(false)
-      toast.success('jogo adicionado')
-      navigate(`/groups/${id}/games/${created.id}`)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'falha ao criar jogo')
-    }
+    create.mutate({
+      name: form.name,
+      steam_appid: form.steam_appid ? Number(form.steam_appid) : null,
+      cover_url: form.cover_url || null,
+      description: form.description || null,
+      is_free: form.is_free,
+      price_current: form.is_free ? 0 : form.price_current ? Number(form.price_current) : null,
+      genres: form.genres,
+      tags: form.tags,
+      player_min: form.player_min,
+      player_max: form.player_max,
+      min_hardware_tier: form.min_hardware_tier,
+      developer: form.developer,
+      release_date: form.release_date,
+      metacritic_score: form.metacritic_score,
+      price_original: form.price_original,
+      discount_percent: form.discount_percent,
+      source: form.source,
+    }, {
+      onSuccess: (created) => {
+        setForm(emptyForm)
+        setShowForm(false)
+        toast.success('jogo adicionado')
+        navigate(`/groups/${id}/games/${created.id}`)
+      },
+      onError: (err) => {
+        toast.error(err instanceof Error ? err.message : 'falha ao criar jogo')
+      },
+    })
   }
 
   const filteredGames = useMemo(() => games.data?.filter((g) => {
