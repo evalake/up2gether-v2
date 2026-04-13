@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.domain.enums import GameStage, HardwareTier, InterestSignal
+from app.domain.enums import GameSource, GameStage, HardwareTier, InterestSignal
 
 # limites humanos: acima disso tratamos como "infinito"/null
 PLAYER_CAP = 32
@@ -43,6 +43,7 @@ class GameCreate(BaseModel):
     metacritic_score: int | None = Field(None, ge=0, le=100)
     price_original: float | None = Field(None, ge=0, le=100000)
     discount_percent: int | None = Field(None, ge=0, le=100)
+    source: GameSource = GameSource.STEAM
 
     @field_validator("price_current", "price_original")
     @classmethod
@@ -123,6 +124,7 @@ class GameResponse(BaseModel):
     price_original: float | None = None
     discount_percent: int | None = None
     review_score_desc: str | None = None
+    source: GameSource = GameSource.STEAM
 
 
 class GameWithViability(GameResponse):

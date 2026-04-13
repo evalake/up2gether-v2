@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 
-from app.domain.enums import GameStage, GroupRole, HardwareTier, InterestSignal
+from app.domain.enums import GameSource, GameStage, GroupRole, HardwareTier, InterestSignal
 from app.models.game import Game
 from app.models.user import User
 from app.repositories.game_repo import GameRepository
@@ -89,6 +89,7 @@ class GameService:
             metacritic_score=data.metacritic_score,
             price_original=data.price_original,
             discount_percent=data.discount_percent,
+            source=data.source,
         )
         await self.games.add(game)
         # auto-marca ownership pra membros do grupo que ja importaram a lib steam
@@ -342,6 +343,7 @@ class GameService:
             created_at=game.created_at,
             archived_at=game.archived_at,
             viability=viab,
+            source=GameSource(game.source),
             user_interest=user_interest,
             user_in_roster=user_in_roster,
             user_owns_game=user_owns,

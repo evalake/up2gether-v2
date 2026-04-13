@@ -1,10 +1,14 @@
 import { api } from '@/lib/api'
 
+export type GameSource = 'steam' | 'riot' | 'epic' | 'manual'
+
 export type SteamSearchItem = {
-  appid: number
+  appid: number | null
   name: string
   header_image: string | null
   price: number | null
+  source?: GameSource
+  slug?: string
 }
 
 export type SteamGameDetails = {
@@ -27,8 +31,26 @@ export type SteamGameDetails = {
   hardware_tier: 'low' | 'mid' | 'high' | 'unknown'
 }
 
+export type BuiltinGameDetails = {
+  slug: string
+  name: string
+  source: GameSource
+  cover_url: string
+  description: string
+  is_free: boolean
+  genres: string[]
+  player_min: number
+  player_max: number | null
+  min_hardware_tier: 'low' | 'mid' | 'high' | 'unknown'
+  developer: string
+  release_date: string
+}
+
 export const steamSearch = (q: string) =>
   api<SteamSearchItem[]>(`/steam/search?q=${encodeURIComponent(q)}`)
 
 export const steamGetDetails = (appid: number) =>
   api<SteamGameDetails>(`/steam/game/${appid}`)
+
+export const builtinGetDetails = (slug: string) =>
+  api<BuiltinGameDetails>(`/steam/builtin/${slug}`)

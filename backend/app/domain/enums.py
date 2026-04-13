@@ -64,3 +64,10 @@ class HardwareTier(StrEnum):
     MID = "mid"
     HIGH = "high"
     UNKNOWN = "unknown"
+
+
+class GameSource(StrEnum):
+    STEAM = "steam"
+    RIOT = "riot"
+    EPIC = "epic"
+    MANUAL = "manual"

@@ -2,6 +2,7 @@ import { api } from '@/lib/api'
 
 export type GameStage = 'exploring' | 'campaign' | 'endgame' | 'paused' | 'abandoned'
 export type HardwareTier = 'low' | 'mid' | 'high' | 'unknown'
+export type GameSource = 'steam' | 'riot' | 'epic' | 'manual'
 export type InterestSignal = 'want' | 'ok' | 'pass'
 
 export type GameViability = {
@@ -40,6 +41,7 @@ export type Game = {
   price_original: number | null
   discount_percent: number | null
   review_score_desc: string | null
+  source: GameSource
   viability: GameViability
   user_interest: InterestSignal | null
   user_in_roster: boolean
@@ -58,6 +60,7 @@ export type GameCreateInput = {
   player_min?: number
   player_max?: number | null
   min_hardware_tier?: HardwareTier
+  source?: GameSource
   developer?: string | null
   release_date?: string | null
   metacritic_score?: number | null

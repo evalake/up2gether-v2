@@ -7,8 +7,8 @@ import {
   useSetInterest,
   useToggleOwnership,
 } from '@/features/games/hooks'
-import type { HardwareTier } from '@/features/games/api'
-import { steamSearch, steamGetDetails, type SteamSearchItem } from '@/features/steam/api'
+import type { HardwareTier, GameSource } from '@/features/games/api'
+import { steamSearch, steamGetDetails, builtinGetDetails, type SteamSearchItem } from '@/features/steam/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -36,6 +36,7 @@ type FormState = {
   metacritic_score: number | null
   price_original: number | null
   discount_percent: number | null
+  source?: GameSource
 }
 
 const emptyForm: FormState = {
@@ -151,25 +152,49 @@ export function GamesPage() {
     setSteamQ('')
     setFilling(true)
     try {
-      const d = await steamGetDetails(it.appid)
-      setForm({
-        name: d.name || it.name,
-        steam_appid: String(it.appid),
-        description: d.short_description ?? '',
-        is_free: d.price === null || d.price === 0,
-        price_current: d.price !== null && d.price !== undefined ? String(d.price / 100) : '',
-        cover_url: `https://cdn.cloudflare.steamstatic.com/steam/apps/${it.appid}/header.jpg`,
-        genres: d.genres ?? [],
-        tags: d.categories ?? [],
-        player_min: d.player_min ?? 1,
-        player_max: d.player_max ?? null,
-        min_hardware_tier: d.hardware_tier ?? 'unknown',
-        developer: d.developer ?? null,
-        release_date: d.release_date ?? null,
-        metacritic_score: d.metacritic_score ?? null,
-        price_original: d.price_initial != null ? d.price_initial / 100 : null,
-        discount_percent: d.discount_percent ?? null,
-      })
+      // jogo do catalogo built-in (riot/epic)
+      if (it.slug && it.source && it.source !== 'steam') {
+        const b = await builtinGetDetails(it.slug)
+        setForm({
+          name: b.name,
+          steam_appid: '',
+          description: b.description ?? '',
+          is_free: b.is_free,
+          price_current: '',
+          cover_url: b.cover_url,
+          genres: b.genres ?? [],
+          tags: [],
+          player_min: b.player_min ?? 1,
+          player_max: b.player_max ?? null,
+          min_hardware_tier: b.min_hardware_tier ?? 'unknown',
+          developer: b.developer ?? null,
+          release_date: b.release_date ?? null,
+          metacritic_score: null,
+          price_original: null,
+          discount_percent: null,
+          source: b.source,
+        })
+      } else {
+        const d = await steamGetDetails(it.appid!)
+        setForm({
+          name: d.name || it.name,
+          steam_appid: String(it.appid),
+          description: d.short_description ?? '',
+          is_free: d.price === null || d.price === 0,
+          price_current: d.price !== null && d.price !== undefined ? String(d.price / 100) : '',
+          cover_url: `https://cdn.cloudflare.steamstatic.com/steam/apps/${it.appid}/header.jpg`,
+          genres: d.genres ?? [],
+          tags: d.categories ?? [],
+          player_min: d.player_min ?? 1,
+          player_max: d.player_max ?? null,
+          min_hardware_tier: d.hardware_tier ?? 'unknown',
+          developer: d.developer ?? null,
+          release_date: d.release_date ?? null,
+          metacritic_score: d.metacritic_score ?? null,
+          price_original: d.price_initial != null ? d.price_initial / 100 : null,
+          discount_percent: d.discount_percent ?? null,
+        })
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'falha ao buscar detalhes')
     } finally {
@@ -198,6 +223,7 @@ export function GamesPage() {
         metacritic_score: form.metacritic_score,
         price_original: form.price_original,
         discount_percent: form.discount_percent,
+        source: form.source,
       })
       setForm(emptyForm)
       setShowForm(false)
@@ -248,10 +274,10 @@ export function GamesPage() {
                     <img src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   )}
                   <input
-                    aria-label="buscar na steam"
+                    aria-label="buscar jogo"
                     value={steamQ}
                     onChange={(e) => setSteamQ(e.target.value)}
-                    placeholder={form.name ? form.name : 'buscar na steam pra autopreencher...'}
+                    placeholder={form.name ? form.name : 'buscar jogo pra autopreencher...'}
                     className="h-8 flex-1 bg-transparent text-xs focus:outline-none"
                   />
                   {(steamLoading || filling) && <span className="text-[10px] text-nerv-dim">...</span>}
@@ -259,17 +285,27 @@ export function GamesPage() {
                 <AnimatePresence>
                 {steamHits.length > 0 && (
                   <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }} className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-sm border border-nerv-orange/40 bg-nerv-panel shadow-lg">
-                    {steamHits.map((it) => (
+                    {steamHits.map((it, i) => (
                       <button
-                        key={it.appid}
+                        key={it.slug ?? it.appid ?? i}
                         type="button"
                         onClick={() => pickSteam(it)}
                         className="flex w-full items-center gap-2 border-b border-nerv-line/60 px-2 py-1.5 text-left transition-colors hover:bg-nerv-orange/10"
                       >
-                        <SteamThumb appid={it.appid} alt={it.name} className="h-7 w-14 rounded-sm object-cover" />
+                        {it.appid ? (
+                          <SteamThumb appid={it.appid} alt={it.name} className="h-7 w-14 rounded-sm object-cover" />
+                        ) : (
+                          <img src={it.header_image ?? ''} alt={it.name} className="h-7 w-14 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                        )}
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-xs">{it.name}</div>
-                          <div className="text-[9px] text-nerv-dim">#{it.appid}</div>
+                          <div className="flex items-center gap-1.5 text-[9px] text-nerv-dim">
+                            {it.source && it.source !== 'steam' ? (
+                              <span className="rounded-sm border border-nerv-magenta/40 bg-nerv-magenta/10 px-1 text-nerv-magenta">{it.source}</span>
+                            ) : (
+                              <span>#{it.appid}</span>
+                            )}
+                          </div>
                         </div>
                       </button>
                     ))}

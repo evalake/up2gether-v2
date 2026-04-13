@@ -91,7 +91,32 @@ async def steam_search(
     _: CurrentUser,
     client: Annotated[SteamClient, Depends(get_steam_client)],
 ) -> list[dict]:
-    return await client.search(q)
+    import logging as _log
+
+    from app.integrations.builtin_catalog import search_builtin
+
+    # built-in primeiro (sincrono, nunca falha)
+    builtin_hits = search_builtin(q)
+    builtin_as_search = [
+        {
+            "appid": None,
+            "name": g["name"],
+            "header_image": g["cover_url"],
+            "price": None,
+            "source": g["source"],
+            "slug": g["slug"],
+        }
+        for g in builtin_hits
+    ]
+
+    # steam pode falhar (rate limit, timeout, etc) - nao pode matar os built-in
+    try:
+        steam_results = await client.search(q)
+    except Exception:
+        _log.getLogger(__name__).warning("steam search falhou pra q=%s", q, exc_info=True)
+        steam_results = []
+
+    return builtin_as_search + steam_results
 
 
 @router.get("/game/{appid}")
@@ -101,6 +126,19 @@ async def steam_game(
     client: Annotated[SteamClient, Depends(get_steam_client)],
 ) -> dict:
     return await client.get_details(appid)
+
+
+@router.get("/builtin/{slug}")
+async def builtin_game_details(
+    slug: str,
+    _: CurrentUser,
+) -> dict:
+    from app.integrations.builtin_catalog import get_builtin_by_slug
+
+    details = get_builtin_by_slug(slug)
+    if not details:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "jogo nao encontrado no catalogo")
+    return details
 
 
 class ImportLibraryIn(BaseModel):

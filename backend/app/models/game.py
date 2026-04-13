@@ -51,6 +51,7 @@ class Game(Base, TimestampMixin):
     price_original: Mapped[float | None] = mapped_column(Float, nullable=True)
     discount_percent: Mapped[int | None] = mapped_column(Integer, nullable=True)
     review_score_desc: Mapped[str | None] = mapped_column(String, nullable=True)
+    source: Mapped[str] = mapped_column(String, default="steam", nullable=False)
 
 
 class InterestSignalRow(Base):
