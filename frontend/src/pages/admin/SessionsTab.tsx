@@ -39,7 +39,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
   const deleteOne = async (sid: string) => {
     try {
       await del.mutateAsync(sid)
-      toast.success('sessao apagada')
+      toast.success('sessão apagada')
       setPendingDelete(null)
       setSelected((prev) => {
         const n = new Set(prev)
@@ -65,7 +65,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
         }
       }),
     )
-    if (fail === 0) toast.success(`${ok} sessao${ok === 1 ? '' : 'es'} apagada${ok === 1 ? '' : 's'}`)
+    if (fail === 0) toast.success(`${ok} sessão${ok === 1 ? '' : 'ões'} apagada${ok === 1 ? '' : 's'}`)
     else toast.error(`${ok} apagadas, ${fail} falharam`)
     setSelected(new Set())
     setBulkConfirm(false)
@@ -78,9 +78,9 @@ export function SessionsTab({ groupId }: { groupId: string }) {
     <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Sessoes do grupo</div>
+          <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Sessões do grupo</div>
           <p className="mt-1 text-[11px] text-nerv-dim/80">
-            Passadas e futuras. Busca por titulo ou nome do jogo.
+            Passadas e futuras. Busca por título ou nome do jogo.
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
@@ -90,10 +90,10 @@ export function SessionsTab({ groupId }: { groupId: string }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <input
-          aria-label="buscar sessao"
+          aria-label="buscar sessão"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar sessao..."
+          placeholder="buscar sessão..."
           className="h-8 min-w-[180px] flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus:border-nerv-orange focus:outline-none"
         />
         {filtered.length > 0 && (
@@ -110,7 +110,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
 
       {bulkConfirm && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
-          <p className="text-xs text-nerv-red">apagar {selected.size} sessao{selected.size === 1 ? '' : 'es'}?</p>
+          <p className="text-xs text-nerv-red">apagar {selected.size} sessão{selected.size === 1 ? '' : 'ões'}?</p>
           <div className="flex shrink-0 gap-2">
             <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
             <button onClick={deleteBulk} disabled={del.isPending} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40">
@@ -122,7 +122,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
 
       {filtered.length === 0 ? (
         <div className="mt-4 py-6 text-center text-[11px] text-nerv-dim">
-          {q ? `nenhuma sessao pra "${q}"` : 'nenhuma sessao ainda'}
+          {q ? `nenhuma sessão pra "${q}"` : 'nenhuma sessão ainda'}
         </div>
       ) : (
         <div className="mt-4 divide-y divide-nerv-line/30">

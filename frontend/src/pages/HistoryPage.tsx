@@ -53,12 +53,12 @@ export function HistoryPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between gap-4">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-nerv-orange/80">Historico</div>
+          <div className="text-[11px] uppercase tracking-wider text-nerv-orange/80">Histórico</div>
           <h1 className="mt-1 font-display text-3xl text-nerv-text">
             {group.data?.name ?? 'Grupo'}
           </h1>
           <p className="mt-1 text-xs text-nerv-dim">
-            Games que ja foram escolhidos pelo grupo. Derivado das votacoes fechadas.
+            Games que já foram escolhidos pelo grupo. Derivado das votações fechadas.
           </p>
         </div>
         <Link
@@ -71,14 +71,14 @@ export function HistoryPage() {
 
       <div className="flex items-center gap-2">
         <input
-          aria-label="buscar historico"
+          aria-label="buscar histórico"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar por jogo ou titulo da votacao..."
+          placeholder="buscar por jogo ou título da votação..."
           className="h-9 w-full max-w-md rounded-sm border border-nerv-line bg-black/40 px-3 text-xs text-nerv-text focus:border-nerv-orange focus:outline-none"
         />
         <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
-          <span className="tabular-nums text-nerv-orange">{chapters.length}</span> capitulos
+          <span className="tabular-nums text-nerv-orange">{chapters.length}</span> capítulos
         </div>
       </div>
 
@@ -86,8 +86,8 @@ export function HistoryPage() {
         <EmptyState
           tone="soft"
           glyph="✧"
-          title={q ? `nada pra ${JSON.stringify(q)}` : 'nenhum capitulo ainda'}
-          hint={q ? 'tenta outro termo ou limpa a busca' : 'quando uma votação fechar com vencedor, vai aparecer aqui como um capitulo da timeline.'}
+          title={q ? `nada pra ${JSON.stringify(q)}` : 'nenhum capítulo ainda'}
+          hint={q ? 'tenta outro termo ou limpa a busca' : 'quando uma votação fechar com vencedor, vai aparecer aqui como um capítulo da timeline.'}
         />
       ) : (
         <div className="space-y-2">

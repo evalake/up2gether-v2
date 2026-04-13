@@ -158,7 +158,7 @@ export function SessionsPage() {
           </button>
           <button
             onClick={() => setFullDay((v) => !v)}
-            title={fullDay ? 'mostrar so prime time' : 'mostrar dia todo'}
+            title={fullDay ? 'mostrar só prime time' : 'mostrar dia todo'}
             className={`ml-1 rounded-full px-3 h-7 text-[10px] uppercase tracking-wider transition-colors ${fullDay ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:bg-nerv-orange/10 hover:text-nerv-orange'}`}
           >
             {fullDay ? 'dia todo' : 'noite'}
@@ -205,7 +205,7 @@ export function SessionsPage() {
                 >
                   {cover ? (
                     <div className="relative h-full w-40 shrink-0 overflow-hidden">
-                      <img src={cover} alt="" className="h-full w-full object-cover transition-transform group-hover/hero:scale-105" />
+                      <img loading="lazy" src={cover} alt="" className="h-full w-full object-cover transition-transform group-hover/hero:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-nerv-panel/30 to-nerv-panel" />
                     </div>
                   ) : (
@@ -247,7 +247,7 @@ export function SessionsPage() {
                 className="group/chip flex h-28 w-[200px] shrink-0 items-stretch overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/40 text-left transition-all hover:border-nerv-orange/60 hover:bg-nerv-panel"
               >
                 {cover ? (
-                  <img src={cover} alt="" className="h-full w-20 shrink-0 object-cover opacity-80 group-hover/chip:opacity-100" />
+                  <img loading="lazy" src={cover} alt="" className="h-full w-20 shrink-0 object-cover opacity-80 group-hover/chip:opacity-100" />
                 ) : (
                   <span className="grid h-full w-20 shrink-0 place-items-center bg-nerv-orange/10 font-display text-xl text-nerv-orange/60">◈</span>
                 )}
@@ -312,8 +312,8 @@ export function SessionsPage() {
                       type="button"
                       onClick={() => !isPast && openDraft(slot)}
                       disabled={isPast}
-                      aria-label="novo horario"
-                      title={isPast ? undefined : 'agendar sessao'}
+                      aria-label="novo horário"
+                      title={isPast ? undefined : 'agendar sessão'}
                       className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'group/empty transition-colors hover:bg-nerv-orange/5' : ''}`}
                     >
                       {!isPast && inSlot.length === 0 && (
@@ -324,7 +324,7 @@ export function SessionsPage() {
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); openDraft(slot) }}
-                        aria-label="adicionar outra no mesmo horario"
+                        aria-label="adicionar outra no mesmo horário"
                         className="absolute right-0.5 top-0.5 z-20 hidden h-4 w-4 place-items-center rounded-full border border-nerv-orange/50 bg-nerv-panel text-[10px] leading-none text-nerv-orange hover:bg-nerv-orange transition-colors hover:text-nerv-panel group-hover/cell:grid"
                       >
                         +
@@ -374,7 +374,7 @@ export function SessionsPage() {
                 return (
                   <button key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:bg-nerv-panel/50 hover:shadow-lg hover:shadow-black/20">
                     {cover ? (
-                      <img src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                      <img loading="lazy" src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
                       <div className="h-20 w-32 shrink-0 rounded-sm bg-nerv-line/20" />
                     )}

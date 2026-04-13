@@ -3,7 +3,6 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -50,6 +49,53 @@ async def create_or_join_group(
     )
 
 
+@router.post("/auto-discover")
+async def auto_discover_groups(
+    actor: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    discord: Annotated[DiscordClient, Depends(get_discord_client)],
+) -> dict:
+    """busca guilds do discord do user e faz join automatico nos que ja existem."""
+    integ = next(
+        (i for i in actor.integrations if i.provider == AuthProvider.DISCORD),
+        None,
+    )
+    if integ is None or not integ.access_token:
+        return {"joined": [], "available": []}
+    try:
+        raw_guilds = await discord.fetch_guilds(integ.access_token)
+    except Exception:
+        return {"joined": [], "available": []}
+    guild_ids = [str(g["id"]) for g in raw_guilds]
+    if not guild_ids:
+        return {"joined": [], "available": []}
+    # acha quais desses guilds ja existem no up2gether
+    from sqlalchemy import select as sa_select
+    rows = (
+        await db.execute(
+            sa_select(Group).where(Group.discord_guild_id.in_(guild_ids))
+        )
+    ).scalars().all()
+    repo = GroupRepository(db)
+    joined = []
+    for grp in rows:
+        membership = await repo.get_membership(grp.id, actor.id)
+        if membership is None:
+            await repo.add_member(grp, actor.id, "member")
+            joined.append({"id": str(grp.id), "name": grp.name, "icon_url": grp.icon_url})
+    if joined:
+        await db.commit()
+    # tambem retorna guilds do discord que nao estao no up2gether (pra sugerir criar)
+    existing_ids = {grp.discord_guild_id for grp in rows}
+    available = []
+    for g in raw_guilds:
+        if str(g["id"]) not in existing_ids:
+            icon_hash = g.get("icon")
+            icon_url = f"https://cdn.discordapp.com/icons/{g['id']}/{icon_hash}.png?size=128" if icon_hash else None
+            available.append({"discord_guild_id": str(g["id"]), "name": g["name"], "icon_url": icon_url})
+    return {"joined": joined, "available": available}
+
+
 @router.get("", response_model=list[GroupWithStats])
 async def list_groups(
     actor: CurrentUser,
@@ -91,11 +137,13 @@ async def get_group_presence(
     Vazio se o bot nao tiver conectado ou se o guild nao tiver o bot.
     Membros nao listados sao considerados offline no frontend.
     """
-    # valida que o actor ta no grupo
-    row = await db.execute(select(Group).where(Group.id == group_id))
-    group = row.scalar_one_or_none()
+    repo = GroupRepository(db)
+    group = await repo.get_by_id(group_id)
     if group is None:
         raise HTTPException(status_code=404, detail="grupo nao encontrado")
+    membership = await repo.get_membership(group_id, actor.id)
+    if membership is None and not actor.is_sys_admin:
+        raise HTTPException(status_code=403, detail="nao e membro do grupo")
     bot = get_bot()
     if bot is None:
         return {}

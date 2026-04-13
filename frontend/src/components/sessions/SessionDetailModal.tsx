@@ -94,7 +94,7 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
                   rsvp.mutate({ sessionId: audit.data!.session.id, status: v })
                 }
                 onDelete={async () => {
-                  if (!confirm('remover esta sessao?')) return
+                  if (!confirm('remover esta sessão?')) return
                   await del.mutateAsync(audit.data!.session.id)
                   onClose()
                 }}
@@ -172,7 +172,7 @@ function Body({
           )}
           {isPast && (
             <span className="mb-2 inline-block rounded-full border border-nerv-line/60 bg-black/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
-              ja rolou
+              já rolou
             </span>
           )}
           <h2 className="font-display text-2xl leading-tight text-nerv-text">
@@ -238,12 +238,12 @@ function Body({
             className="space-y-1.5"
           >
             <div className="text-[10px] uppercase tracking-wider text-nerv-dim">
-              voce vai?
+              você vai?
             </div>
             <div className="flex gap-1.5">
               {(['yes', 'maybe', 'no'] as const).map((v) => {
                 const active = session.user_rsvp === v
-                const label = v === 'yes' ? 'bora' : v === 'maybe' ? 'talvez' : 'nao rola'
+                const label = v === 'yes' ? 'bora' : v === 'maybe' ? 'talvez' : 'não rola'
                 const tone =
                   v === 'yes'
                     ? 'border-nerv-green/60 bg-nerv-green/10 text-nerv-green'
@@ -281,7 +281,7 @@ function Body({
             <Group title="talvez" tone="text-nerv-amber" people={maybe} pop={pop} onClickMember={setProfileUserId} />
           )}
           {no.length > 0 && (
-            <Group title="nao rola" tone="text-red-400/80" people={no} pop={pop} onClickMember={setProfileUserId} />
+            <Group title="não rola" tone="text-red-400/80" people={no} pop={pop} onClickMember={setProfileUserId} />
           )}
           {non_respondents.length > 0 && (
             <GroupMuted title="silenciosos" people={non_respondents} pop={pop} onClickMember={setProfileUserId} />

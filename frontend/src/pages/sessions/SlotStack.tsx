@@ -35,7 +35,7 @@ export function SlotStack({
       >
         {cover ? (
           <span className="relative block w-[40%] shrink-0 overflow-hidden">
-            <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className={`h-full w-full object-cover ${isPast ? 'opacity-60 grayscale-[50%]' : 'opacity-90'}`} />
+            <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className={`h-full w-full object-cover ${isPast ? 'opacity-60 grayscale-[50%]' : 'opacity-90'}`} />
             <span className="absolute inset-0 bg-gradient-to-r from-transparent to-nerv-panel/60" />
           </span>
         ) : (
@@ -69,7 +69,7 @@ export function SlotStack({
               key={ss.id}
               type="button"
               onClick={(e) => { e.stopPropagation(); setActive(i) }}
-              aria-label={`sessao ${i + 1}`}
+              aria-label={`sessão ${i + 1}`}
               className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-4 bg-nerv-orange' : 'w-1.5 bg-nerv-orange/30 hover:bg-nerv-orange/60'}`}
             />
           ))}

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useQueryClient } from '@tanstack/react-query'
 import {
   useGroup,
   useLeaveGroup,
@@ -75,26 +74,14 @@ export function GroupDetailPage() {
   const demote = useDemote(id)
   const kick = useKick(id)
   const toast = useToast()
-  const qc = useQueryClient()
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
-  // tick em tempo real pro countdown + refetch periodico de tudo que muda
+  // tick pro countdown de sessoes
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(tick)
   }, [])
-  useEffect(() => {
-    const poll = setInterval(() => {
-      qc.invalidateQueries({ queryKey: ['groups', id, 'sessions'] })
-      qc.invalidateQueries({ queryKey: ['groups', id, 'votes'] })
-      qc.invalidateQueries({ queryKey: ['groups', id, 'themes', 'current'] })
-      qc.invalidateQueries({ queryKey: ['groups', id, 'games'] })
-      qc.invalidateQueries({ queryKey: ['groups', id, 'members'] })
-      qc.invalidateQueries({ queryKey: ['groups', id, 'current-game', 'audit'] })
-    }, 10000)
-    return () => clearInterval(poll)
-  }, [id, qc])
 
   if (group.isLoading) return <Loading />
   if (group.error) return <ErrorBox error={group.error} />

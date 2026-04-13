@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     frontend_base_url: str = "http://localhost:5173"
 
     # discord ids que tem acesso god-mode (bypass de owner/admin/mod em tudo)
-    sys_admin_discord_ids: list[str] = ["220244848593076224"]
+    # setar via env SYS_ADMIN_DISCORD_IDS='["123","456"]'
+    sys_admin_discord_ids: list[str] = []
 
     # dev only — habilita POST /api/auth/dev-login pra E2E. NUNCA ligar em prod.
     dev_login_enabled: bool = False

@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import type { PresenceStatus } from '@/features/groups/api'
 
-type Size = 'xs' | 'sm' | 'md' | 'lg'
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 const SIZE: Record<Size, { px: number; cls: string; text: string; dot: string }> = {
   xs: { px: 32, cls: 'h-6 w-6', text: 'text-[9px]', dot: 'h-1.5 w-1.5 ring-1' },
   sm: { px: 64, cls: 'h-8 w-8', text: 'text-xs', dot: 'h-2 w-2 ring-2' },
   md: { px: 128, cls: 'h-10 w-10', text: 'text-sm', dot: 'h-2.5 w-2.5 ring-2' },
   lg: { px: 256, cls: 'h-16 w-16', text: 'text-lg', dot: 'h-3.5 w-3.5 ring-2' },
+  xl: { px: 256, cls: 'h-24 w-24', text: 'text-2xl', dot: 'h-4 w-4 ring-2' },
 }
 
 const DOT_COLOR: Record<PresenceStatus, string> = {

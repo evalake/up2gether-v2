@@ -33,8 +33,8 @@ class GameCreate(BaseModel):
     description: str | None = Field(None, max_length=2000)
     is_free: bool = False
     price_current: float | None = Field(None, ge=0, le=100000)
-    genres: list[str] = []
-    tags: list[str] = []
+    genres: list[str] = Field(default=[], max_length=20)
+    tags: list[str] = Field(default=[], max_length=30)
     player_min: int = Field(1, ge=1, le=PLAYER_CAP)
     player_max: int | None = Field(None, ge=1)
     min_hardware_tier: HardwareTier = HardwareTier.UNKNOWN

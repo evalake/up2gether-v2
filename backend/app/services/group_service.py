@@ -131,12 +131,15 @@ class GroupService:
 
     async def list_for_user(self, actor: User) -> list[GroupWithStats]:
         rows = await self.repo.list_for_user(actor.id)
+        if not rows:
+            return []
+        group_ids = [g.id for g, _ in rows]
+        counts = await self.repo.count_members_batch(group_ids)
         out: list[GroupWithStats] = []
         for group, membership in rows:
-            member_count = await self.repo.count_members(group.id)
             item = GroupWithStats.model_validate(group, from_attributes=True).model_copy(
                 update={
-                    "member_count": member_count,
+                    "member_count": counts.get(group.id, 0),
                     "game_count": 0,
                     "active_vote_sessions": 0,
                     "user_role": GroupRole(membership.role),

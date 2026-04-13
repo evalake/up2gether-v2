@@ -64,14 +64,14 @@ export function VoteCard({
         <div className="flex gap-2">
           <button
             onClick={onAudit}
-            title="ver detalhes da votacao"
+            title="ver detalhes da votação"
             className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
           >
             audit
           </button>
           <button
             onClick={onClose}
-            title="encerrar votacao manualmente"
+            title="encerrar votação manualmente"
             className="rounded-sm border border-nerv-red/40 bg-nerv-red/5 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red/80 transition-colors hover:border-nerv-red/60 hover:bg-nerv-red/10 hover:text-nerv-red"
           >
             encerrar
@@ -119,7 +119,7 @@ export function VoteCard({
               }`}
             >
               {cover ? (
-                <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-12 w-20 shrink-0 rounded-sm object-cover" />
+                <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-12 w-20 shrink-0 rounded-sm object-cover" />
               ) : (
                 <div className="h-12 w-20 shrink-0 rounded-sm bg-nerv-line/30" />
               )}
@@ -205,7 +205,7 @@ export function LastClosedPreview({ vote, game }: { vote: VoteRow; game: Game | 
       <div className="text-[10px] uppercase tracking-wider text-nerv-dim">última votação encerrada</div>
       <div className="mt-3 flex items-center gap-4">
         {cover ? (
-          <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-16 w-28 shrink-0 rounded-sm object-cover" />
+          <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-16 w-28 shrink-0 rounded-sm object-cover" />
         ) : (
           <div className="h-16 w-28 shrink-0 rounded-sm bg-nerv-line/20" />
         )}

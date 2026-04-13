@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.domain.enums import SessionRsvp
 
@@ -15,6 +15,18 @@ class SessionCreate(BaseModel):
     start_at: datetime
     duration_minutes: int = Field(60, ge=30, le=480)
     max_participants: int | None = Field(None, ge=2, le=100)
+
+    @field_validator("start_at")
+    @classmethod
+    def start_must_be_future(cls, v: datetime) -> datetime:
+        from datetime import UTC
+
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=UTC)
+        now = datetime.now(UTC)
+        if v < now:
+            raise ValueError("start_at precisa ser no futuro")
+        return v
 
 
 class SessionUpdate(BaseModel):

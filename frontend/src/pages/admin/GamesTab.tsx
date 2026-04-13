@@ -116,7 +116,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
         <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
           <p className="text-xs text-nerv-red">
-            apagar {selected.size} jogo{selected.size === 1 ? '' : 's'}? nao da pra desfazer.
+            apagar {selected.size} jogo{selected.size === 1 ? '' : 's'}? não dá pra desfazer.
           </p>
           <div className="flex shrink-0 gap-2">
             <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">
@@ -153,7 +153,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
                   className="h-3.5 w-3.5 shrink-0 accent-nerv-orange"
                 />
                 {g.cover_url ? (
-                  <img src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-8 w-14 shrink-0 rounded-sm object-cover" />
+                  <img loading="lazy" src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-8 w-14 shrink-0 rounded-sm object-cover" />
                 ) : (
                   <div className="h-8 w-14 shrink-0 rounded-sm bg-nerv-line/20" />
                 )}

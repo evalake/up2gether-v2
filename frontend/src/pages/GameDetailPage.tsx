@@ -202,7 +202,7 @@ export function GameDetailPage() {
             />
             <div className="flex items-center gap-2">
               {edit.cover_url && (
-                <img src={edit.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                <img loading="lazy" src={edit.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
               )}
               <input
                 value={edit.cover_url}
@@ -217,7 +217,7 @@ export function GameDetailPage() {
               maxLength={2000}
               onChange={(e) => setEdit({ ...edit, description: e.target.value })}
               rows={3}
-              placeholder="descricao"
+              placeholder="descrição"
               className="w-full rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs focus:border-nerv-orange focus:outline-none"
             />
             <div className="grid grid-cols-12 gap-2">

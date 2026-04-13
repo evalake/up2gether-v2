@@ -274,7 +274,7 @@ export function GamesPage() {
               <div className="relative">
                 <div className="flex items-center gap-2 rounded-sm border border-nerv-orange/30 bg-black/40 px-2">
                   {form.cover_url && (
-                    <img src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                    <img loading="lazy" src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   )}
                   <input
                     aria-label="buscar jogo"
@@ -298,7 +298,7 @@ export function GamesPage() {
                         {it.appid ? (
                           <SteamThumb appid={it.appid} alt={it.name} className="h-7 w-14 rounded-sm object-cover" />
                         ) : (
-                          <img src={it.header_image ?? ''} alt={it.name} className="h-7 w-14 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                          <img loading="lazy" src={it.header_image ?? ''} alt={it.name} className="h-7 w-14 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-xs">{it.name}</div>
@@ -403,7 +403,7 @@ export function GamesPage() {
                 maxLength={2000}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={2}
-                placeholder="descricao (opcional)"
+                placeholder="descrição (opcional)"
                 className="w-full rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs focus:border-nerv-orange focus:outline-none"
               />
 

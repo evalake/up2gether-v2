@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.security import CurrentUser
 from app.integrations.steam import HttpSteamClient, SteamClient, get_steam_client
 from app.models.game import Game, SteamGameOwnership, SteamProfile
+from app.models.group import GroupMembership
 from app.models.user import IntegrationAccount
 
 router = APIRouter(tags=["steam"], prefix="/steam")
@@ -209,12 +210,20 @@ async def import_library(
 
     _fm(actor, "settings")
 
-    # marca ownership pra todo Game cujo steam_appid esta na biblioteca
+    # marca ownership so em games de grupos que o user faz parte
+    user_group_ids = (
+        await db.execute(
+            select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+        )
+    ).scalars().all()
     matches = (
         (
             await db.execute(
-                select(Game).where(Game.steam_appid.in_(owned_appids))
-                if owned_appids
+                select(Game).where(
+                    Game.steam_appid.in_(owned_appids),
+                    Game.group_id.in_(user_group_ids),
+                )
+                if owned_appids and user_group_ids
                 else select(Game).where(Game.id == None)  # noqa: E711
             )
         )
@@ -313,11 +322,19 @@ async def sync_steam(
 
     _fm(actor, "settings")
 
+    sync_group_ids = (
+        await db.execute(
+            select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+        )
+    ).scalars().all()
     matches = (
         (
             await db.execute(
-                select(Game).where(Game.steam_appid.in_(owned_appids))
-                if owned_appids
+                select(Game).where(
+                    Game.steam_appid.in_(owned_appids),
+                    Game.group_id.in_(sync_group_ids),
+                )
+                if owned_appids and sync_group_ids
                 else select(Game).where(Game.id == None)  # noqa: E711
             )
         )

@@ -80,7 +80,7 @@ export function GroupAdminPage() {
     return (
       <div className="space-y-4">
         <h1 className="font-display text-2xl text-nerv-text">Painel do Admin</h1>
-        <p className="text-sm text-nerv-dim">Voce nao tem permissao pra acessar esse painel.</p>
+        <p className="text-sm text-nerv-dim">Você não tem permissão pra acessar esse painel.</p>
         <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">
           ← voltar
         </Link>
@@ -158,7 +158,7 @@ export function GroupAdminPage() {
           <div className="min-w-0 flex-1">
             <div className="text-[11px] uppercase tracking-wider text-nerv-green/80">Game atual</div>
             <p className="mt-1 text-[11px] text-nerv-dim/80">
-              Por padrao, o game da vez vira o vencedor da ultima votacao. Aqui voce pode travar manualmente, destravar ou trocar a qualquer momento.
+              Por padrão, o game da vez vira o vencedor da última votação. Aqui você pode travar manualmente, destravar ou trocar a qualquer momento.
             </p>
             {currentGame.data ? (
               <Link
@@ -166,12 +166,12 @@ export function GroupAdminPage() {
                 className="mt-3 flex items-center gap-3 transition-opacity hover:opacity-80"
               >
                 {currentGame.data.cover_url && (
-                  <img src={currentGame.data.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-14 w-24 rounded-sm border border-nerv-green/30 object-cover" />
+                  <img loading="lazy" src={currentGame.data.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-14 w-24 rounded-sm border border-nerv-green/30 object-cover" />
                 )}
                 <div className="min-w-0">
                   <div className="truncate font-display text-base text-nerv-text">{currentGame.data.name}</div>
                   <div className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
-                    {currentGame.data.source === 'manual' ? 'travado manual' : 'definido por votacao'}
+                    {currentGame.data.source === 'manual' ? 'travado manual' : 'definido por votação'}
                   </div>
                 </div>
               </Link>
@@ -223,7 +223,7 @@ export function GroupAdminPage() {
                     }}
                     className="flex w-full items-center gap-2 border-b border-nerv-line/20 px-2 py-1.5 text-left text-xs text-nerv-text transition-colors hover:bg-nerv-green/10"
                   >
-                    {g.cover_url && <img src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 rounded-sm object-cover" />}
+                    {g.cover_url && <img loading="lazy" src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 rounded-sm object-cover" />}
                     <span className="truncate">{g.name}</span>
                   </button>
                 ))}
@@ -255,11 +255,11 @@ export function GroupAdminPage() {
           <div className="min-w-0 flex-1">
             <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Visual do Discord</div>
             <p className="mt-1 text-[11px] text-nerv-dim/80">
-              Puxa icone, banner, splash e descricao direto do servidor no Discord. Banner/splash so aparecem se o servidor tiver esses recursos habilitados (boosts).
+              Puxa ícone, banner, splash e descrição direto do servidor no Discord. Banner/splash só aparecem se o servidor tiver esses recursos habilitados (boosts).
             </p>
             <div className="mt-3 flex items-center gap-3">
               {group.data.icon_url && (
-                <img src={group.data.icon_url} alt="" className="h-12 w-12 rounded-sm border border-nerv-line object-cover" />
+                <img loading="lazy" src={group.data.icon_url} alt="" className="h-12 w-12 rounded-sm border border-nerv-line object-cover" />
               )}
               <div className="flex flex-col gap-0.5 text-[10px] text-nerv-dim">
                 <span>icone: {group.data.icon_url ? 'ok' : '--'}</span>
@@ -294,7 +294,7 @@ export function GroupAdminPage() {
           <div>
             <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Membros</div>
             <p className="mt-1 text-[11px] text-nerv-dim/80">
-              Gerencie roles e remocao. Apenas o dono promove/rebaixa outros admins. Mods nao aparecem aqui como editaveis.
+              Gerencie roles e remoção. Apenas o dono promove/rebaixa outros admins. Mods não aparecem aqui como editáveis.
             </p>
           </div>
           <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
@@ -320,7 +320,7 @@ export function GroupAdminPage() {
                 <button type="button" onClick={() => setProfileUserId(m.user_id)} className="min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm text-nerv-text transition-colors hover:text-nerv-orange">{name}</span>
-                    {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange">voce</span>}
+                    {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange">você</span>}
                     {isTargetOwner && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-magenta">dono</span>}
                   </div>
                   <div className={`font-mono text-[9px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
@@ -332,7 +332,7 @@ export function GroupAdminPage() {
                         onClick={() => {
                           const next = m.role === 'mod' ? 'admin' : 'mod'
                           if (next === 'admin' && !isOwner) {
-                            toast.error('so o dono pode promover a admin')
+                            toast.error('só o dono pode promover a admin')
                             return
                           }
                           promote.mutate({ userId: m.user_id, role: next })

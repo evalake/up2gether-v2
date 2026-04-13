@@ -64,7 +64,7 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
 
             <div className="border-b border-nerv-line/40 px-5 py-3">
               <div className="text-[11px] uppercase tracking-wider text-nerv-orange">
-                Audit da votacao
+                Audit da votação
               </div>
             </div>
 
@@ -253,7 +253,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                           className="inline-flex items-center gap-1.5 rounded-sm border border-nerv-orange/30 bg-nerv-orange/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange"
                         >
                           {g?.cover_url && (
-                            <img src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-4 w-7 rounded-[2px] object-cover" />
+                            <img loading="lazy" src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-4 w-7 rounded-[2px] object-cover" />
                           )}
                           {g?.name ?? 'removido'}
                         </span>
@@ -275,7 +275,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
       {non_voters.length > 0 && (
         <section>
           <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
-            Ainda nao votaram ({non_voters.length})
+            Ainda não votaram ({non_voters.length})
           </div>
           <div className="flex flex-wrap gap-2">
             {non_voters.map((p) => (

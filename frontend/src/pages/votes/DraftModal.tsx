@@ -72,7 +72,7 @@ export function DraftModal({
         </div>
         <div className="max-h-80 overflow-y-auto px-5 py-3">
           <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
-            <span>candidatos · {picked.length} selecionados {picked.length < 2 && '(minimo 2)'}</span>
+            <span>candidatos · {picked.length} selecionados {picked.length < 2 && '(mínimo 2)'}</span>
             {q && <span>{filtered.length} match{filtered.length === 1 ? '' : 'es'}</span>}
           </div>
           {filtered.length === 0 ? (
@@ -91,7 +91,7 @@ export function DraftModal({
                     on ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange' : 'border-nerv-line text-nerv-text transition-colors hover:border-nerv-orange/40'
                   }`}
                 >
-                  {cover && <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 shrink-0 rounded-sm object-cover" />}
+                  {cover && <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 shrink-0 rounded-sm object-cover" />}
                   <span className="truncate text-xs">{g.name}</span>
                 </button>
               )

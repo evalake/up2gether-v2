@@ -17,12 +17,17 @@ export function DiscordCallbackPage() {
     ran.current = true
     const code = params.get('code')
     if (!code) {
-      setError('codigo ausente na URL')
+      setError('código ausente na URL')
       return
     }
     discordCallback(code)
       .then((res) => {
         setToken(res.access_token)
+        // user novo ou sem onboarding completo -> wizard
+        if (!res.user.onboarding_completed) {
+          navigate('/onboarding', { replace: true })
+          return
+        }
         let next = '/'
         try {
           const stored = sessionStorage.getItem('u2g-auth-next')

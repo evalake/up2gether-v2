@@ -51,6 +51,16 @@ class GroupRepository:
         )
         return list(result.scalars().all())
 
+    async def count_members_batch(self, group_ids: list[uuid.UUID]) -> dict[uuid.UUID, int]:
+        if not group_ids:
+            return {}
+        result = await self.db.execute(
+            select(GroupMembership.group_id, func.count())
+            .where(GroupMembership.group_id.in_(group_ids))
+            .group_by(GroupMembership.group_id)
+        )
+        return {gid: cnt for gid, cnt in result.all()}
+
     async def count_members(self, group_id: uuid.UUID) -> int:
         result = await self.db.execute(
             select(func.count())

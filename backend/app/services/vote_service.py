@@ -515,12 +515,15 @@ class VoteService:
     ) -> dict[uuid.UUID, float]:
         member_count = max(await self.groups.count_members(group_id), 1)
         tiers = await self.games.member_tiers(group_id)
+        games = await self.games.get_by_ids(candidate_ids)
+        games_by_id = {g.id: g for g in games}
+        all_counts = await self.games.count_interests_batch(candidate_ids)
         out: dict[uuid.UUID, float] = {}
         for cid in candidate_ids:
-            game = await self.games.get_by_id(cid)
+            game = games_by_id.get(cid)
             if game is None:
                 continue
-            counts = await self.games.count_interests_by_signal(cid)
+            counts = all_counts.get(cid, {})
             score = calculate_viability(
                 ViabilityInput(
                     is_free=game.is_free,

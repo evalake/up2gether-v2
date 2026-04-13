@@ -173,14 +173,14 @@ export function CurrentGameHero({
                 onClick={() => navigate(`/groups/${groupId}/votes`)}
                 className="text-nerv-dim transition-colors hover:text-nerv-orange"
               >
-                votacao
+                votação
               </button>
             )}
             <button
               onClick={() => navigate(`/groups/${groupId}/history`)}
               className="text-nerv-dim transition-colors hover:text-nerv-orange"
             >
-              historico
+              histórico
             </button>
             {isAdmin && (
               <button

@@ -118,6 +118,27 @@ class GameRepository:
         )
         return {InterestSignal(s): int(c) for s, c in result.all()}
 
+    async def count_interests_batch(
+        self, game_ids: list[uuid.UUID]
+    ) -> dict[uuid.UUID, dict[InterestSignal, int]]:
+        if not game_ids:
+            return {}
+        result = await self.db.execute(
+            select(InterestSignalRow.game_id, InterestSignalRow.signal, func.count())
+            .where(InterestSignalRow.game_id.in_(game_ids))
+            .group_by(InterestSignalRow.game_id, InterestSignalRow.signal)
+        )
+        out: dict[uuid.UUID, dict[InterestSignal, int]] = {}
+        for gid, sig, cnt in result.all():
+            out.setdefault(gid, {})[InterestSignal(sig)] = int(cnt)
+        return out
+
+    async def get_by_ids(self, game_ids: list[uuid.UUID]) -> list[Game]:
+        if not game_ids:
+            return []
+        result = await self.db.execute(select(Game).where(Game.id.in_(game_ids)))
+        return list(result.scalars().all())
+
     # ---- roster ----
 
     async def upsert_roster(
@@ -200,14 +221,27 @@ class GameRepository:
         result = await self.db.execute(
             select(func.count())
             .select_from(SteamGameOwnership)
+            .join(Game, Game.id == SteamGameOwnership.game_id)
+            .join(
+                GroupMembership,
+                (GroupMembership.user_id == SteamGameOwnership.user_id)
+                & (GroupMembership.group_id == Game.group_id),
+            )
             .where(SteamGameOwnership.game_id == game_id)
         )
         return int(result.scalar_one())
 
     async def list_owners(self, game_id: uuid.UUID) -> list[User]:
+        # so retorna owners que sao membros do grupo do game
         result = await self.db.execute(
             select(User)
             .join(SteamGameOwnership, SteamGameOwnership.user_id == User.id)
+            .join(Game, Game.id == SteamGameOwnership.game_id)
+            .join(
+                GroupMembership,
+                (GroupMembership.user_id == User.id)
+                & (GroupMembership.group_id == Game.group_id),
+            )
             .where(SteamGameOwnership.game_id == game_id)
         )
         return list(result.scalars().all())

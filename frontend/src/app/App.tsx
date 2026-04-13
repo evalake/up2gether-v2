@@ -1,19 +1,21 @@
+import { lazy, Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '@/pages/LoginPage'
 import { DiscordCallbackPage } from '@/pages/DiscordCallbackPage'
-import { GroupsPage } from '@/pages/GroupsPage'
-import { GroupDetailPage } from '@/pages/GroupDetailPage'
-import { GroupAdminPage } from '@/pages/GroupAdminPage'
-import { GamesPage } from '@/pages/GamesPage'
-import { GameDetailPage } from '@/pages/GameDetailPage'
-import { VotesPage } from '@/pages/VotesPage'
-import { ThemesPage } from '@/pages/ThemesPage'
-import { SessionsPage } from '@/pages/SessionsPage'
-import { HistoryPage } from '@/pages/HistoryPage'
-import { SettingsPage } from '@/pages/SettingsPage'
-import { PublicSessionPage } from '@/pages/PublicSessionPage'
-import { Navigate } from 'react-router-dom'
+
+const GroupsPage = lazy(() => import('@/pages/GroupsPage').then(m => ({ default: m.GroupsPage })))
+const GroupDetailPage = lazy(() => import('@/pages/GroupDetailPage').then(m => ({ default: m.GroupDetailPage })))
+const GroupAdminPage = lazy(() => import('@/pages/GroupAdminPage').then(m => ({ default: m.GroupAdminPage })))
+const GamesPage = lazy(() => import('@/pages/GamesPage').then(m => ({ default: m.GamesPage })))
+const GameDetailPage = lazy(() => import('@/pages/GameDetailPage').then(m => ({ default: m.GameDetailPage })))
+const VotesPage = lazy(() => import('@/pages/VotesPage').then(m => ({ default: m.VotesPage })))
+const ThemesPage = lazy(() => import('@/pages/ThemesPage').then(m => ({ default: m.ThemesPage })))
+const SessionsPage = lazy(() => import('@/pages/SessionsPage').then(m => ({ default: m.SessionsPage })))
+const HistoryPage = lazy(() => import('@/pages/HistoryPage').then(m => ({ default: m.HistoryPage })))
+const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })))
+const PublicSessionPage = lazy(() => import('@/pages/PublicSessionPage').then(m => ({ default: m.PublicSessionPage })))
+const OnboardingPage = lazy(() => import('@/pages/OnboardingPage').then(m => ({ default: m.OnboardingPage })))
 import { RequireAuth } from './RequireAuth'
 import { Toaster } from '@/components/ui/Toaster'
 // SSE religado em modo seletivo: so "momentos grandes" (vote opened/closed,
@@ -45,11 +47,20 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <RealtimeBoot />
       <BrowserRouter>
+        <Suspense fallback={null}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/discord/callback" element={<DiscordCallbackPage />} />
           <Route path="/share/sessions/:id" element={<PublicSessionPage />} />
           <Route path="/" element={<Navigate to="/groups" replace />} />
+          <Route
+            path="/onboarding"
+            element={
+              <RequireAuth>
+                <OnboardingPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/groups"
             element={
@@ -131,6 +142,7 @@ export function App() {
             }
           />
         </Routes>
+        </Suspense>
         <Toaster />
       </BrowserRouter>
     </QueryClientProvider>

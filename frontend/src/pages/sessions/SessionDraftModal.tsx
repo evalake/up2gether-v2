@@ -159,7 +159,7 @@ export function SessionDraftModal({
                         }`}
                       >
                         {cover ? (
-                          <img src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 shrink-0 rounded-sm object-cover" />
+                          <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 shrink-0 rounded-sm object-cover" />
                         ) : (
                           <div className="h-6 w-10 shrink-0 rounded-sm bg-nerv-line/30" />
                         )}
@@ -178,7 +178,7 @@ export function SessionDraftModal({
             transition={{ delay: 0.16 }}
           >
             <div className="mb-1.5 text-[10px] uppercase tracking-wider text-nerv-dim">
-              titulo (opcional)
+              título (opcional)
             </div>
             <input
               value={title}

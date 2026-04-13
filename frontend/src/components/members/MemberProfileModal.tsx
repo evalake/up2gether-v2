@@ -154,7 +154,7 @@ function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<type
                 >
                   <div className="aspect-[3/4] overflow-hidden rounded-sm border border-nerv-orange/15 bg-black/40">
                     {w.cover_url ? (
-                      <img src={w.cover_url} alt="" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                      <img loading="lazy" src={w.cover_url} alt="" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
                       <div className="grid h-full place-items-center text-[9px] text-nerv-dim">sem capa</div>
                     )}
@@ -174,7 +174,7 @@ function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<type
                 <li key={s.id} className="flex items-center gap-2 rounded-sm border border-nerv-orange/10 bg-black/20 px-2 py-1.5 transition-colors hover:border-nerv-orange/30 hover:bg-black/30">
                   <div className="h-8 w-8 shrink-0 overflow-hidden rounded-sm border border-nerv-orange/15 bg-black/40">
                     {s.game_cover_url ? (
-                      <img src={s.game_cover_url} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" src={s.game_cover_url} alt="" className="h-full w-full object-cover" />
                     ) : null}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -222,7 +222,7 @@ function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<type
               </div>
               <div className="rounded-sm border border-nerv-orange/15 bg-black/30 px-2 py-1.5">
                 <div className="font-mono text-sm tabular-nums text-nerv-amber">{steam.group_hours_2weeks}h</div>
-                <div className="text-[9px] uppercase tracking-wider text-nerv-dim">ultimas 2 semanas</div>
+                <div className="text-[9px] uppercase tracking-wider text-nerv-dim">últimas 2 semanas</div>
               </div>
             </div>
 
@@ -233,7 +233,7 @@ function Body({ data, groupId, onNavigate }: { data: NonNullable<ReturnType<type
                   {steam.top_played.map((g) => (
                     <li key={g.game_id} className="flex items-center gap-2">
                       <div className="h-6 w-6 shrink-0 overflow-hidden rounded-sm border border-nerv-orange/15 bg-black/40">
-                        {g.cover_url ? <img src={g.cover_url} alt="" className="h-full w-full object-cover" /> : null}
+                        {g.cover_url ? <img loading="lazy" src={g.cover_url} alt="" className="h-full w-full object-cover" /> : null}
                       </div>
                       <span className="min-w-0 flex-1 truncate text-[11px] text-nerv-text">{g.name}</span>
                       <span className="font-mono text-[10px] tabular-nums text-nerv-orange">{g.hours}h</span>

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCreateGroup, useGroups } from '@/features/groups/hooks'
 import { fetchMyGuilds, type DiscordGuild } from '@/features/auth/api'
+import { api } from '@/lib/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -102,7 +103,7 @@ function GuildPickerModal({
                     className="flex w-full items-center gap-3 border-b border-nerv-line/60 px-4 py-2.5 text-left transition-colors hover:bg-nerv-orange/10 disabled:opacity-40 disabled:hover:bg-transparent"
                   >
                     {url ? (
-                      <img src={url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                      <img loading="lazy" src={url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 font-display text-sm text-nerv-orange">
                         {g.name.charAt(0).toUpperCase()}
@@ -138,6 +139,17 @@ export function GroupsPage() {
   const create = useCreateGroup()
   const [pickerOpen, setPickerOpen] = useState(false)
   const toast = useToast()
+  const qc = useQueryClient()
+
+  // auto-discover silencioso: tenta join em servers que ja existem no up2gether
+  const discovered = useRef(false)
+  useEffect(() => {
+    if (discovered.current || isLoading || !data) return
+    discovered.current = true
+    api<{ joined: { id: string }[] }>('/groups/auto-discover', { method: 'POST' })
+      .then((r) => { if (r.joined.length > 0) qc.invalidateQueries({ queryKey: ['groups'] }) })
+      .catch(() => {})
+  }, [data, isLoading, qc])
 
   const registered = useMemo(
     () => new Set((data ?? []).map((g) => g.discord_guild_id)),
@@ -215,6 +227,7 @@ export function GroupsPage() {
                 {(g.banner_url || g.icon_url) && (
                   <div className="pointer-events-none absolute inset-0">
                     <img
+                      loading="lazy"
                       src={g.banner_url || g.icon_url || ''}
                       alt=""
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
@@ -226,7 +239,7 @@ export function GroupsPage() {
                 <div className="relative mb-3 flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     {g.icon_url && (
-                      <img src={g.icon_url} alt="" className="h-8 w-8 rounded-sm border border-nerv-orange/30 object-cover" />
+                      <img loading="lazy" src={g.icon_url} alt="" className="h-8 w-8 rounded-sm border border-nerv-orange/30 object-cover" />
                     )}
                     <div className="font-display text-xl text-nerv-text">{g.name}</div>
                   </div>

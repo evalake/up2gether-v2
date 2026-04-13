@@ -31,14 +31,14 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
     setValue('')
     mut.mutate(null)
   }
-  const masked = current ? current.slice(0, 48) + '...' : '-- nao configurado'
+  const masked = current ? current.slice(0, 48) + '...' : '-- não configurado'
   return (
     <section className="rounded-sm border border-nerv-orange/20 bg-nerv-panel/30 p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Discord Webhook</div>
           <p className="mt-1 text-[11px] text-nerv-dim/80">
-            Usado pra avisar o servidor quando votacao abre ou sessao e agendada. Cole a URL de um webhook criado no canal do Discord.
+            Usado pra avisar o servidor quando votação abre ou sessão é agendada. Cole a URL de um webhook criado no canal do Discord.
           </p>
           {!editing && (
             <div className="mt-2 truncate font-mono text-[11px] text-nerv-text/80">{masked}</div>

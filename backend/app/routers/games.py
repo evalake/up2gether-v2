@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -108,11 +108,17 @@ async def leave_roster(
 @router.get("/games/{game_id}/owners")
 async def list_game_owners(
     game_id: uuid.UUID,
-    _: CurrentUser,
+    actor: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[dict]:
-    repo = GameRepository(db)
-    owners = await repo.list_owners(game_id)
+    game_repo = GameRepository(db)
+    game = await game_repo.get_by_id(game_id)
+    if game is None:
+        raise HTTPException(404, "game not found")
+    group_repo = GroupRepository(db)
+    if (await group_repo.get_membership(game.group_id, actor.id)) is None and not actor.is_sys_admin:
+        raise HTTPException(403, "not a member")
+    owners = await game_repo.list_owners(game_id)
     return [
         {
             "id": str(u.id),
