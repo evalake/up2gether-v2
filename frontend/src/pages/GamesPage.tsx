@@ -206,7 +206,7 @@ export function GamesPage() {
     e.preventDefault()
     if (!form.name) return
     try {
-      await create.mutateAsync({
+      const created = await create.mutateAsync({
         name: form.name,
         steam_appid: form.steam_appid ? Number(form.steam_appid) : null,
         cover_url: form.cover_url || null,
@@ -228,6 +228,7 @@ export function GamesPage() {
       setForm(emptyForm)
       setShowForm(false)
       toast.success('jogo adicionado')
+      navigate(`/groups/${id}/games/${created.id}`)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'falha ao criar jogo')
     }
