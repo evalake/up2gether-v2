@@ -12,6 +12,7 @@ BUILTIN_GAMES: list[dict] = [
         "name": "League of Legends",
         "aliases": ["lol", "league"],
         "source": "riot",
+        # ddragon e o CDN oficial da Riot, estavel desde 2012
         "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg",
         "description": "MOBA 5v5 competitivo da Riot Games. Escolha entre mais de 160 campeoes e destrua o Nexus inimigo.",
         "is_free": True,
@@ -27,7 +28,8 @@ BUILTIN_GAMES: list[dict] = [
         "name": "VALORANT",
         "aliases": ["val", "valo"],
         "source": "riot",
-        "cover_url": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt3484b18ab498efb5/649dc88b97a0bc0377014c23/Val_EP7_PlayVALORANT_ContentStackThumbnail_1200x625_B2.png",
+        # valorant-api.com - CDN publica estavel, splash do mapa Ascent
+        "cover_url": "https://media.valorant-api.com/maps/7eaecc1b-4337-bbf6-6ab9-04b8f06b3319/splash.png",
         "description": "FPS tatico 5v5 com agentes e habilidades unicas. Plante a spike e domine o mapa.",
         "is_free": True,
         "genres": ["FPS", "Tatico"],
@@ -42,7 +44,8 @@ BUILTIN_GAMES: list[dict] = [
         "name": "Teamfight Tactics",
         "aliases": ["tft"],
         "source": "riot",
-        "cover_url": "https://images.contentstack.io/v3/assets/blt76b5e73bfd1451ea/blt8b4ab8644c098a6c/60c7a135b83c3c0d68b2021b/TFT_generic_background.jpg",
+        # ddragon splash tematico (TFT usa campeoes de LoL)
+        "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/AurelionSol_0.jpg",
         "description": "Auto battler da Riot. Monte seu comp, posicione seus campeoes e venca os 7 oponentes.",
         "is_free": True,
         "genres": ["Auto Battler", "Estrategia"],
@@ -57,7 +60,8 @@ BUILTIN_GAMES: list[dict] = [
         "name": "Legends of Runeterra",
         "aliases": ["lor", "runeterra"],
         "source": "riot",
-        "cover_url": "https://images.contentstack.io/v3/assets/blta38dcaae86f2ef5c/blt27a63c07c8471754/60a2572e6bf3b10f55e3140b/lor-backgrounds-desktop.jpg",
+        # ddragon splash (LoR usa personagens de Runeterra)
+        "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ezreal_0.jpg",
         "description": "Card game estrategico no universo de League of Legends.",
         "is_free": True,
         "genres": ["Card Game", "Estrategia"],
@@ -72,7 +76,8 @@ BUILTIN_GAMES: list[dict] = [
         "name": "League of Legends: Wild Rift",
         "aliases": ["wr", "wild rift"],
         "source": "riot",
-        "cover_url": "https://images.contentstack.io/v3/assets/blt370612131b6e0756/blt3e5141a0a057a935/60ee3a2b4a53ef13e4999391/WR_Meta_Thumbnail.jpg",
+        # ddragon splash (Wild Rift usa mesmos campeoes)
+        "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg",
         "description": "Versao mobile/console de League of Legends. MOBA 5v5 com partidas de ~15 minutos.",
         "is_free": True,
         "genres": ["MOBA", "Estrategia"],
@@ -87,6 +92,7 @@ BUILTIN_GAMES: list[dict] = [
         "name": "Fortnite",
         "aliases": ["fort", "fn"],
         "source": "epic",
+        # unreal CDN - bloqueia bots mas browsers carregam normal
         "cover_url": "https://cdn2.unrealengine.com/social-image-chapter4-s3-3840x2160-d35912cc25ad.jpg",
         "description": "Battle royale ate 100 jogadores com construcao, armas e modos criativos.",
         "is_free": True,
@@ -125,3 +131,12 @@ def search_builtin(query: str) -> list[dict]:
 
 def get_builtin_by_slug(slug: str) -> dict | None:
     return _BY_SLUG.get(slug)
+
+
+def get_builtin_by_name(name: str) -> dict | None:
+    """Busca por nome exato (case-insensitive)."""
+    q = name.lower().strip()
+    for g in BUILTIN_GAMES:
+        if g["name"].lower() == q:
+            return g
+    return None

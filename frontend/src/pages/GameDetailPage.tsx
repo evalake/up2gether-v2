@@ -18,7 +18,7 @@ import { EnergyBar } from '@/components/nerv/EnergyBar'
 import { Avatar } from '@/components/nerv/Avatar'
 import { useToast } from '@/components/ui/toast'
 import { formatPlayers } from '@/lib/players'
-import { steamGetDetails } from '@/features/steam/api'
+import { steamGetDetails, builtinGetDetails } from '@/features/steam/api'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import { SIGNALS, STAGES, TIERS } from '@/lib/constants'
 import { useTitle } from '@/lib/useTitle'
@@ -45,6 +45,7 @@ export function GameDetailPage() {
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
   const [edit, setEdit] = useState({
     name: '',
+    cover_url: '',
     description: '',
     is_free: false,
     price_current: '',
@@ -57,6 +58,7 @@ export function GameDetailPage() {
     if (!game.data) return
     setEdit({
       name: game.data.name,
+      cover_url: game.data.cover_url ?? '',
       description: game.data.description ?? '',
       is_free: game.data.is_free,
       price_current: game.data.price_current?.toString() ?? '',
@@ -71,6 +73,7 @@ export function GameDetailPage() {
     try {
       await update.mutateAsync({
         name: edit.name,
+        cover_url: edit.cover_url || null,
         description: edit.description || null,
         is_free: edit.is_free,
         price_current: edit.is_free ? 0 : edit.price_current ? Number(edit.price_current) : null,
@@ -115,6 +118,30 @@ export function GameDetailPage() {
     }
   }
 
+  // slug derivado do nome pra buscar no catalogo built-in
+  const builtinSlug = g.source && g.source !== 'steam' && g.source !== 'manual'
+    ? g.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    : null
+
+  const refreshFromCatalog = async () => {
+    if (!builtinSlug) return
+    try {
+      const b = await builtinGetDetails(builtinSlug, g.name)
+      await update.mutateAsync({
+        cover_url: b.cover_url,
+        description: b.description ?? g.description,
+        player_min: b.player_min ?? g.player_min,
+        player_max: b.player_max ?? g.player_max,
+        min_hardware_tier: b.min_hardware_tier ?? g.min_hardware_tier,
+        developer: b.developer ?? g.developer,
+        release_date: b.release_date ?? g.release_date,
+      })
+      toast.success('atualizado do catalogo')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'falha ao atualizar')
+    }
+  }
+
   const setStage = async (s: GameStage) => {
     try {
       await update.mutateAsync({ stage: s })
@@ -131,6 +158,9 @@ export function GameDetailPage() {
         <div className="flex gap-3">
           {g.steam_appid && (
             <button onClick={refreshFromSteam} className="transition-colors hover:text-nerv-orange">atualizar da steam</button>
+          )}
+          {builtinSlug && (
+            <button onClick={refreshFromCatalog} className="transition-colors hover:text-nerv-orange">atualizar do catalogo</button>
           )}
           {canManage && (
             <button onClick={editing ? () => setEditing(false) : startEdit} className="transition-colors hover:text-nerv-orange">
@@ -170,6 +200,18 @@ export function GameDetailPage() {
               placeholder="nome"
               className="h-8 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
             />
+            <div className="flex items-center gap-2">
+              {edit.cover_url && (
+                <img src={edit.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+              )}
+              <input
+                value={edit.cover_url}
+                maxLength={500}
+                onChange={(e) => setEdit({ ...edit, cover_url: e.target.value })}
+                placeholder="url da capa (imagem)"
+                className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
+              />
+            </div>
             <textarea
               value={edit.description}
               maxLength={2000}
@@ -298,6 +340,9 @@ export function GameDetailPage() {
                 </span>
               )}
               {g.steam_appid && <span>steam #{g.steam_appid}</span>}
+              {g.source && g.source !== 'steam' && (
+                <span className="rounded-sm border border-nerv-magenta/40 bg-nerv-magenta/10 px-1.5 py-0.5 text-nerv-magenta">{g.source}</span>
+              )}
               <span>jogadores {formatPlayers(g.player_min, g.player_max, g.tags)}</span>
               <span>hardware {g.min_hardware_tier}</span>
             </div>
@@ -467,6 +512,7 @@ export function GameDetailPage() {
               <dt className="text-nerv-dim">hardware</dt>
               <dd className="text-right text-nerv-amber">{g.min_hardware_tier}</dd>
               {g.steam_appid && <><dt className="text-nerv-dim">steam id</dt><dd className="text-right text-nerv-orange tabular-nums">{g.steam_appid}</dd></>}
+              {g.source && <><dt className="text-nerv-dim">fonte</dt><dd className="text-right text-nerv-magenta">{g.source}</dd></>}
             </dl>
           </section>
         </div>

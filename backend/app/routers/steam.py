@@ -132,10 +132,14 @@ async def steam_game(
 async def builtin_game_details(
     slug: str,
     _: CurrentUser,
+    name: Annotated[str | None, Query()] = None,
 ) -> dict:
-    from app.integrations.builtin_catalog import get_builtin_by_slug
+    from app.integrations.builtin_catalog import get_builtin_by_name, get_builtin_by_slug
 
     details = get_builtin_by_slug(slug)
+    # fallback: busca por nome (pra quando o slug derivado nao bate)
+    if not details and name:
+        details = get_builtin_by_name(name)
     if not details:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "jogo nao encontrado no catalogo")
     return details

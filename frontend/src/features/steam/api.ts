@@ -52,5 +52,7 @@ export const steamSearch = (q: string) =>
 export const steamGetDetails = (appid: number) =>
   api<SteamGameDetails>(`/steam/game/${appid}`)
 
-export const builtinGetDetails = (slug: string) =>
-  api<BuiltinGameDetails>(`/steam/builtin/${slug}`)
+export const builtinGetDetails = (slug: string, name?: string) => {
+  const params = name ? `?name=${encodeURIComponent(name)}` : ''
+  return api<BuiltinGameDetails>(`/steam/builtin/${slug}${params}`)
+}
