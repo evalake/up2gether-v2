@@ -44,8 +44,10 @@ async def test_steam_search(app, client, make_user, auth_headers):
     res = await client.get("/api/steam/search?q=cs", headers=auth_headers(user))
     assert res.status_code == 200, res.text
     body = res.json()
-    assert len(body) == 2
-    assert body[0]["appid"] == 730
+    # builtin catalog pode retornar hits extras, entao checa >= 2
+    assert len(body) >= 2
+    steam_appids = [r["appid"] for r in body if r["appid"] is not None]
+    assert 730 in steam_appids
 
 
 async def test_steam_search_requires_auth(client):
