@@ -212,10 +212,14 @@ async def import_library(
 
     # marca ownership so em games de grupos que o user faz parte
     user_group_ids = (
-        await db.execute(
-            select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+        (
+            await db.execute(
+                select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     matches = (
         (
             await db.execute(
@@ -323,10 +327,14 @@ async def sync_steam(
     _fm(actor, "settings")
 
     sync_group_ids = (
-        await db.execute(
-            select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+        (
+            await db.execute(
+                select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     matches = (
         (
             await db.execute(

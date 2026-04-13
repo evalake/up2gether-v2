@@ -116,7 +116,9 @@ async def list_game_owners(
     if game is None:
         raise HTTPException(404, "game not found")
     group_repo = GroupRepository(db)
-    if (await group_repo.get_membership(game.group_id, actor.id)) is None and not actor.is_sys_admin:
+    if (
+        await group_repo.get_membership(game.group_id, actor.id)
+    ) is None and not actor.is_sys_admin:
         raise HTTPException(403, "not a member")
     owners = await game_repo.list_owners(game_id)
     return [

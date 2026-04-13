@@ -71,11 +71,12 @@ async def auto_discover_groups(
         return {"joined": [], "available": []}
     # acha quais desses guilds ja existem no up2gether
     from sqlalchemy import select as sa_select
+
     rows = (
-        await db.execute(
-            sa_select(Group).where(Group.discord_guild_id.in_(guild_ids))
-        )
-    ).scalars().all()
+        (await db.execute(sa_select(Group).where(Group.discord_guild_id.in_(guild_ids))))
+        .scalars()
+        .all()
+    )
     repo = GroupRepository(db)
     joined = []
     for grp in rows:
@@ -91,8 +92,14 @@ async def auto_discover_groups(
     for g in raw_guilds:
         if str(g["id"]) not in existing_ids:
             icon_hash = g.get("icon")
-            icon_url = f"https://cdn.discordapp.com/icons/{g['id']}/{icon_hash}.png?size=128" if icon_hash else None
-            available.append({"discord_guild_id": str(g["id"]), "name": g["name"], "icon_url": icon_url})
+            icon_url = (
+                f"https://cdn.discordapp.com/icons/{g['id']}/{icon_hash}.png?size=128"
+                if icon_hash
+                else None
+            )
+            available.append(
+                {"discord_guild_id": str(g["id"]), "name": g["name"], "icon_url": icon_url}
+            )
     return {"joined": joined, "available": available}
 
 

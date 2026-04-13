@@ -239,8 +239,7 @@ class GameRepository:
             .join(Game, Game.id == SteamGameOwnership.game_id)
             .join(
                 GroupMembership,
-                (GroupMembership.user_id == User.id)
-                & (GroupMembership.group_id == Game.group_id),
+                (GroupMembership.user_id == User.id) & (GroupMembership.group_id == Game.group_id),
             )
             .where(SteamGameOwnership.game_id == game_id)
         )
