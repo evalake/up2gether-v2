@@ -45,6 +45,9 @@ dump.rdb
 .vercel
 .fly/
 
+# generated
+screenshots/
+
 # local-only (ferramentas, notas, rascunhos)
 .claude/
 CLAUDE.md
