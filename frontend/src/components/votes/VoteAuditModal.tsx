@@ -126,6 +126,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
             <img
               src={winner.cover_url}
               alt=""
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
               className="h-12 w-20 rounded-sm border border-nerv-green/30 object-cover"
             />
           )}
@@ -194,6 +195,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                   <img
                     src={g.cover_url}
                     alt=""
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                     className="h-8 w-14 shrink-0 rounded-sm object-cover"
                   />
                 )}
@@ -242,14 +244,17 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                   </div>
                 </div>
                 {v.approvals.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1 pl-10">
+                  <div className="mt-2 flex flex-wrap gap-1.5 pl-10">
                     {v.approvals.map((gid) => {
                       const g = gameById(gid)
                       return (
                         <span
                           key={gid}
-                          className="rounded-sm border border-nerv-orange/30 bg-nerv-orange/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange"
+                          className="inline-flex items-center gap-1.5 rounded-sm border border-nerv-orange/30 bg-nerv-orange/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange"
                         >
+                          {g?.cover_url && (
+                            <img src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-4 w-7 rounded-[2px] object-cover" />
+                          )}
                           {g?.name ?? 'removido'}
                         </span>
                       )

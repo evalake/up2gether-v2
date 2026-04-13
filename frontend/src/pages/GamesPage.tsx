@@ -238,7 +238,7 @@ export function GamesPage() {
 
       {showForm && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="rounded-sm border border-nerv-orange/30 bg-nerv-panel/40 p-5 shadow-lg shadow-black/20">
+          <div className="rounded-sm border border-nerv-orange/40 bg-nerv-panel/60 p-5 shadow-lg shadow-black/30">
             <div className="mb-4 text-[11px] uppercase tracking-wider text-nerv-dim">novo jogo</div>
             <form onSubmit={onSubmit} className="space-y-4">
               {/* Steam search compacto */}
