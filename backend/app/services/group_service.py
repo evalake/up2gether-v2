@@ -12,6 +12,7 @@ from app.models.user import User
 from app.repositories.group_repo import GroupRepository
 from app.schemas.group import GroupMembershipResponse, GroupResponse, GroupWithStats
 from app.schemas.user import UserResponse
+from app.services.events import EVENT_GROUP_CREATED, EVENT_GROUP_JOINED, track_event
 
 
 def _forbid(detail: str) -> HTTPException:
@@ -68,6 +69,12 @@ class GroupService:
             membership = await self.repo.get_membership(existing.id, actor.id)
             if membership is None:
                 await self.repo.add_member(existing, actor.id, GroupRole.MEMBER)
+                await track_event(
+                    self.repo.db,
+                    EVENT_GROUP_JOINED,
+                    user_id=actor.id,
+                    group_id=existing.id,
+                )
             await self._sync_steam_ownership(actor, existing.id)
             return GroupResponse.model_validate(existing)
 
@@ -77,6 +84,13 @@ class GroupService:
             icon_url=icon_url,
             webhook_url=webhook_url,
             owner_user_id=actor.id,
+        )
+        await track_event(
+            self.repo.db,
+            EVENT_GROUP_CREATED,
+            user_id=actor.id,
+            group_id=group.id,
+            payload={"discord_guild_id": discord_guild_id},
         )
         await self._sync_steam_ownership(actor, group.id)
         return GroupResponse.model_validate(group)

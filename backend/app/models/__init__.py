@@ -1,5 +1,6 @@
 """Importar todos os models aqui pra Base.metadata os enxergar em create_all e Alembic autogenerate."""
 
+from app.models.event import Event
 from app.models.game import (
     Game,
     GameRosterMembership,
@@ -14,6 +15,7 @@ from app.models.user import IntegrationAccount, User, UserHardwareProfile
 from app.models.vote import VoteBallot, VoteSession
 
 __all__ = [
+    "Event",
     "Game",
     "GameRosterMembership",
     "Group",
