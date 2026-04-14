@@ -138,6 +138,18 @@ export function Shell({ children }: { children: ReactNode }) {
             )
           })}
           {inGroup && <GroupContext groupId={inGroup} />}
+          {me.data?.is_sys_admin && (
+            <Link
+              to="/admin/metrics"
+              className={`mt-2 block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-all ${
+                loc.pathname.startsWith('/admin')
+                  ? 'border-nerv-red bg-nerv-red/10 text-nerv-red'
+                  : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-red/40 hover:bg-nerv-red/5 hover:text-nerv-red'
+              }`}
+            >
+              metrics
+            </Link>
+          )}
         </nav>
 
         <div className="border-t border-nerv-orange/20 p-3">
