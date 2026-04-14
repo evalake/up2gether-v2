@@ -15,18 +15,18 @@ export function LegalLayout({
       <header className="border-b border-nerv-line bg-black/40 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-3 transition-colors hover:text-nerv-orange">
-            <img src="/up2gether-logo.png" alt="up2gether" className="h-8 w-auto" />
-            <span className="font-display text-lg text-nerv-orange">up2gether</span>
+            <img src="/up2gether-logo.png" alt="Up2Gether" className="h-8 w-auto" />
+            <span className="font-display text-lg text-nerv-orange">Up2Gether</span>
           </Link>
           <nav className="flex items-center gap-4 text-[11px] uppercase tracking-widest">
             <Link to="/privacy" className="transition-colors hover:text-nerv-orange">
-              privacidade
+              Privacidade
             </Link>
             <Link to="/terms" className="transition-colors hover:text-nerv-orange">
-              termos
+              Termos
             </Link>
             <Link to="/login" className="transition-colors hover:text-nerv-orange">
-              entrar
+              Entrar
             </Link>
           </nav>
         </div>
@@ -41,9 +41,9 @@ export function LegalLayout({
         </div>
 
         <footer className="mt-16 border-t border-nerv-line pt-6 text-[10px] uppercase tracking-widest text-nerv-dim/70">
-          operado por YURI DA SILVA AMARAL, CNPJ 48.127.326/0001-00, Campo Grande, MS.
+          Operado por Yuri da Silva Amaral, CNPJ 48.127.326/0001-00, Campo Grande/MS.
           <br />
-          contato: <a href="mailto:contato@up2gether.com.br" className="text-nerv-orange hover:underline">contato@up2gether.com.br</a>
+          Contato: <a href="mailto:contato@up2gether.com.br" className="text-nerv-orange hover:underline">contato@up2gether.com.br</a>
         </footer>
       </main>
     </div>

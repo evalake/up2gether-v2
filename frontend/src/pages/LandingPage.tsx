@@ -17,21 +17,21 @@ export function LandingPage() {
       <header className="relative border-b border-nerv-line bg-black/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/up2gether-logo.png" alt="up2gether" className="h-8 w-auto" />
-            <span className="font-display text-lg text-nerv-orange">up2gether</span>
+            <img src="/up2gether-logo.png" alt="Up2Gether" className="h-8 w-auto" />
+            <span className="font-display text-lg text-nerv-orange">Up2Gether</span>
           </Link>
           <nav className="hidden items-center gap-6 text-[11px] uppercase tracking-widest sm:flex">
             <a href="#como-funciona" className="transition-colors hover:text-nerv-orange">
-              como funciona
+              Como funciona
             </a>
-            <a href="#features" className="transition-colors hover:text-nerv-orange">
-              recursos
+            <a href="#recursos" className="transition-colors hover:text-nerv-orange">
+              Recursos
             </a>
             <a href="#faq" className="transition-colors hover:text-nerv-orange">
-              faq
+              FAQ
             </a>
             <a href={discordLoginUrl()} className="text-nerv-orange transition-colors hover:text-nerv-amber">
-              entrar
+              Entrar
             </a>
           </nav>
         </div>
@@ -41,14 +41,14 @@ export function LandingPage() {
         {/* hero */}
         <section className="mx-auto max-w-5xl px-6 pt-20 pb-24 text-center">
           <div className="mb-4 text-[10px] uppercase tracking-[0.4em] text-nerv-amber">
-            pra comunidades discord que jogam junto
+            Para comunidades Discord que jogam juntas
           </div>
           <h1 className="font-display text-5xl leading-tight text-nerv-orange sm:text-6xl">
-            pare de perder 30min<br />decidindo o que jogar
+            Pare de perder 30 minutos<br />decidindo o que jogar
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-nerv-dim">
-            votacao rapida, agenda compartilhada, compatibilidade automatica de biblioteca.
-            tudo integrado ao discord que teu grupo ja usa.
+            Votação rápida, agenda compartilhada e compatibilidade automática de biblioteca.
+            Tudo integrado ao Discord que o seu grupo já usa.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -56,7 +56,7 @@ export function LandingPage() {
               href={discordLoginUrl()}
               className="w-full rounded-sm border border-nerv-orange bg-nerv-orange/10 px-8 py-3 text-sm uppercase tracking-widest text-nerv-orange transition-colors hover:bg-nerv-orange/20 sm:w-auto"
             >
-              entrar com discord
+              Entrar com Discord
             </a>
             <a
               href={BOT_INVITE_URL}
@@ -64,12 +64,12 @@ export function LandingPage() {
               rel="noopener noreferrer"
               className="w-full rounded-sm border border-nerv-line bg-black/40 px-8 py-3 text-sm uppercase tracking-widest text-nerv-dim transition-colors hover:border-nerv-orange hover:text-nerv-orange sm:w-auto"
             >
-              adicionar bot no servidor
+              Adicionar bot no servidor
             </a>
           </div>
 
           <div className="mt-6 text-[10px] uppercase tracking-widest text-nerv-dim/70">
-            gratis enquanto durar a fase de testes
+            Gratuito durante a fase de testes
           </div>
         </section>
 
@@ -78,81 +78,81 @@ export function LandingPage() {
           <div className="mx-auto max-w-5xl px-6">
             <div className="mb-12 text-center">
               <div className="mb-2 text-[10px] uppercase tracking-[0.4em] text-nerv-amber">
-                tres passos
+                Três passos
               </div>
-              <h2 className="font-display text-3xl text-nerv-orange">como funciona</h2>
+              <h2 className="font-display text-3xl text-nerv-orange">Como funciona</h2>
             </div>
 
             <div className="grid gap-8 sm:grid-cols-3">
               <div className="rounded-sm border border-nerv-line bg-black/40 p-6">
                 <div className="font-display text-4xl text-nerv-orange/60">01</div>
                 <div className="mt-3 font-display text-lg text-nerv-orange">
-                  conecta o discord
+                  Conecte o Discord
                 </div>
                 <p className="mt-2 text-sm leading-relaxed">
-                  login com OAuth. o servidor onde voce e admin vira um grupo no up2gether em
-                  um clique.
+                  Login via OAuth. O servidor onde você é administrador vira um grupo no
+                  Up2Gether em um clique.
                 </p>
               </div>
 
               <div className="rounded-sm border border-nerv-line bg-black/40 p-6">
                 <div className="font-display text-4xl text-nerv-orange/60">02</div>
                 <div className="mt-3 font-display text-lg text-nerv-orange">
-                  sincroniza a biblioteca
+                  Sincronize a biblioteca
                 </div>
                 <p className="mt-2 text-sm leading-relaxed">
-                  conecta a steam pra saber quem tem o que. opcional mas elimina o "eu nao
-                  tenho esse jogo" em cada votacao.
+                  Conecte a sua Steam para saber quem tem cada jogo. É opcional, mas elimina
+                  o "eu não tenho esse jogo" em cada votação.
                 </p>
               </div>
 
               <div className="rounded-sm border border-nerv-line bg-black/40 p-6">
                 <div className="font-display text-4xl text-nerv-orange/60">03</div>
                 <div className="mt-3 font-display text-lg text-nerv-orange">
-                  abre uma votacao
+                  Abra uma votação
                 </div>
                 <p className="mt-2 text-sm leading-relaxed">
-                  sistema de eliminacao multi-rodada. o grupo decide rapido e o up2gether
-                  avisa todo mundo no discord.
+                  Sistema de eliminação em múltiplas rodadas. O grupo decide rápido e o
+                  Up2Gether notifica todos pelo Discord.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* features */}
-        <section id="features" className="mx-auto max-w-5xl px-6 py-20">
+        {/* recursos */}
+        <section id="recursos" className="mx-auto max-w-5xl px-6 py-20">
           <div className="mb-12 text-center">
             <div className="mb-2 text-[10px] uppercase tracking-[0.4em] text-nerv-amber">
-              o que tem dentro
+              O que tem dentro
             </div>
-            <h2 className="font-display text-3xl text-nerv-orange">recursos</h2>
+            <h2 className="font-display text-3xl text-nerv-orange">Recursos</h2>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
             <FeatureCard
-              title="votacao multi-rodada"
-              body="sistema de eliminacao 30/15/7/3/2 que converge rapido. chega de thread de discord com 40 mensagens pra decidir coop de sabado."
+              title="Votação em múltiplas rodadas"
+              body="Sistema de eliminação 30/15/7/3/2 que converge rápido. Chega de thread no Discord com quarenta mensagens para decidir o coop de sábado."
             />
             <FeatureCard
-              title="agenda compartilhada"
-              body="cria sessao com data, duracao e participantes. integracao opcional com google calendar pra lembrete automatico."
+              title="Agenda compartilhada"
+              body="Crie sessões com data, duração e participantes. Integração opcional com Google Calendar para lembrete automático."
             />
             <FeatureCard
-              title="compatibilidade steam"
-              body="sabe na hora quem tem o jogo, quem jogou recentemente e quanto tempo. para de perder tempo com jogo que metade nao tem."
+              title="Compatibilidade Steam"
+              body="Veja na hora quem tem cada jogo, quem jogou recentemente e quanto tempo dedicou. Nunca mais escolha um jogo que metade do grupo não possui."
             />
             <FeatureCard
-              title="bot discord"
-              body="slash commands nativos no servidor. /up2gether mostra resumo do grupo sem sair do discord."
+              title="Bot Discord oficial"
+              body="Slash commands nativos no servidor. Digite /up2gether para ver o resumo do grupo sem sair do Discord."
             />
             <FeatureCard
-              title="temas e seasons"
-              body="organiza fases do grupo tipo 'mes de coop-horror' com vencedor decidido por votacao cega."
+              title="Temas e temporadas"
+              body="Organize fases do grupo, como um 'mês de coop e terror', com vencedor decidido por votação cega."
             />
             <FeatureCard
-              title="historia de sessoes"
-              body="ve o que o grupo jogou, quantas horas, com quem. boa pra retomar jogo largado ou negociar a proxima campanha."
+              title="Histórico de sessões"
+              body="Veja o que o grupo jogou, quantas horas e com quem. Ótimo para retomar um jogo deixado de lado ou planejar a próxima campanha."
             />
           </div>
         </section>
@@ -162,39 +162,43 @@ export function LandingPage() {
           <div className="mx-auto max-w-3xl px-6">
             <div className="mb-12 text-center">
               <div className="mb-2 text-[10px] uppercase tracking-[0.4em] text-nerv-amber">
-                perguntas comuns
+                Perguntas frequentes
               </div>
-              <h2 className="font-display text-3xl text-nerv-orange">faq</h2>
+              <h2 className="font-display text-3xl text-nerv-orange">FAQ</h2>
             </div>
 
             <div className="space-y-6">
-              <FaqItem q="e gratis?">
-                durante a fase de testes, tudo gratis pra qualquer grupo. quando lancarmos
-                planos pagos, grupos que ja estao usando ficam em tarifa legada pra sempre.
+              <FaqItem q="É gratuito?">
+                Durante a fase de testes, é gratuito para qualquer grupo. Quando lançarmos
+                planos pagos, os grupos que já estiverem em uso ficarão em uma tarifa legada,
+                sem cobrança, para sempre.
               </FaqItem>
-              <FaqItem q="precisa instalar alguma coisa?">
-                nao. funciona no navegador. o bot discord e opcional mas recomendado, serve
-                pra comandos rapidos dentro do servidor.
+              <FaqItem q="Preciso instalar alguma coisa?">
+                Não. Funciona direto no navegador. O bot do Discord é opcional, mas
+                recomendado, pois permite comandos rápidos dentro do próprio servidor.
               </FaqItem>
-              <FaqItem q="voces leem mensagens do discord?">
-                nao. a gente nunca le conteudo de chat. so usamos o discord pra identidade
-                (quem voce e) e pra saber de quais servidores voce faz parte. detalhes na{' '}
+              <FaqItem q="Vocês leem mensagens do Discord?">
+                Não. Nunca acessamos o conteúdo de chat. Usamos o Discord apenas para
+                identidade (saber quem é você) e para listar os servidores dos quais você
+                faz parte. Os detalhes estão na{' '}
                 <Link to="/privacy" className="text-nerv-orange hover:underline">
-                  politica de privacidade
+                  Política de Privacidade
                 </Link>
                 .
               </FaqItem>
-              <FaqItem q="preciso conectar a steam?">
-                nao. e opcional, mas ajuda muito na hora de votar jogo (sabe quem tem o que).
-                da pra usar o up2gether sem steam, marcando manual os jogos que o grupo quer.
+              <FaqItem q="Preciso conectar a Steam?">
+                Não é obrigatório. A conexão é opcional, mas ajuda muito na hora da votação,
+                pois o app sabe quem tem cada jogo. Você pode usar o Up2Gether sem Steam,
+                marcando manualmente os jogos desejados.
               </FaqItem>
-              <FaqItem q="funciona pra jogos fora da steam?">
-                sim. riot (lol, valorant), epic (fortnite) e outros principais estao no
-                catalogo. jogos custom da pra adicionar manualmente.
+              <FaqItem q="Funciona para jogos fora da Steam?">
+                Sim. Títulos da Riot (League of Legends, Valorant), Epic Games (Fortnite) e
+                outros grandes estão no catálogo. Jogos fora desse conjunto podem ser
+                adicionados manualmente.
               </FaqItem>
-              <FaqItem q="posso sair e apagar meus dados?">
-                sim, a qualquer momento. em configuracoes voce solicita exclusao e os dados
-                sao apagados em ate 30 dias. direito garantido pela LGPD.
+              <FaqItem q="Posso sair e apagar meus dados?">
+                Sim, a qualquer momento. Em Configurações você solicita a exclusão e os
+                dados são apagados em até 30 dias. Esse é um direito garantido pela LGPD.
               </FaqItem>
             </div>
           </div>
@@ -203,18 +207,18 @@ export function LandingPage() {
         {/* cta final */}
         <section className="mx-auto max-w-4xl px-6 py-20 text-center">
           <h2 className="font-display text-3xl text-nerv-orange">
-            comeca agora
+            Comece agora
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed">
-            leva um minuto pra conectar o discord e criar o primeiro grupo. sem cartao,
-            sem trial, sem letra miuda.
+            Leva um minuto para conectar o Discord e criar o primeiro grupo. Sem cartão,
+            sem período de avaliação e sem letra miúda.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href={discordLoginUrl()}
               className="w-full rounded-sm border border-nerv-orange bg-nerv-orange/10 px-8 py-3 text-sm uppercase tracking-widest text-nerv-orange transition-colors hover:bg-nerv-orange/20 sm:w-auto"
             >
-              entrar com discord
+              Entrar com Discord
             </a>
           </div>
         </section>
@@ -224,24 +228,24 @@ export function LandingPage() {
         <div className="mx-auto max-w-6xl px-6 py-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
-              <img src="/up2gether-logo.png" alt="up2gether" className="h-6 w-auto opacity-80" />
+              <img src="/up2gether-logo.png" alt="Up2Gether" className="h-6 w-auto opacity-80" />
               <div className="text-[10px] uppercase tracking-widest text-nerv-dim/70">
-                coordena, vota e joga junto
+                Coordene, vote e jogue junto
               </div>
             </div>
 
             <nav className="flex flex-wrap items-center gap-5 text-[11px] uppercase tracking-widest">
               <Link to="/privacy" className="transition-colors hover:text-nerv-orange">
-                privacidade
+                Privacidade
               </Link>
               <Link to="/terms" className="transition-colors hover:text-nerv-orange">
-                termos
+                Termos
               </Link>
               <a
                 href="mailto:contato@up2gether.com.br"
                 className="transition-colors hover:text-nerv-orange"
               >
-                contato
+                Contato
               </a>
               <a
                 href={BOT_INVITE_URL}
@@ -249,13 +253,13 @@ export function LandingPage() {
                 rel="noopener noreferrer"
                 className="transition-colors hover:text-nerv-orange"
               >
-                adicionar bot
+                Adicionar bot
               </a>
             </nav>
           </div>
 
           <div className="mt-6 border-t border-nerv-line pt-4 text-[10px] uppercase tracking-widest text-nerv-dim/50">
-            operado por yuri da silva amaral, cnpj 48.127.326/0001-00, campo grande/ms
+            Operado por Yuri da Silva Amaral, CNPJ 48.127.326/0001-00, Campo Grande/MS
           </div>
         </div>
       </footer>

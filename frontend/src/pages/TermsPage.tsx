@@ -2,175 +2,198 @@ import { LegalLayout } from './LegalLayout'
 
 export function TermsPage() {
   return (
-    <LegalLayout title="Termos de Uso" subtitle="ultima atualizacao: 14 de abril de 2026">
+    <LegalLayout title="Termos de Uso" subtitle="Última atualização: 14 de abril de 2026">
       <p>
-        Esses sao os termos que regem o uso do up2gether. Ao criar conta ou usar o servico
-        voce aceita essas regras. Se nao concordar, pare de usar.
+        Estes são os termos que regulam o uso do Up2Gether. Ao criar uma conta ou utilizar
+        o serviço, você concorda com estas regras. Caso não concorde, interrompa o uso.
       </p>
 
       <p>
-        O up2gether e operado por <strong>Yuri da Silva Amaral</strong>, CNPJ 48.127.326/0001-00,
-        com sede em Campo Grande/MS.
+        O Up2Gether é operado por <strong>Yuri da Silva Amaral</strong>, inscrito sob o CNPJ
+        48.127.326/0001-00, com sede em Campo Grande/MS.
       </p>
 
-      <h2>1. O que e o up2gether</h2>
+      <h2>1. Sobre o serviço</h2>
 
       <p>
-        up2gether e uma plataforma web que ajuda comunidades Discord a coordenar sessoes de
-        jogo: votacao de jogos, agendamento, compatibilidade de biblioteca, presenca. O acesso
-        se da via OAuth do Discord.
+        O Up2Gether é uma plataforma web destinada a auxiliar comunidades do Discord na
+        coordenação de sessões de jogo: votação de jogos, agendamento, verificação de
+        compatibilidade de biblioteca e acompanhamento de presença. O acesso é feito por
+        meio de autenticação OAuth do Discord.
       </p>
 
       <p>
-        O servico e oferecido <strong>como esta</strong> e <strong>conforme disponivel</strong>.
-        A gente faz o possivel pra manter tudo no ar e funcionando, mas nao garante
-        disponibilidade ininterrupta nem ausencia de bugs.
+        O serviço é fornecido <strong>"como está"</strong> e <strong>"conforme
+        disponível"</strong>. Empenhamos todos os esforços razoáveis para manter a
+        plataforma no ar e funcionando, mas não garantimos disponibilidade ininterrupta
+        nem ausência total de falhas.
       </p>
 
       <h2>2. Conta e elegibilidade</h2>
 
       <ul>
-        <li>Pra usar, voce precisa ter no minimo 13 anos</li>
-        <li>Uma conta e pessoal e intransferivel</li>
-        <li>Voce e responsavel por manter tua conta Discord segura</li>
+        <li>É necessário ter, no mínimo, 13 anos de idade para utilizar o serviço;</li>
+        <li>A conta é pessoal e intransferível;</li>
+        <li>Você é responsável por manter a segurança da sua conta do Discord;</li>
         <li>
-          Se voce e admin de um grupo, concorda com esses termos em nome do grupo tambem
+          Se você é administrador de um grupo, concorda com estes termos também em nome do
+          grupo que administra.
         </li>
       </ul>
 
-      <h2>3. Uso aceitavel</h2>
+      <h2>3. Uso aceitável</h2>
 
-      <p>Voce concorda em <strong>nao</strong>:</p>
+      <p>Você concorda em <strong>não</strong>:</p>
 
       <ul>
-        <li>Usar o servico pra atividades ilegais ou que violem direitos de terceiros</li>
         <li>
-          Fazer scraping, bot automatizado, ataque de carga, exploit ou reverse engineering do
-          servico
+          Utilizar o serviço para atividades ilegais ou que violem direitos de terceiros;
         </li>
         <li>
-          Criar contas falsas, se passar por outra pessoa ou manipular votacoes/agendamentos
+          Realizar scraping, operar bots automatizados, gerar carga excessiva, explorar
+          vulnerabilidades ou aplicar engenharia reversa ao serviço;
         </li>
         <li>
-          Publicar conteudo ofensivo, discriminatorio, que incite violencia ou viole direitos
-          autorais
+          Criar contas falsas, se passar por outra pessoa ou manipular votações e
+          agendamentos;
         </li>
         <li>
-          Tentar acessar dados de outros usuarios sem autorizacao
+          Publicar conteúdo ofensivo, discriminatório, que incite violência ou que viole
+          direitos autorais;
         </li>
         <li>
-          Revender, sublicenciar ou reembalar o servico sem acordo comercial especifico
+          Tentar acessar dados de outros usuários sem autorização;
+        </li>
+        <li>
+          Revender, sublicenciar ou distribuir o serviço sem um acordo comercial
+          específico.
         </li>
       </ul>
 
       <p>
-        A gente pode suspender ou encerrar tua conta sem aviso previo se identificarmos
-        violacao dessas regras.
+        Podemos suspender ou encerrar a sua conta, sem aviso prévio, caso seja identificada
+        violação destas regras.
       </p>
 
-      <h2>4. Conteudo do usuario</h2>
+      <h2>4. Conteúdo do usuário</h2>
 
       <p>
-        Tudo que voce publica no up2gether (nome de grupo, notas em jogos, comentarios em
-        sessao, temas) continua sendo teu. Voce concede pro up2gether uma licenca nao
-        exclusiva, mundial e gratuita pra exibir esse conteudo dentro do proprio servico, no
-        contexto do grupo.
+        Todo o conteúdo publicado por você no Up2Gether (nome de grupo, anotações em jogos,
+        comentários em sessão, temas) continua sendo de sua propriedade. Você concede ao
+        Up2Gether uma licença não exclusiva, mundial e gratuita para exibir esse conteúdo
+        dentro do próprio serviço, no contexto do respectivo grupo.
       </p>
 
       <p>
-        Voce e responsavel pelo que posta. Se o conteudo violar direitos de terceiros ou essas
-        regras, a gente pode remover e, dependendo do caso, encerrar a conta.
+        Você é responsável pelo conteúdo que publica. Caso o conteúdo viole direitos de
+        terceiros ou estes termos, podemos removê-lo e, conforme o caso, encerrar a conta.
       </p>
 
-      <h2>5. Integracoes de terceiros</h2>
+      <h2>5. Integrações com terceiros</h2>
 
       <p>
-        O up2gether se integra com Discord, Steam e Google Calendar. Quando voce usa essas
-        integracoes, tambem concorda com os termos deles. Interrupcoes, mudancas ou bloqueios
-        dessas plataformas podem afetar o up2gether e nao sao responsabilidade nossa.
+        O Up2Gether integra-se com Discord, Steam e Google Calendar. Ao utilizar essas
+        integrações, você também concorda com os respectivos termos de uso de cada
+        plataforma. Interrupções, alterações ou bloqueios em serviços de terceiros podem
+        afetar o Up2Gether e não configuram responsabilidade nossa.
       </p>
 
-      <h2>6. Planos pagos e cobranca</h2>
+      <h2>6. Planos pagos e cobrança</h2>
 
       <p>
-        Atualmente o servico e oferecido sem custo. No futuro pode existir planos pagos com
-        limites e features expandidos. Quando houver cobranca:
+        Atualmente, o serviço é oferecido sem custo. No futuro, poderão existir planos
+        pagos com limites e funcionalidades ampliados. Quando houver cobrança:
       </p>
 
       <ul>
-        <li>Os precos serao informados com clareza antes de qualquer pagamento</li>
-        <li>Pagamentos processados por <strong>Stripe</strong> e/ou <strong>Mercado Pago</strong></li>
+        <li>Os preços serão informados com clareza antes de qualquer pagamento;</li>
         <li>
-          A cobranca e por <strong>grupo</strong>, com base no numero de membros ativos,
-          conforme a <a href="/">pagina de precos</a>
+          Os pagamentos serão processados por <strong>Stripe</strong> e/ou
+          <strong> Mercado Pago</strong>;
         </li>
-        <li>Voce pode cancelar a qualquer momento</li>
         <li>
-          Grupos criados ate a data do lancamento do plano pago ficam em uma tarifa legada e
-          nao sao forcados a migrar
+          A cobrança será feita <strong>por grupo</strong>, com base no número de membros
+          ativos, conforme descrito na página de preços;
+        </li>
+        <li>O cancelamento poderá ser feito a qualquer momento;</li>
+        <li>
+          Os grupos criados até a data oficial de lançamento do plano pago permanecerão em
+          uma tarifa legada e não serão migrados compulsoriamente.
         </li>
       </ul>
 
       <h2>7. Propriedade intelectual</h2>
 
       <p>
-        O nome up2gether, o codigo-fonte, o design, os textos, a marca e o bot sao de nossa
-        propriedade. Voce nao recebe nenhuma licenca sobre eles alem do uso normal do servico.
+        O nome Up2Gether, o código-fonte, o design, os textos, a marca e o bot são de nossa
+        propriedade. Nenhuma licença sobre esses elementos é concedida ao usuário além do
+        uso regular do serviço.
       </p>
 
       <p>
-        Steam, Discord, Riot Games, Epic Games e demais marcas mencionadas pertencem aos seus
-        respectivos donos. A gente nao e afiliada, patrocinada nem endossada por elas.
+        Steam, Discord, Riot Games, Epic Games e demais marcas mencionadas pertencem aos
+        seus respectivos titulares. O Up2Gether não é afiliado, patrocinado nem endossado
+        por essas empresas.
       </p>
 
       <h2>8. Encerramento</h2>
 
       <p>
-        Voce pode encerrar tua conta a qualquer momento em <strong>Configuracoes</strong> ou
-        enviando pedido pra <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>.
-        Apos a exclusao, teus dados pessoais sao apagados em ate 30 dias, exceto o que a lei
-        obriga a manter.
+        Você pode encerrar a sua conta a qualquer momento, por meio da seção
+        <strong> Configurações</strong> ou mediante solicitação enviada para{' '}
+        <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>. Após o
+        pedido de exclusão, os seus dados pessoais são apagados em até 30 dias,
+        ressalvado o que a lei obriga a manter.
       </p>
 
       <p>
-        A gente pode encerrar ou suspender o servico (todo ou em parte) com aviso previo de 30
-        dias. Em caso de violacao grave dessas regras, podemos encerrar imediatamente.
+        Podemos encerrar ou suspender o serviço, parcial ou totalmente, mediante aviso
+        prévio de 30 dias. Em caso de violação grave destes termos, o encerramento pode
+        ocorrer de forma imediata.
       </p>
 
-      <h2>9. Limitacao de responsabilidade</h2>
+      <h2>9. Limitação de responsabilidade</h2>
 
       <p>
-        Na maxima extensao permitida pela lei, a gente nao e responsavel por:
+        Na máxima extensão permitida pela legislação aplicável, o Up2Gether não será
+        responsável por:
       </p>
 
       <ul>
-        <li>Perdas indiretas, lucros cessantes ou danos morais decorrentes do uso do servico</li>
-        <li>Indisponibilidade temporaria, perda de dados por falha de terceiros ou forca maior</li>
         <li>
-          Conflitos entre usuarios dentro dos grupos (a gente e plataforma, nao mediadora)
+          Perdas indiretas, lucros cessantes ou danos morais decorrentes do uso do serviço;
+        </li>
+        <li>
+          Indisponibilidade temporária, perda de dados causada por falha de terceiros ou
+          hipóteses de caso fortuito e força maior;
+        </li>
+        <li>
+          Conflitos entre usuários dentro dos grupos (atuamos como plataforma, não como
+          mediadora).
         </li>
       </ul>
 
       <p>
-        A responsabilidade total do up2gether em qualquer situacao nao excedera o valor pago
-        por voce nos 12 meses anteriores ao evento que originou o pedido. Se o servico for
-        gratuito pra voce, o limite e simbolico (R$ 100).
+        A responsabilidade total do Up2Gether, em qualquer hipótese, fica limitada ao valor
+        pago pelo usuário nos 12 meses anteriores ao evento que deu origem à demanda. Caso
+        o serviço seja gratuito para você, esse limite é simbólico, fixado em R$ 100,00.
       </p>
 
-      <h2>10. Mudancas nesses termos</h2>
+      <h2>10. Alterações destes termos</h2>
 
       <p>
-        A gente pode atualizar esses termos. Mudancas relevantes sao comunicadas por email e
-        no proprio app com pelo menos 30 dias de antecedencia. Continuar usando apos o prazo
-        significa aceitacao.
+        Estes termos podem ser atualizados. Alterações relevantes serão comunicadas por
+        email e dentro do próprio aplicativo com, pelo menos, 30 dias de antecedência. O
+        uso continuado do serviço após o prazo indica aceitação das novas condições.
       </p>
 
-      <h2>11. Lei aplicavel e foro</h2>
+      <h2>11. Lei aplicável e foro</h2>
 
       <p>
-        Esses termos sao regidos pelas leis da Republica Federativa do Brasil. Fica eleito o
-        foro da Comarca de <strong>Campo Grande/MS</strong> pra dirimir qualquer disputa, com
-        renuncia a qualquer outro, por mais privilegiado que seja.
+        Estes termos são regidos pelas leis da República Federativa do Brasil. Fica eleito
+        o foro da Comarca de <strong>Campo Grande/MS</strong> para dirimir quaisquer
+        controvérsias, com renúncia expressa a qualquer outro, por mais privilegiado que
+        seja.
       </p>
 
       <h2>12. Contato</h2>

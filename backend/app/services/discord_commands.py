@@ -34,12 +34,12 @@ def register_commands(client: discord.Client) -> app_commands.CommandTree:
 
     @tree.command(
         name="up2gether",
-        description="Resumo rapido do servidor no up2gether",
+        description="Resumo rápido do servidor no Up2Gether",
     )
     async def up2gether_cmd(interaction: discord.Interaction) -> None:
         if interaction.guild_id is None:
             await interaction.response.send_message(
-                "Esse comando so funciona dentro de um servidor.", ephemeral=True
+                "Este comando só funciona dentro de um servidor.", ephemeral=True
             )
             return
 
@@ -56,10 +56,11 @@ def register_commands(client: discord.Client) -> app_commands.CommandTree:
 
             if group is None:
                 embed = discord.Embed(
-                    title="up2gether",
+                    title="Up2Gether",
                     description=(
-                        f"Esse servidor ainda nao esta registrado.\n"
-                        f"Entra em **{base_url}** e loga com Discord pra criar o grupo."
+                        f"Este servidor ainda não está registrado.\n"
+                        f"Acesse **{base_url}** e faça login com o Discord "
+                        f"para criar o grupo."
                     ),
                     color=0xEF7C00,
                 )
@@ -101,16 +102,16 @@ def register_commands(client: discord.Client) -> app_commands.CommandTree:
                 )
             ).scalar_one()
 
-        legacy_tag = " (legacy)" if group.legacy_free else ""
+        legacy_tag = " (plano legado)" if group.legacy_free else ""
         embed = discord.Embed(
             title=f"{group.name}{legacy_tag}",
             url=f"{base_url}/groups/{group.id}",
             color=0xEF7C00,
         )
         embed.add_field(name="Membros ativos", value=str(seats), inline=True)
-        embed.add_field(name="Votacoes abertas", value=str(open_votes), inline=True)
-        embed.add_field(name="Sessoes futuras", value=str(upcoming), inline=True)
-        embed.set_footer(text="up2gether")
+        embed.add_field(name="Votações abertas", value=str(open_votes), inline=True)
+        embed.add_field(name="Sessões futuras", value=str(upcoming), inline=True)
+        embed.set_footer(text="Up2Gether")
 
         await interaction.followup.send(embed=embed, ephemeral=True)
 

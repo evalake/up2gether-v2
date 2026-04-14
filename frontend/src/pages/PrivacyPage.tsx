@@ -2,197 +2,211 @@ import { LegalLayout } from './LegalLayout'
 
 export function PrivacyPage() {
   return (
-    <LegalLayout title="Politica de Privacidade" subtitle="ultima atualizacao: 14 de abril de 2026">
+    <LegalLayout title="Política de Privacidade" subtitle="Última atualização: 14 de abril de 2026">
       <p>
-        Essa politica explica como o up2gether coleta, usa, guarda e compartilha os teus
-        dados pessoais. A plataforma e operada por <strong>Yuri da Silva Amaral</strong>,
-        inscrito no CNPJ 48.127.326/0001-00, com endereco em Av. Afonso Pena 4785, Sala 701,
-        Edif. The Place Corporate, Campo Grande/MS, CEP 79.031-010 ("nos", "up2gether").
-        Se voce usa o up2gether, voce concorda com essa politica.
+        Esta política explica como o Up2Gether coleta, usa, armazena e compartilha os seus
+        dados pessoais. A plataforma é operada por <strong>Yuri da Silva Amaral</strong>,
+        inscrito sob o CNPJ 48.127.326/0001-00, com endereço na Avenida Afonso Pena, 4785,
+        Sala 701, Edifício The Place Corporate, Campo Grande/MS, CEP 79.031-010 ("nós",
+        "Up2Gether"). Ao utilizar o Up2Gether, você concorda com esta política.
       </p>
 
       <p>
-        A gente segue a <strong>Lei Geral de Protecao de Dados (LGPD, Lei 13.709/2018)</strong>.
-        Se voce tiver qualquer duvida ou quiser exercer um direito seu, manda email pra{' '}
+        Seguimos integralmente a <strong>Lei Geral de Proteção de Dados (LGPD, Lei nº
+        13.709/2018)</strong>. Em caso de dúvida ou para exercer qualquer direito como
+        titular, entre em contato pelo email{' '}
         <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>.
       </p>
 
-      <h2>1. O que a gente coleta</h2>
+      <h2>1. Dados que coletamos</h2>
 
       <h3>1.1 Dados do Discord (OAuth)</h3>
       <p>
-        Pra logar voce usa a conta Discord. Quando voce autoriza, o Discord compartilha com a gente:
+        O acesso à plataforma é feito por meio da sua conta Discord. Ao autorizar o login, o
+        Discord compartilha conosco as seguintes informações:
       </p>
       <ul>
-        <li>ID numerico do Discord (identificador unico, publico)</li>
-        <li>Username e display name</li>
-        <li>Avatar (URL)</li>
-        <li>Lista dos servidores (guilds) que voce faz parte, pra encontrar o grupo no up2gether</li>
+        <li>Identificador numérico do Discord (público e único);</li>
+        <li>Nome de usuário e nome de exibição;</li>
+        <li>URL do avatar;</li>
+        <li>
+          Lista dos servidores (guilds) dos quais você faz parte, utilizada apenas para
+          localizar o grupo correspondente no Up2Gether.
+        </li>
       </ul>
       <p>
-        A gente <strong>nao recebe</strong> tua senha do Discord, teu email, mensagens privadas
-        nem historico de chat.
+        <strong>Não recebemos</strong> a sua senha do Discord, o seu email, mensagens
+        privadas ou histórico de conversas.
       </p>
 
-      <h3>1.2 Dados do Steam (opcional)</h3>
+      <h3>1.2 Dados da Steam (opcional)</h3>
       <p>
-        Se voce escolher conectar a conta Steam, a gente consulta a API publica do Steam pra
-        ler tua biblioteca de jogos. Isso e opcional e serve pra calcular compatibilidade de
-        jogos entre membros do grupo. Voce pode desconectar a qualquer momento.
+        Caso você escolha conectar a sua conta Steam, consultamos a API pública da Valve
+        para ler a sua biblioteca de jogos. Essa integração é opcional e serve para calcular
+        a compatibilidade de títulos entre os membros do grupo. Você pode desconectar a
+        qualquer momento.
       </p>
 
       <h3>1.3 Dados do Google Calendar (opcional)</h3>
       <p>
-        Se voce autorizar, a gente cria eventos no teu Google Calendar quando voce participa
-        de sessoes agendadas. So escrevemos eventos que voce confirmou, nunca lemos tua agenda
-        pessoal.
+        Se você autorizar, criamos eventos no seu Google Calendar referentes às sessões
+        agendadas em que você confirma presença. Nunca lemos a sua agenda pessoal;
+        escrevemos apenas os eventos que você autorizou.
       </p>
 
       <h3>1.4 Dados de uso</h3>
       <p>
-        A gente guarda informacoes sobre como voce usa o app: grupos que criou/entrou, votos
-        que deu, sessoes em que participou, horario dos eventos. Isso serve pra mostrar pra
-        voce o proprio historico, calcular estatisticas do grupo e melhorar o produto.
+        Armazenamos informações sobre como você utiliza o aplicativo: grupos que criou ou
+        dos quais participa, votos registrados, sessões em que participou e horários dos
+        eventos. Esses dados servem para apresentar o seu histórico, calcular estatísticas
+        do grupo e melhorar o produto.
       </p>
 
-      <h3>1.5 Dados tecnicos</h3>
+      <h3>1.5 Dados técnicos</h3>
       <p>
-        Logs de servidor contem: endereco IP, user agent (navegador), timestamp e rota
-        acessada. Sao usados pra seguranca, detectar abuso e depurar bugs. Ficam guardados
-        por no maximo 90 dias.
+        Os registros de servidor incluem endereço IP, identificação do navegador (user
+        agent), carimbo de tempo e rota acessada. São utilizados para segurança, detecção
+        de abuso e diagnóstico de falhas, sendo mantidos por no máximo 90 dias.
       </p>
 
       <p>
-        A gente <strong>nao usa</strong> cookies de rastreamento de terceiros. Nao tem Google
-        Analytics, Meta Pixel nem afins. O unico cookie ou armazenamento local que a gente usa
-        e um token de sessao pra manter voce logado.
+        <strong>Não utilizamos</strong> cookies de rastreamento de terceiros. Não há Google
+        Analytics, Meta Pixel ou ferramentas similares. O único armazenamento local que
+        utilizamos é um token de sessão, necessário para manter você autenticado.
       </p>
 
-      <h2>2. Por que a gente coleta (base legal)</h2>
+      <h2>2. Bases legais para o tratamento</h2>
 
       <ul>
         <li>
-          <strong>Execucao de contrato (art. 7, V da LGPD):</strong> dados do Discord, grupos,
-          votos, sessoes, biblioteca Steam sao necessarios pra entregar o servico que voce pediu.
+          <strong>Execução de contrato (art. 7º, V, da LGPD):</strong> dados do Discord,
+          grupos, votos, sessões e biblioteca Steam são necessários para a prestação do
+          serviço contratado.
         </li>
         <li>
-          <strong>Consentimento (art. 7, I):</strong> conexao com Google Calendar, notificacoes
-          push, integracoes opcionais. Voce pode revogar a qualquer momento.
+          <strong>Consentimento (art. 7º, I):</strong> conexão com Google Calendar,
+          notificações push e demais integrações opcionais. O consentimento pode ser
+          revogado a qualquer momento.
         </li>
         <li>
-          <strong>Legitimo interesse (art. 7, IX):</strong> logs tecnicos pra seguranca e
-          deteccao de abuso.
+          <strong>Legítimo interesse (art. 7º, IX):</strong> registros técnicos para fins
+          de segurança e prevenção de fraude.
         </li>
       </ul>
 
-      <h2>3. Com quem a gente compartilha</h2>
+      <h2>3. Compartilhamento de dados</h2>
 
       <p>
-        A gente <strong>nao vende</strong> teus dados. Nao compartilha com anunciantes. Os
-        unicos terceiros que recebem parte dos teus dados sao os fornecedores que a gente usa
-        pra operar o servico:
+        <strong>Não vendemos</strong> os seus dados, tampouco os compartilhamos com
+        anunciantes. Os únicos terceiros que recebem parte dos dados são os fornecedores
+        que operam a infraestrutura do serviço:
       </p>
 
       <ul>
+        <li><strong>Discord:</strong> provedor de identidade e do bot;</li>
+        <li><strong>Valve (Steam):</strong> quando você conecta a biblioteca;</li>
+        <li><strong>Google:</strong> quando você conecta o Google Calendar;</li>
         <li>
-          <strong>Discord</strong> (provedor de identidade e bot)
+          <strong>Vercel</strong> (hospedagem do frontend), <strong>Fly.io</strong>
+          {' '}(hospedagem do backend) e <strong>Neon</strong> (banco de dados PostgreSQL);
         </li>
-        <li>
-          <strong>Valve (Steam)</strong>, quando voce conecta biblioteca
-        </li>
-        <li>
-          <strong>Google</strong>, quando voce conecta Calendar
-        </li>
-        <li>
-          <strong>Vercel</strong> (hospedagem frontend), <strong>Fly.io</strong> (hospedagem
-          backend), <strong>Neon</strong> (banco Postgres)
-        </li>
-        <li>
-          <strong>Cloudflare</strong> (CDN, DNS e protecao contra abuso)
-        </li>
+        <li><strong>Cloudflare:</strong> CDN, DNS e proteção contra abuso.</li>
       </ul>
 
       <p>
-        Esses fornecedores acessam teus dados apenas pra operar o servico que contratamos, sob
-        contratos de confidencialidade. Alguns processam dados fora do Brasil (EUA,
-        principalmente). Quando isso acontece, a gente se certifica que a transferencia segue
-        o Capitulo V da LGPD.
+        Esses fornecedores acessam os dados exclusivamente para operar o serviço
+        contratado, sob contratos de confidencialidade. Alguns deles realizam o
+        processamento fora do território nacional (principalmente nos Estados Unidos).
+        Quando há transferência internacional, garantimos o cumprimento do Capítulo V da
+        LGPD.
       </p>
 
       <p>
-        A gente tambem pode divulgar dados se for obrigado por ordem judicial ou requisicao
-        legal valida.
+        Também podemos divulgar dados mediante ordem judicial ou requisição legal válida.
       </p>
 
-      <h2>4. Quanto tempo a gente guarda</h2>
+      <h2>4. Prazo de retenção</h2>
 
       <ul>
-        <li>Conta ativa: enquanto voce usar o servico</li>
-        <li>Depois que voce excluir a conta: 30 dias pra backups, depois apagado</li>
-        <li>Logs tecnicos: 90 dias</li>
+        <li>Conta ativa: enquanto você utilizar o serviço;</li>
         <li>
-          Dados de faturamento (se voce virar pagante no futuro): 5 anos, por obrigacao fiscal
+          Após solicitação de exclusão da conta: 30 dias de retenção em backup, e depois
+          apagamento definitivo;
+        </li>
+        <li>Registros técnicos: 90 dias;</li>
+        <li>
+          Dados fiscais e de faturamento (caso você se torne assinante no futuro): 5 anos,
+          por obrigação legal.
         </li>
       </ul>
 
-      <h2>5. Teus direitos</h2>
+      <h2>5. Direitos do titular</h2>
 
       <p>
-        A LGPD garante que voce pode, a qualquer momento:
+        A LGPD assegura, a qualquer momento, o direito de:
       </p>
 
       <ul>
-        <li>Saber quais dados a gente tem sobre voce</li>
-        <li>Corrigir dados incorretos ou desatualizados</li>
-        <li>Pedir pra apagar teus dados (exceto quando a lei obriga a guardar)</li>
-        <li>Levar teus dados pra outro servico (portabilidade)</li>
-        <li>Revogar consentimento pras integracoes opcionais</li>
+        <li>Saber quais dados mantemos sobre você;</li>
+        <li>Corrigir dados incorretos ou desatualizados;</li>
         <li>
-          Reclamar na <strong>Autoridade Nacional de Protecao de Dados (ANPD)</strong>
+          Solicitar a exclusão dos seus dados (ressalvadas as hipóteses de guarda legal
+          obrigatória);
+        </li>
+        <li>Solicitar a portabilidade dos dados para outro serviço;</li>
+        <li>Revogar o consentimento das integrações opcionais;</li>
+        <li>
+          Apresentar reclamação à <strong>Autoridade Nacional de Proteção de Dados
+          (ANPD)</strong>.
         </li>
       </ul>
 
       <p>
-        Pra exercer qualquer direito, manda email pra{' '}
-        <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>. Respondemos em
-        ate 15 dias.
+        Para exercer qualquer um desses direitos, envie um email para{' '}
+        <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>. O prazo de
+        resposta é de até 15 dias.
       </p>
 
-      <h2>6. Seguranca</h2>
+      <h2>6. Segurança</h2>
 
       <p>
-        Senhas: a gente nao guarda senha do Discord, Google nem Steam, voce loga no provedor e
-        recebemos so um token. Comunicacao sempre em HTTPS. Banco com backup automatico e
-        acesso restrito. Se acontecer um incidente que afete teus dados, a gente avisa voce e
-        a ANPD no prazo legal.
+        Não armazenamos senhas de Discord, Google ou Steam; o login ocorre diretamente no
+        provedor e recebemos apenas um token de acesso. Todas as comunicações são feitas
+        via HTTPS. O banco de dados possui backups automáticos e acesso restrito. Em caso
+        de incidente que afete os seus dados, comunicaremos você e a ANPD dentro do prazo
+        legal.
       </p>
 
-      <h2>7. Criancas</h2>
+      <h2>7. Crianças e adolescentes</h2>
 
       <p>
-        O up2gether nao e direcionado pra menores de 13 anos. Se voce tem entre 13 e 18, pedimos
-        que use com autorizacao de responsavel. Se descobrirmos que coletamos dados de menor
-        de 13 sem autorizacao, apagamos imediatamente.
+        O Up2Gether não é destinado a menores de 13 anos. Para usuários entre 13 e 18 anos,
+        recomendamos o uso com autorização do responsável legal. Caso identifiquemos coleta
+        de dados de menores de 13 anos sem autorização, a exclusão é imediata.
       </p>
 
-      <h2>8. Mudancas nessa politica</h2>
+      <h2>8. Alterações desta política</h2>
 
       <p>
-        Se a gente mudar essa politica de forma relevante, avisa por email e no proprio app
-        com pelo menos 30 dias de antecedencia. Mudancas menores (correcao de digitacao, link
-        quebrado) entram em vigor imediatamente e ficam registradas pela data de "ultima
-        atualizacao" no topo.
+        Em caso de alteração relevante nesta política, você será notificado por email e
+        dentro do próprio aplicativo com, pelo menos, 30 dias de antecedência. Ajustes
+        menores (correções ortográficas ou de links quebrados) entram em vigor
+        imediatamente, e a data de "última atualização" no topo do documento reflete essa
+        revisão.
       </p>
 
       <h2>9. Contato</h2>
 
       <p>
-        Duvida, reclamacao, pedido: <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>.
-        A gente responde em ate 5 dias uteis pra casos gerais e 15 dias pra pedidos de LGPD.
+        Para dúvidas, reclamações ou solicitações, escreva para{' '}
+        <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>. Nosso
+        prazo de resposta é de até 5 dias úteis para solicitações gerais e 15 dias para
+        pedidos relacionados à LGPD.
       </p>
 
       <p>
-        Encarregado de Dados (DPO): Yuri da Silva Amaral, mesmo email acima.
+        Encarregado pelo Tratamento de Dados Pessoais (DPO): Yuri da Silva Amaral, pelo
+        mesmo canal acima.
       </p>
     </LegalLayout>
   )
