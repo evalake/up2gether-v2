@@ -9,6 +9,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.jobs.theme_cycle_cron import auto_open_theme_cycles
 from app.routers import (
+    admin,
     auth,
     events,
     games,
@@ -91,6 +92,7 @@ def create_app() -> FastAPI:
     app.include_router(notifications.router, prefix="/api")
     app.include_router(google.router, prefix="/api")
     app.include_router(events.router, prefix="/api")
+    app.include_router(admin.router, prefix="/api")
     return app
 
 

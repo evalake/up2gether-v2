@@ -1,0 +1,80 @@
+"""Tests do endpoint de metrics (observability read side)."""
+
+from __future__ import annotations
+
+import pytest
+
+from app.core.config import get_settings
+from app.services.events import (
+    EVENT_MEMBER_ACTIVATED,
+    EVENT_SESSION_CREATED,
+    EVENT_VOTE_CAST,
+    track_event,
+)
+
+pytestmark = pytest.mark.asyncio
+
+
+@pytest.fixture
+def as_sys_admin(monkeypatch):
+    """Injeta discord_id do user como sys admin no settings cached."""
+
+    def _setup(discord_id: str) -> None:
+        settings = get_settings()
+        current = list(settings.sys_admin_discord_ids)
+        if discord_id not in current:
+            monkeypatch.setattr(
+                settings, "sys_admin_discord_ids", [*current, discord_id], raising=False
+            )
+
+    return _setup
+
+
+async def test_metrics_endpoint_requires_sys_admin(make_user, auth_headers, client):
+    user = await make_user(username="regular")
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(user))
+    assert res.status_code == 403
+
+
+async def test_metrics_endpoint_returns_counts(
+    make_user, auth_headers, client, db_session, as_sys_admin
+):
+    admin = await make_user(discord_id="admin-1", username="boss")
+    as_sys_admin(admin.discord_id)
+
+    # semeia events: 2 session_created, 3 vote_cast, 1 member_activated
+    for _ in range(2):
+        await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id)
+    for _ in range(3):
+        await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id)
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=admin.id)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["totals"][EVENT_SESSION_CREATED] == 2
+    assert body["totals"][EVENT_VOTE_CAST] == 3
+    assert body["totals"][EVENT_MEMBER_ACTIVATED] == 1
+    assert body["last_7d"][EVENT_VOTE_CAST] == 3
+    assert body["seats_activated"] == 1
+
+
+async def test_metrics_seats_counts_distinct_users(
+    make_user, auth_headers, client, db_session, as_sys_admin
+):
+    admin = await make_user(discord_id="admin-2", username="boss2")
+    as_sys_admin(admin.discord_id)
+
+    u1 = await make_user(discord_id="u1", username="u1")
+    u2 = await make_user(discord_id="u2", username="u2")
+
+    # u1 ativa uma vez, u2 ativa duas (nao devia, mas so pra testar distinct)
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=u1.id)
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=u2.id)
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=u2.id)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    assert res.json()["seats_activated"] == 2
