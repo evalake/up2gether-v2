@@ -28,3 +28,6 @@ export const getMySettings = () => api<SettingsResponse>('/users/me/settings')
 
 export const patchMySettings = (input: SettingsUpdate) =>
   api<SettingsResponse>('/users/me/settings', { method: 'PATCH', body: input })
+
+export const deleteMyAccount = () =>
+  api<void>('/users/me', { method: 'DELETE' })

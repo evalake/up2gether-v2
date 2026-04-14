@@ -54,3 +54,11 @@ class UserService:
         await self.db.commit()
         await self.db.refresh(actor)
         return await self.get_settings(actor)
+
+    async def delete_account(self, actor: User) -> None:
+        # artefatos pessoais cascata via FK (memberships, ballots, rsvps,
+        # integrations, notifications, hardware). groups onde ele era owner
+        # ficam com owner_user_id = NULL (SET NULL). created_by de votes,
+        # sessions, themes tambem vai pra NULL -- historico preservado.
+        await self.db.delete(actor)
+        await self.db.commit()

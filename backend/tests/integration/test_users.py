@@ -74,3 +74,20 @@ async def test_patch_settings_merges(make_user, auth_headers, client):
 async def test_settings_requires_auth(client):
     res = await client.get("/api/users/me/settings")
     assert res.status_code == 401
+
+
+async def test_delete_account_removes_user(make_user, auth_headers, client):
+    user = await make_user(username="del")
+    headers = auth_headers(user)
+
+    res = await client.delete("/api/users/me", headers=headers)
+    assert res.status_code == 204
+
+    # token antigo nao resolve mais (user nao existe)
+    res2 = await client.get("/api/users/me/settings", headers=headers)
+    assert res2.status_code == 401
+
+
+async def test_delete_account_requires_auth(client):
+    res = await client.delete("/api/users/me")
+    assert res.status_code == 401

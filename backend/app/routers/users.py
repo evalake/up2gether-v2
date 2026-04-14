@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -44,3 +44,11 @@ async def patch_my_settings(
     service: Annotated[UserService, Depends(get_user_service)],
 ) -> SettingsResponse:
     return await service.update_settings(actor, payload)
+
+
+@router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_my_account(
+    actor: CurrentUser,
+    service: Annotated[UserService, Depends(get_user_service)],
+) -> None:
+    await service.delete_account(actor)
