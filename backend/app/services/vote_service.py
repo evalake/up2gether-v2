@@ -15,10 +15,7 @@ from app.repositories.game_repo import GameRepository
 from app.repositories.group_repo import GroupRepository
 from app.repositories.vote_repo import VoteRepository
 from app.schemas.vote import (
-    VoteAuditCreator,
-    VoteAuditGame,
     VoteAuditResponse,
-    VoteAuditVoter,
     VoteSessionCreate,
     VoteSessionResponse,
     VoteStageResponse,
@@ -31,6 +28,7 @@ from app.services.events import (
 )
 from app.services.notifications import notify_group
 from app.services.viability import ViabilityInput, calculate_viability
+from app.services.vote_audit import build_audit
 from app.services.vote_engine import (
     advance_stage,
     calculate_max_selections_for_stage,
@@ -205,99 +203,8 @@ class VoteService:
         session = await self.votes.get(vote_id)
         if session is None or session.group_id != group_id:
             raise _not_found("Vote not found")
-
-        # resposta base ja traz stages/tallies/etc
         session_resp = await self._to_response(session, actor)
-
-        # todos os ballots de todos os stages
-        ballots = await self.votes.list_ballots(vote_id)
-        stages = await self.votes.list_stages(vote_id)
-        stage_num_by_id = {s.id: s.stage_number for s in stages}
-
-        # users dos ballots + criador + membros do grupo (pra non_voters)
-        from sqlalchemy import select as _sel
-
-        from app.models.user import User as UserModel
-        from app.repositories.group_repo import GroupRepository
-
-        user_ids = {b.user_id for b in ballots}
-        if session.created_by:
-            user_ids.add(session.created_by)
-
-        members = await GroupRepository(self.votes.db).list_members(group_id)
-        member_user_ids = [m.user_id for m in members]
-        user_ids.update(member_user_ids)
-
-        users_by_id: dict[uuid.UUID, UserModel] = {}
-        if user_ids:
-            rows = await self.votes.db.execute(
-                _sel(UserModel).where(UserModel.id.in_(list(user_ids)))
-            )
-            for u in rows.scalars().all():
-                users_by_id[u.id] = u
-
-        def _creator(uid: uuid.UUID | None) -> VoteAuditCreator:
-            if uid is None or uid not in users_by_id:
-                return VoteAuditCreator(id=uid, discord_id=None, display_name=None, avatar_url=None)
-            u = users_by_id[uid]
-            return VoteAuditCreator(
-                id=u.id,
-                discord_id=u.discord_id,
-                display_name=u.discord_display_name or u.discord_username,
-                avatar_url=u.discord_avatar,
-            )
-
-        # candidatos: pega nome/cover
-        all_cand_ids: set[uuid.UUID] = set()
-        for s in stages:
-            all_cand_ids.update(s.candidate_game_ids)
-        all_cand_ids.update(session.candidate_game_ids)
-        if session.winner_game_id:
-            all_cand_ids.add(session.winner_game_id)
-
-        games_list: list[VoteAuditGame] = []
-        if all_cand_ids:
-            from app.models.game import Game as GameModel
-
-            grows = await self.votes.db.execute(
-                _sel(GameModel).where(GameModel.id.in_(list(all_cand_ids)))
-            )
-            for g in grows.scalars().all():
-                games_list.append(VoteAuditGame(id=g.id, name=g.name, cover_url=g.cover_url))
-
-        voters: list[VoteAuditVoter] = []
-        voted_user_ids: set[uuid.UUID] = set()
-        for b in sorted(ballots, key=lambda x: x.submitted_at, reverse=True):
-            u = users_by_id.get(b.user_id)
-            voted_user_ids.add(b.user_id)
-            voters.append(
-                VoteAuditVoter(
-                    user_id=b.user_id,
-                    discord_id=u.discord_id if u else None,
-                    display_name=(u.discord_display_name or u.discord_username)
-                    if u
-                    else "(removido)",
-                    avatar_url=u.discord_avatar if u else None,
-                    approvals=list(b.approvals),
-                    stage_id=b.stage_id,
-                    stage_number=stage_num_by_id.get(b.stage_id) if b.stage_id else None,
-                    submitted_at=b.submitted_at,
-                )
-            )
-
-        non_voters: list[VoteAuditCreator] = []
-        for uid in member_user_ids:
-            if uid in voted_user_ids:
-                continue
-            non_voters.append(_creator(uid))
-
-        return VoteAuditResponse(
-            session=session_resp,
-            creator=_creator(session.created_by),
-            games=games_list,
-            voters=voters,
-            non_voters=non_voters,
-        )
+        return await build_audit(self.votes, self.groups, session, session_resp)
 
     async def submit_ballot(
         self, vote_id: uuid.UUID, approvals: list[uuid.UUID], actor: User
