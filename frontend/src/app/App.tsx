@@ -16,6 +16,7 @@ const HistoryPage = lazy(() => import('@/pages/HistoryPage').then(m => ({ defaul
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })))
 const PublicSessionPage = lazy(() => import('@/pages/PublicSessionPage').then(m => ({ default: m.PublicSessionPage })))
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage').then(m => ({ default: m.OnboardingPage })))
+const AdminMetricsPage = lazy(() => import('@/pages/AdminMetricsPage').then(m => ({ default: m.AdminMetricsPage })))
 import { RequireAuth } from './RequireAuth'
 import { Toaster } from '@/components/ui/Toaster'
 // SSE religado em modo seletivo: so "momentos grandes" (vote opened/closed,
@@ -138,6 +139,14 @@ export function App() {
             element={
               <RequireAuth>
                 <SettingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/metrics"
+            element={
+              <RequireAuth>
+                <AdminMetricsPage />
               </RequireAuth>
             }
           />
