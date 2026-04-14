@@ -1,8 +1,11 @@
 import { lazy, Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '@/pages/LoginPage'
 import { DiscordCallbackPage } from '@/pages/DiscordCallbackPage'
+import { LandingPage } from '@/pages/LandingPage'
+import { PrivacyPage } from '@/pages/PrivacyPage'
+import { TermsPage } from '@/pages/TermsPage'
 
 const GroupsPage = lazy(() => import('@/pages/GroupsPage').then(m => ({ default: m.GroupsPage })))
 const GroupDetailPage = lazy(() => import('@/pages/GroupDetailPage').then(m => ({ default: m.GroupDetailPage })))
@@ -53,7 +56,9 @@ export function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/discord/callback" element={<DiscordCallbackPage />} />
           <Route path="/share/sessions/:id" element={<PublicSessionPage />} />
-          <Route path="/" element={<Navigate to="/groups" replace />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route
             path="/onboarding"
             element={

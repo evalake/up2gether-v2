@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /auth/
+Disallow: /groups/
+Disallow: /settings
+Disallow: /admin/
+
+Sitemap: https://up2gether.com.br/sitemap.xml
