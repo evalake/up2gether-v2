@@ -105,6 +105,72 @@ export function AdminMetricsPage() {
           </tbody>
         </table>
       </section>
+
+      <section className="mt-8 grid gap-6 md:grid-cols-2">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-5">
+          <div className="mb-3 text-xs uppercase tracking-wide text-zinc-400">
+            top grupos (28d)
+          </div>
+          {m.top_groups.length === 0 ? (
+            <div className="py-6 text-center text-[11px] text-zinc-500">sem atividade</div>
+          ) : (
+            <ul className="space-y-1.5 font-mono text-[12px]">
+              {m.top_groups.map((g, i) => {
+                const max = m.top_groups[0]?.events_28d ?? 1
+                const pct = (g.events_28d / max) * 100
+                return (
+                  <li key={g.group_id} className="flex items-center gap-2">
+                    <span className="w-5 text-right text-[10px] text-zinc-500">
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-zinc-200">{g.name}</span>
+                    <div className="relative h-1.5 w-24 overflow-hidden rounded-sm bg-zinc-800">
+                      <div
+                        className="h-full bg-orange-400/70"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="w-8 text-right text-orange-400">{g.events_28d}</span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 p-5">
+          <div className="mb-3 flex items-baseline justify-between">
+            <div className="text-xs uppercase tracking-wide text-zinc-400">
+              atividade diaria (28d)
+            </div>
+            <div className="font-mono text-[10px] text-zinc-500">
+              peak {Math.max(...m.daily_28d.map((d) => d.count))}
+            </div>
+          </div>
+          {(() => {
+            const peak = Math.max(1, ...m.daily_28d.map((d) => d.count))
+            return (
+              <div className="flex h-24 items-end gap-[2px]">
+                {m.daily_28d.map((d) => {
+                  const h = (d.count / peak) * 100
+                  return (
+                    <div
+                      key={d.date}
+                      title={`${d.date}: ${d.count}`}
+                      className="group flex-1 rounded-t-sm bg-orange-400/40 transition-colors hover:bg-orange-400"
+                      style={{ height: `${Math.max(h, 2)}%` }}
+                    />
+                  )
+                })}
+              </div>
+            )
+          })()}
+          <div className="mt-2 flex justify-between font-mono text-[9px] text-zinc-600">
+            <span>{m.daily_28d[0]?.date.slice(5)}</span>
+            <span>{m.daily_28d[m.daily_28d.length - 1]?.date.slice(5)}</span>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

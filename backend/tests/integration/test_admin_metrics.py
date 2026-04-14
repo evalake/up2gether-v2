@@ -78,3 +78,59 @@ async def test_metrics_seats_counts_distinct_users(
     res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
     assert res.status_code == 200
     assert res.json()["seats_activated"] == 2
+
+
+async def test_metrics_top_groups(make_user, auth_headers, client, db_session, as_sys_admin):
+    import uuid
+
+    admin = await make_user(discord_id="admin-3", username="boss3")
+    as_sys_admin(admin.discord_id)
+
+    r1 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "tg-1", "name": "ativo"},
+        headers=auth_headers(admin),
+    )
+    r2 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "tg-2", "name": "parado"},
+        headers=auth_headers(admin),
+    )
+    g1_id = uuid.UUID(r1.json()["id"])
+    g2_id = uuid.UUID(r2.json()["id"])
+
+    # g1 recebe 3 events adicionais, g2 recebe 1 adicional
+    for _ in range(3):
+        await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id, group_id=g1_id)
+    await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id, group_id=g2_id)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    top = res.json()["top_groups"]
+    # achar as entradas por id (group_created tambem conta)
+    by_id = {t["group_id"]: t for t in top}
+    assert str(g1_id) in by_id
+    assert str(g2_id) in by_id
+    assert by_id[str(g1_id)]["events_28d"] > by_id[str(g2_id)]["events_28d"]
+    assert by_id[str(g1_id)]["name"] == "ativo"
+
+
+async def test_metrics_daily_series(make_user, auth_headers, client, db_session, as_sys_admin):
+    admin = await make_user(discord_id="admin-4", username="boss4")
+    as_sys_admin(admin.discord_id)
+
+    # 2 events hoje, deveriam aparecer no ultimo bucket
+    await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id)
+    await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    series = res.json()["daily_28d"]
+    assert len(series) == 28
+    # cada entry tem date + count
+    assert "date" in series[0] and "count" in series[0]
+    # total na serie bate com soma dos events
+    total = sum(p["count"] for p in series)
+    assert total >= 2
