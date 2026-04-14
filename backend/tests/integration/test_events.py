@@ -8,9 +8,12 @@ import pytest
 from sqlalchemy import select
 
 from app.models.event import Event
+from app.repositories.user_repo import UserRepository
+from app.services.auth_service import AuthService
 from app.services.events import (
     EVENT_GROUP_CREATED,
     EVENT_GROUP_JOINED,
+    EVENT_MEMBER_ACTIVATED,
     EVENT_SESSION_COMPLETED,
     EVENT_SESSION_CREATED,
     EVENT_VOTE_CAST,
@@ -414,3 +417,60 @@ async def test_vote_force_close_emits_vote_completed_event(
     )
     assert len(evs) == 1
     assert evs[0].payload["vote_id"] == vote["id"]
+
+
+class _StubDiscordClient:
+    def __init__(self, discord_id: str, username: str = "newbie"):
+        self.discord_id = discord_id
+        self.username = username
+
+    async def exchange_code(self, code: str):
+        return {"access_token": "at", "refresh_token": "rt"}
+
+    async def fetch_user(self, access_token: str):
+        return {
+            "id": self.discord_id,
+            "username": self.username,
+            "global_name": self.username,
+            "avatar": None,
+            "email": f"{self.username}@test.local",
+        }
+
+    async def fetch_guilds(self, access_token: str):
+        return []
+
+    async def fetch_guild_preview(self, access_token: str, guild_id: str):
+        return None
+
+
+async def test_first_discord_login_emits_member_activated(db_session):
+    svc = AuthService(UserRepository(db_session), _StubDiscordClient("new-disc-1", "newbie"))
+    res = await svc.login_with_discord(code="xxx")
+    await db_session.commit()
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_MEMBER_ACTIVATED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert str(evs[0].user_id) == str(res.user.id)
+    assert evs[0].payload["discord_id"] == "new-disc-1"
+    assert evs[0].payload["source"] == "oauth"
+
+
+async def test_second_discord_login_does_not_emit_member_activated(db_session):
+    stub = _StubDiscordClient("new-disc-2", "dupe")
+    svc = AuthService(UserRepository(db_session), stub)
+    await svc.login_with_discord(code="xxx")
+    await db_session.commit()
+    # segundo login do mesmo discord_id nao ativa de novo
+    await svc.login_with_discord(code="yyy")
+    await db_session.commit()
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_MEMBER_ACTIVATED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1

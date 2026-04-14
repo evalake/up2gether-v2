@@ -12,6 +12,7 @@ from app.repositories.user_repo import UserRepository
 from app.schemas.auth import AuthTokenResponse, DiscordCallbackRequest
 from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
+from app.services.events import EVENT_MEMBER_ACTIVATED, track_event
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -123,6 +124,13 @@ async def dev_login(
         access_token="dev",
         refresh_token=None,
     )
+    if is_new:
+        await track_event(
+            db,
+            EVENT_MEMBER_ACTIVATED,
+            user_id=user.id,
+            payload={"discord_id": payload.discord_id, "source": "dev"},
+        )
     token = issue_access_token(user.id, user.discord_id)
     return AuthTokenResponse(
         access_token=token,

@@ -6,6 +6,7 @@ from app.models.user import User
 from app.repositories.user_repo import UserRepository
 from app.schemas.auth import AuthTokenResponse
 from app.schemas.user import UserResponse
+from app.services.events import EVENT_MEMBER_ACTIVATED, track_event
 
 # nota: discord_avatar guarda apenas o hash retornado pela api do discord.
 # o frontend constroi a URL final via cdn.discordapp.com/avatars/{discord_id}/{hash}.png
@@ -35,6 +36,14 @@ class AuthService:
             access_token=access_token,
             refresh_token=refresh_token,
         )
+        if is_new:
+            # seat ativado: primeira vez que o user loga via discord
+            await track_event(
+                self.repo.db,
+                EVENT_MEMBER_ACTIVATED,
+                user_id=user.id,
+                payload={"discord_id": discord_id, "source": "oauth"},
+            )
 
         jwt_token = issue_access_token(user.id, user.discord_id)
         return AuthTokenResponse(
