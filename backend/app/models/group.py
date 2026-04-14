@@ -52,6 +52,11 @@ class Group(Base, TimestampMixin):
     webhook_url: Mapped[str | None] = mapped_column(String, nullable=True)
     budget_max: Mapped[float | None] = mapped_column(Float, nullable=True)
     typical_party_size: Mapped[int] = mapped_column(Integer, default=4, nullable=False)
+    # grandfathering: grupos criados ate o cutoff do paid launch ficam free pra sempre.
+    # checar isso em qualquer gate de entitlement antes de aplicar limite de tier.
+    legacy_free: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", nullable=False
+    )
 
     memberships: Mapped[list[GroupMembership]] = relationship(
         back_populates="group", cascade="all, delete-orphan", lazy="selectin"
@@ -73,6 +78,11 @@ class GroupMembership(Base):
     is_eligible_for_votes: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     joined_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, nullable=False
+    )
+    # seat counter: populado no primeiro login via Discord no grupo.
+    # convite pendente ou admin-add sem login nao conta ate user logar.
+    activated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), default=utcnow, nullable=True
     )
 
     group: Mapped[Group] = relationship(back_populates="memberships")
