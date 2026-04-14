@@ -6,6 +6,7 @@ import { DiscordCallbackPage } from '@/pages/DiscordCallbackPage'
 import { LandingPage } from '@/pages/LandingPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { TermsPage } from '@/pages/TermsPage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 
 const GroupsPage = lazy(() => import('@/pages/GroupsPage').then(m => ({ default: m.GroupsPage })))
 const GroupDetailPage = lazy(() => import('@/pages/GroupDetailPage').then(m => ({ default: m.GroupDetailPage })))
@@ -155,6 +156,7 @@ export function App() {
               </RequireAuth>
             }
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
         </Suspense>
         <Toaster />
