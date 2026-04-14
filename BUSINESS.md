@@ -41,7 +41,7 @@ Siglas de SaaS/growth que aparecem aqui. Decora nao, consulta quando precisar.
 Dono/admin de servidor Discord com 30-500 membros ativos que:
 - Joga com a galera mas sempre trava no "oq vamo jogar hoje"
 - Ja usou Sesh, Mee6, bots de votacao, mas nada resolve o problema de *compatibilidade de biblioteca* (quem tem o jogo) + *agendamento* + *votacao* no mesmo lugar
-- Ta disposto a pagar R$20-80/mes pra manter a comunidade viva (mesmo range do Discord Nitro, entao o usuario ja tem precedente de pagar pra coisa de Discord)
+- Ta disposto a pagar R$ 30-90/mes pra manter a comunidade viva (mesmo range do Discord Nitro, entao o usuario ja tem precedente de pagar pra coisa de Discord)
 
 Nao e ICP agora: competitivo e-sports, servidores corporativos, comunidades >5k membros (enterprise depois, so quando der).
 
@@ -54,10 +54,12 @@ Por grupo (servidor). Precos em BRL.
 | Tier | Preco | Limite de membros | Features | Perfil tipico |
 |------|-------|-------------------|----------|----------------|
 | **Free** | R$ 0 | ate 10 membros | Core: login Discord, sync Steam, votacao, 2 sessoes agendadas simultaneas, tema default | Panela classica: squad de 5 + reservas |
-| **Pro** | R$ 19/mes ou R$ 190/ano | ate 30 membros | Sessoes ilimitadas, analytics basico, temas custom, web push prioritario | 2-3 panelas, crew de faculdade/trampo |
-| **Community** | R$ 49/mes ou R$ 490/ano | ate 100 membros | Analytics completo, branding (logo/cor), API read, moderacao avancada | Streamer pequeno, comunidade organizada |
-| **Creator** | R$ 149/mes | 100+ membros | White-label, SLA, suporte direto (eu no DM), features custom sob demanda | Streamer medio+, servidor grande |
+| **Pro** | R$ 29/mes ou R$ 290/ano | ate 30 membros | Sessoes ilimitadas, analytics basico, temas custom, web push prioritario | 2-3 panelas, crew de faculdade/trampo |
+| **Community** | R$ 89/mes ou R$ 890/ano | ate 100 membros | Analytics completo, branding (logo/cor), API read, moderacao avancada | Streamer pequeno, comunidade organizada |
+| **Creator** | R$ 249/mes ou R$ 2490/ano | ate 500 membros | White-label, suporte direto (eu no DM), features custom sob demanda | Streamer medio+, servidor grande |
 | **Legacy** | R$ 0 pra sempre | sem limite | Tudo | Grupos existentes ate data do cutoff. Flag no DB. |
+
+Servidor que passar de 500 ativos (caso raro pra jogos, e so streamer bem grande) continua usando normalmente, sem paywall duro. Eu entro em contato via DM pra conversar infra/pricing especifico. Nao tem tier publico acima disso. E app de jogos, nao ERP.
 
 **Como conta o membro:** conta a partir do *primeiro login via Discord* no grupo. Convite pendente nao conta. Admin adicionar manualmente nao conta ate o usuario logar. Padrao de mercado (Slack, Linear, Notion): seat so ativa quando usuario autentica.
 
@@ -74,7 +76,9 @@ Por grupo (servidor). Precos em BRL.
 Implementacao: coluna `activated_at timestamp` em `group_members`, populada no primeiro OAuth success. Counter = `count(*) where activated_at is not null`.
 
 **Rationale do ancoramento:**
-- R$ 19 bate com plano basico de ferramentas Discord BR e bolso do usuario medio brasileiro (1/3 do Nitro)
+- R$ 29 fica 24% abaixo do Nitro (R$ 38). Usuario ja paga mensalidade de Discord, entao a barreira mental e baixa. O R$ 19 antigo comprimia margem demais sem ganho real em conversao.
+- R$ 89 no Community cobre custo real de 100 membros ativos (SSE, audit, webhook Discord batendo toda hora) com folga. R$ 49 nao fechava conta se 3-4 grupos do tier acumulassem ao mesmo tempo.
+- R$ 249 no Creator com teto de 500 e a mudanca critica. "100+ sem limite" do plano antigo era suicidio de margem, um server com 2000 pessoas comia tudo. Teto em 500 cobre 99% dos casos de gaming real (streamer medio-grande raramente tem >300 ativos simultaneos usando o app).
 - Anual com desconto ~17% pra melhorar retencao e cash upfront
 - Free calibrado pra panela classica (squad + reservas) cruzar o limite quando vira "comunidade de panelas"
 
@@ -126,18 +130,19 @@ Bonus: teus amigos viram *case study* e prova social. Pedir depoimento quando fo
 Supondo distribuicao em M12:
 - 300 grupos ativos
 - 70% free, 25% Pro, 4% Community, 1% Creator
-- ARPU blended: 0.70 * 0 + 0.25 * 19 + 0.04 * 49 + 0.01 * 149 = **R$ 8.2/grupo/mes**
-- MRR: 300 * 8.2 = R$ 2.5k
+- ARPU blended: 0.70 * 0 + 0.25 * 29 + 0.04 * 89 + 0.01 * 249 = **R$ 13.3/grupo/mes**
+- MRR: 300 * 13.3 = **R$ 3.99k**
 
 Custo por grupo (estimativa Fly + Neon + Vercel):
 - Ate 30 membros: ~R$ 2-4/grupo/mes (compute compartilhado, DB shared)
 - 30-100 membros: ~R$ 5-10/grupo/mes
-- Margem bruta estimada: 55-70% (ok pra estagio inicial, sobe conforme escala)
+- 100-500 membros: ~R$ 15-25/grupo/mes (SSE pesado, historico, audit)
+- Margem bruta estimada: 85-92% nos tiers pagos (sobe conforme escala)
 
-ARPU mais baixo que versao anterior (R$ 12.4 -> R$ 8.2) porque os precos caiem. Compensacao: muito mais grupos cruzam limite de 10 do que cruzariam 25, entao taxa de conversao potencial sobe. Precisa validar: se conversao free -> pago bate 5% com o limite de 10, o modelo funciona.
+Precisa validar: se conversao free -> pago bate 5% com o limite de 10, o modelo funciona. Se bater 8-10% (realista pra core loop forte), MRR dobra sem mexer em preco.
 
-CAC alvo: <R$ 30/server pago (organico + parcerias deve manter proximo de zero)
-LTV alvo: >R$ 180/server (12 meses de retencao * R$ 15)
+CAC alvo: <R$ 45/server pago (organico + parcerias deve manter proximo de zero, budget cresce com ARPU maior)
+LTV alvo: >R$ 280/server (12 meses de retencao * ARPU medio ~R$ 23 no mix pago)
 LTV/CAC alvo: >6x antes de considerar growth pago
 
 ## O que precisa ser construido (pra suportar billing)
