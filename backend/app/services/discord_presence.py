@@ -12,6 +12,9 @@ import logging
 from typing import Literal
 
 import discord
+from discord import app_commands
+
+from app.services.discord_commands import register_commands
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +35,7 @@ class PresenceBot:
     def __init__(self, token: str) -> None:
         self.token = token
         self._client: discord.Client | None = None
+        self._tree: app_commands.CommandTree | None = None
         self._task: asyncio.Task[None] | None = None
         # {guild_id: {user_id: status}}
         self._cache: dict[int, dict[int, Status]] = {}
@@ -55,6 +59,7 @@ class PresenceBot:
 
         client = discord.Client(intents=intents)
         self._client = client
+        self._tree = register_commands(client)
 
         @client.event
         async def on_ready() -> None:  # type: ignore[misc]
@@ -69,6 +74,14 @@ class PresenceBot:
                 len(client.guilds),
                 sum(len(m) for m in self._cache.values()),
             )
+            # sync slash commands. global sync pode levar ate 1h pra propagar
+            # mas so precisa rodar uma vez por deploy (discord cacheia).
+            if self._tree is not None:
+                try:
+                    synced = await self._tree.sync()
+                    log.info("slash commands sincronizados: %d", len(synced))
+                except Exception:
+                    log.exception("erro syncando slash commands")
             self._ready.set()
 
         @client.event
