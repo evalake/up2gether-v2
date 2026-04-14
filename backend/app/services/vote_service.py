@@ -23,6 +23,12 @@ from app.schemas.vote import (
     VoteSessionResponse,
     VoteStageResponse,
 )
+from app.services.events import (
+    EVENT_VOTE_CAST,
+    EVENT_VOTE_COMPLETED,
+    EVENT_VOTE_CREATED,
+    track_event,
+)
 from app.services.notifications import notify_group
 from app.services.viability import ViabilityInput, calculate_viability
 from app.services.vote_engine import (
@@ -124,6 +130,17 @@ class VoteService:
             closes_at=stage_closes,
         )
         await self.votes.add_stage(stage1)
+        await track_event(
+            self.votes.db,
+            EVENT_VOTE_CREATED,
+            user_id=actor.id,
+            group_id=group_id,
+            payload={
+                "vote_id": str(session.id),
+                "candidates": len(data.candidate_game_ids),
+                "total_stages": total_stages,
+            },
+        )
         # notifica todos os membros do grupo + webhook discord
         cand_games = (
             (
@@ -303,6 +320,17 @@ class VoteService:
                 raise _bad(f"{cid} nao e um candidato valido")
 
         await self.votes.upsert_ballot(vote_id, actor.id, list(approvals), stage_id=stage.id)
+        await track_event(
+            self.votes.db,
+            EVENT_VOTE_CAST,
+            user_id=actor.id,
+            group_id=session.group_id,
+            payload={
+                "vote_id": str(vote_id),
+                "stage_number": stage.stage_number,
+                "approvals": len(approvals),
+            },
+        )
 
         # realtime: notifica que o tally mudou
         from app.services.realtime import get_broker
@@ -379,6 +407,18 @@ class VoteService:
             session.closed_at = now
             session.winner_game_id = result.winner_id
             await self.votes.save()
+            await track_event(
+                self.votes.db,
+                EVENT_VOTE_COMPLETED,
+                group_id=session.group_id,
+                payload={
+                    "vote_id": str(session.id),
+                    "winner_game_id": str(result.winner_id),
+                    "total_stages": session.total_stages,
+                    "final_stage": stage.stage_number,
+                    "early_consensus": result.early_consensus,
+                },
+            )
             await self._post_winner_effects(session, stage, ballots, result.winner_id)
             return
 
@@ -389,6 +429,17 @@ class VoteService:
             session.status = VoteStatus.CLOSED
             session.closed_at = now
             await self.votes.save()
+            await track_event(
+                self.votes.db,
+                EVENT_VOTE_COMPLETED,
+                group_id=session.group_id,
+                payload={
+                    "vote_id": str(session.id),
+                    "winner_game_id": None,
+                    "total_stages": session.total_stages,
+                    "final_stage": stage.stage_number,
+                },
+            )
             return
         next_number = stage.stage_number + 1
         # duracao restante / stages restantes

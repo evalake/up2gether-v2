@@ -21,6 +21,11 @@ from app.schemas.session import (
     SessionResponse,
     SessionUpdate,
 )
+from app.services.events import (
+    EVENT_SESSION_COMPLETED,
+    EVENT_SESSION_CREATED,
+    track_event,
+)
 from app.services.notifications import notify_group
 
 
@@ -85,6 +90,13 @@ class PlaySessionService:
             status="scheduled",
         )
         await self.sessions.add(session)
+        await track_event(
+            self.sessions.db,
+            EVENT_SESSION_CREATED,
+            user_id=actor.id,
+            group_id=group_id,
+            payload={"session_id": str(session.id), "game_id": str(data.game_id)},
+        )
         # best-effort google calendar sync pro criador (se conectado)
         from app.domain.enums import AuthProvider
 
@@ -174,6 +186,7 @@ class PlaySessionService:
         is_staff = actor.is_sys_admin or m.role in (GroupRole.ADMIN, GroupRole.MOD)
         if session.created_by != actor.id and not is_staff:
             raise _forbid("so o criador, mod ou admin pode editar essa sessao")
+        prev_status = session.status
         for field in (
             "title",
             "description",
@@ -186,6 +199,14 @@ class PlaySessionService:
             if v is not None:
                 setattr(session, field, v)
         await self.sessions.save()
+        if session.status == "completed" and prev_status != "completed":
+            await track_event(
+                self.sessions.db,
+                EVENT_SESSION_COMPLETED,
+                user_id=actor.id,
+                group_id=group_id,
+                payload={"session_id": str(session.id), "game_id": str(session.game_id)},
+            )
         return await self._to_response(session, actor)
 
     async def delete(self, group_id: uuid.UUID, session_id: uuid.UUID, actor: User) -> None:

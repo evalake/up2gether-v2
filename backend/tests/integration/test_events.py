@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 from sqlalchemy import select
 
@@ -9,6 +11,11 @@ from app.models.event import Event
 from app.services.events import (
     EVENT_GROUP_CREATED,
     EVENT_GROUP_JOINED,
+    EVENT_SESSION_COMPLETED,
+    EVENT_SESSION_CREATED,
+    EVENT_VOTE_CAST,
+    EVENT_VOTE_COMPLETED,
+    EVENT_VOTE_CREATED,
     track_event,
 )
 
@@ -118,3 +125,292 @@ async def test_rejoining_existing_group_does_not_emit_duplicate_joined(
         .all()
     )
     assert len(joined) == 0
+
+
+async def _setup_group_and_game(make_user, auth_headers, client, guild):
+    owner = await make_user(username="sowner")
+    g = (
+        await client.post(
+            "/api/groups",
+            json={"discord_guild_id": guild, "name": "Squad"},
+            headers=auth_headers(owner),
+        )
+    ).json()
+    game = (
+        await client.post(
+            f"/api/groups/{g['id']}/games",
+            json={"name": "GameX"},
+            headers=auth_headers(owner),
+        )
+    ).json()
+    return owner, g, game
+
+
+async def test_session_creation_emits_session_created_event(
+    make_user, auth_headers, client, db_session
+):
+    owner, g, game = await _setup_group_and_game(make_user, auth_headers, client, "ev-s-1")
+    start_at = (datetime.now(UTC) + timedelta(days=1)).isoformat()
+    res = await client.post(
+        f"/api/groups/{g['id']}/sessions",
+        json={
+            "game_id": game["id"],
+            "title": "Raid",
+            "start_at": start_at,
+            "duration_minutes": 60,
+        },
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200, res.text
+    session_id = res.json()["id"]
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_SESSION_CREATED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert evs[0].user_id == owner.id
+    assert str(evs[0].group_id) == g["id"]
+    assert evs[0].payload["session_id"] == session_id
+
+
+async def test_session_marked_completed_emits_event(make_user, auth_headers, client, db_session):
+    owner, g, game = await _setup_group_and_game(make_user, auth_headers, client, "ev-s-2")
+    start_at = (datetime.now(UTC) + timedelta(days=1)).isoformat()
+    s = (
+        await client.post(
+            f"/api/groups/{g['id']}/sessions",
+            json={
+                "game_id": game["id"],
+                "title": "Raid",
+                "start_at": start_at,
+                "duration_minutes": 60,
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+
+    # marca como completa via update
+    res = await client.patch(
+        f"/api/groups/{g['id']}/sessions/{s['id']}",
+        json={"status": "completed"},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200, res.text
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_SESSION_COMPLETED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert evs[0].payload["session_id"] == s["id"]
+
+
+async def test_session_update_without_status_change_does_not_emit_completed(
+    make_user, auth_headers, client, db_session
+):
+    owner, g, game = await _setup_group_and_game(make_user, auth_headers, client, "ev-s-3")
+    start_at = (datetime.now(UTC) + timedelta(days=1)).isoformat()
+    s = (
+        await client.post(
+            f"/api/groups/{g['id']}/sessions",
+            json={
+                "game_id": game["id"],
+                "title": "Raid",
+                "start_at": start_at,
+                "duration_minutes": 60,
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+
+    # so muda titulo, nao o status
+    await client.patch(
+        f"/api/groups/{g['id']}/sessions/{s['id']}",
+        json={"title": "Raid renamed"},
+        headers=auth_headers(owner),
+    )
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_SESSION_COMPLETED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 0
+
+
+async def test_session_double_complete_does_not_duplicate_event(
+    make_user, auth_headers, client, db_session
+):
+    owner, g, game = await _setup_group_and_game(make_user, auth_headers, client, "ev-s-4")
+    start_at = (datetime.now(UTC) + timedelta(days=1)).isoformat()
+    s = (
+        await client.post(
+            f"/api/groups/{g['id']}/sessions",
+            json={
+                "game_id": game["id"],
+                "title": "Raid",
+                "start_at": start_at,
+                "duration_minutes": 60,
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+    # complete duas vezes
+    await client.patch(
+        f"/api/groups/{g['id']}/sessions/{s['id']}",
+        json={"status": "completed"},
+        headers=auth_headers(owner),
+    )
+    await client.patch(
+        f"/api/groups/{g['id']}/sessions/{s['id']}",
+        json={"status": "completed"},
+        headers=auth_headers(owner),
+    )
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_SESSION_COMPLETED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+
+
+async def _setup_group_with_games(make_user, auth_headers, client, guild, n=3):
+    owner = await make_user(username="vowner")
+    g = (
+        await client.post(
+            "/api/groups",
+            json={"discord_guild_id": guild, "name": "Squad"},
+            headers=auth_headers(owner),
+        )
+    ).json()
+    games = []
+    for i in range(n):
+        res = await client.post(
+            f"/api/groups/{g['id']}/games",
+            json={"name": f"Game{i}", "is_free": i == 0},
+            headers=auth_headers(owner),
+        )
+        games.append(res.json())
+    return owner, g, games
+
+
+async def test_vote_creation_emits_vote_created_event(make_user, auth_headers, client, db_session):
+    owner, g, games = await _setup_group_with_games(make_user, auth_headers, client, "ev-v-1", n=3)
+    res = await client.post(
+        f"/api/groups/{g['id']}/votes",
+        json={"title": "Pick one", "candidate_game_ids": [x["id"] for x in games]},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200, res.text
+    vote_id = res.json()["id"]
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_VOTE_CREATED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert evs[0].user_id == owner.id
+    assert str(evs[0].group_id) == g["id"]
+    assert evs[0].payload["vote_id"] == vote_id
+    assert evs[0].payload["candidates"] == 3
+
+
+async def test_ballot_submission_emits_vote_cast_event(make_user, auth_headers, client, db_session):
+    owner, g, games = await _setup_group_with_games(make_user, auth_headers, client, "ev-v-2", n=3)
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={"title": "Pick", "candidate_game_ids": [x["id"] for x in games]},
+            headers=auth_headers(owner),
+        )
+    ).json()
+
+    res = await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[0]["id"]]},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200, res.text
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_VOTE_CAST)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert evs[0].user_id == owner.id
+    assert evs[0].payload["vote_id"] == vote["id"]
+    assert evs[0].payload["stage_number"] == 1
+    assert evs[0].payload["approvals"] == 1
+
+
+async def test_vote_auto_close_emits_vote_completed_event(
+    make_user, auth_headers, client, db_session
+):
+    # so um eleitor, ballot dele fecha a votacao direto
+    owner, g, games = await _setup_group_with_games(make_user, auth_headers, client, "ev-v-3", n=2)
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={"title": "Pick", "candidate_game_ids": [x["id"] for x in games]},
+            headers=auth_headers(owner),
+        )
+    ).json()
+    res = await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[0]["id"]]},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_VOTE_COMPLETED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert evs[0].payload["vote_id"] == vote["id"]
+    assert evs[0].payload["winner_game_id"] == games[0]["id"]
+
+
+async def test_vote_force_close_emits_vote_completed_event(
+    make_user, auth_headers, client, db_session
+):
+    owner, g, games = await _setup_group_with_games(make_user, auth_headers, client, "ev-v-4", n=3)
+    # adiciona mais um eleitor pra nao fechar auto
+    second = await make_user(username="vsecond")
+    await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "ev-v-4", "name": "Squad"},
+        headers=auth_headers(second),
+    )
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={"title": "Pick", "candidate_game_ids": [x["id"] for x in games]},
+            headers=auth_headers(owner),
+        )
+    ).json()
+    # owner vota, mas second nao -- nao fecha auto
+    await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[0]["id"]]},
+        headers=auth_headers(owner),
+    )
+    # force close
+    res = await client.post(
+        f"/api/groups/{g['id']}/votes/{vote['id']}/close",
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200, res.text
+
+    evs = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_VOTE_COMPLETED)))
+        .scalars()
+        .all()
+    )
+    assert len(evs) == 1
+    assert evs[0].payload["vote_id"] == vote["id"]
