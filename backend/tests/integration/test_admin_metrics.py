@@ -431,6 +431,67 @@ async def test_metrics_landing_conversion(
     assert body["landing_conversion_rate_28d"] > 0
 
 
+async def test_metrics_retention_w4(make_user, auth_headers, client, db_session, as_sys_admin):
+    """W4 retention: grupos criados 28-56d atras com atividade nos ultimos 14d.
+    Metrica #2 BUSINESS.md. Backdate created_at pra entrar no cohort.
+    """
+    import uuid
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import update as sa_update
+
+    from app.models.event import Event
+    from app.models.group import Group as GroupModel
+
+    admin = await make_user(discord_id="admin-ret", username="ret")
+    as_sys_admin(admin.discord_id)
+
+    r1 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "rt-1", "name": "retido"},
+        headers=auth_headers(admin),
+    )
+    r2 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "rt-2", "name": "churn"},
+        headers=auth_headers(admin),
+    )
+    g1 = uuid.UUID(r1.json()["id"])
+    g2 = uuid.UUID(r2.json()["id"])
+
+    # ambos criados 40d atras (entra no cohort 28-56d)
+    old = datetime.now(UTC) - timedelta(days=40)
+    await db_session.execute(
+        sa_update(GroupModel).where(GroupModel.id.in_([g1, g2])).values(created_at=old)
+    )
+    # events do POST backdated pra nao poluir janelas recentes
+    await db_session.execute(
+        sa_update(Event).where(Event.group_id.in_([g1, g2])).values(occurred_at=old)
+    )
+    # g1 tem atividade agora -> retido. g2 nao tem -> churn.
+    await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id, group_id=g1)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["cohort_w4_size"] == 2
+    assert body["retained_w4"] == 1
+    assert body["retention_w4"] == 0.5
+
+
+async def test_metrics_retention_w4_empty_cohort_safe(
+    make_user, auth_headers, client, as_sys_admin
+):
+    admin = await make_user(discord_id="admin-ret-empty", username="rempty")
+    as_sys_admin(admin.discord_id)
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["cohort_w4_size"] == 0
+    assert body["retention_w4"] == 0
+
+
 async def test_metrics_landing_conversion_zero_visits_safe(
     make_user, auth_headers, client, as_sys_admin
 ):

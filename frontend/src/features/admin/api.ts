@@ -40,6 +40,9 @@ export type EventMetrics = {
   landing_visits_28d: number
   signups_28d: number
   landing_conversion_rate_28d: number
+  cohort_w4_size: number
+  retained_w4: number
+  retention_w4: number
   groups_by_tier: TierBreakdown
   mrr_if_all_paid_brl: number
   mrr_billable_brl: number

@@ -154,7 +154,7 @@ export function AdminMetricsPage() {
         />
       </section>
 
-      <section className="mb-8 grid gap-4 md:grid-cols-3">
+      <section className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label="landing visits 28d"
           value={m.landing_visits_28d}
@@ -172,6 +172,12 @@ export function AdminMetricsPage() {
           highlight={
             m.landing_conversion_rate_28d >= 0.05 && m.landing_visits_28d >= 20
           }
+        />
+        <KpiCard
+          label="W4 retention"
+          value={`${(m.retention_w4 * 100).toFixed(1)}%`}
+          hint={`${m.retained_w4}/${m.cohort_w4_size} cohort 28-56d`}
+          highlight={m.retention_w4 >= 0.3 && m.cohort_w4_size >= 5}
         />
       </section>
 

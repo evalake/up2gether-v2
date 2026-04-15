@@ -182,6 +182,22 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         round(signups_28d / landing_visits_28d, 4) if landing_visits_28d else 0
     )
 
+    # W4 retention: grupos criados 28-56d atras que tiveram atividade nos ultimos 14d.
+    # metrica #2 do BUSINESS.md. indicador mais duro de product-market fit.
+    d14 = now - timedelta(days=14)
+    cohort_stmt = select(Group.id).where(Group.created_at >= d56, Group.created_at < d28)
+    cohort_rows = (await db.execute(cohort_stmt)).all()
+    cohort_ids = [r[0] for r in cohort_rows]
+    retained_w4 = 0
+    if cohort_ids:
+        retained_stmt = select(func.count(func.distinct(Event.group_id))).where(
+            Event.occurred_at >= d14,
+            Event.group_id.in_(cohort_ids),
+        )
+        retained_w4 = int((await db.execute(retained_stmt)).scalar_one() or 0)
+    cohort_w4_size = len(cohort_ids)
+    retention_w4 = round(retained_w4 / cohort_w4_size, 4) if cohort_w4_size else 0
+
     # top referrers: agrega payload->>'ref' dos events de signup.
     # so aparece se ref nao for null. preserva nao-ativos pra futuro funnel.
     ref_col = Event.payload["ref"].astext.label("ref")
@@ -247,6 +263,9 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "landing_visits_28d": landing_visits_28d,
         "signups_28d": signups_28d,
         "landing_conversion_rate_28d": landing_conversion_rate_28d,
+        "cohort_w4_size": cohort_w4_size,
+        "retained_w4": retained_w4,
+        "retention_w4": retention_w4,
         "groups_by_tier": tiers,
         "mrr_if_all_paid_brl": mrr_if_all_paid,
         "mrr_billable_brl": mrr_billable,
