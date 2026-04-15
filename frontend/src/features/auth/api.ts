@@ -49,6 +49,23 @@ export function captureRef() {
   }
 }
 
+/** Registra uma visita a landing (1x por sessao). Nao bloqueia render, silencia erro.
+ * Alimenta landing_conversion_rate_28d no admin dashboard. */
+export function trackLandingVisit() {
+  try {
+    if (sessionStorage.getItem('u2g-visit-tracked') === '1') return
+    sessionStorage.setItem('u2g-visit-tracked', '1')
+    const ref = sessionStorage.getItem('u2g-ref')
+    const body: { ref?: string } = {}
+    if (ref) body.ref = ref
+    void api('/telemetry/visit', { method: 'POST', body }).catch(() => {
+      /* ignore (rate limit, offline, etc) */
+    })
+  } catch {
+    /* ignore */
+  }
+}
+
 export function fetchMe() {
   return api<DiscordUser>('/auth/me')
 }

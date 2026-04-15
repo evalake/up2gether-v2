@@ -1,12 +1,17 @@
+import { useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/store'
-import { discordLoginUrl } from '@/features/auth/api'
+import { discordLoginUrl, trackLandingVisit } from '@/features/auth/api'
 
 const BOT_INVITE_URL =
   'https://discord.com/oauth2/authorize?client_id=1478820217697075250&permissions=68608&integration_type=0&scope=bot+applications.commands'
 
 export function LandingPage() {
   const token = useAuthStore((s) => s.token)
+  // telemetria: registra visita so pra visitante (token presente ja passou do funil)
+  useEffect(() => {
+    if (!token) trackLandingVisit()
+  }, [token])
   // user logado vai direto pro dashboard, landing e pra visitante
   if (token) return <Navigate to="/groups" replace />
 

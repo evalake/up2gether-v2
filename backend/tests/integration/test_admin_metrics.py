@@ -7,6 +7,7 @@ import pytest
 from app.core.config import get_settings
 from app.services.events import (
     EVENT_GROUP_CREATED,
+    EVENT_LANDING_VISIT,
     EVENT_MEMBER_ACTIVATED,
     EVENT_SESSION_COMPLETED,
     EVENT_SESSION_CREATED,
@@ -403,6 +404,43 @@ async def test_metrics_tier_breakdown_empty(
     assert body["mrr_billable_brl"] == 0
     assert body["groups_billable"] == 0
     assert body["legacy_groups"] == 0
+
+
+async def test_metrics_landing_conversion(
+    make_user, auth_headers, client, db_session, as_sys_admin
+):
+    """landing_conversion_rate_28d: signups / landing visits. Topo do funil."""
+    admin = await make_user(discord_id="admin-conv", username="conv")
+    as_sys_admin(admin.discord_id)
+
+    # 10 visitas, 2 signups -> 20% conversao
+    for _ in range(10):
+        await track_event(db_session, EVENT_LANDING_VISIT)
+    u1 = await make_user()
+    u2 = await make_user()
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=u1.id)
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=u2.id)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["landing_visits_28d"] == 10
+    # signups inclui o admin + os 2 -> 3 member_activated (admin tambem)
+    assert body["signups_28d"] >= 2
+    assert body["landing_conversion_rate_28d"] > 0
+
+
+async def test_metrics_landing_conversion_zero_visits_safe(
+    make_user, auth_headers, client, as_sys_admin
+):
+    admin = await make_user(discord_id="admin-conv-empty", username="cempty")
+    as_sys_admin(admin.discord_id)
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["landing_visits_28d"] == 0
+    assert body["landing_conversion_rate_28d"] == 0
 
 
 async def test_metrics_daily_series(make_user, auth_headers, client, db_session, as_sys_admin):

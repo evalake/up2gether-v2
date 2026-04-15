@@ -25,6 +25,7 @@ EVENT_SESSION_COMPLETED = "session_completed"
 EVENT_VOTE_CREATED = "vote_created"
 EVENT_VOTE_CAST = "vote_cast"
 EVENT_VOTE_COMPLETED = "vote_completed"
+EVENT_LANDING_VISIT = "landing_visit"
 
 
 async def track_event(

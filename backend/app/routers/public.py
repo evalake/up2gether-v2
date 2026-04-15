@@ -9,12 +9,32 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.rate_limit import RateLimitAuth
 from app.domain.enums import SessionRsvp
 from app.models.game import Game
 from app.models.group import Group
 from app.models.session import PlaySession, SessionRsvpRow
+from app.services.events import EVENT_LANDING_VISIT, track_event
 
 router = APIRouter(tags=["public"])
+
+
+class VisitPayload(BaseModel):
+    # ref capturado da query ?ref=. truncado pra 64 no backend. sem IP, sem user_id.
+    ref: str | None = None
+
+
+@router.post("/telemetry/visit", status_code=status.HTTP_204_NO_CONTENT)
+async def track_visit(
+    payload: VisitPayload,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _rl: RateLimitAuth,
+) -> None:
+    body: dict = {}
+    if payload.ref:
+        body["ref"] = payload.ref[:64]
+    await track_event(db, EVENT_LANDING_VISIT, payload=body)
+    await db.commit()
 
 
 class PublicSessionCard(BaseModel):

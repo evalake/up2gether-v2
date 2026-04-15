@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.event import Event
 from app.models.group import Group, GroupMembership
 from app.services.events import (
+    EVENT_LANDING_VISIT,
     EVENT_MEMBER_ACTIVATED,
     EVENT_SESSION_COMPLETED,
     EVENT_SESSION_CREATED,
@@ -173,6 +174,14 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         round(sessions_completed_28d / sessions_created_28d, 4) if sessions_created_28d else 0
     )
 
+    # conversao do topo do funil: signups / visitas em 28d. mede se a landing
+    # converte ou so atrai curiosidade. abaixo de 5% -> revisar copy/CTA.
+    landing_visits_28d = int(last_28d.get(EVENT_LANDING_VISIT, 0))
+    signups_28d = int(last_28d.get(EVENT_MEMBER_ACTIVATED, 0))
+    landing_conversion_rate_28d = (
+        round(signups_28d / landing_visits_28d, 4) if landing_visits_28d else 0
+    )
+
     # top referrers: agrega payload->>'ref' dos events de signup.
     # so aparece se ref nao for null. preserva nao-ativos pra futuro funnel.
     ref_col = Event.payload["ref"].astext.label("ref")
@@ -235,6 +244,9 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "sessions_created_28d": sessions_created_28d,
         "sessions_completed_28d": sessions_completed_28d,
         "session_completion_rate_28d": session_completion_rate_28d,
+        "landing_visits_28d": landing_visits_28d,
+        "signups_28d": signups_28d,
+        "landing_conversion_rate_28d": landing_conversion_rate_28d,
         "groups_by_tier": tiers,
         "mrr_if_all_paid_brl": mrr_if_all_paid,
         "mrr_billable_brl": mrr_billable,

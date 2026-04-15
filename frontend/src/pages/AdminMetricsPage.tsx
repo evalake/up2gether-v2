@@ -14,9 +14,11 @@ const EVENT_LABEL: Record<string, string> = {
   vote_created: 'votacoes abertas',
   vote_cast: 'ballots enviados',
   vote_completed: 'votacoes fechadas',
+  landing_visit: 'visitas landing',
 }
 
 const ORDER = [
+  'landing_visit',
   'member_activated',
   'group_created',
   'group_joined',
@@ -149,6 +151,27 @@ export function AdminMetricsPage() {
           value={`${(m.session_completion_rate_28d * 100).toFixed(1)}%`}
           hint={`${m.sessions_completed_28d}/${m.sessions_created_28d} no mes`}
           highlight={m.session_completion_rate_28d >= 0.4}
+        />
+      </section>
+
+      <section className="mb-8 grid gap-4 md:grid-cols-3">
+        <KpiCard
+          label="landing visits 28d"
+          value={m.landing_visits_28d}
+          hint="anon hits em / (1x por sessao)"
+        />
+        <KpiCard
+          label="signups 28d"
+          value={m.signups_28d}
+          hint="member_activated (primeiro login)"
+        />
+        <KpiCard
+          label="landing -> signup"
+          value={`${(m.landing_conversion_rate_28d * 100).toFixed(1)}%`}
+          hint="abaixo de 5% revisar copy/CTA"
+          highlight={
+            m.landing_conversion_rate_28d >= 0.05 && m.landing_visits_28d >= 20
+          }
         />
       </section>
 
