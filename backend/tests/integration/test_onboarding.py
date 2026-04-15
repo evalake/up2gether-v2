@@ -66,13 +66,11 @@ async def test_onboarding_games_need_three(make_user, auth_headers, client):
 async def test_onboarding_complete_when_all_four(make_user, auth_headers, client):
     """Steps parciais somam corretamente. complete=True so quando 4/4."""
     u = await make_user(username="u")
-    g = (
-        await client.post(
-            "/api/groups",
-            json={"discord_guild_id": "onb-3", "name": "X"},
-            headers=auth_headers(u),
-        )
-    ).json()
+    await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "onb-3", "name": "X"},
+        headers=auth_headers(u),
+    )
     res = await client.get("/api/users/me/onboarding", headers=auth_headers(u))
     assert res.json()["complete"] is False
     assert res.json()["steps_done"] == 1  # group

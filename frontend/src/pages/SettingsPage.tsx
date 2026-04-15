@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/nerv/Button'
 import { KanjiLabel } from '@/components/nerv/KanjiLabel'
 import { Avatar } from '@/components/nerv/Avatar'
+import { InviteLinkSection } from '@/components/invite/InviteLinkSection'
 import { api } from '@/lib/api'
 import { useTitle } from '@/lib/useTitle'
 
@@ -165,6 +166,7 @@ export function SettingsPage() {
 
       <SteamLibrarySection />
       <PushNotificationsSection />
+      <InviteLinkSection />
 
       <div className="flex items-center justify-end gap-3">
         {dirty && <span className="text-[11px] text-nerv-amber">alterações não salvas</span>}

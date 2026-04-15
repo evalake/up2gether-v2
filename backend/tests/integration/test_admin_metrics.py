@@ -218,6 +218,42 @@ async def test_metrics_top_referrers(make_user, auth_headers, client, db_session
     assert by_ref["streamerA"] == 2
     assert by_ref["streamerB"] == 1
     assert len(top) == 2  # sem ref nao gera entry
+    # refs nao-uuid vem com user_name null
+    for t in top:
+        assert t["user_name"] is None
+
+
+async def test_metrics_top_referrers_resolves_uuid_to_user(
+    make_user, auth_headers, client, db_session, as_sys_admin
+):
+    """Quando o ref e um uuid de user valido, top_referrers resolve pro display_name."""
+    admin = await make_user(discord_id="admin-refu", username="refu")
+    as_sys_admin(admin.discord_id)
+
+    referrer = await make_user(username="the_host")
+    u1 = await make_user()
+    u2 = await make_user()
+
+    await track_event(
+        db_session,
+        EVENT_MEMBER_ACTIVATED,
+        user_id=u1.id,
+        payload={"ref": str(referrer.id)},
+    )
+    await track_event(
+        db_session,
+        EVENT_MEMBER_ACTIVATED,
+        user_id=u2.id,
+        payload={"ref": str(referrer.id)},
+    )
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    top = res.json()["top_referrers"]
+    assert len(top) == 1
+    assert top[0]["ref"] == str(referrer.id)
+    assert top[0]["count"] == 2
+    assert top[0]["user_name"] == referrer.discord_username
 
 
 async def test_metrics_active_groups(make_user, auth_headers, client, db_session, as_sys_admin):

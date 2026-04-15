@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import cast, desc, func, select
@@ -184,7 +185,8 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
     retention_w4 = round(retained_w4 / cohort_w4_size, 4) if cohort_w4_size else 0
 
     # top referrers: agrega payload->>'ref' dos events de signup.
-    # so aparece se ref nao for null. preserva nao-ativos pra futuro funnel.
+    # quando o ref e um uuid de user (link do programa de referral), resolve pro
+    # display_name. quando e string arbitraria (utm, canal externo), devolve crua.
     ref_col = Event.payload["ref"].astext.label("ref")
     ref_rows = (
         await db.execute(
@@ -198,7 +200,30 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
             .limit(10)
         )
     ).all()
-    top_referrers = [{"ref": r[0], "count": int(r[1])} for r in ref_rows]
+    ref_strings = [r[0] for r in ref_rows]
+    user_ref_map: dict[str, str] = {}
+    import contextlib
+
+    uuid_refs: list[uuid.UUID] = []
+    for rs in ref_strings:
+        with contextlib.suppress(ValueError, AttributeError, TypeError):
+            uuid_refs.append(uuid.UUID(rs))
+    if uuid_refs:
+        from app.models.user import User as UserModel
+
+        users = (
+            (await db.execute(select(UserModel).where(UserModel.id.in_(uuid_refs)))).scalars().all()
+        )
+        for u in users:
+            user_ref_map[str(u.id)] = u.discord_display_name or u.discord_username
+    top_referrers = [
+        {
+            "ref": r[0],
+            "count": int(r[1]),
+            "user_name": user_ref_map.get(r[0]),
+        }
+        for r in ref_rows
+    ]
 
     # tier breakdown + MRR potencial se todos pagassem (ignora legacy_free).
     # util pra validar pricing antes de ligar cobranca: onde a distribuicao

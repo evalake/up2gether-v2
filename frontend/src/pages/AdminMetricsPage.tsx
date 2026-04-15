@@ -344,7 +344,16 @@ export function AdminMetricsPage() {
               return (
                 <li key={r.ref} className="flex items-center gap-2">
                   <span className="w-5 text-right text-[10px] text-zinc-500">{i + 1}</span>
-                  <span className="min-w-0 flex-1 truncate text-zinc-200">{r.ref}</span>
+                  <span className="min-w-0 flex-1 truncate text-zinc-200">
+                    {r.user_name ? (
+                      <>
+                        <span className="text-nerv-green/90">@{r.user_name}</span>
+                        <span className="ml-1.5 text-[10px] text-zinc-500">{r.ref.slice(0, 8)}</span>
+                      </>
+                    ) : (
+                      r.ref
+                    )}
+                  </span>
                   <div className="relative h-1.5 w-24 overflow-hidden rounded-sm bg-zinc-800">
                     <div
                       className="h-full bg-orange-400/70"

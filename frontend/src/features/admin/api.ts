@@ -9,6 +9,7 @@ export type TopGroup = {
 export type TopReferrer = {
   ref: string
   count: number
+  user_name: string | null
 }
 
 export type DailyPoint = {
