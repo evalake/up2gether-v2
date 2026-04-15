@@ -22,6 +22,7 @@ from app.schemas.theme import (
     ThemeCreate,
     ThemeResponse,
 )
+from app.services.theme_engine import pick_theme_winners
 
 
 def _forbid(d: str) -> HTTPException:
@@ -427,40 +428,11 @@ class ThemeService:
         votes = await self.themes.list_votes(cycle_id)
         if not suggestions:
             raise _bad("sem sugestoes")
-        counts: dict[uuid.UUID, int] = {s.id: 0 for s in suggestions}
-        for v in votes:
-            if v.suggestion_id in counts:
-                counts[v.suggestion_id] += 1
-        # repeat-block K=3: se uma sugestao com nome igual a algum dos 3 ultimos
-        # temas do grupo vencer, deprioriza (so volta a contar se for o unico
-        # candidato com votos)
         recent_themes = await self.themes.list_for_group(group_id)
-        blocked_names = {t.theme_name.strip().lower() for t in recent_themes[:3]}
-        sug_by_id = {s.id: s for s in suggestions}
-        max_votes = max(counts.values()) if counts else 0
-        winners = [sid for sid, c in counts.items() if c == max_votes]
-        if blocked_names and max_votes > 0:
-            non_blocked = [
-                sid for sid in winners if sug_by_id[sid].name.strip().lower() not in blocked_names
-            ]
-            if non_blocked:
-                winners = non_blocked
-            else:
-                # todos top winners estao bloqueados: tenta o proximo nivel
-                ranked = sorted(counts.items(), key=lambda x: -x[1])
-                for _, c in ranked:
-                    if c == 0 or c == max_votes:
-                        continue
-                    level = [sid for sid, cc in counts.items() if cc == c]
-                    level_nb = [
-                        sid
-                        for sid in level
-                        if sug_by_id[sid].name.strip().lower() not in blocked_names
-                    ]
-                    if level_nb:
-                        winners = level_nb
-                        max_votes = c
-                        break
+        recent_names = [t.theme_name for t in recent_themes[:3]]
+        winners = pick_theme_winners(suggestions, [v.suggestion_id for v in votes], recent_names)
+        if not winners:
+            raise _bad("sem votos")
         if len(winners) == 1:
             return await self._finalize(cycle, winners[0], "vote", actor)
         kind = "tiebreak_coin" if len(winners) == 2 else "tiebreak_roulette"
