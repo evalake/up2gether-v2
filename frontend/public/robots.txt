@@ -5,4 +5,4 @@ Disallow: /groups/
 Disallow: /settings
 Disallow: /admin/
 
-Sitemap: https://up2gether.com.br/sitemap.xml
+Sitemap: https://www.up2gether.com.br/sitemap.xml
