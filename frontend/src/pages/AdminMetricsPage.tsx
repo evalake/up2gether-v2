@@ -97,7 +97,7 @@ export function AdminMetricsPage() {
         </Link>
       </header>
 
-      <section className="mb-4 grid gap-4 md:grid-cols-4">
+      <section className="mb-4 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         <KpiCard
           label="grupos ativos 1d"
           value={m.active_groups_1d}
@@ -118,6 +118,12 @@ export function AdminMetricsPage() {
           label="users ativos 7d"
           value={m.active_users_7d}
           hint="distinct user_id em events"
+        />
+        <KpiCard
+          label="dormentes"
+          value={m.dormant_groups}
+          hint="ativos em 28-56d, sumiram agora"
+          highlight={m.dormant_groups > 0 && m.dormant_groups >= m.active_groups_28d / 2}
         />
       </section>
 

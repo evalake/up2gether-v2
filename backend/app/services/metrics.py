@@ -41,6 +41,7 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
     d1 = now - timedelta(days=1)
     d7 = now - timedelta(days=7)
     d28 = now - timedelta(days=28)
+    d56 = now - timedelta(days=56)
 
     async def _active_groups(since: datetime) -> int:
         return int(
@@ -58,6 +59,28 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
     active_groups_1d = await _active_groups(d1)
     active_groups_7d = await _active_groups(d7)
     active_groups_28d = await _active_groups(d28)
+
+    # dormant: tinham atividade na janela 28-56d mas silenciaram nos ultimos 28d.
+    # serve pra planejar reengagement (email, mensagem direta no discord).
+    prev_active_stmt = select(func.distinct(Event.group_id)).where(
+        Event.occurred_at >= d56,
+        Event.occurred_at < d28,
+        Event.group_id.isnot(None),
+    )
+    current_active_stmt = select(func.distinct(Event.group_id)).where(
+        Event.occurred_at >= d28,
+        Event.group_id.isnot(None),
+    )
+    dormant_groups = int(
+        (
+            await db.execute(
+                select(func.count()).select_from(
+                    prev_active_stmt.except_(current_active_stmt).subquery()
+                )
+            )
+        ).scalar_one()
+        or 0
+    )
 
     active_users_7d = int(
         (
@@ -220,6 +243,7 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "active_groups_1d": active_groups_1d,
         "active_groups_7d": active_groups_7d,
         "active_groups_28d": active_groups_28d,
+        "dormant_groups": dormant_groups,
         "active_users_7d": active_users_7d,
         "top_referrers": top_referrers,
     }

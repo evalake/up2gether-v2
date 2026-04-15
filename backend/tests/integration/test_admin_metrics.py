@@ -253,6 +253,54 @@ async def test_metrics_active_groups(make_user, auth_headers, client, db_session
     assert body["active_groups_7d"] == 2
     assert body["active_groups_28d"] == 2
     assert body["active_users_7d"] == 1
+    assert body["dormant_groups"] == 0
+
+
+async def test_metrics_dormant_groups(make_user, auth_headers, client, db_session, as_sys_admin):
+    """dormant: grupos que tinham atividade em 28-56d mas silenciaram nos ultimos 28d.
+    Serve pra reengagement (email, DM). Se dormant_groups >> active_groups_28d, churn.
+    """
+    import uuid
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.event import Event
+
+    admin = await make_user(discord_id="admin-dormant", username="dorm")
+    as_sys_admin(admin.discord_id)
+
+    r1 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "dg-1", "name": "churned"},
+        headers=auth_headers(admin),
+    )
+    r2 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "dg-2", "name": "retained"},
+        headers=auth_headers(admin),
+    )
+    g1 = uuid.UUID(r1.json()["id"])
+    g2 = uuid.UUID(r2.json()["id"])
+
+    # backdate os events de criacao (auto gerados pelo POST) pra 40d atras,
+    # se nao g1 tb conta como ativo em 28d
+    old = datetime.now(UTC) - timedelta(days=40)
+    from sqlalchemy import update as sa_update
+
+    await db_session.execute(
+        sa_update(Event).where(Event.group_id.in_([g1, g2])).values(occurred_at=old)
+    )
+    # g1: atividade 40d atras, nada recente -> dormant
+    db_session.add(
+        Event(event_type=EVENT_VOTE_CAST, user_id=admin.id, group_id=g1, occurred_at=old)
+    )
+    # g2: atividade 40d atras + agora -> retained
+    await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id, group_id=g2)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["dormant_groups"] == 1
 
 
 async def test_metrics_tier_breakdown(make_user, auth_headers, client, db_session, as_sys_admin):

@@ -45,6 +45,7 @@ export type EventMetrics = {
   active_groups_1d: number
   active_groups_7d: number
   active_groups_28d: number
+  dormant_groups: number
   active_users_7d: number
   top_referrers: TopReferrer[]
 }
