@@ -8,6 +8,7 @@ import { useMe } from '@/features/auth/hooks'
 import { useGroup } from '@/features/groups/hooks'
 import { Avatar } from './Avatar'
 import { NotificationBell } from './NotificationBell'
+import { MiniCalendar } from './MiniCalendar'
 
 const TOP_NAV = [
   { label: 'groups', to: '/groups' },
@@ -217,6 +218,8 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         </motion.div>
       </main>
+
+      {inGroup && <MiniCalendar groupId={inGroup} />}
     </div>
   )
 }
