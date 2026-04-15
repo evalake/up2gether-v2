@@ -68,6 +68,66 @@ async def test_discord_callback_creates_new_user(app, client):
 
 
 @pytest.mark.asyncio
+async def test_discord_callback_records_referrer_on_new_signup(app, client, db_session):
+    """Ref vindo de ?ref=X na landing deve cair no payload do event de signup."""
+    from sqlalchemy import select
+
+    from app.models.event import Event
+    from app.services.events import EVENT_MEMBER_ACTIVATED
+
+    fake = FakeDiscordClient(
+        profile={"id": "777", "username": "ref-user", "global_name": "Ref", "avatar": None}
+    )
+    app.dependency_overrides[get_discord_client] = _override_discord(fake)
+
+    res = await client.post(
+        "/api/auth/discord/callback",
+        json={"code": "any", "ref": "streamer-foo"},
+    )
+    assert res.status_code == 200
+    assert res.json()["user"]["is_new_user"] is True
+
+    # confere que o event foi gravado com ref
+    rows = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_MEMBER_ACTIVATED)))
+        .scalars()
+        .all()
+    )
+    # pode ter varios events (existing users do conftest), filtra o do ref-user
+    user_events = [e for e in rows if e.payload and e.payload.get("discord_id") == "777"]
+    assert len(user_events) == 1
+    assert user_events[0].payload["ref"] == "streamer-foo"
+
+
+@pytest.mark.asyncio
+async def test_discord_callback_ref_truncated_to_64(app, client, db_session):
+    from sqlalchemy import select
+
+    from app.models.event import Event
+    from app.services.events import EVENT_MEMBER_ACTIVATED
+
+    fake = FakeDiscordClient(
+        profile={"id": "778", "username": "long-ref", "global_name": "L", "avatar": None}
+    )
+    app.dependency_overrides[get_discord_client] = _override_discord(fake)
+
+    long_ref = "x" * 200
+    res = await client.post(
+        "/api/auth/discord/callback",
+        json={"code": "any", "ref": long_ref},
+    )
+    assert res.status_code == 200
+
+    rows = (
+        (await db_session.execute(select(Event).where(Event.event_type == EVENT_MEMBER_ACTIVATED)))
+        .scalars()
+        .all()
+    )
+    ev = next(e for e in rows if e.payload and e.payload.get("discord_id") == "778")
+    assert len(ev.payload["ref"]) == 64
+
+
+@pytest.mark.asyncio
 async def test_discord_callback_updates_existing_user(app, client, db_session):
     existing = User(discord_id="999", discord_username="old", settings={})
     db_session.add(existing)

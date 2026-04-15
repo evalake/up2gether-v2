@@ -17,7 +17,7 @@ class AuthService:
         self.repo = repo
         self.discord = discord
 
-    async def login_with_discord(self, code: str) -> AuthTokenResponse:
+    async def login_with_discord(self, code: str, ref: str | None = None) -> AuthTokenResponse:
         token_bundle = await self.discord.exchange_code(code)
         access_token = token_bundle.get("access_token")
         refresh_token = token_bundle.get("refresh_token")
@@ -38,11 +38,15 @@ class AuthService:
         )
         if is_new:
             # seat ativado: primeira vez que o user loga via discord
+            payload: dict = {"discord_id": discord_id, "source": "oauth"}
+            if ref:
+                # trunca pra nao encher o banco com lixo
+                payload["ref"] = ref[:64]
             await track_event(
                 self.repo.db,
                 EVENT_MEMBER_ACTIVATED,
                 user_id=user.id,
-                payload={"discord_id": discord_id, "source": "oauth"},
+                payload=payload,
             )
 
         jwt_token = issue_access_token(user.id, user.discord_id)

@@ -29,7 +29,7 @@ async def discord_callback(
     payload: DiscordCallbackRequest,
     service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> AuthTokenResponse:
-    return await service.login_with_discord(payload.code)
+    return await service.login_with_discord(payload.code, ref=payload.ref)
 
 
 @router.get("/me", response_model=UserResponse)

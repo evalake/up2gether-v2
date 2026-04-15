@@ -18,7 +18,35 @@ export type LoginResponse = {
 }
 
 export function discordCallback(code: string) {
-  return api<LoginResponse>('/auth/discord/callback', { method: 'POST', body: { code } })
+  // pega ref capturado em qualquer pagina (stashado pelo captureRef). so e usado
+  // na primeira vez que o user loga (signup). o backend grava no payload do event.
+  let ref: string | null = null
+  try {
+    ref = sessionStorage.getItem('u2g-ref')
+  } catch {
+    /* ignore */
+  }
+  const body: { code: string; ref?: string } = { code }
+  if (ref) body.ref = ref
+  return api<LoginResponse>('/auth/discord/callback', { method: 'POST', body }).then((r) => {
+    try {
+      sessionStorage.removeItem('u2g-ref')
+    } catch {
+      /* ignore */
+    }
+    return r
+  })
+}
+
+/** Captura ?ref=X da URL atual e stasha pra usar no proximo signup. */
+export function captureRef() {
+  try {
+    const p = new URLSearchParams(window.location.search)
+    const ref = p.get('ref')
+    if (ref) sessionStorage.setItem('u2g-ref', ref.slice(0, 64))
+  } catch {
+    /* ignore */
+  }
 }
 
 export function fetchMe() {
