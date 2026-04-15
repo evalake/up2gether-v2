@@ -60,8 +60,8 @@ export function SessionsPage() {
   const [detailId, setDetailId] = useState<string | null>(null)
   const [fullDay, setFullDay] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    if (typeof window === 'undefined') return 'grid'
-    return (window.localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'grid'
+    if (typeof window === 'undefined') return 'list'
+    return (window.localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'list'
   })
 
   useEffect(() => {
@@ -88,8 +88,14 @@ export function SessionsPage() {
   const canDelete = group.data?.user_role === 'admin' || group.data?.user_role === 'mod'
 
   const openDraft = (start: Date) => {
-    if (start < new Date()) return
-    setDraft({ start })
+    const safe = new Date(start)
+    const nowDate = new Date()
+    if (safe < nowDate) {
+      safe.setTime(nowDate.getTime())
+      safe.setMinutes(0, 0, 0)
+      safe.setHours(safe.getHours() + 1)
+    }
+    setDraft({ start: safe })
     setTitle('')
     setGameId('')
     setDuration(120)
@@ -208,6 +214,7 @@ export function SessionsPage() {
         {draft && (
           <SessionDraftModal
             start={draft.start}
+            setStart={(d) => setDraft({ start: d })}
             games={games.data ?? []}
             gameId={gameId}
             setGameId={setGameId}

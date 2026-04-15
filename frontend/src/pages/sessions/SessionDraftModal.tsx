@@ -5,6 +5,7 @@ import type { Game } from '@/features/games/api'
 
 export function SessionDraftModal({
   start,
+  setStart,
   games,
   gameId,
   setGameId,
@@ -17,6 +18,7 @@ export function SessionDraftModal({
   isPending,
 }: {
   start: Date
+  setStart: (d: Date) => void
   games: Game[]
   gameId: string
   setGameId: (v: string) => void
@@ -39,6 +41,15 @@ export function SessionDraftModal({
   const selectedCover = selected ? steamCover(selected) : null
   const end = new Date(start.getTime() + duration * 60_000)
   const hour = (d: Date) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  const hh = String(start.getHours()).padStart(2, '0')
+  const mm = String(start.getMinutes()).padStart(2, '0')
+  const onTimeChange = (v: string) => {
+    const [h, m] = v.split(':').map((n) => parseInt(n, 10))
+    if (Number.isNaN(h) || Number.isNaN(m)) return
+    const next = new Date(start)
+    next.setHours(h, m, 0, 0)
+    setStart(next)
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -186,6 +197,48 @@ export function SessionDraftModal({
               placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
               className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
             />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+          >
+            <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+              <span>horário</span>
+              <span className="font-mono text-nerv-orange/80 tabular-nums">
+                {hour(start)} → {hour(end)}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="time"
+                value={`${hh}:${mm}`}
+                step={300}
+                onChange={(e) => onTimeChange(e.target.value)}
+                aria-label="horário de início"
+                className="h-9 w-28 rounded-sm border border-nerv-line/40 bg-black/30 px-3 font-mono text-sm text-nerv-text tabular-nums focus-visible:border-nerv-orange/60 focus-visible:outline-none [color-scheme:dark]"
+              />
+              <div className="flex flex-wrap gap-1">
+                {[19, 20, 21, 22].map((h) => {
+                  const on = start.getHours() === h && start.getMinutes() === 0
+                  return (
+                    <button
+                      key={h}
+                      type="button"
+                      onClick={() => onTimeChange(`${String(h).padStart(2, '0')}:00`)}
+                      className={`rounded-sm border px-2 py-1 font-mono text-[10px] tabular-nums transition-colors ${
+                        on
+                          ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
+                          : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/30 hover:text-nerv-text'
+                      }`}
+                    >
+                      {String(h).padStart(2, '0')}:00
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
           </motion.div>
 
           <motion.div

@@ -27,8 +27,8 @@ type Props = {
 
 export function CalendarGrid({ weekAnchor, hours, sessions, games, now, canExpand, onExpand, onOpenSlot, onOpenDetail }: Props) {
   return (
-    <div className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30" style={{ height: 'calc(100vh - 260px)', minHeight: 420 }}>
-      <div className="grid h-full min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(0, 1fr)) auto` }}>
+    <div className="overflow-x-auto rounded-sm border border-nerv-orange/15 bg-nerv-panel/30">
+      <div className="grid min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(56px, auto)) auto` }}>
         <div className="border-b border-nerv-orange/10" />
         {WEEKDAYS.map((wd, i) => {
           const day = addDays(weekAnchor, i)
