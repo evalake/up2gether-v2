@@ -8,7 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.event import Event
 from app.models.group import Group
-from app.services.events import EVENT_MEMBER_ACTIVATED
+from app.services.events import (
+    EVENT_MEMBER_ACTIVATED,
+    EVENT_SESSION_COMPLETED,
+    EVENT_SESSION_CREATED,
+)
 
 
 async def compute_event_metrics(db: AsyncSession) -> dict:
@@ -76,6 +80,30 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         d = today - timedelta(days=i)
         daily_28d.append({"date": d.isoformat(), "count": counts_by_day.get(d, 0)})
 
+    # health KPIs: activation e completion
+    groups_created_total = (
+        await db.execute(select(func.count()).select_from(Group))
+    ).scalar_one() or 0
+
+    groups_with_session = (
+        await db.execute(
+            select(func.count(func.distinct(Event.group_id))).where(
+                Event.event_type == EVENT_SESSION_CREATED,
+                Event.group_id.isnot(None),
+            )
+        )
+    ).scalar_one() or 0
+
+    activation_rate = (
+        round(groups_with_session / groups_created_total, 4) if groups_created_total else 0
+    )
+
+    sessions_created_28d = int(last_28d.get(EVENT_SESSION_CREATED, 0))
+    sessions_completed_28d = int(last_28d.get(EVENT_SESSION_COMPLETED, 0))
+    session_completion_rate_28d = (
+        round(sessions_completed_28d / sessions_created_28d, 4) if sessions_created_28d else 0
+    )
+
     return {
         "totals": totals,
         "last_7d": last_7d,
@@ -83,4 +111,10 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "seats_activated": int(seats or 0),
         "top_groups": top_groups,
         "daily_28d": daily_28d,
+        "groups_created_total": int(groups_created_total),
+        "groups_with_session": int(groups_with_session),
+        "activation_rate": activation_rate,
+        "sessions_created_28d": sessions_created_28d,
+        "sessions_completed_28d": sessions_completed_28d,
+        "session_completion_rate_28d": session_completion_rate_28d,
     }

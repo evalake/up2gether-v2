@@ -27,6 +27,38 @@ const ORDER = [
   'vote_completed',
 ]
 
+function KpiCard({
+  label,
+  value,
+  hint,
+  highlight,
+}: {
+  label: string
+  value: string | number
+  hint?: string
+  highlight?: boolean
+}) {
+  return (
+    <div
+      className={`rounded-lg border p-5 ${
+        highlight
+          ? 'border-orange-500/40 bg-orange-500/5'
+          : 'border-zinc-800 bg-zinc-900/40'
+      }`}
+    >
+      <div className="text-[11px] uppercase tracking-wide text-zinc-400">{label}</div>
+      <div
+        className={`mt-2 font-mono text-3xl ${
+          highlight ? 'text-orange-400' : 'text-zinc-100'
+        }`}
+      >
+        {value}
+      </div>
+      {hint && <div className="mt-1 text-[10px] text-zinc-500">{hint}</div>}
+    </div>
+  )
+}
+
 export function AdminMetricsPage() {
   useTitle('metrics')
   const me = useMe()
@@ -65,12 +97,29 @@ export function AdminMetricsPage() {
         </Link>
       </header>
 
-      <section className="mb-8 rounded-lg border border-orange-500/25 bg-zinc-900/60 p-5">
-        <div className="text-xs uppercase tracking-wide text-zinc-400">seats ativados</div>
-        <div className="mt-2 font-mono text-4xl text-orange-400">{m.seats_activated}</div>
-        <div className="mt-1 text-[11px] text-zinc-500">
-          users distintos que completaram o 1o login via discord
-        </div>
+      <section className="mb-8 grid gap-4 md:grid-cols-4">
+        <KpiCard
+          label="seats ativados"
+          value={m.seats_activated}
+          hint="users que logaram via discord"
+        />
+        <KpiCard
+          label="grupos criados"
+          value={m.groups_created_total}
+          hint={`${m.groups_with_session} com >=1 sessao`}
+        />
+        <KpiCard
+          label="activation rate"
+          value={`${(m.activation_rate * 100).toFixed(1)}%`}
+          hint="grupos que tiveram sessao / total"
+          highlight={m.activation_rate >= 0.5}
+        />
+        <KpiCard
+          label="session completion 28d"
+          value={`${(m.session_completion_rate_28d * 100).toFixed(1)}%`}
+          hint={`${m.sessions_completed_28d}/${m.sessions_created_28d} no mes`}
+          highlight={m.session_completion_rate_28d >= 0.4}
+        />
       </section>
 
       <section className="rounded-lg border border-zinc-800 bg-zinc-900/40">

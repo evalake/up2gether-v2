@@ -6,7 +6,9 @@ import pytest
 
 from app.core.config import get_settings
 from app.services.events import (
+    EVENT_GROUP_CREATED,
     EVENT_MEMBER_ACTIVATED,
+    EVENT_SESSION_COMPLETED,
     EVENT_SESSION_CREATED,
     EVENT_VOTE_CAST,
     track_event,
@@ -114,6 +116,73 @@ async def test_metrics_top_groups(make_user, auth_headers, client, db_session, a
     assert str(g2_id) in by_id
     assert by_id[str(g1_id)]["events_28d"] > by_id[str(g2_id)]["events_28d"]
     assert by_id[str(g1_id)]["name"] == "ativo"
+
+
+async def test_metrics_health_kpis(make_user, auth_headers, client, db_session, as_sys_admin):
+    import uuid
+
+    admin = await make_user(discord_id="admin-health", username="health")
+    as_sys_admin(admin.discord_id)
+
+    # 3 grupos criados, 2 deles receberam sessao (activated)
+    r1 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "hg-1", "name": "g1"},
+        headers=auth_headers(admin),
+    )
+    r2 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "hg-2", "name": "g2"},
+        headers=auth_headers(admin),
+    )
+    await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "hg-3", "name": "g3"},
+        headers=auth_headers(admin),
+    )
+    g1 = uuid.UUID(r1.json()["id"])
+    g2 = uuid.UUID(r2.json()["id"])
+
+    # g1 teve 2 sessoes criadas, 1 concluida. g2 teve 1 criada, 0 concluida
+    await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id, group_id=g1)
+    await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id, group_id=g1)
+    await track_event(db_session, EVENT_SESSION_COMPLETED, user_id=admin.id, group_id=g1)
+    await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id, group_id=g2)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    # activation = grupos com >= 1 session_created / total de grupos criados
+    assert body["groups_created_total"] >= 3
+    assert body["groups_with_session"] == 2
+    # 2/3 grupos tiveram pelo menos 1 sessao
+    assert 0.66 <= body["activation_rate"] <= 0.67
+    # sessoes criadas = 3, concluidas = 1 -> completion rate = 0.33
+    assert body["sessions_created_28d"] == 3
+    assert body["sessions_completed_28d"] == 1
+    assert 0.33 <= body["session_completion_rate_28d"] <= 0.34
+
+
+async def test_metrics_health_kpis_empty_safe(
+    make_user, auth_headers, client, db_session, as_sys_admin
+):
+    admin = await make_user(discord_id="admin-empty", username="empty")
+    as_sys_admin(admin.discord_id)
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    # sem grupos nenhum, rates viram 0 (nunca dividir por zero)
+    assert body["groups_created_total"] == 0
+    assert body["groups_with_session"] == 0
+    assert body["activation_rate"] == 0
+    assert body["session_completion_rate_28d"] == 0
+    # precisa aceitar mesmo sem dado, nao e erro
+    assert (
+        EVENT_GROUP_CREATED not in body.get("totals", {})
+        or body["totals"][EVENT_GROUP_CREATED] >= 0
+    )
 
 
 async def test_metrics_daily_series(make_user, auth_headers, client, db_session, as_sys_admin):
