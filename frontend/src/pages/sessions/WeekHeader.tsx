@@ -1,45 +1,113 @@
+import { useRef } from 'react'
+
+const MONTHS_SHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+
+type ViewMode = 'grid' | 'list'
+
 type Props = {
-  weekLabel: string
-  fullDay: boolean
+  weekAnchor: Date
+  viewMode: ViewMode
   onPrev: () => void
   onNext: () => void
   onToday: () => void
-  onToggleFullDay: () => void
+  onJump: (d: Date) => void
+  onViewChange: (v: ViewMode) => void
 }
 
-export function WeekHeader({ weekLabel, fullDay, onPrev, onNext, onToday, onToggleFullDay }: Props) {
+function fmtRange(anchor: Date): string {
+  const end = new Date(anchor)
+  end.setDate(anchor.getDate() + 6)
+  const sameMonth = anchor.getMonth() === end.getMonth()
+  const a = `${MONTHS_SHORT[anchor.getMonth()]} ${anchor.getDate()}`
+  const b = sameMonth ? `${end.getDate()}` : `${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`
+  return `${a} — ${b}`
+}
+
+export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJump, onViewChange }: Props) {
+  const dateRef = useRef<HTMLInputElement>(null)
+  const today = new Date()
+  const isThisWeek = (() => {
+    const d = new Date(today)
+    d.setHours(0, 0, 0, 0)
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7))
+    return d.getTime() === weekAnchor.getTime()
+  })()
+
+  const openPicker = () => {
+    const el = dateRef.current
+    if (!el) return
+    el.showPicker?.() ?? el.click()
+  }
+
   return (
-    <div className="flex items-center gap-1 rounded-full border border-nerv-line/60 bg-nerv-panel/40 px-1 py-1 text-[11px] text-nerv-dim">
-      <button
-        onClick={onPrev}
-        aria-label="semana anterior"
-        title="semana anterior"
-        className="grid h-7 w-7 place-items-center rounded-full hover:bg-nerv-orange/10 hover:text-nerv-orange transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-      </button>
-      <span className="min-w-[110px] text-center text-nerv-text/90 tabular-nums">{weekLabel}</span>
-      <button
-        onClick={onNext}
-        aria-label="próxima semana"
-        title="próxima semana"
-        className="grid h-7 w-7 place-items-center rounded-full hover:bg-nerv-orange/10 hover:text-nerv-orange transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-      </button>
-      <button
-        onClick={onToday}
-        className="ml-1 rounded-full px-3 h-7 text-[10px] uppercase tracking-wider hover:bg-nerv-orange/10 hover:text-nerv-orange transition-colors"
-      >
-        hoje
-      </button>
-      <button
-        onClick={onToggleFullDay}
-        title={fullDay ? 'mostrar só prime time' : 'mostrar dia todo'}
-        className={`ml-1 rounded-full px-3 h-7 text-[10px] uppercase tracking-wider transition-colors ${fullDay ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:bg-nerv-orange/10 hover:text-nerv-orange'}`}
-      >
-        {fullDay ? 'dia todo' : 'noite'}
-      </button>
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-0.5 rounded-full border border-nerv-line/60 bg-nerv-panel/40 p-1 text-nerv-dim">
+        <button
+          type="button"
+          onClick={onPrev}
+          aria-label="semana anterior"
+          title="semana anterior"
+          className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <button
+          type="button"
+          onClick={openPicker}
+          title="escolher data"
+          className="relative min-w-[110px] rounded-full px-3 py-0.5 text-center text-[12px] text-nerv-text/90 tabular-nums transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange"
+        >
+          {fmtRange(weekAnchor)}
+          <input
+            ref={dateRef}
+            type="date"
+            defaultValue={weekAnchor.toISOString().slice(0, 10)}
+            onChange={(e) => e.target.value && onJump(new Date(e.target.value + 'T00:00:00'))}
+            className="pointer-events-none absolute inset-0 opacity-0"
+            tabIndex={-1}
+            aria-hidden
+          />
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          aria-label="próxima semana"
+          title="próxima semana"
+          className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+        <button
+          type="button"
+          onClick={onToday}
+          disabled={isThisWeek}
+          aria-label="semana de hoje"
+          title="ir pra semana de hoje"
+          className="ml-0.5 grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange disabled:cursor-default disabled:text-nerv-dim/40 disabled:hover:bg-transparent disabled:hover:text-nerv-dim/40"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z" /></svg>
+        </button>
+      </div>
+      <div className="flex items-center rounded-full border border-nerv-line/60 bg-nerv-panel/40 p-1 text-[10px] uppercase tracking-wider text-nerv-dim">
+        <button
+          type="button"
+          onClick={() => onViewChange('grid')}
+          aria-pressed={viewMode === 'grid'}
+          title="grade por horário"
+          className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'grid' ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:text-nerv-orange'}`}
+        >
+          grade
+        </button>
+        <button
+          type="button"
+          onClick={() => onViewChange('list')}
+          aria-pressed={viewMode === 'list'}
+          title="lista por dia"
+          className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'list' ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:text-nerv-orange'}`}
+        >
+          lista
+        </button>
+      </div>
     </div>
   )
 }

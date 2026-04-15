@@ -19,14 +19,16 @@ type Props = {
   sessions: PlaySession[]
   games: Game[]
   now: Date
+  canExpand: boolean
+  onExpand: () => void
   onOpenSlot: (start: Date) => void
   onOpenDetail: (sessionId: string) => void
 }
 
-export function CalendarGrid({ weekAnchor, hours, sessions, games, now, onOpenSlot, onOpenDetail }: Props) {
+export function CalendarGrid({ weekAnchor, hours, sessions, games, now, canExpand, onExpand, onOpenSlot, onOpenDetail }: Props) {
   return (
     <div className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30" style={{ height: 'calc(100vh - 260px)', minHeight: 420 }}>
-      <div className="grid h-full min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(0, 1fr))` }}>
+      <div className="grid h-full min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(0, 1fr)) auto` }}>
         <div className="border-b border-nerv-orange/10" />
         {WEEKDAYS.map((wd, i) => {
           const day = addDays(weekAnchor, i)
@@ -97,6 +99,18 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, onOpenSl
             })}
           </div>
         ))}
+        {canExpand && (
+          <div className="col-span-8 border-t border-nerv-orange/10 px-2 py-1.5 text-center">
+            <button
+              type="button"
+              onClick={onExpand}
+              className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
+              title="mostrar todas as horas do dia"
+            >
+              + mostrar 24h
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

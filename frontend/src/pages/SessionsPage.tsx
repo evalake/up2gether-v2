@@ -14,11 +14,14 @@ import { SessionDraftModal } from './sessions/SessionDraftModal'
 import { WeekHeader } from './sessions/WeekHeader'
 import { UpcomingStrip } from './sessions/UpcomingStrip'
 import { CalendarGrid } from './sessions/CalendarGrid'
+import { WeekList } from './sessions/WeekList'
 import { PastSessions } from './sessions/PastSessions'
 
-const PRIME_HOURS = Array.from({ length: 8 }, (_, i) => i + 16) // 16..23
-const FULL_HOURS = Array.from({ length: 16 }, (_, i) => i + 8) // 08..23
+const DEFAULT_HOURS = [18, 19, 20, 21, 22, 23]
 const MAX_FUTURE_YEARS = 1
+const VIEW_KEY = 'up2.sessions.view'
+
+type ViewMode = 'grid' | 'list'
 
 function startOfWeek(d: Date): Date {
   const x = new Date(d)
@@ -56,6 +59,14 @@ export function SessionsPage() {
   const [openPast, setOpenPast] = useState(false)
   const [detailId, setDetailId] = useState<string | null>(null)
   const [fullDay, setFullDay] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window === 'undefined') return 'grid'
+    return (window.localStorage.getItem(VIEW_KEY) as ViewMode) ?? 'grid'
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') window.localStorage.setItem(VIEW_KEY, viewMode)
+  }, [viewMode])
 
   useEffect(() => {
     if (detailId && sessions.data && !sessions.data.some((s) => s.id === detailId)) {
@@ -63,19 +74,16 @@ export function SessionsPage() {
     }
   }, [detailId, sessions.data])
 
+  // hours = auto-densidade a partir dos dados do grupo, fallback 18-23
   const hours = useMemo(() => {
-    if (fullDay) return FULL_HOURS
-    const extras = new Set<number>()
-    for (const s of sessions.data ?? []) {
-      const d = new Date(s.start_at)
-      const h = d.getHours()
-      if (d >= weekAnchor && d < addDays(weekAnchor, 7) && (h < 16 || h > 23)) {
-        extras.add(h)
-      }
-    }
-    if (extras.size === 0) return PRIME_HOURS
-    return Array.from(new Set([...PRIME_HOURS, ...extras])).sort((a, b) => a - b)
-  }, [fullDay, sessions.data, weekAnchor])
+    if (fullDay) return Array.from({ length: 24 }, (_, i) => i)
+    const used = new Set<number>()
+    for (const s of sessions.data ?? []) used.add(new Date(s.start_at).getHours())
+    const base = used.size > 0 ? [...used] : DEFAULT_HOURS
+    const lo = Math.max(0, Math.min(...base, 18) - 1)
+    const hi = Math.min(23, Math.max(...base, 23))
+    return Array.from({ length: hi - lo + 1 }, (_, i) => lo + i)
+  }, [fullDay, sessions.data])
 
   const canDelete = group.data?.user_role === 'admin' || group.data?.user_role === 'mod'
 
@@ -113,16 +121,19 @@ export function SessionsPage() {
     }
   }
 
-  const { upcoming, past } = useMemo(() => {
+  const { upcoming, past, weekSessions } = useMemo(() => {
     const nowDate = new Date()
     const all = sessions.data ?? []
+    const weekEnd = addDays(weekAnchor, 7)
     return {
       upcoming: all.filter((s) => new Date(s.start_at) >= nowDate).sort((a, b) => a.start_at.localeCompare(b.start_at)),
       past: all.filter((s) => new Date(s.start_at) < nowDate).sort((a, b) => b.start_at.localeCompare(a.start_at)),
+      weekSessions: all.filter((s) => {
+        const d = new Date(s.start_at)
+        return d >= weekAnchor && d < weekEnd
+      }),
     }
-  }, [sessions.data])
-
-  const weekLabel = `${weekAnchor.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} – ${addDays(weekAnchor, 6).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}`
+  }, [sessions.data, weekAnchor])
 
   return (
     <div className="space-y-8">
@@ -132,12 +143,13 @@ export function SessionsPage() {
           <p className="mt-1 text-xs text-nerv-dim">toque num horário livre para agendar</p>
         </div>
         <WeekHeader
-          weekLabel={weekLabel}
-          fullDay={fullDay}
+          weekAnchor={weekAnchor}
+          viewMode={viewMode}
           onPrev={() => setWeekAnchor(addDays(weekAnchor, -7))}
           onNext={() => setWeekAnchor(addDays(weekAnchor, 7))}
           onToday={() => setWeekAnchor(startOfWeek(new Date()))}
-          onToggleFullDay={() => setFullDay((v) => !v)}
+          onJump={(d) => setWeekAnchor(startOfWeek(d))}
+          onViewChange={setViewMode}
         />
       </header>
 
@@ -161,15 +173,28 @@ export function SessionsPage() {
         }}
       />
 
-      <CalendarGrid
-        weekAnchor={weekAnchor}
-        hours={hours}
-        sessions={sessions.data ?? []}
-        games={games.data ?? []}
-        now={now}
-        onOpenSlot={openDraft}
-        onOpenDetail={setDetailId}
-      />
+      {viewMode === 'grid' ? (
+        <CalendarGrid
+          weekAnchor={weekAnchor}
+          hours={hours}
+          sessions={sessions.data ?? []}
+          games={games.data ?? []}
+          now={now}
+          canExpand={!fullDay}
+          onExpand={() => setFullDay(true)}
+          onOpenSlot={openDraft}
+          onOpenDetail={setDetailId}
+        />
+      ) : (
+        <WeekList
+          weekAnchor={weekAnchor}
+          sessions={weekSessions}
+          games={games.data ?? []}
+          now={now}
+          onOpenSlot={openDraft}
+          onOpenDetail={setDetailId}
+        />
+      )}
 
       <PastSessions
         past={past}
