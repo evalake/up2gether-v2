@@ -226,7 +226,7 @@ export function GroupsPage() {
             transition={{ delay: i * 0.04 }}
           >
             <Link to={`/groups/${g.id}`} className="block">
-              <div className="group relative overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/60 p-4 transition-all hover:border-nerv-orange hover:shadow-[0_0_30px_rgba(255,102,0,0.2)]">
+              <div className="group relative flex min-h-[180px] flex-col overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/60 p-4 transition-all hover:border-nerv-orange hover:shadow-[0_0_30px_rgba(255,102,0,0.2)]">
                 {(g.banner_url || g.icon_url) && (
                   <div className="pointer-events-none absolute inset-0">
                     <img

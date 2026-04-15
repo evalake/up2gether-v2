@@ -64,7 +64,7 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
 
             <div className="border-b border-nerv-line/40 px-5 py-3">
               <div className="text-[11px] uppercase tracking-wider text-nerv-orange">
-                Audit da votação
+                Auditoria da votação
               </div>
             </div>
 
@@ -200,7 +200,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                   />
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs text-nerv-text">
+                  <div className="truncate text-xs text-nerv-text" title={g?.name ?? undefined}>
                     {g?.name ?? '(removido)'}
                   </div>
                 </div>
@@ -219,7 +219,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
         </div>
         {voters.length === 0 ? (
           <div className="rounded-sm border border-nerv-line/40 bg-black/20 py-4 text-center text-[11px] text-nerv-dim">
-            ninguem votou ainda
+            ninguém votou ainda
           </div>
         ) : (
           <div className="space-y-2">
@@ -236,7 +236,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                     size="sm"
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm text-nerv-text">{v.display_name}</div>
+                    <div className="truncate text-sm text-nerv-text" title={v.display_name ?? undefined}>{v.display_name}</div>
                     <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
                       {fmt(v.submitted_at)}
                       {v.stage_number != null && ` · stage ${v.stage_number}`}

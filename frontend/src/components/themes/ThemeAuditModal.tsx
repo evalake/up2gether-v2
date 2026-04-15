@@ -250,7 +250,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useThemeAudit
       {non_voters.length > 0 && (
         <section>
           <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
-            Nao votaram ({non_voters.length})
+            Não votaram ({non_voters.length})
           </div>
           <div className="flex flex-wrap gap-2">
             {non_voters.map((p) => (
@@ -274,7 +274,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useThemeAudit
       {non_suggesters.length > 0 && (
         <section>
           <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
-            Nao sugeriram ({non_suggesters.length})
+            Não sugeriram ({non_suggesters.length})
           </div>
           <div className="flex flex-wrap gap-2">
             {non_suggesters.map((p) => (

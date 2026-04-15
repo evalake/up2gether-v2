@@ -64,7 +64,7 @@ export function DangerZone({
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
             <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
               <p className="text-xs text-nerv-red">
-                Apaga o servidor e tudo dentro. Nao da pra desfazer. Tem certeza?
+                Apaga o servidor e tudo dentro. Não dá pra desfazer. Tem certeza?
               </p>
               <div className="flex shrink-0 gap-2">
                 <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>

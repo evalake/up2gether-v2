@@ -347,7 +347,7 @@ function Group({
         <div className={`mb-1.5 text-[10px] uppercase tracking-wider ${tone}`}>
           {title} <span className="tabular-nums text-nerv-dim">0</span>
         </div>
-        <div className="text-[11px] text-nerv-dim/60">ninguem ainda</div>
+        <div className="text-[11px] text-nerv-dim/60">ninguém ainda</div>
       </div>
     )
   }

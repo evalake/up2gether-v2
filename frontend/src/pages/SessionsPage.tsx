@@ -145,7 +145,7 @@ export function SessionsPage() {
           <button
             onClick={() => setWeekAnchor(addDays(weekAnchor, 7))}
             aria-label="próxima semana"
-            title="proxima semana"
+            title="próxima semana"
             className="grid h-7 w-7 place-items-center rounded-full hover:bg-nerv-orange/10 hover:text-nerv-orange transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
@@ -213,7 +213,7 @@ export function SessionsPage() {
                   )}
                   <div className="flex min-w-0 flex-col justify-center gap-1 px-4 pr-6">
                     <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-nerv-orange/50 bg-nerv-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange">
-                      proxima · {rel}
+                      próxima · {rel}
                     </span>
                     <span className="truncate font-display text-lg leading-tight text-nerv-text group-hover/hero:text-nerv-orange">
                       {s.title}

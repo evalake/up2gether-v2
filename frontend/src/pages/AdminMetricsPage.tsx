@@ -138,12 +138,12 @@ export function AdminMetricsPage() {
         <KpiCard
           label="grupos criados"
           value={m.groups_created_total}
-          hint={`${m.groups_with_session} com >=1 sessao`}
+          hint={`${m.groups_with_session} com >=1 sessão`}
         />
         <KpiCard
           label="activation rate"
           value={`${(m.activation_rate * 100).toFixed(1)}%`}
-          hint="grupos que tiveram sessao / total"
+          hint="grupos que tiveram sessão / total"
           highlight={m.activation_rate >= 0.5}
         />
         <KpiCard
@@ -158,7 +158,7 @@ export function AdminMetricsPage() {
         <KpiCard
           label="landing visits 28d"
           value={m.landing_visits_28d}
-          hint="anon hits em / (1x por sessao)"
+          hint="anon hits em / (1x por sessão)"
         />
         <KpiCard
           label="signups 28d"

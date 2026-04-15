@@ -79,6 +79,7 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
               <button
                 key={s.value}
                 onClick={() => setInt.mutate({ gameId: g.id, signal: s.value })}
+                aria-label={`marcar interesse: ${s.label}`}
                 className={`flex-1 rounded-sm border px-1 py-1 text-[9px] uppercase tracking-wider transition-all ${
                   g.user_interest === s.value
                     ? `${s.color} bg-current/10`

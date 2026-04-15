@@ -195,11 +195,11 @@ function DangerZoneSection() {
     setLoading(true)
     try {
       await deleteMyAccount()
-      toast.success('Conta excluída. Até logo.')
+      toast.success('conta excluída, até logo')
       logout()
       navigate('/', { replace: true })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Falha ao excluir conta')
+      toast.error(e instanceof Error ? e.message : 'falha ao excluir conta')
       setLoading(false)
     }
   }

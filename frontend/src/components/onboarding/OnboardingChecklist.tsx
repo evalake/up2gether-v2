@@ -8,7 +8,7 @@ const STEPS: {
 }[] = [
   { key: 'has_group', label: 'conecta um servidor', hint: 'importa do discord em 1 clique' },
   { key: 'has_games', label: 'cataloga 3 jogos', hint: 'adiciona os top games da galera' },
-  { key: 'has_session', label: 'cria uma sessao', hint: 'marca o proximo play' },
+  { key: 'has_session', label: 'cria uma sessão', hint: 'marca o próximo play' },
   { key: 'has_vote', label: 'vota num game', hint: 'participa de uma enquete' },
 ]
 

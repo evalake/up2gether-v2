@@ -15,7 +15,7 @@ export function InviteLinkSection() {
       toast.success('link copiado')
       setTimeout(() => setCopied(false), 1800)
     } catch {
-      toast.error('nao rolou copiar, selecione a mao')
+      toast.error('não rolou copiar, selecione à mão')
     }
   }
   return (
@@ -24,7 +24,7 @@ export function InviteLinkSection() {
         convide a galera
       </div>
       <p className="mb-3 text-xs leading-relaxed text-nerv-text/70">
-        manda esse link pra comunidade. cada signup atraves dele fica creditado pra voce no painel
+        manda esse link pra comunidade. cada signup através dele fica creditado pra você no painel
         (e ajuda a gente a entender de onde vem o pessoal bom).
       </p>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">

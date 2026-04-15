@@ -100,7 +100,7 @@ export function GameSidebar({
         <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">quem tem <span className="text-nerv-orange tabular-nums">{owners?.length ?? 0}</span></div>
         {ownersLoading && <Loading />}
         {owners && owners.length === 0 && (
-          <p className="text-xs text-nerv-dim">ninguem marcou ainda.</p>
+          <p className="text-xs text-nerv-dim">ninguém marcou ainda.</p>
         )}
         <div className="space-y-1.5">
           {owners?.map((o) => (
