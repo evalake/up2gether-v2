@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useGames } from '@/features/games/hooks'
-import { Loading } from '@/components/ui/Loading'
+import { GameGridSkeleton } from '@/components/ui/CardSkeletons'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Button } from '@/components/nerv/Button'
@@ -103,7 +103,7 @@ export function GamesPage() {
         />
       )}
 
-      {games.isLoading && <Loading />}
+      {games.isLoading && <GameGridSkeleton count={8} />}
       {games.error && <ErrorBox error={games.error} />}
       {games.data && games.data.length === 0 && (
         <EmptyState title="biblioteca vazia" hint="adicione o primeiro jogo para começar uma votação" />

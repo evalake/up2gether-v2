@@ -8,7 +8,7 @@ import {
 } from '@/features/sessions/hooks'
 import { SessionDetailModal } from '@/components/sessions/SessionDetailModal'
 import { useGroup } from '@/features/groups/hooks'
-import { Loading } from '@/components/ui/Loading'
+import { SessionListSkeleton } from '@/components/ui/CardSkeletons'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
@@ -166,7 +166,7 @@ export function SessionsPage() {
         </div>
       </header>
 
-      {sessions.isLoading && <Loading />}
+      {sessions.isLoading && <SessionListSkeleton count={4} />}
       {sessions.error && <ErrorBox error={sessions.error} />}
 
       {!sessions.isLoading && (sessions.data?.length ?? 0) === 0 && (
@@ -365,6 +365,7 @@ export function SessionsPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className="grid gap-3 overflow-hidden sm:grid-cols-2"
             >
               {past.map((s) => {
@@ -372,7 +373,7 @@ export function SessionsPage() {
                 const cover = game ? steamCover(game) : null
                 const start = new Date(s.start_at)
                 return (
-                  <button key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:bg-nerv-panel/50 hover:shadow-lg hover:shadow-black/20">
+                  <motion.button layout key={s.id} type="button" onClick={() => setDetailId(s.id)} className="flex gap-3 rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:bg-nerv-panel/50 hover:shadow-lg hover:shadow-black/20">
                     {cover ? (
                       <img loading="lazy" src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
@@ -392,7 +393,7 @@ export function SessionsPage() {
                         <span className="ml-auto text-nerv-dim/70">{s.duration_minutes / 60}h</span>
                       </div>
                     </div>
-                  </button>
+                  </motion.button>
                 )
               })}
             </motion.div>

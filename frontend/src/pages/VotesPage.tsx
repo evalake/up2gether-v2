@@ -8,7 +8,7 @@ import {
   useSubmitBallot,
   useVotes,
 } from '@/features/votes/hooks'
-import { Loading } from '@/components/ui/Loading'
+import { VoteListSkeleton } from '@/components/ui/CardSkeletons'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
@@ -162,7 +162,7 @@ export function VotesPage() {
         </button>
       </header>
 
-      {votes.isLoading && <Loading />}
+      {votes.isLoading && <VoteListSkeleton count={3} />}
       {votes.error && <ErrorBox error={votes.error} />}
 
       {open.length === 0 && closed.length === 0 && !votes.isLoading && (
