@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
 import { useCreateSession, useSessions } from '@/features/sessions/hooks'
@@ -35,7 +35,6 @@ const addDays = (d: Date, n: number) => {
 
 export function SessionsPage() {
   const { id = '' } = useParams()
-  const location = useLocation()
   const sessions = useSessions(id)
   const games = useGames(id)
   const create = useCreateSession(id)
@@ -43,11 +42,7 @@ export function SessionsPage() {
   const group = useGroup(id)
   useTitle(group.data ? `sessoes · ${group.data.name}` : undefined)
 
-  const [weekAnchor, setWeekAnchor] = useState(() => {
-    const state = location.state as { weekOf?: string } | null
-    if (state?.weekOf) return startOfWeek(new Date(state.weekOf))
-    return startOfWeek(new Date())
-  })
+  const [weekAnchor, setWeekAnchor] = useState(() => startOfWeek(new Date()))
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     const tick = setInterval(() => setNow(new Date()), 60_000)
