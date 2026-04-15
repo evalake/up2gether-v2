@@ -5,7 +5,7 @@
 - [x] Audit completo de votes/themes/sessions
 - [ ] Web push notifications (app fechado, celular) -- prioridade 1
 - [ ] Dark/light toggle persistente
-- [ ] Empty states guiados (grupo vazio, primeira sessão, etc) -- **proximo**
+- [x] Empty states guiados (grupo vazio, primeira sessão, etc)
 - [ ] Loading states suavizados tematicos EVA (skeletons soft, nao spinners), perf geral mais fluida
 
 ## Engajamento

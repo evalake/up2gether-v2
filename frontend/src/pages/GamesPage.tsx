@@ -106,7 +106,12 @@ export function GamesPage() {
       {games.isLoading && <GameGridSkeleton count={8} />}
       {games.error && <ErrorBox error={games.error} />}
       {games.data && games.data.length === 0 && (
-        <EmptyState title="biblioteca vazia" hint="adicione o primeiro jogo para começar uma votação" />
+        <EmptyState
+          glyph="◇"
+          title="biblioteca vazia"
+          hint="adicione jogos pra virar candidatos em votações e sessões. dá pra buscar pelo Steam ou cadastrar na mão."
+          action={<Button onClick={() => setShowForm(true)}>+ adicionar primeiro jogo</Button>}
+        />
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

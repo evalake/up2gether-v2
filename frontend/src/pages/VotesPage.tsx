@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
 import {
@@ -165,13 +165,34 @@ export function VotesPage() {
       {votes.isLoading && <VoteListSkeleton count={3} />}
       {votes.error && <ErrorBox error={votes.error} />}
 
-      {open.length === 0 && closed.length === 0 && !votes.isLoading && (
-        <EmptyState
-          glyph="▲"
-          title="nenhuma votação ainda"
-          hint="abre a primeira pro grupo decidir o que jogar. tudo que tem no acervo vira candidato."
-        />
-      )}
+      {open.length === 0 && closed.length === 0 && !votes.isLoading && (() => {
+        const activeGames = games.data?.filter((g) => !g.archived_at).length ?? 0
+        const needsGames = activeGames < 2
+        return (
+          <EmptyState
+            glyph="▲"
+            title="nenhuma votação ainda"
+            hint={needsGames
+              ? `precisa de pelo menos 2 jogos ativos no acervo pra abrir uma votação. hoje tem ${activeGames}.`
+              : 'abre a primeira pro grupo decidir o que jogar. tudo que tem no acervo vira candidato e o engine estreita em stages até sobrar 1.'}
+            action={needsGames ? (
+              <Link
+                to={`/groups/${id}/games`}
+                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25"
+              >
+                ir pro acervo
+              </Link>
+            ) : (
+              <button
+                onClick={() => setDraft(true)}
+                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25"
+              >
+                abrir primeira votação
+              </button>
+            )}
+          />
+        )
+      })()}
 
       {open.length === 0 && closed.length > 0 && (
         <LastClosedPreview

@@ -169,7 +169,18 @@ export function ThemesPage() {
         <EmptyState
           glyph="✦"
           title="nenhum tema definido"
-          hint="abra o ciclo mensal pro grupo sugerir nomes e votar no tema do mês."
+          hint={isStaff
+            ? 'abre o ciclo mensal. cada membro sugere 1 nome (tipo "cooperativo", "indie 2010s"), e o grupo vota. o tema vencedor guia as sugestões de jogos do mês.'
+            : 'só admin ou mod pode abrir o ciclo mensal. chama alguém com permissão.'}
+          action={isStaff ? (
+            <button
+              onClick={onOpenCycle}
+              disabled={openC.isPending}
+              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+            >
+              {openC.isPending ? 'abrindo...' : 'iniciar primeiro ciclo'}
+            </button>
+          ) : undefined}
         />
       )}
 

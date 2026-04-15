@@ -25,6 +25,7 @@ import { GroupHero } from './group-detail/GroupHero'
 import { CommandDeck } from './group-detail/CommandDeck'
 import { LibraryBar } from './group-detail/LibraryBar'
 import { MembersSection } from './group-detail/MembersSection'
+import { FirstStepsGuide } from './group-detail/FirstStepsGuide'
 
 export function GroupDetailPage() {
   const { id = '' } = useParams()
@@ -111,6 +112,14 @@ export function GroupDetailPage() {
       {currentGameAudit.data && (
         <CurrentGameHero audit={currentGameAudit.data} groupId={id} isAdmin={isAdmin} now={now} />
       )}
+
+      <FirstStepsGuide
+        groupId={id}
+        gamesCount={activeGames.length}
+        votesCount={(votes.data ?? []).length}
+        sessionsCount={(sessions.data ?? []).length}
+        hasTheme={!!theme.data}
+      />
 
       <CommandDeck
         groupId={id}
