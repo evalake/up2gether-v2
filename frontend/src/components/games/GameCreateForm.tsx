@@ -191,7 +191,7 @@ export function GameCreateForm({
                 value={steamQ}
                 onChange={(e) => setSteamQ(e.target.value)}
                 placeholder={form.name ? form.name : 'buscar jogo pra autopreencher...'}
-                className="h-8 flex-1 bg-transparent text-xs focus:outline-none"
+                className="h-8 flex-1 bg-transparent text-xs focus-visible:outline-none"
               />
               {(steamLoading || filling) && <span className="text-[10px] text-nerv-dim">...</span>}
             </div>
@@ -236,13 +236,13 @@ export function GameCreateForm({
                     maxLength={150}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="nome do jogo *"
-                    className="col-span-6 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
+                    className="col-span-6 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
                   />
                   <input
                     value={form.steam_appid}
                     onChange={(e) => setForm({ ...form, steam_appid: e.target.value })}
                     placeholder="appid"
-                    className="col-span-2 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
+                    className="col-span-2 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
                   />
                   <input
                     type="number"
@@ -252,7 +252,7 @@ export function GameCreateForm({
                     value={form.is_free ? '' : form.price_current}
                     onChange={(e) => setForm({ ...form, price_current: e.target.value })}
                     placeholder="R$"
-                    className="col-span-2 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none disabled:opacity-40"
+                    className="col-span-2 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none disabled:opacity-40"
                   />
                   <button
                     type="button"
@@ -275,7 +275,7 @@ export function GameCreateForm({
                       min="1"
                       value={form.player_min}
                       onChange={(e) => setForm({ ...form, player_min: Number(e.target.value) || 1 })}
-                      className="w-8 bg-transparent text-center text-xs focus:outline-none"
+                      className="w-8 bg-transparent text-center text-xs focus-visible:outline-none"
                     />
                     <span className="text-nerv-dim">-</span>
                     <input
@@ -284,7 +284,7 @@ export function GameCreateForm({
                       value={form.player_max ?? ''}
                       onChange={(e) => setForm({ ...form, player_max: e.target.value ? Number(e.target.value) : null })}
                       placeholder="∞"
-                      className="w-8 bg-transparent text-center text-xs focus:outline-none"
+                      className="w-8 bg-transparent text-center text-xs focus-visible:outline-none"
                     />
                   </div>
                   <div className="col-span-9 flex gap-1">

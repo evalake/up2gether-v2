@@ -59,6 +59,7 @@ export function CurrentGameSection({
               }
             }}
             disabled={setCurrent.isPending}
+            aria-label="destravar game atual"
             className="shrink-0 rounded-sm border border-nerv-red/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10 disabled:opacity-40"
           >
             destravar
@@ -71,7 +72,7 @@ export function CurrentGameSection({
           value={gameSearch}
           onChange={(e) => setGameSearch(e.target.value)}
           placeholder="buscar jogo..."
-          className="mt-1 h-8 w-full max-w-sm rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus:border-nerv-green focus:outline-none"
+          className="mt-1 h-8 w-full max-w-sm rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus-visible:border-nerv-green focus-visible:outline-none"
         />
         {gameSearch && games && (
           <div className="mt-2 max-h-48 overflow-y-auto rounded-sm border border-nerv-line/40">
@@ -90,6 +91,7 @@ export function CurrentGameSection({
                       toast.error(e instanceof Error ? e.message : 'falha')
                     }
                   }}
+                  aria-label={`trocar game atual para ${g.name}`}
                   className="flex w-full items-center gap-2 border-b border-nerv-line/20 px-2 py-1.5 text-left text-xs text-nerv-text transition-colors hover:bg-nerv-green/10"
                 >
                   {g.cover_url && <img loading="lazy" src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 rounded-sm object-cover" />}

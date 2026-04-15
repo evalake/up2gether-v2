@@ -61,7 +61,7 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus:border-nerv-orange focus:outline-none"
+            className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
           />
           <div className="flex flex-wrap gap-2">
             <button

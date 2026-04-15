@@ -70,7 +70,7 @@ export function GameEditForm({
           maxLength={150}
           onChange={(e) => setEdit({ ...edit, name: e.target.value })}
           placeholder="nome"
-          className="h-8 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
+          className="h-8 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
         />
         <div className="flex items-center gap-2">
           {edit.cover_url && (
@@ -81,7 +81,7 @@ export function GameEditForm({
             maxLength={500}
             onChange={(e) => setEdit({ ...edit, cover_url: e.target.value })}
             placeholder="url da capa (imagem)"
-            className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
+            className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
           />
         </div>
         <Textarea
@@ -104,7 +104,7 @@ export function GameEditForm({
               if (v === '' || /^\d+(\.\d{0,2})?$/.test(v)) setEdit({ ...edit, price_current: v })
             }}
             placeholder="R$"
-            className="col-span-3 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none disabled:opacity-40"
+            className="col-span-3 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none disabled:opacity-40"
           />
           <button
             type="button"
@@ -122,7 +122,7 @@ export function GameEditForm({
               min="1"
               value={edit.player_min}
               onChange={(e) => setEdit({ ...edit, player_min: Number(e.target.value) || 1 })}
-              className="w-10 bg-transparent text-center text-xs focus:outline-none"
+              className="w-10 bg-transparent text-center text-xs focus-visible:outline-none"
             />
             <span className="text-nerv-dim">-</span>
             <input
@@ -131,7 +131,7 @@ export function GameEditForm({
               value={edit.player_max ?? ''}
               onChange={(e) => setEdit({ ...edit, player_max: e.target.value ? Number(e.target.value) : null })}
               placeholder="∞"
-              className="w-10 bg-transparent text-center text-xs focus:outline-none"
+              className="w-10 bg-transparent text-center text-xs focus-visible:outline-none"
             />
           </div>
         </div>

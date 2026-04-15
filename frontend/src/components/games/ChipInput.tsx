@@ -53,7 +53,7 @@ export function ChipInput({
           }}
           onBlur={add}
           placeholder={value.length === 0 ? placeholder : ''}
-          className="min-w-[120px] flex-1 bg-transparent text-xs text-nerv-text placeholder:text-nerv-dim/60 focus:outline-none"
+          className="min-w-[120px] flex-1 bg-transparent text-xs text-nerv-text placeholder:text-nerv-dim/60 focus-visible:outline-none"
         />
       </div>
     </div>

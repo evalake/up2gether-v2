@@ -29,7 +29,7 @@ export function GameFilters({
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           placeholder="buscar..."
-          className="rounded-sm border border-nerv-line bg-black/40 px-3 py-1 text-xs focus:border-nerv-orange focus:outline-none"
+          className="rounded-sm border border-nerv-line bg-black/40 px-3 py-1 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
         />
         {STAGE_VALUES.map((s) => {
           const active = stageFilter.has(s)

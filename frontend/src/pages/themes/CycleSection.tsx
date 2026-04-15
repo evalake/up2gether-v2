@@ -103,7 +103,7 @@ export function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubm
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="ex: souls-likes, indies, retro..."
-              className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-sm transition-colors focus:border-nerv-orange focus:outline-none"
+              className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-sm transition-colors focus-visible:border-nerv-orange focus-visible:outline-none"
             />
             <Textarea
               value={desc}
@@ -126,7 +126,7 @@ export function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubm
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="url de imagem (opcional)"
-                className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs transition-colors focus:border-nerv-orange focus:outline-none"
+                className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs transition-colors focus-visible:border-nerv-orange focus-visible:outline-none"
               />
             </div>
             <div className="flex justify-end gap-3">

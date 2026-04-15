@@ -75,7 +75,7 @@ export function HistoryPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="buscar por jogo ou título da votação..."
-          className="h-9 w-full max-w-md rounded-sm border border-nerv-line bg-black/40 px-3 text-xs text-nerv-text focus:border-nerv-orange focus:outline-none"
+          className="h-9 w-full max-w-md rounded-sm border border-nerv-line bg-black/40 px-3 text-xs text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
         />
         <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
           <span className="tabular-nums text-nerv-orange">{chapters.length}</span> capítulos

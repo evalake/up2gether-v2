@@ -91,7 +91,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="buscar jogo..."
-          className="h-8 min-w-[180px] flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus:border-nerv-orange focus:outline-none"
+          className="h-8 min-w-[180px] flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
         />
         {filtered.length > 0 && (
           <button

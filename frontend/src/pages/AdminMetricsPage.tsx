@@ -278,7 +278,7 @@ export function AdminMetricsPage() {
                     <span className="w-5 text-right text-[10px] text-zinc-500">
                       {i + 1}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-zinc-200">{g.name}</span>
+                    <span className="min-w-0 flex-1 truncate text-zinc-200" title={g.name}>{g.name}</span>
                     <div className="relative h-1.5 w-24 overflow-hidden rounded-sm bg-zinc-800">
                       <div
                         className="h-full bg-orange-400/70"
@@ -344,7 +344,7 @@ export function AdminMetricsPage() {
               return (
                 <li key={r.ref} className="flex items-center gap-2">
                   <span className="w-5 text-right text-[10px] text-zinc-500">{i + 1}</span>
-                  <span className="min-w-0 flex-1 truncate text-zinc-200">
+                  <span className="min-w-0 flex-1 truncate text-zinc-200" title={r.user_name ? `@${r.user_name} (${r.ref})` : r.ref}>
                     {r.user_name ? (
                       <>
                         <span className="text-nerv-green/90">@{r.user_name}</span>

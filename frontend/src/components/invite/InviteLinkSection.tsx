@@ -28,7 +28,10 @@ export function InviteLinkSection() {
         (e ajuda a gente a entender de onde vem o pessoal bom).
       </p>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <code className="flex-1 truncate rounded-sm border border-nerv-line/40 bg-black/40 px-3 py-2 font-mono text-[11px] text-nerv-text">
+        <code
+          title={url}
+          className="flex-1 truncate rounded-sm border border-nerv-line/40 bg-black/40 px-3 py-2 font-mono text-[11px] text-nerv-text"
+        >
           {url}
         </code>
         <button

@@ -134,7 +134,7 @@ export function SessionDraftModal({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="buscar jogo..."
-              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
             />
             <div className="mt-2 max-h-56 overflow-y-auto rounded-sm border border-nerv-line/30 bg-black/20">
               {filtered.length === 0 ? (
@@ -184,7 +184,7 @@ export function SessionDraftModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
-              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
             />
           </motion.div>
 

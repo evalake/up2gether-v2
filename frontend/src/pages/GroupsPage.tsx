@@ -86,7 +86,7 @@ function GuildPickerModal({
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="buscar servers..."
-                className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus:border-nerv-orange focus:outline-none"
+                className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
               />
             </div>
             <div className="max-h-80 overflow-y-auto">

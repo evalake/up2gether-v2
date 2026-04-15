@@ -124,7 +124,7 @@ export function SettingsPage() {
           <select
             value={tz}
             onChange={(e) => mark(setTz)(e.target.value)}
-            className="h-9 w-full max-w-xs rounded-sm border border-nerv-line bg-black/40 px-2 text-sm text-nerv-text focus:border-nerv-orange focus:outline-none"
+            className="h-9 w-full max-w-xs rounded-sm border border-nerv-line bg-black/40 px-2 text-sm text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
           >
             {TIMEZONES.map((z) => (
               <option key={z} value={z}>
@@ -140,7 +140,7 @@ export function SettingsPage() {
             value={email}
             onChange={(e) => mark(setEmail)(e.target.value)}
             placeholder={(me.data as any)?.discord_email ?? 'seu@email'}
-            className="h-9 w-full max-w-sm rounded-sm border border-nerv-line bg-black/40 px-2 text-sm text-nerv-text focus:border-nerv-orange focus:outline-none"
+            className="h-9 w-full max-w-sm rounded-sm border border-nerv-line bg-black/40 px-2 text-sm text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
           />
         </Row>
 
@@ -234,7 +234,7 @@ function DangerZoneSection() {
             value={phrase}
             onChange={(e) => setPhrase(e.target.value)}
             placeholder={CONFIRM_PHRASE}
-            className="h-9 w-full max-w-xs rounded-sm border border-nerv-red/40 bg-black/40 px-2 text-sm text-nerv-text focus:border-nerv-red focus:outline-none"
+            className="h-9 w-full max-w-xs rounded-sm border border-nerv-red/40 bg-black/40 px-2 text-sm text-nerv-text focus-visible:border-nerv-red focus-visible:outline-none"
           />
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -367,7 +367,7 @@ function SteamLibrarySection() {
           value={vanity}
           onChange={(e) => setVanity(e.target.value)}
           placeholder="Cole aqui a URL, nick ou steam id"
-          className="h-9 flex-1 min-w-[220px] rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus:border-nerv-orange focus:outline-none"
+          className="h-9 flex-1 min-w-[220px] rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
         />
         <a
           href="https://steamcommunity.com/my/profile"

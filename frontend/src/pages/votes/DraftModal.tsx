@@ -58,7 +58,7 @@ export function DraftModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="qual jogo na sexta?"
-            className="mt-1 h-9 w-full rounded-sm border-0 border-b border-nerv-line/40 bg-transparent px-0 text-base text-nerv-text focus:border-nerv-orange focus:outline-none"
+            className="mt-1 h-9 w-full rounded-sm border-0 border-b border-nerv-line/40 bg-transparent px-0 text-base text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
           />
         </div>
         <div className="border-b border-nerv-orange/10 px-5 py-2">
@@ -67,7 +67,7 @@ export function DraftModal({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="buscar jogo..."
-            className="h-9 w-full rounded-sm border border-nerv-line/30 bg-black/20 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus:border-nerv-orange/60 focus:outline-none"
+            className="h-9 w-full rounded-sm border border-nerv-line/30 bg-black/20 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
           />
         </div>
         <div className="max-h-80 overflow-y-auto px-5 py-3">

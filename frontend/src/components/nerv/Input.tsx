@@ -17,7 +17,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
       <input
         ref={ref}
         {...rest}
-        className={`w-full rounded-sm border border-nerv-line bg-black/50 px-3 py-2 text-sm text-nerv-text placeholder:text-nerv-dim/60 transition-colors focus:border-nerv-orange focus:bg-black/70 focus:outline-none ${className}`}
+        className={`w-full rounded-sm border border-nerv-line bg-black/50 px-3 py-2 text-sm text-nerv-text placeholder:text-nerv-dim/60 transition-colors focus-visible:border-nerv-orange focus-visible:bg-black/70 focus-visible:outline-none ${className}`}
       />
       {error && <p className="mt-1 text-xs text-nerv-red">! {error}</p>}
     </label>

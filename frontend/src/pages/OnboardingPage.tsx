@@ -246,7 +246,7 @@ export function OnboardingPage() {
                 <select
                   value={tz}
                   onChange={(e) => setTz(e.target.value)}
-                  className="mx-auto block h-10 w-full max-w-xs rounded-sm border border-nerv-orange/30 bg-black/40 px-3 text-sm text-nerv-text focus:border-nerv-orange focus:outline-none"
+                  className="mx-auto block h-10 w-full max-w-xs rounded-sm border border-nerv-orange/30 bg-black/40 px-3 text-sm text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
                 >
                   {TIMEZONES.map((z) => <option key={z} value={z}>{z}</option>)}
                 </select>
@@ -302,7 +302,7 @@ export function OnboardingPage() {
                       value={steamUrl}
                       onChange={(e) => setSteamUrl(e.target.value)}
                       placeholder="cole a URL do seu perfil Steam"
-                      className="h-9 flex-1 rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus:border-nerv-orange focus:outline-none"
+                      className="h-9 flex-1 rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
                     />
                     <Button onClick={importSteam} disabled={steamLoading || !steamUrl.trim()}>
                       {steamLoading ? '...' : 'importar'}
