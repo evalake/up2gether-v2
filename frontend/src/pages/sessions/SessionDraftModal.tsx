@@ -21,57 +21,54 @@ const fmtDuration = (m: number) => {
   const min = m % 60
   if (h === 0) return `${min}min`
   if (min === 0) return `${h}h`
-  return `${h}h ${min}min`
+  return `${h}h${min}`
 }
 
 function Stepper({
-  label,
-  value,
   display,
+  width,
   onDec,
   onInc,
   ariaLabel,
 }: {
-  label?: string
-  value: number
   display: string
+  width: string
   onDec: () => void
   onInc: () => void
   ariaLabel: string
 }) {
   return (
-    <div className="flex flex-col items-center gap-1">
-      {label && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim/70">{label}</span>}
-      <div className="flex items-center gap-1.5">
-        <button
-          type="button"
-          onClick={onDec}
-          aria-label={`diminuir ${ariaLabel}`}
-          className="grid h-7 w-7 place-items-center rounded-full border border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
-        </button>
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={onDec}
+        aria-label={`diminuir ${ariaLabel}`}
+        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
+      >
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+      </button>
+      <div className={`relative ${width} text-center`}>
         <AnimatePresence mode="popLayout">
           <motion.span
-            key={`${ariaLabel}-${value}`}
-            initial={{ opacity: 0, y: -4 }}
+            key={display}
+            initial={{ opacity: 0, y: -3 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
+            exit={{ opacity: 0, y: 3 }}
             transition={{ duration: 0.12 }}
-            className="min-w-[2.2rem] text-center font-display text-2xl tabular-nums text-nerv-text"
+            className="block font-display text-xl tabular-nums text-nerv-text"
           >
             {display}
           </motion.span>
         </AnimatePresence>
-        <button
-          type="button"
-          onClick={onInc}
-          aria-label={`aumentar ${ariaLabel}`}
-          className="grid h-7 w-7 place-items-center rounded-full border border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-        </button>
       </div>
+      <button
+        type="button"
+        onClick={onInc}
+        aria-label={`aumentar ${ariaLabel}`}
+        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
+      >
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+      </button>
     </div>
   )
 }
@@ -146,6 +143,8 @@ export function SessionDraftModal({
     return () => window.removeEventListener('keydown', onKey)
   }, [onCancel])
 
+  const dayLabel = start.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '')
+
   return (
     <motion.div
       key="draft-backdrop"
@@ -158,23 +157,22 @@ export function SessionDraftModal({
     >
       <motion.div
         key="draft-panel"
-        layout
-        initial={{ opacity: 0, scale: 0.94, y: 12 }}
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.97, y: 6 }}
-        transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+        exit={{ opacity: 0, scale: 0.97, y: 4 }}
+        transition={{ type: 'spring', stiffness: 360, damping: 32 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-xl overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
+        className="relative flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
       >
         <button
           onClick={onCancel}
           aria-label="fechar"
-          className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+          className="absolute right-2.5 top-2.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
         </button>
 
-        <div className="relative h-32 w-full overflow-hidden">
+        <div className="relative h-16 shrink-0 overflow-hidden">
           <AnimatePresence mode="wait">
             {selectedCover ? (
               <motion.img
@@ -197,198 +195,154 @@ export function SessionDraftModal({
               />
             )}
           </AnimatePresence>
-          <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/75 to-nerv-panel/20" />
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 }}
-            className="absolute inset-x-0 bottom-0 p-5"
-          >
-            <span className="mb-2 inline-block rounded-full border border-nerv-orange/40 bg-nerv-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange">
-              agendar
-            </span>
-            <h2 className="font-display text-2xl capitalize leading-tight text-nerv-text">
-              {start.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-            </h2>
-            <div className="mt-0.5 font-mono text-[11px] text-nerv-orange/80 tabular-nums">
+          <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/85 to-nerv-panel/30" />
+          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-4 pb-2 pt-1">
+            <div className="min-w-0">
+              <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange/80">agendar</div>
+              <div className="truncate font-display text-sm capitalize text-nerv-text">{dayLabel}</div>
+            </div>
+            <div className="font-mono text-[10px] tabular-nums text-nerv-orange/80">
               {hour(start)} {'\u2192'} {hour(end)} · {fmtDuration(duration)}
             </div>
-          </motion.div>
+          </div>
         </div>
 
-        <div className="space-y-5 p-5">
-          <motion.section
-            layout
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 }}
-          >
-            <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+        <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+          <section>
+            <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
               <span>jogo</span>
-              {selected && (
-                <span className="truncate text-nerv-orange/80">{selected.name}</span>
-              )}
+              {selected && <span className="truncate text-nerv-orange/80">{selected.name}</span>}
             </div>
             <input
               aria-label="buscar jogo"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="buscar jogo..."
-              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
+              className="h-8 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-2.5 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
             />
-            <div className="mt-2 max-h-52 overflow-y-auto rounded-sm border border-nerv-line/30 bg-black/20">
+            <div className="mt-1.5 max-h-32 overflow-y-auto rounded-sm border border-nerv-line/30 bg-black/20">
               {filtered.length === 0 ? (
-                <div className="py-6 text-center text-[11px] text-nerv-dim">
-                  nenhum jogo pra "{query}"
-                </div>
+                <div className="py-4 text-center text-[11px] text-nerv-dim">nenhum jogo pra "{query}"</div>
               ) : (
                 <div className="grid gap-1 p-1.5 sm:grid-cols-2">
                   {filtered.map((g) => {
                     const on = g.id === gameId
                     const cover = steamCover(g)
                     return (
-                      <motion.button
+                      <button
                         key={g.id}
                         type="button"
-                        whileTap={{ scale: 0.97 }}
                         onClick={() => setGameId(g.id)}
-                        className={`flex items-center gap-2 rounded-sm border px-2 py-1.5 text-left transition-all ${
+                        className={`flex items-center gap-2 rounded-sm border px-1.5 py-1 text-left transition-colors ${
                           on
                             ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                            : 'border-transparent text-nerv-text transition-colors hover:border-nerv-orange/30 hover:bg-nerv-orange/5'
+                            : 'border-transparent text-nerv-text hover:border-nerv-orange/30 hover:bg-nerv-orange/5'
                         }`}
                       >
                         {cover ? (
-                          <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-6 w-10 shrink-0 rounded-sm object-cover" />
+                          <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-5 w-9 shrink-0 rounded-sm object-cover" />
                         ) : (
-                          <div className="h-6 w-10 shrink-0 rounded-sm bg-nerv-line/30" />
+                          <div className="h-5 w-9 shrink-0 rounded-sm bg-nerv-line/30" />
                         )}
                         <span className="truncate text-[11px]">{g.name}</span>
-                      </motion.button>
+                      </button>
                     )
                   })}
                 </div>
               )}
             </div>
-          </motion.section>
+          </section>
 
-          <motion.section
-            layout
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.16 }}
-          >
-            <div className="mb-1.5 text-[10px] uppercase tracking-wider text-nerv-dim">
-              título (opcional)
-            </div>
+          <section>
+            <div className="mb-1 text-[10px] uppercase tracking-wider text-nerv-dim">título <span className="text-nerv-dim/50">(opcional)</span></div>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
-              className="h-9 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-3 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
+              className="h-8 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-2.5 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
             />
-          </motion.section>
+          </section>
 
-          <motion.section
-            layout
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
-            className="rounded-sm border border-nerv-line/30 bg-black/20 p-4"
-          >
-            <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
-              <span>horário</span>
-              <span className="font-mono text-nerv-orange/80 tabular-nums">{hour(start)}</span>
-            </div>
-            <div className="flex items-center justify-center gap-3">
-              <Stepper
-                label="hora"
-                value={hh}
-                display={String(hh).padStart(2, '0')}
-                onDec={() => setHour(hh - 1)}
-                onInc={() => setHour(hh + 1)}
-                ariaLabel="hora"
-              />
-              <span className="-mt-3 font-display text-2xl text-nerv-dim/40">:</span>
-              <Stepper
-                label="min"
-                value={mm}
-                display={String(mm).padStart(2, '0')}
-                onDec={() => setMinute(mm - MINUTE_STEP)}
-                onInc={() => setMinute(mm + MINUTE_STEP)}
-                ariaLabel="minuto"
-              />
-            </div>
-            <div className="mt-3 flex flex-wrap justify-center gap-1">
-              {TIME_PRESETS.map((h) => {
-                const on = hh === h && mm === 0
-                return (
-                  <button
-                    key={h}
-                    type="button"
-                    onClick={() => setQuickTime(h)}
-                    className={`rounded-full border px-2.5 py-0.5 font-mono text-[10px] tabular-nums transition-colors ${
-                      on
-                        ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
-                        : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
-                    }`}
-                  >
-                    {String(h).padStart(2, '0')}:00
-                  </button>
-                )
-              })}
-            </div>
-            <div className="mt-2 text-center font-mono text-[9px] uppercase tracking-wider text-nerv-dim/60">
-              hora 0–23 · min em passos de {MINUTE_STEP}
-            </div>
-          </motion.section>
+          <div className="grid grid-cols-2 gap-3">
+            <section>
+              <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+                <span>horário</span>
+              </div>
+              <div className="flex items-center justify-center gap-1">
+                <Stepper
+                  display={String(hh).padStart(2, '0')}
+                  width="w-7"
+                  onDec={() => setHour(hh - 1)}
+                  onInc={() => setHour(hh + 1)}
+                  ariaLabel="hora"
+                />
+                <span className="font-display text-xl text-nerv-dim/40">:</span>
+                <Stepper
+                  display={String(mm).padStart(2, '0')}
+                  width="w-7"
+                  onDec={() => setMinute(mm - MINUTE_STEP)}
+                  onInc={() => setMinute(mm + MINUTE_STEP)}
+                  ariaLabel="minuto"
+                />
+              </div>
+              <div className="mt-1.5 flex flex-wrap justify-center gap-1">
+                {TIME_PRESETS.map((h) => {
+                  const on = hh === h && mm === 0
+                  return (
+                    <button
+                      key={h}
+                      type="button"
+                      onClick={() => setQuickTime(h)}
+                      className={`rounded-full border px-2 py-0.5 font-mono text-[9px] tabular-nums transition-colors ${
+                        on
+                          ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
+                          : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                      }`}
+                    >
+                      {String(h).padStart(2, '0')}h
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
 
-          <motion.section
-            layout
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-sm border border-nerv-line/30 bg-black/20 p-4"
-          >
-            <div className="mb-3 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
-              <span>duração</span>
-              <span className="font-mono text-nerv-orange/80 tabular-nums">{fmtDuration(duration)}</span>
-            </div>
-            <div className="flex items-center justify-center">
-              <Stepper
-                value={duration}
-                display={fmtDuration(duration)}
-                onDec={decDuration}
-                onInc={incDuration}
-                ariaLabel="duração"
-              />
-            </div>
-            <div className="mt-3 flex flex-wrap justify-center gap-1">
-              {DURATION_PRESETS.map((p) => {
-                const on = duration === p.value
-                return (
-                  <button
-                    key={p.value}
-                    type="button"
-                    onClick={() => setDuration(p.value)}
-                    className={`rounded-full border px-2.5 py-0.5 font-mono text-[10px] tabular-nums transition-colors ${
-                      on
-                        ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
-                        : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                )
-              })}
-            </div>
-            <div className="mt-2 text-center font-mono text-[9px] uppercase tracking-wider text-nerv-dim/60">
-              {DURATION_MIN}min até {DURATION_MAX / 60}h · passos de {DURATION_STEP}min
-            </div>
-          </motion.section>
+            <section>
+              <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+                <span>duração</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <Stepper
+                  display={fmtDuration(duration)}
+                  width="w-16"
+                  onDec={decDuration}
+                  onInc={incDuration}
+                  ariaLabel="duração"
+                />
+              </div>
+              <div className="mt-1.5 flex flex-wrap justify-center gap-1">
+                {DURATION_PRESETS.map((p) => {
+                  const on = duration === p.value
+                  return (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => setDuration(p.value)}
+                      className={`rounded-full border px-2 py-0.5 font-mono text-[9px] tabular-nums transition-colors ${
+                        on
+                          ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
+                          : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-nerv-line/30 px-5 py-3">
+        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-nerv-line/30 px-4 py-2.5">
           <button
             onClick={onCancel}
             className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
