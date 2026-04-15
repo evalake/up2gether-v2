@@ -35,6 +35,10 @@ export type EventMetrics = {
   groups_by_tier: TierBreakdown
   mrr_if_all_paid_brl: number
   legacy_groups: number
+  active_groups_1d: number
+  active_groups_7d: number
+  active_groups_28d: number
+  active_users_7d: number
 }
 
 export const fetchEventMetrics = () => api<EventMetrics>('/admin/metrics/events')

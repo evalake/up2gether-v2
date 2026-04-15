@@ -38,8 +38,38 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
     por atividade em 28d e time series diaria em 28d.
     """
     now = datetime.now(UTC)
+    d1 = now - timedelta(days=1)
     d7 = now - timedelta(days=7)
     d28 = now - timedelta(days=28)
+
+    async def _active_groups(since: datetime) -> int:
+        return int(
+            (
+                await db.execute(
+                    select(func.count(func.distinct(Event.group_id))).where(
+                        Event.occurred_at >= since,
+                        Event.group_id.isnot(None),
+                    )
+                )
+            ).scalar_one()
+            or 0
+        )
+
+    active_groups_1d = await _active_groups(d1)
+    active_groups_7d = await _active_groups(d7)
+    active_groups_28d = await _active_groups(d28)
+
+    active_users_7d = int(
+        (
+            await db.execute(
+                select(func.count(func.distinct(Event.user_id))).where(
+                    Event.occurred_at >= d7,
+                    Event.user_id.isnot(None),
+                )
+            )
+        ).scalar_one()
+        or 0
+    )
 
     async def _counts_since(since: datetime | None) -> dict[str, int]:
         stmt = select(Event.event_type, func.count().label("n"))
@@ -161,4 +191,8 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "groups_by_tier": tiers,
         "mrr_if_all_paid_brl": mrr_if_all_paid,
         "legacy_groups": legacy_groups,
+        "active_groups_1d": active_groups_1d,
+        "active_groups_7d": active_groups_7d,
+        "active_groups_28d": active_groups_28d,
+        "active_users_7d": active_users_7d,
     }

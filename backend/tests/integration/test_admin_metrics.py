@@ -185,6 +185,42 @@ async def test_metrics_health_kpis_empty_safe(
     )
 
 
+async def test_metrics_active_groups(make_user, auth_headers, client, db_session, as_sys_admin):
+    """active_groups_1d / 7d / 28d: distinct groups com qualquer evento no periodo.
+    metrica #1 do BUSINESS.md ("Servidores ativos" = DAU/WAU por server).
+    """
+    import uuid
+
+    admin = await make_user(discord_id="admin-active", username="act")
+    as_sys_admin(admin.discord_id)
+
+    r1 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "ag-1", "name": "a"},
+        headers=auth_headers(admin),
+    )
+    r2 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "ag-2", "name": "b"},
+        headers=auth_headers(admin),
+    )
+    g1 = uuid.UUID(r1.json()["id"])
+    g2 = uuid.UUID(r2.json()["id"])
+
+    await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id, group_id=g1)
+    await track_event(db_session, EVENT_VOTE_CAST, user_id=admin.id, group_id=g1)
+    await track_event(db_session, EVENT_SESSION_CREATED, user_id=admin.id, group_id=g2)
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["active_groups_1d"] == 2
+    assert body["active_groups_7d"] == 2
+    assert body["active_groups_28d"] == 2
+    assert body["active_users_7d"] == 1
+
+
 async def test_metrics_tier_breakdown(make_user, auth_headers, client, db_session, as_sys_admin):
     """Valida que o dashboard mostra distribuicao de grupos por tier projetado
     + MRR potencial se todos pagassem (ignorando legacy_free). Util pra decidir

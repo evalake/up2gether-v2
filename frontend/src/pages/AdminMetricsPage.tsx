@@ -97,6 +97,30 @@ export function AdminMetricsPage() {
         </Link>
       </header>
 
+      <section className="mb-4 grid gap-4 md:grid-cols-4">
+        <KpiCard
+          label="grupos ativos 1d"
+          value={m.active_groups_1d}
+          hint="com qualquer evento hoje"
+        />
+        <KpiCard
+          label="grupos ativos 7d"
+          value={m.active_groups_7d}
+          hint="WAU por servidor"
+          highlight={m.active_groups_7d >= 10}
+        />
+        <KpiCard
+          label="grupos ativos 28d"
+          value={m.active_groups_28d}
+          hint="MAU por servidor"
+        />
+        <KpiCard
+          label="users ativos 7d"
+          value={m.active_users_7d}
+          hint="distinct user_id em events"
+        />
+      </section>
+
       <section className="mb-8 grid gap-4 md:grid-cols-4">
         <KpiCard
           label="seats ativados"
