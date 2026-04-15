@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import type { UseMutationResult } from '@tanstack/react-query'
 import type { Game, GameUpdateInput, HardwareTier } from '@/features/games/api'
 import { useToast } from '@/components/ui/toast'
+import { Textarea } from '@/components/ui/Textarea'
 import { TIERS } from '@/lib/constants'
 
 type EditState = {
@@ -83,13 +84,12 @@ export function GameEditForm({
             className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
           />
         </div>
-        <textarea
+        <Textarea
           value={edit.description}
           maxLength={2000}
           onChange={(e) => setEdit({ ...edit, description: e.target.value })}
           rows={3}
           placeholder="descrição"
-          className="w-full rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs focus:border-nerv-orange focus:outline-none"
         />
         <div className="grid grid-cols-12 gap-2">
           <input

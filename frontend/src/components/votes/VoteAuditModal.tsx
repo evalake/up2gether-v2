@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVoteAudit } from '@/features/votes/hooks'
 import { Avatar } from '@/components/nerv/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 
 type Props = {
   groupId: string
@@ -22,6 +23,7 @@ const fmt = (iso: string) =>
 
 export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
   const audit = useVoteAudit(groupId, voteId)
+  const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -71,16 +73,29 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
             <div className="max-h-[80vh] overflow-y-auto p-5">
               {audit.isLoading && <Loading />}
               {audit.error && <ErrorBox error={audit.error} />}
-              {audit.data && <AuditBody data={audit.data} />}
+              {audit.data && (
+                <AuditBody data={audit.data} onOpenProfile={setProfileUserId} />
+              )}
             </div>
           </motion.div>
         </motion.div>
       )}
+      <MemberProfileModal
+        groupId={groupId}
+        userId={profileUserId}
+        onClose={() => setProfileUserId(null)}
+      />
     </AnimatePresence>
   )
 }
 
-function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>['data']> }) {
+function AuditBody({
+  data,
+  onOpenProfile,
+}: {
+  data: NonNullable<ReturnType<typeof useVoteAudit>['data']>
+  onOpenProfile: (userId: string) => void
+}) {
   const { session, creator, games, voters, non_voters } = data
   const gameById = (gid: string) => games.find((g) => g.id === gid)
   const winner = session.winner_game_id ? gameById(session.winner_game_id) : null
@@ -143,7 +158,12 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
         <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
           Criador
         </div>
-        <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => creator.id && onOpenProfile(creator.id)}
+          disabled={!creator.id}
+          className="flex items-center gap-2 rounded-sm transition-colors hover:text-nerv-orange disabled:cursor-default"
+        >
           <Avatar
             discordId={creator.discord_id}
             hash={creator.avatar_url}
@@ -153,7 +173,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
           <span className="text-sm text-nerv-text">
             {creator.display_name ?? '(desconhecido)'}
           </span>
-        </div>
+        </button>
       </section>
 
       <section>
@@ -228,7 +248,11 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                 key={`${v.user_id}-${v.stage_id ?? 'legacy'}-${i}`}
                 className="rounded-sm border border-nerv-line/40 bg-black/20 p-3"
               >
-                <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onOpenProfile(v.user_id)}
+                  className="flex w-full items-center gap-2 text-left transition-colors hover:text-nerv-orange"
+                >
                   <Avatar
                     discordId={v.discord_id}
                     hash={v.avatar_url}
@@ -242,7 +266,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                       {v.stage_number != null && ` · stage ${v.stage_number}`}
                     </div>
                   </div>
-                </div>
+                </button>
                 {v.approvals.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5 pl-10">
                     {v.approvals.map((gid) => {
@@ -279,9 +303,12 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
           </div>
           <div className="flex flex-wrap gap-2">
             {non_voters.map((p) => (
-              <div
+              <button
                 key={p.id ?? Math.random()}
-                className="flex items-center gap-2 rounded-sm border border-nerv-line/40 bg-black/20 px-2 py-1"
+                type="button"
+                onClick={() => p.id && onOpenProfile(p.id)}
+                disabled={!p.id}
+                className="flex items-center gap-2 rounded-sm border border-nerv-line/40 bg-black/20 px-2 py-1 transition-colors hover:border-nerv-orange/40 disabled:cursor-default"
               >
                 <Avatar
                   discordId={p.discord_id}
@@ -292,7 +319,7 @@ function AuditBody({ data }: { data: NonNullable<ReturnType<typeof useVoteAudit>
                 <span className="text-[11px] text-nerv-dim">
                   {p.display_name ?? '?'}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         </section>

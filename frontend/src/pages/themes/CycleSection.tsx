@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Avatar } from '@/components/nerv/Avatar'
+import { Textarea } from '@/components/ui/Textarea'
 import type { Cycle, Suggestion } from '@/features/themes/api'
 
 type CycleSectionProps = {
@@ -104,12 +105,13 @@ export function CycleSection({ cycle, isStaff, isAdmin, isSysAdmin, meId, onSubm
               placeholder="ex: souls-likes, indies, retro..."
               className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-sm transition-colors focus:border-nerv-orange focus:outline-none"
             />
-            <textarea
+            <Textarea
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
+              maxLength={500}
               rows={2}
               placeholder="por que esse tema? (opcional)"
-              className="w-full rounded-sm border border-nerv-line bg-black/40 px-3 py-2 text-xs transition-colors focus:border-nerv-orange focus:outline-none"
+              className="w-full resize-none rounded-sm border border-nerv-line bg-black/40 px-3 py-2 text-xs transition-colors focus-visible:border-nerv-orange focus-visible:outline-none"
             />
             <div className="flex items-center gap-2">
               {imageUrl && (

@@ -4,6 +4,7 @@ import { useCreateGame } from '@/features/games/hooks'
 import type { HardwareTier, GameSource } from '@/features/games/api'
 import { steamSearch, steamGetDetails, builtinGetDetails, type SteamSearchItem } from '@/features/steam/api'
 import { useToast } from '@/components/ui/toast'
+import { Textarea } from '@/components/ui/Textarea'
 import { Button } from '@/components/nerv/Button'
 import { SteamThumb } from '@/components/SteamThumb'
 import { TIERS } from '@/lib/constants'
@@ -304,13 +305,12 @@ export function GameCreateForm({
                   </div>
                 </div>
 
-                <textarea
+                <Textarea
                   value={form.description}
                   maxLength={2000}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={2}
                   placeholder="descrição (opcional)"
-                  className="w-full rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs focus:border-nerv-orange focus:outline-none"
                 />
 
                 <div className="grid grid-cols-2 gap-2">

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { LoginPage } from '@/pages/LoginPage'
 import { DiscordCallbackPage } from '@/pages/DiscordCallbackPage'
 import { LandingPage } from '@/pages/LandingPage'
@@ -47,13 +48,18 @@ function RealtimeBoot() {
   return null
 }
 
-export function App() {
+function AnimatedRoutes() {
+  const location = useLocation()
   return (
-    <QueryClientProvider client={queryClient}>
-      <RealtimeBoot />
-      <BrowserRouter>
-        <Suspense fallback={null}>
-        <Routes>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.15 }}
+      >
+        <Routes location={location}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/discord/callback" element={<DiscordCallbackPage />} />
           <Route path="/share/sessions/:id" element={<PublicSessionPage />} />
@@ -158,6 +164,18 @@ export function App() {
           />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RealtimeBoot />
+      <BrowserRouter>
+        <Suspense fallback={null}>
+          <AnimatedRoutes />
         </Suspense>
         <Toaster />
       </BrowserRouter>
