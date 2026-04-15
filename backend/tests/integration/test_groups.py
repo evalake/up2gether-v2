@@ -378,3 +378,52 @@ async def test_demote_admin_only_by_owner(make_user, auth_headers, client):
         headers=auth_headers(owner),
     )
     assert res.status_code == 204
+
+
+async def test_get_group_exposes_seat_and_tier(make_user, auth_headers, client, db_session):
+    """Dono ve seat_count, tier, seat_limit, legacy_free no /api/groups/{id}.
+    Seat so conta quando user ativa (primeiro login via discord -> activated_at).
+    """
+    from datetime import UTC, datetime
+
+    from sqlalchemy import update as sa_update
+
+    from app.models.group import GroupMembership
+
+    owner = await make_user(username="seats")
+    res = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "seat-g", "name": "Squad"},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 200
+    gid = res.json()["id"]
+
+    # zera activated_at pra forcar seat = 0 (o membership do owner comeca ativado)
+    await db_session.execute(
+        sa_update(GroupMembership)
+        .where(GroupMembership.user_id == owner.id)
+        .values(activated_at=None)
+    )
+    await db_session.commit()
+
+    r = await client.get(f"/api/groups/{gid}", headers=auth_headers(owner))
+    assert r.status_code == 200
+    body = r.json()
+    assert body["seat_count"] == 0
+    assert body["tier"] == "free"
+    assert body["seat_limit"] == 10
+    assert body["legacy_free"] is False
+
+    # ativa owner -> seat vira 1, ainda free
+    await db_session.execute(
+        sa_update(GroupMembership)
+        .where(GroupMembership.user_id == owner.id)
+        .values(activated_at=datetime.now(UTC))
+    )
+    await db_session.commit()
+
+    r = await client.get(f"/api/groups/{gid}", headers=auth_headers(owner))
+    body = r.json()
+    assert body["seat_count"] == 1
+    assert body["tier"] == "free"

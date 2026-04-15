@@ -6,6 +6,7 @@ from sqlalchemy import cast, desc, func, select
 from sqlalchemy.dialects.postgresql import DATE
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.domain.tiers import TIER_PRICE_BRL, tier_for_seats
 from app.models.event import Event
 from app.models.group import Group, GroupMembership
 from app.services.events import (
@@ -14,22 +15,6 @@ from app.services.events import (
     EVENT_SESSION_COMPLETED,
     EVENT_SESSION_CREATED,
 )
-
-# tiers do BUSINESS.md. bucketizacao por count(activated_at) de cada grupo.
-# preco em BRL/mes. free e over geram 0 MRR (sem tier publico acima de 500).
-TIER_PRICE_BRL = {"free": 0, "pro": 29, "community": 89, "creator": 249, "over": 0}
-
-
-def _tier_for_seats(seats: int) -> str:
-    if seats <= 10:
-        return "free"
-    if seats <= 30:
-        return "pro"
-    if seats <= 100:
-        return "community"
-    if seats <= 500:
-        return "creator"
-    return "over"
 
 
 async def compute_event_metrics(db: AsyncSession) -> dict:
@@ -236,7 +221,7 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
     groups_billable = 0
     legacy_groups = 0
     for _gid, seats, legacy in seats_rows:
-        t = _tier_for_seats(int(seats or 0))
+        t = tier_for_seats(int(seats or 0))
         tiers[t] += 1
         mrr_if_all_paid += TIER_PRICE_BRL[t]
         # billable = non-legacy em tier pago. projecao realista de MRR se

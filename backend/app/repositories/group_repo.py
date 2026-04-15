@@ -69,6 +69,19 @@ class GroupRepository:
         )
         return int(result.scalar_one())
 
+    async def count_seats(self, group_id: uuid.UUID) -> int:
+        """Seats = memberships com activated_at populado (primeiro login discord).
+        Base do tier. Convite pendente nao conta. Ver BUSINESS.md."""
+        result = await self.db.execute(
+            select(func.count())
+            .select_from(GroupMembership)
+            .where(
+                GroupMembership.group_id == group_id,
+                GroupMembership.activated_at.is_not(None),
+            )
+        )
+        return int(result.scalar_one())
+
     async def count_admins(self, group_id: uuid.UUID) -> int:
         result = await self.db.execute(
             select(func.count())

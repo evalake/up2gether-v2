@@ -23,11 +23,17 @@ export type Group = {
   created_at: string
 }
 
+export type GroupTier = 'free' | 'pro' | 'community' | 'creator' | 'over'
+
 export type GroupWithStats = Group & {
   member_count: number
   game_count: number
   active_vote_sessions: number
   user_role: GroupRole
+  seat_count: number
+  tier: GroupTier
+  seat_limit: number | null
+  legacy_free: boolean
 }
 
 export type GroupMember = {

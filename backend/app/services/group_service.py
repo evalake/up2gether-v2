@@ -163,14 +163,22 @@ class GroupService:
         return out
 
     async def get_for_user(self, group_id: uuid.UUID, actor: User) -> GroupWithStats:
+        from app.domain.tiers import seat_limit_for_tier, tier_for_seats
+
         group, membership = await self._require_membership(group_id, actor)
         member_count = await self.repo.count_members(group.id)
+        seat_count = await self.repo.count_seats(group.id)
+        tier = tier_for_seats(seat_count)
         return GroupWithStats.model_validate(group, from_attributes=True).model_copy(
             update={
                 "member_count": member_count,
                 "game_count": 0,
                 "active_vote_sessions": 0,
                 "user_role": GroupRole(membership.role),
+                "seat_count": seat_count,
+                "tier": tier,
+                "seat_limit": seat_limit_for_tier(tier),
+                "legacy_free": bool(group.legacy_free),
             }
         )
 

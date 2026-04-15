@@ -45,6 +45,12 @@ class GroupWithStats(GroupResponse):
     game_count: int = 0
     active_vote_sessions: int = 0
     user_role: GroupRole = GroupRole.MEMBER
+    # seat model (BUSINESS.md): seat_count = membros com activated_at (primeiro
+    # login via discord). tier e seat_limit derivados. legacy_free grandfathering.
+    seat_count: int = 0
+    tier: str = "free"
+    seat_limit: int | None = 10
+    legacy_free: bool = False
 
 
 class GroupMembershipResponse(BaseModel):

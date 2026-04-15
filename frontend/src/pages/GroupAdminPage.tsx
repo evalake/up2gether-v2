@@ -13,6 +13,7 @@ import {
   useDemote,
   useKick,
 } from '@/features/groups/hooks'
+import type { GroupTier, GroupWithStats } from '@/features/groups/api'
 import { useGames } from '@/features/games/hooks'
 import { useVotes } from '@/features/votes/hooks'
 import { useSessions } from '@/features/sessions/hooks'
@@ -123,6 +124,8 @@ export function GroupAdminPage() {
           ← voltar
         </Link>
       </header>
+
+      <SeatIndicator group={group.data} />
 
       <div className="flex flex-wrap gap-1 border-b border-nerv-line/30 pb-1">
         {TABS.filter((t) => !t.ownerOnly || isOwner).map((t) => (
@@ -443,6 +446,53 @@ export function GroupAdminPage() {
       </AnimatePresence>
       <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
+  )
+}
+
+const TIER_LABEL: Record<GroupTier, string> = {
+  free: 'free',
+  pro: 'pro',
+  community: 'community',
+  creator: 'creator',
+  over: 'over',
+}
+
+function SeatIndicator({ group }: { group: GroupWithStats }) {
+  const { seat_count, seat_limit, tier, legacy_free } = group
+  const pct = seat_limit ? Math.min(100, (seat_count / seat_limit) * 100) : 100
+  const over = seat_limit != null && seat_count > seat_limit
+  const near = seat_limit != null && !over && seat_count >= seat_limit * 0.8
+  const barColor = over ? 'bg-nerv-red' : near ? 'bg-nerv-orange' : 'bg-nerv-green'
+  return (
+    <section className="rounded-sm border border-nerv-line/30 bg-nerv-panel/10 px-4 py-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">seats</span>
+          <span className="font-display text-lg tabular-nums text-nerv-text">{seat_count}</span>
+          <span className="font-mono text-[11px] text-nerv-dim">/ {seat_limit ?? '∞'}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {legacy_free && (
+            <span className="rounded-sm border border-nerv-green/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-green/90">
+              legacy free
+            </span>
+          )}
+          <span className="font-mono text-[10px] uppercase tracking-wider text-nerv-orange/80">
+            tier: {TIER_LABEL[tier]}
+          </span>
+        </div>
+      </div>
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-nerv-line/30">
+        <div className={`h-full ${barColor} transition-all`} style={{ width: `${pct}%` }} />
+      </div>
+      <p className="mt-1.5 font-mono text-[10px] text-nerv-dim">
+        {over
+          ? 'acima do limite do tier atual'
+          : seat_limit == null
+            ? 'sem limite de seats'
+            : `${seat_limit - seat_count} seats livres no tier ${TIER_LABEL[tier]}`}
+      </p>
+    </section>
   )
 }
 
