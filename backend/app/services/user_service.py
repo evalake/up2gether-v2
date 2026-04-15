@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.enums import HardwareTier
+from app.models.game import Game
+from app.models.group import GroupMembership
+from app.models.session import PlaySession
 from app.models.user import User, UserHardwareProfile
+from app.models.vote import VoteBallot
 from app.schemas.user import (
     HardwareResponse,
     HardwareUpdate,
+    OnboardingResponse,
     SettingsResponse,
     SettingsUpdate,
 )
@@ -54,6 +59,52 @@ class UserService:
         await self.db.commit()
         await self.db.refresh(actor)
         return await self.get_settings(actor)
+
+    async def onboarding(self, actor: User) -> OnboardingResponse:
+        """Checklist de ativacao. 4 passos: grupo, 3+ games, 1 sessao, 1 voto."""
+        group_ids = (
+            (
+                await self.db.execute(
+                    select(GroupMembership.group_id).where(GroupMembership.user_id == actor.id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        has_group = bool(group_ids)
+
+        has_games = False
+        if group_ids:
+            game_count = await self.db.scalar(
+                select(func.count()).select_from(Game).where(Game.group_id.in_(group_ids))
+            )
+            has_games = (game_count or 0) >= 3
+
+        has_session = False
+        if group_ids:
+            session_count = await self.db.scalar(
+                select(func.count())
+                .select_from(PlaySession)
+                .where(PlaySession.group_id.in_(group_ids))
+            )
+            has_session = (session_count or 0) >= 1
+
+        has_vote = bool(
+            await self.db.scalar(
+                select(func.count()).select_from(VoteBallot).where(VoteBallot.user_id == actor.id)
+            )
+        )
+
+        done = sum([has_group, has_games, has_session, has_vote])
+        return OnboardingResponse(
+            has_group=has_group,
+            has_games=has_games,
+            has_session=has_session,
+            has_vote=has_vote,
+            steps_done=done,
+            steps_total=4,
+            complete=done == 4,
+        )
 
     async def delete_account(self, actor: User) -> None:
         # artefatos pessoais cascata via FK (memberships, ballots, rsvps,

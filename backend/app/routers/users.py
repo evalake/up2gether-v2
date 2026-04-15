@@ -8,6 +8,7 @@ from app.core.security import CurrentUser
 from app.schemas.user import (
     HardwareResponse,
     HardwareUpdate,
+    OnboardingResponse,
     SettingsResponse,
     SettingsUpdate,
 )
@@ -27,6 +28,14 @@ async def update_hardware(
     service: Annotated[UserService, Depends(get_user_service)],
 ) -> HardwareResponse:
     return await service.set_hardware(actor, payload)
+
+
+@router.get("/users/me/onboarding", response_model=OnboardingResponse)
+async def get_onboarding(
+    actor: CurrentUser,
+    service: Annotated[UserService, Depends(get_user_service)],
+) -> OnboardingResponse:
+    return await service.onboarding(actor)
 
 
 @router.get("/users/me/settings", response_model=SettingsResponse)

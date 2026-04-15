@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/nerv/Button'
 import { KanjiLabel } from '@/components/nerv/KanjiLabel'
 import { useTitle } from '@/lib/useTitle'
+import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 
 function guildIconUrl(g: DiscordGuild): string | null {
   return g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=128` : null
@@ -195,6 +196,8 @@ export function GroupsPage() {
         onPick={onPickGuild}
         registered={registered}
       />
+
+      <OnboardingChecklist />
 
 <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-wider text-nerv-dim">
         <span><span className="text-nerv-orange tabular-nums">{total}</span> grupos</span>

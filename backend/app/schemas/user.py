@@ -34,6 +34,16 @@ class SettingsResponse(BaseModel):
     settings: dict
 
 
+class OnboardingResponse(BaseModel):
+    has_group: bool
+    has_games: bool
+    has_session: bool
+    has_vote: bool
+    steps_done: int
+    steps_total: int
+    complete: bool
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

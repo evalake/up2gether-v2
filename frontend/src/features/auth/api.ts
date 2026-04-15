@@ -70,6 +70,20 @@ export function fetchMe() {
   return api<DiscordUser>('/auth/me')
 }
 
+export type OnboardingState = {
+  has_group: boolean
+  has_games: boolean
+  has_session: boolean
+  has_vote: boolean
+  steps_done: number
+  steps_total: number
+  complete: boolean
+}
+
+export function fetchOnboarding() {
+  return api<OnboardingState>('/users/me/onboarding')
+}
+
 export type DiscordGuild = {
   id: string
   name: string

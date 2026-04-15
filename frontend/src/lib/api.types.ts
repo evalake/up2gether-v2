@@ -55,6 +55,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/discord/guilds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Discord Guilds */
+        get: operations["my_discord_guilds_api_auth_discord_guilds_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/dev-login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dev Login */
+        post: operations["dev_login_api_auth_dev_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/groups": {
         parameters: {
             query?: never;
@@ -67,6 +101,26 @@ export interface paths {
         put?: never;
         /** Create Or Join Group */
         post: operations["create_or_join_group_api_groups_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/auto-discover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Auto Discover Groups
+         * @description busca guilds do discord do user e faz join automatico nos que ja existem.
+         */
+        post: operations["auto_discover_groups_api_groups_auto_discover_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -100,6 +154,46 @@ export interface paths {
         };
         /** List Members */
         get: operations["list_members_api_groups__group_id__members_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/presence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Group Presence
+         * @description Retorna {discord_user_id: status} pros membros online do guild.
+         *
+         *     Vazio se o bot nao tiver conectado ou se o guild nao tiver o bot.
+         *     Membros nao listados sao considerados offline no frontend.
+         */
+        get: operations["get_group_presence_api_groups__group_id__presence_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/members/{target_user_id}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Member Profile Endpoint */
+        get: operations["get_member_profile_endpoint_api_groups__group_id__members__target_user_id__profile_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -142,6 +236,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/groups/{group_id}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Purge Group */
+        post: operations["purge_group_api_groups__group_id__purge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/groups/{group_id}/members/{target_user_id}/promote": {
         parameters: {
             query?: never;
@@ -171,6 +282,74 @@ export interface paths {
         /** Demote Member */
         post: operations["demote_member_api_groups__group_id__members__target_user_id__demote_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/current-game": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set Current Game */
+        patch: operations["set_current_game_api_groups__group_id__current_game_patch"];
+        trace?: never;
+    };
+    "/api/groups/{group_id}/current-game/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current Game Audit */
+        get: operations["current_game_audit_api_groups__group_id__current_game_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/sync-discord": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sync Discord Visuals */
+        post: operations["sync_discord_visuals_api_groups__group_id__sync_discord_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/members/{target_user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Kick Member */
+        delete: operations["kick_member_api_groups__group_id__members__target_user_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -248,6 +427,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/games/{game_id}/owners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Game Owners */
+        get: operations["list_game_owners_api_games__game_id__owners_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/games/{game_id}/ownership": {
         parameters: {
             query?: never;
@@ -283,6 +479,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/groups/{group_id}/votes/{vote_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vote Audit */
+        get: operations["vote_audit_api_groups__group_id__votes__vote_id__audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/groups/{group_id}/votes/{vote_id}": {
         parameters: {
             query?: never;
@@ -294,7 +507,8 @@ export interface paths {
         get: operations["get_vote_api_groups__group_id__votes__vote_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete Vote */
+        delete: operations["delete_vote_api_groups__group_id__votes__vote_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -369,6 +583,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/groups/{group_id}/themes/{theme_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Theme Audit */
+        get: operations["theme_audit_api_groups__group_id__themes__theme_id__audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Theme Cycle Audit */
+        get: operations["theme_cycle_audit_api_groups__group_id__themes_cycle__cycle_id__audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/groups/{group_id}/themes/{theme_id}": {
         parameters: {
             query?: never;
@@ -386,6 +634,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/groups/{group_id}/themes/cycle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Current Cycle */
+        get: operations["get_current_cycle_api_groups__group_id__themes_cycle_get"];
+        put?: never;
+        /** Open Cycle */
+        post: operations["open_cycle_api_groups__group_id__themes_cycle_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upsert Suggestion */
+        put: operations["upsert_suggestion_api_groups__group_id__themes_cycle__cycle_id__suggestion_put"];
+        post?: never;
+        /** Delete Suggestion */
+        delete: operations["delete_suggestion_api_groups__group_id__themes_cycle__cycle_id__suggestion_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/suggestion/{suggestion_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Suggestion By Id */
+        delete: operations["delete_suggestion_by_id_api_groups__group_id__themes_cycle__cycle_id__suggestion__suggestion_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/start-voting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start Voting */
+        post: operations["start_voting_api_groups__group_id__themes_cycle__cycle_id__start_voting_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Cast Vote */
+        put: operations["cast_vote_api_groups__group_id__themes_cycle__cycle_id__vote_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close Cycle */
+        post: operations["close_cycle_api_groups__group_id__themes_cycle__cycle_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/force/{suggestion_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Force Decide */
+        post: operations["force_decide_api_groups__group_id__themes_cycle__cycle_id__force__suggestion_id__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/themes/cycle/{cycle_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Cycle */
+        post: operations["cancel_cycle_api_groups__group_id__themes_cycle__cycle_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/groups/{group_id}/sessions": {
         parameters: {
             query?: never;
@@ -398,6 +784,23 @@ export interface paths {
         put?: never;
         /** Create Session */
         post: operations["create_session_api_groups__group_id__sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/groups/{group_id}/sessions/{session_id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Session Audit */
+        get: operations["session_audit_api_groups__group_id__sessions__session_id__audit_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -457,6 +860,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/me/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Onboarding */
+        get: operations["get_onboarding_api_users_me_onboarding_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users/me/settings": {
         parameters: {
             query?: never;
@@ -473,6 +893,23 @@ export interface paths {
         head?: never;
         /** Patch My Settings */
         patch: operations["patch_my_settings_api_users_me_settings_patch"];
+        trace?: never;
+    };
+    "/api/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete My Account */
+        delete: operations["delete_my_account_api_users_me_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/steam/search": {
@@ -509,6 +946,335 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/steam/builtin/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Builtin Game Details */
+        get: operations["builtin_game_details_api_steam_builtin__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/steam/library/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Library */
+        post: operations["import_library_api_steam_library_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/steam/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sync Steam
+         * @description Resync da biblioteca + perfil usando o steam_id ja cadastrado.
+         *
+         *     Reaproveita import_library mas sem precisar informar o id de novo.
+         */
+        post: operations["sync_steam_api_steam_sync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/steam/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Steam Profile */
+        get: operations["get_my_steam_profile_api_steam_profile_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/telemetry/visit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Track Visit */
+        post: operations["track_visit_api_telemetry_visit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public Session */
+        get: operations["public_session_api_public_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Notifications */
+        get: operations["list_notifications_api_notifications_get"];
+        put?: never;
+        post?: never;
+        /** Clear Notifications */
+        delete: operations["clear_notifications_api_notifications_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/mark-read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Read */
+        post: operations["mark_read_api_notifications_mark_read_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/{nid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Notification */
+        delete: operations["delete_notification_api_notifications__nid__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/push/vapid-public-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vapid Public Key */
+        get: operations["vapid_public_key_api_notifications_push_vapid_public_key_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/push/subscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Push Subscribe */
+        post: operations["push_subscribe_api_notifications_push_subscribe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/push/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Push Unsubscribe */
+        post: operations["push_unsubscribe_api_notifications_push_unsubscribe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send Test */
+        post: operations["send_test_api_notifications_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/google/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Google Connect */
+        get: operations["google_connect_api_google_connect_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/google/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Google Callback */
+        get: operations["google_callback_api_google_callback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/google/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Google Status */
+        get: operations["google_status_api_google_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/google/disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Google Disconnect */
+        post: operations["google_disconnect_api_google_disconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/events/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream */
+        get: operations["stream_api_events_stream_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/metrics/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metrics Events */
+        get: operations["metrics_events_api_admin_metrics_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -529,10 +1295,172 @@ export interface components {
             /** Approvals */
             approvals: string[];
         };
+        /** CurrentGameAudit */
+        CurrentGameAudit: {
+            /**
+             * Game Id
+             * Format: uuid
+             */
+            game_id: string;
+            /** Name */
+            name: string;
+            /** Cover Url */
+            cover_url?: string | null;
+            /** Source */
+            source?: string | null;
+            /** Set At */
+            set_at?: string | null;
+            /** Set By User Id */
+            set_by_user_id?: string | null;
+            /** Set By User Name */
+            set_by_user_name?: string | null;
+            /** Vote Id */
+            vote_id?: string | null;
+            /** Vote Title */
+            vote_title?: string | null;
+            /** Vote Ballots Count */
+            vote_ballots_count?: number | null;
+            /** Vote Eligible Count */
+            vote_eligible_count?: number | null;
+            /** Vote Winner Approvals */
+            vote_winner_approvals?: number | null;
+            /**
+             * Vote Was Tiebreak
+             * @default false
+             */
+            vote_was_tiebreak: boolean;
+            /**
+             * Vote Runner Ups
+             * @default []
+             */
+            vote_runner_ups: {
+                [key: string]: unknown;
+            }[];
+            /** Added By User Id */
+            added_by_user_id?: string | null;
+            /** Added By User Name */
+            added_by_user_name?: string | null;
+            /** Added At */
+            added_at?: string | null;
+            /**
+             * Interest Want Count
+             * @default 0
+             */
+            interest_want_count: number;
+            /**
+             * Interest Meh Count
+             * @default 0
+             */
+            interest_meh_count: number;
+            /**
+             * Interest Nope Count
+             * @default 0
+             */
+            interest_nope_count: number;
+            /**
+             * Owners Count
+             * @default 0
+             */
+            owners_count: number;
+            /**
+             * Sessions Count
+             * @default 0
+             */
+            sessions_count: number;
+            /**
+             * Playtime Leaderboard
+             * @default []
+             */
+            playtime_leaderboard: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** CurrentGameUpdate */
+        CurrentGameUpdate: {
+            /** Game Id */
+            game_id?: string | null;
+            /**
+             * Lock Manual
+             * @default true
+             */
+            lock_manual: boolean;
+        };
+        /** CycleResponse */
+        CycleResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Group Id
+             * Format: uuid
+             */
+            group_id: string;
+            /** Month Year */
+            month_year: string;
+            /** Phase */
+            phase: string;
+            /** Opened By */
+            opened_by: string | null;
+            /** Winner Suggestion Id */
+            winner_suggestion_id: string | null;
+            /** Tiebreak Kind */
+            tiebreak_kind: string | null;
+            /** Tied Suggestion Ids */
+            tied_suggestion_ids: string[] | null;
+            /** Decided At */
+            decided_at: string | null;
+            /**
+             * Suggestions
+             * @default []
+             */
+            suggestions: components["schemas"]["SuggestionResponse"][];
+            /** User Suggestion Id */
+            user_suggestion_id?: string | null;
+            /** User Vote Suggestion Id */
+            user_vote_suggestion_id?: string | null;
+            /**
+             * Total Votes
+             * @default 0
+             */
+            total_votes: number;
+        };
+        /** DevLoginRequest */
+        DevLoginRequest: {
+            /**
+             * Discord Id
+             * @default e2e-user
+             */
+            discord_id: string;
+            /**
+             * Username
+             * @default e2e
+             */
+            username: string;
+        };
         /** DiscordCallbackRequest */
         DiscordCallbackRequest: {
             /** Code */
             code: string;
+            /** Ref */
+            ref?: string | null;
+        };
+        /** DiscordGuild */
+        DiscordGuild: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Icon */
+            icon?: string | null;
+            /**
+             * Owner
+             * @default false
+             */
+            owner: boolean;
+            /** Permissions */
+            permissions?: string | null;
         };
         /** GameCreate */
         GameCreate: {
@@ -570,7 +1498,24 @@ export interface components {
             player_max?: number | null;
             /** @default unknown */
             min_hardware_tier: components["schemas"]["HardwareTier"];
+            /** Developer */
+            developer?: string | null;
+            /** Release Date */
+            release_date?: string | null;
+            /** Metacritic Score */
+            metacritic_score?: number | null;
+            /** Price Original */
+            price_original?: number | null;
+            /** Discount Percent */
+            discount_percent?: number | null;
+            /** @default steam */
+            source: components["schemas"]["GameSource"];
         };
+        /**
+         * GameSource
+         * @enum {string}
+         */
+        GameSource: "steam" | "riot" | "epic" | "manual";
         /**
          * GameStage
          * @enum {string}
@@ -600,6 +1545,16 @@ export interface components {
             genres?: string[] | null;
             /** Tags */
             tags?: string[] | null;
+            /** Developer */
+            developer?: string | null;
+            /** Release Date */
+            release_date?: string | null;
+            /** Metacritic Score */
+            metacritic_score?: number | null;
+            /** Price Original */
+            price_original?: number | null;
+            /** Discount Percent */
+            discount_percent?: number | null;
         };
         /** GameViability */
         GameViability: {
@@ -674,6 +1629,20 @@ export interface components {
             created_at: string;
             /** Archived At */
             archived_at?: string | null;
+            /** Developer */
+            developer?: string | null;
+            /** Release Date */
+            release_date?: string | null;
+            /** Metacritic Score */
+            metacritic_score?: number | null;
+            /** Price Original */
+            price_original?: number | null;
+            /** Discount Percent */
+            discount_percent?: number | null;
+            /** Review Score Desc */
+            review_score_desc?: string | null;
+            /** @default steam */
+            source: components["schemas"]["GameSource"];
             viability: components["schemas"]["GameViability"];
             user_interest?: components["schemas"]["InterestSignal"] | null;
             /**
@@ -697,6 +1666,8 @@ export interface components {
             icon_url?: string | null;
             /** Webhook Url */
             webhook_url?: string | null;
+            /** Discord Permissions */
+            discord_permissions?: string | null;
         };
         /** GroupMembershipResponse */
         GroupMembershipResponse: {
@@ -736,6 +1707,24 @@ export interface components {
             discord_guild_id: string;
             /** Icon Url */
             icon_url?: string | null;
+            /** Banner Url */
+            banner_url?: string | null;
+            /** Splash Url */
+            splash_url?: string | null;
+            /** Accent Color */
+            accent_color?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Current Game Id */
+            current_game_id?: string | null;
+            /** Current Game Source */
+            current_game_source?: string | null;
+            /** Current Game Set At */
+            current_game_set_at?: string | null;
+            /** Current Game Set By */
+            current_game_set_by?: string | null;
+            /** Current Game Vote Id */
+            current_game_vote_id?: string | null;
             /** Owner User Id */
             owner_user_id?: string | null;
             /** Webhook Url */
@@ -772,6 +1761,24 @@ export interface components {
             discord_guild_id: string;
             /** Icon Url */
             icon_url?: string | null;
+            /** Banner Url */
+            banner_url?: string | null;
+            /** Splash Url */
+            splash_url?: string | null;
+            /** Accent Color */
+            accent_color?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Current Game Id */
+            current_game_id?: string | null;
+            /** Current Game Source */
+            current_game_source?: string | null;
+            /** Current Game Set At */
+            current_game_set_at?: string | null;
+            /** Current Game Set By */
+            current_game_set_by?: string | null;
+            /** Current Game Vote Id */
+            current_game_vote_id?: string | null;
             /** Owner User Id */
             owner_user_id?: string | null;
             /** Webhook Url */
@@ -805,6 +1812,26 @@ export interface components {
             active_vote_sessions: number;
             /** @default member */
             user_role: components["schemas"]["GroupRole"];
+            /**
+             * Seat Count
+             * @default 0
+             */
+            seat_count: number;
+            /**
+             * Tier
+             * @default free
+             */
+            tier: string;
+            /**
+             * Seat Limit
+             * @default 10
+             */
+            seat_limit: number | null;
+            /**
+             * Legacy Free
+             * @default false
+             */
+            legacy_free: boolean;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -833,6 +1860,22 @@ export interface components {
             /** Notes */
             notes?: string | null;
         };
+        /** ImportLibraryIn */
+        ImportLibraryIn: {
+            /** Steam Id Or Vanity */
+            steam_id_or_vanity: string;
+        };
+        /** ImportLibraryOut */
+        ImportLibraryOut: {
+            /** Steam Id */
+            steam_id: string;
+            /** Owned Count */
+            owned_count: number;
+            /** Matched Count */
+            matched_count: number;
+            /** Matched Appids */
+            matched_appids: number[];
+        };
         /**
          * InterestSignal
          * @enum {string}
@@ -842,6 +1885,55 @@ export interface components {
         InterestSignalUpdate: {
             signal: components["schemas"]["InterestSignal"];
         };
+        /** MarkReadIn */
+        MarkReadIn: {
+            /** Ids */
+            ids?: string[] | null;
+        };
+        /** NotificationOut */
+        NotificationOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Title */
+            title: string;
+            /** Body */
+            body: string | null;
+            /** Link */
+            link: string | null;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Read At */
+            read_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** OnboardingResponse */
+        OnboardingResponse: {
+            /** Has Group */
+            has_group: boolean;
+            /** Has Games */
+            has_games: boolean;
+            /** Has Session */
+            has_session: boolean;
+            /** Has Vote */
+            has_vote: boolean;
+            /** Steps Done */
+            steps_done: number;
+            /** Steps Total */
+            steps_total: number;
+            /** Complete */
+            complete: boolean;
+        };
         /** OwnershipToggle */
         OwnershipToggle: {
             /** Owns */
@@ -850,6 +1942,51 @@ export interface components {
         /** PromoteRequest */
         PromoteRequest: {
             new_role: components["schemas"]["GroupRole"];
+        };
+        /** PublicSessionCard */
+        PublicSessionCard: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Group Id
+             * Format: uuid
+             */
+            group_id: string;
+            /** Title */
+            title: string;
+            /** Start At */
+            start_at: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Game Name */
+            game_name: string | null;
+            /** Group Name */
+            group_name: string;
+            /** Rsvp Yes */
+            rsvp_yes: number;
+            /** Rsvp Maybe */
+            rsvp_maybe: number;
+        };
+        /** PushKeys */
+        PushKeys: {
+            /** P256Dh */
+            p256dh: string;
+            /** Auth */
+            auth: string;
+        };
+        /** PushSubscribeIn */
+        PushSubscribeIn: {
+            /** Endpoint */
+            endpoint: string;
+            keys: components["schemas"]["PushKeys"];
+        };
+        /** PushUnsubscribeIn */
+        PushUnsubscribeIn: {
+            /** Endpoint */
+            endpoint: string;
         };
         /** RsvpResponse */
         RsvpResponse: {
@@ -868,6 +2005,59 @@ export interface components {
         /** RsvpUpdate */
         RsvpUpdate: {
             status: components["schemas"]["SessionRsvp"];
+        };
+        /** SessionAuditGame */
+        SessionAuditGame: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Cover Url */
+            cover_url: string | null;
+        };
+        /** SessionAuditPerson */
+        SessionAuditPerson: {
+            /** Id */
+            id: string | null;
+            /** Discord Id */
+            discord_id?: string | null;
+            /** Display Name */
+            display_name: string | null;
+            /** Avatar Url */
+            avatar_url: string | null;
+        };
+        /** SessionAuditResponse */
+        SessionAuditResponse: {
+            session: components["schemas"]["SessionResponse"];
+            creator: components["schemas"]["SessionAuditPerson"];
+            game: components["schemas"]["SessionAuditGame"] | null;
+            /** Rsvps */
+            rsvps: components["schemas"]["SessionAuditRsvp"][];
+            /** Non Respondents */
+            non_respondents: components["schemas"]["SessionAuditPerson"][];
+        };
+        /** SessionAuditRsvp */
+        SessionAuditRsvp: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Discord Id */
+            discord_id: string | null;
+            /** Display Name */
+            display_name: string;
+            /** Avatar Url */
+            avatar_url: string | null;
+            status: components["schemas"]["SessionRsvp"];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** SessionCreate */
         SessionCreate: {
@@ -1000,12 +2190,101 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** SuggestionCreate */
+        SuggestionCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Image Url */
+            image_url?: string | null;
+        };
+        /** SuggestionResponse */
+        SuggestionResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Cycle Id
+             * Format: uuid
+             */
+            cycle_id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name?: string | null;
+            /** User Avatar */
+            user_avatar?: string | null;
+            /** User Discord Id */
+            user_discord_id?: string | null;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Image Url */
+            image_url: string | null;
+            /**
+             * Vote Count
+             * @default 0
+             */
+            vote_count: number;
+        };
+        /** ThemeAuditPerson */
+        ThemeAuditPerson: {
+            /** Id */
+            id: string | null;
+            /** Discord Id */
+            discord_id?: string | null;
+            /** Display Name */
+            display_name: string | null;
+            /** Avatar Url */
+            avatar_url: string | null;
+        };
+        /** ThemeAuditResponse */
+        ThemeAuditResponse: {
+            theme: components["schemas"]["ThemeResponse"] | null;
+            cycle: components["schemas"]["CycleResponse"] | null;
+            opener: components["schemas"]["ThemeAuditPerson"] | null;
+            decided_by: components["schemas"]["ThemeAuditPerson"] | null;
+            /** Votes */
+            votes: components["schemas"]["ThemeAuditVote"][];
+            /** Non Voters */
+            non_voters: components["schemas"]["ThemeAuditPerson"][];
+            /** Non Suggesters */
+            non_suggesters: components["schemas"]["ThemeAuditPerson"][];
+        };
+        /** ThemeAuditVote */
+        ThemeAuditVote: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Discord Id */
+            discord_id: string | null;
+            /** Display Name */
+            display_name: string;
+            /** Avatar Url */
+            avatar_url: string | null;
+            /**
+             * Suggestion Id
+             * Format: uuid
+             */
+            suggestion_id: string;
+        };
         /** ThemeCreate */
         ThemeCreate: {
             /** Theme Name */
             theme_name: string;
             /** Description */
             description?: string | null;
+            /** Image Url */
+            image_url?: string | null;
             /**
              * Month Year
              * @description YYYY-MM, default: mes atual
@@ -1030,6 +2309,8 @@ export interface components {
             theme_name: string;
             /** Description */
             description: string | null;
+            /** Image Url */
+            image_url?: string | null;
             /** Decided By */
             decided_by: string;
             /**
@@ -1078,6 +2359,11 @@ export interface components {
              * @default false
              */
             is_new_user: boolean;
+            /**
+             * Is Sys Admin
+             * @default false
+             */
+            is_sys_admin: boolean;
         };
         /** ValidationError */
         ValidationError: {
@@ -1091,6 +2377,78 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VisitPayload */
+        VisitPayload: {
+            /** Ref */
+            ref?: string | null;
+        };
+        /** VoteAuditCreator */
+        VoteAuditCreator: {
+            /** Id */
+            id: string | null;
+            /** Discord Id */
+            discord_id?: string | null;
+            /** Display Name */
+            display_name: string | null;
+            /** Avatar Url */
+            avatar_url: string | null;
+        };
+        /** VoteAuditGame */
+        VoteAuditGame: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Cover Url */
+            cover_url: string | null;
+        };
+        /** VoteAuditResponse */
+        VoteAuditResponse: {
+            session: components["schemas"]["VoteSessionResponse"];
+            creator: components["schemas"]["VoteAuditCreator"];
+            /** Games */
+            games: components["schemas"]["VoteAuditGame"][];
+            /** Voters */
+            voters: components["schemas"]["VoteAuditVoter"][];
+            /** Non Voters */
+            non_voters: components["schemas"]["VoteAuditCreator"][];
+        };
+        /** VoteAuditVoter */
+        VoteAuditVoter: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Discord Id */
+            discord_id: string | null;
+            /** Display Name */
+            display_name: string;
+            /** Avatar Url */
+            avatar_url: string | null;
+            /** Approvals */
+            approvals: string[];
+            /** Stage Id */
+            stage_id: string | null;
+            /** Stage Number */
+            stage_number: number | null;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+        };
+        /** VoteCast */
+        VoteCast: {
+            /**
+             * Suggestion Id
+             * Format: uuid
+             */
+            suggestion_id: string;
         };
         /** VoteSessionCreate */
         VoteSessionCreate: {
@@ -1154,6 +2512,42 @@ export interface components {
              * @default 0
              */
             ballots_count: number;
+            /** Tallies */
+            tallies?: {
+                [key: string]: number;
+            };
+            /** Your Approvals */
+            your_approvals?: string[];
+            /** Current Stage Number */
+            current_stage_number?: number | null;
+            /** Total Stages */
+            total_stages?: number | null;
+            /** Stages */
+            stages?: components["schemas"]["VoteStageResponse"][];
+        };
+        /** VoteStageResponse */
+        VoteStageResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Stage Number */
+            stage_number: number;
+            /** Candidate Game Ids */
+            candidate_game_ids: string[];
+            /** Max Selections */
+            max_selections: number;
+            status: components["schemas"]["VoteStatus"];
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /** Closes At */
+            closes_at: string | null;
+            /** Closed At */
+            closed_at: string | null;
         };
         /**
          * VoteStatus
@@ -1249,6 +2643,59 @@ export interface operations {
             };
         };
     };
+    my_discord_guilds_api_auth_discord_guilds_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscordGuild"][];
+                };
+            };
+        };
+    };
+    dev_login_api_auth_dev_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DevLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthTokenResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_groups_api_groups_get: {
         parameters: {
             query?: never;
@@ -1298,6 +2745,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    auto_discover_groups_api_groups_auto_discover_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -1393,6 +2862,73 @@ export interface operations {
             };
         };
     };
+    get_group_presence_api_groups__group_id__presence_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_member_profile_endpoint_api_groups__group_id__members__target_user_id__profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                target_user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_webhook_api_groups__group_id__webhook_put: {
         parameters: {
             query?: never;
@@ -1427,6 +2963,35 @@ export interface operations {
         };
     };
     leave_group_api_groups__group_id__leave_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purge_group_api_groups__group_id__purge_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1519,10 +3084,139 @@ export interface operations {
             };
         };
     };
+    set_current_game_api_groups__group_id__current_game_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CurrentGameUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_game_audit_api_groups__group_id__current_game_audit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentGameAudit"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sync_discord_visuals_api_groups__group_id__sync_discord_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GroupResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    kick_member_api_groups__group_id__members__target_user_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                target_user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_games_api_groups__group_id__games_get: {
         parameters: {
             query?: {
                 include_archived?: boolean;
+                limit?: number;
+                offset?: number;
             };
             header?: never;
             path: {
@@ -1701,11 +3395,13 @@ export interface operations {
         };
         responses: {
             /** @description Successful Response */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GameWithViability"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1730,11 +3426,13 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GameWithViability"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1759,11 +3457,46 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GameWithViability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_game_owners_api_games__game_id__owners_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                game_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1792,11 +3525,13 @@ export interface operations {
         };
         responses: {
             /** @description Successful Response */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GameWithViability"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1811,7 +3546,10 @@ export interface operations {
     };
     list_votes_api_groups__group_id__votes_get: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
             header?: never;
             path: {
                 group_id: string;
@@ -1875,6 +3613,38 @@ export interface operations {
             };
         };
     };
+    vote_audit_api_groups__group_id__votes__vote_id__audit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                vote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoteAuditResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_vote_api_groups__group_id__votes__vote_id__get: {
         parameters: {
             query?: never;
@@ -1907,6 +3677,36 @@ export interface operations {
             };
         };
     };
+    delete_vote_api_groups__group_id__votes__vote_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                vote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     submit_ballot_api_votes__vote_id__ballot_put: {
         parameters: {
             query?: never;
@@ -1923,11 +3723,13 @@ export interface operations {
         };
         responses: {
             /** @description Successful Response */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["VoteSessionResponse"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1974,7 +3776,10 @@ export interface operations {
     };
     list_themes_api_groups__group_id__themes_get: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
             header?: never;
             path: {
                 group_id: string;
@@ -2069,6 +3874,70 @@ export interface operations {
             };
         };
     };
+    theme_audit_api_groups__group_id__themes__theme_id__audit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                theme_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeAuditResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    theme_cycle_audit_api_groups__group_id__themes_cycle__cycle_id__audit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeAuditResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     delete_theme_api_groups__group_id__themes__theme_id__delete: {
         parameters: {
             query?: never;
@@ -2099,9 +3968,340 @@ export interface operations {
             };
         };
     };
-    list_sessions_api_groups__group_id__sessions_get: {
+    get_current_cycle_api_groups__group_id__themes_cycle_get: {
         parameters: {
             query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_cycle_api_groups__group_id__themes_cycle_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upsert_suggestion_api_groups__group_id__themes_cycle__cycle_id__suggestion_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuggestionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_suggestion_api_groups__group_id__themes_cycle__cycle_id__suggestion_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_suggestion_by_id_api_groups__group_id__themes_cycle__cycle_id__suggestion__suggestion_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_voting_api_groups__group_id__themes_cycle__cycle_id__start_voting_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cast_vote_api_groups__group_id__themes_cycle__cycle_id__vote_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoteCast"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_cycle_api_groups__group_id__themes_cycle__cycle_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    force_decide_api_groups__group_id__themes_cycle__cycle_id__force__suggestion_id__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+                suggestion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_cycle_api_groups__group_id__themes_cycle__cycle_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                cycle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CycleResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sessions_api_groups__group_id__sessions_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
             header?: never;
             path: {
                 group_id: string;
@@ -2152,6 +4352,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    session_audit_api_groups__group_id__sessions__session_id__audit_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                group_id: string;
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionAuditResponse"];
                 };
             };
             /** @description Validation Error */
@@ -2332,6 +4564,26 @@ export interface operations {
             };
         };
     };
+    get_onboarding_api_users_me_onboarding_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingResponse"];
+                };
+            };
+        };
+    };
     get_my_settings_api_users_me_settings_get: {
         parameters: {
             query?: never;
@@ -2382,6 +4634,24 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    delete_my_account_api_users_me_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2447,6 +4717,566 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    builtin_game_details_api_steam_builtin__slug__get: {
+        parameters: {
+            query?: {
+                name?: string | null;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_library_api_steam_library_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportLibraryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportLibraryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sync_steam_api_steam_sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    get_my_steam_profile_api_steam_profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    } | null;
+                };
+            };
+        };
+    };
+    track_visit_api_telemetry_visit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisitPayload"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    public_session_api_public_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSessionCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_notifications_api_notifications_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_notifications_api_notifications_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    mark_read_api_notifications_mark_read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkReadIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_notification_api_notifications__nid__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                nid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vapid_public_key_api_notifications_push_vapid_public_key_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    push_subscribe_api_notifications_push_subscribe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushSubscribeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    push_unsubscribe_api_notifications_push_unsubscribe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushUnsubscribeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_test_api_notifications_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    google_connect_api_google_connect_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    google_callback_api_google_callback_get: {
+        parameters: {
+            query: {
+                code: string;
+                state: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    google_status_api_google_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    google_disconnect_api_google_disconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    stream_api_events_stream_get: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_events_api_admin_metrics_events_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
