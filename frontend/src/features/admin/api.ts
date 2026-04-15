@@ -11,6 +11,14 @@ export type DailyPoint = {
   count: number
 }
 
+export type TierBreakdown = {
+  free: number
+  pro: number
+  community: number
+  creator: number
+  over: number
+}
+
 export type EventMetrics = {
   totals: Record<string, number>
   last_7d: Record<string, number>
@@ -24,6 +32,9 @@ export type EventMetrics = {
   sessions_created_28d: number
   sessions_completed_28d: number
   session_completion_rate_28d: number
+  groups_by_tier: TierBreakdown
+  mrr_if_all_paid_brl: number
+  legacy_groups: number
 }
 
 export const fetchEventMetrics = () => api<EventMetrics>('/admin/metrics/events')

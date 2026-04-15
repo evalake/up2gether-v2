@@ -122,6 +122,46 @@ export function AdminMetricsPage() {
         />
       </section>
 
+      <section className="mb-8 rounded-lg border border-orange-500/20 bg-orange-500/5 p-5">
+        <div className="mb-3 flex items-baseline justify-between">
+          <div className="text-xs uppercase tracking-wide text-orange-300">
+            tier breakdown (projecao paywall)
+          </div>
+          <div className="font-mono text-[10px] text-zinc-500">
+            {m.legacy_groups} grupos com legacy_free
+          </div>
+        </div>
+        <div className="grid gap-3 md:grid-cols-5">
+          {(['free', 'pro', 'community', 'creator', 'over'] as const).map((t) => {
+            const label = t === 'over' ? '>500' : t
+            const price = { free: 0, pro: 29, community: 89, creator: 249, over: 0 }[t]
+            return (
+              <div
+                key={t}
+                className="rounded-md border border-zinc-800 bg-zinc-900/60 p-3"
+              >
+                <div className="text-[10px] uppercase tracking-wide text-zinc-500">
+                  {label}
+                </div>
+                <div className="mt-1 font-mono text-2xl text-zinc-100">
+                  {m.groups_by_tier[t]}
+                </div>
+                <div className="mt-0.5 text-[10px] text-zinc-500">
+                  {price > 0 ? `R$ ${price}/mes` : '—'}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div className="mt-4 border-t border-orange-500/20 pt-3 text-[11px] text-zinc-400">
+          MRR teorico se todos pagassem (ignora legacy):{' '}
+          <span className="font-mono text-base text-orange-300">
+            R$ {m.mrr_if_all_paid_brl}
+          </span>
+          <span className="ml-2 text-zinc-600">/ mes</span>
+        </div>
+      </section>
+
       <section className="rounded-lg border border-zinc-800 bg-zinc-900/40">
         <table className="w-full text-sm">
           <thead className="text-[11px] uppercase tracking-wide text-zinc-500">

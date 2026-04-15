@@ -181,12 +181,29 @@ Weekly review dessas 5 metricas:
 
 Nao olhar: total users signed up (vanity), total groups created (vanity), Discord server count (vanity).
 
+## Decisoes operacionais (fixadas 2026-04-14)
+
+Depois de revisar o plano inteiro com pair programming, fixei isso pra parar de floar em "depois a gente decide":
+
+| Tema | Decisao |
+|------|---------|
+| **Cutoff legacy** | 2026-10-14 (M6). Todo grupo criado antes dessa data = `legacy_free = true` pra sempre. Migration atual ja marcou todos como legacy; proxima migration vai *desmarcar* so os grupos criados entre o cutoff e o redeploy (caso nenhum, no-op). |
+| **Gateway de pagamento** | Asaas. Motivos: PIX recorrente nativo, boleto, cartao domestico, taxa ~3.49% no credito e R$ 1.99 no boleto. Stripe Brasil nao faz PIX recorrente. Pagar.me e otimo mas mais caro. Asaas da conta de MEI-size. Internacional fica pra depois com Stripe em paralelo. |
+| **Politica de reembolso** | 7 dias corridos apos primeira cobranca, sem pergunta (CDC). Cancelamento a qualquer momento, acesso ate fim do periodo pago. Nao estorna proporcional. |
+| **CNPJ** | Abrir MEI em **2026-09** (1 mes antes do cutoff). Teto R$ 81k/ano cobre 1-2 anos tranquilo. Migrar pra ME/Simples quando ARR passar R$ 60k. |
+| **Nota fiscal** | MEI pra PF nao precisa emitir. Quando chegar cliente PJ (Community/Creator), emitir via emissor do MEI. |
+| **Free limit** | Mantem 10 por enquanto, mas marcar revisao em M3 (jul/2026): se retention W4 <25%, subir pra 15 (mais viralidade, MRR projetado -20%). Dado bate palpite. |
+| **Trial** | Novos servidores que cruzam 25 membros na fase paga ganham 14 dias de trial Pro gratis. Nao cobra cartao no trial. Expirou sem pagar = downgrade automatico pra Free (read-only nas sessoes acima do limite). |
+
 ## Proximos passos imediatos
 
 - [ ] Validar hipotese de pricing com 3-5 donos de servidor que nao sao amigos (entrevista, 15min cada)
-- [ ] Criar coluna `legacy_free` em `groups` + migracao (nao popular ainda)
-- [ ] Definir data do cutoff legacy (sugestao: dia do lancamento paid, nao hoje)
+- [x] Criar coluna `legacy_free` em `groups` + migracao (feito em 358242a31020)
+- [x] Definir data do cutoff legacy (2026-10-14)
+- [x] Escolher gateway (Asaas)
+- [ ] Criar conta Asaas + sandbox (fazer so em agosto/2026, 2 meses antes do cutoff)
 - [ ] Listar bot em top.gg (precisa bot oficial Discord, nao so OAuth)
 - [ ] Escrever 3 posts SEO pt-BR pra validar trafego organico
-- [ ] Abrir MEI ate M6
+- [ ] Abrir MEI em 2026-09
 - [x] Definir regra de "membro registrado": primeiro login via Discord no grupo (activated_at populado)
+- [ ] Revisar Free limit em 2026-07 com dado de retention W4

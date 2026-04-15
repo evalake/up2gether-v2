@@ -7,12 +7,28 @@ from sqlalchemy.dialects.postgresql import DATE
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.event import Event
-from app.models.group import Group
+from app.models.group import Group, GroupMembership
 from app.services.events import (
     EVENT_MEMBER_ACTIVATED,
     EVENT_SESSION_COMPLETED,
     EVENT_SESSION_CREATED,
 )
+
+# tiers do BUSINESS.md. bucketizacao por count(activated_at) de cada grupo.
+# preco em BRL/mes. free e over geram 0 MRR (sem tier publico acima de 500).
+TIER_PRICE_BRL = {"free": 0, "pro": 29, "community": 89, "creator": 249, "over": 0}
+
+
+def _tier_for_seats(seats: int) -> str:
+    if seats <= 10:
+        return "free"
+    if seats <= 30:
+        return "pro"
+    if seats <= 100:
+        return "community"
+    if seats <= 500:
+        return "creator"
+    return "over"
 
 
 async def compute_event_metrics(db: AsyncSession) -> dict:
@@ -104,6 +120,31 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         round(sessions_completed_28d / sessions_created_28d, 4) if sessions_created_28d else 0
     )
 
+    # tier breakdown + MRR potencial se todos pagassem (ignora legacy_free).
+    # util pra validar pricing antes de ligar cobranca: onde a distribuicao
+    # real dos grupos cai hoje, e quanto seria o MRR teorico.
+    seats_stmt = (
+        select(
+            Group.id,
+            func.count(GroupMembership.id)
+            .filter(GroupMembership.activated_at.isnot(None))
+            .label("seats"),
+            Group.legacy_free,
+        )
+        .outerjoin(GroupMembership, GroupMembership.group_id == Group.id)
+        .group_by(Group.id, Group.legacy_free)
+    )
+    seats_rows = (await db.execute(seats_stmt)).all()
+    tiers = {"free": 0, "pro": 0, "community": 0, "creator": 0, "over": 0}
+    mrr_if_all_paid = 0
+    legacy_groups = 0
+    for _gid, seats, legacy in seats_rows:
+        t = _tier_for_seats(int(seats or 0))
+        tiers[t] += 1
+        mrr_if_all_paid += TIER_PRICE_BRL[t]
+        if legacy:
+            legacy_groups += 1
+
     return {
         "totals": totals,
         "last_7d": last_7d,
@@ -117,4 +158,7 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "sessions_created_28d": sessions_created_28d,
         "sessions_completed_28d": sessions_completed_28d,
         "session_completion_rate_28d": session_completion_rate_28d,
+        "groups_by_tier": tiers,
+        "mrr_if_all_paid_brl": mrr_if_all_paid,
+        "legacy_groups": legacy_groups,
     }

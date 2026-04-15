@@ -185,6 +185,101 @@ async def test_metrics_health_kpis_empty_safe(
     )
 
 
+async def test_metrics_tier_breakdown(make_user, auth_headers, client, db_session, as_sys_admin):
+    """Valida que o dashboard mostra distribuicao de grupos por tier projetado
+    + MRR potencial se todos pagassem (ignorando legacy_free). Util pra decidir
+    subir/descer limite do Free antes de ligar cobranca.
+    """
+    import uuid
+
+    from app.models.group import GroupMembership
+
+    admin = await make_user(discord_id="admin-tier", username="tier")
+    as_sys_admin(admin.discord_id)
+
+    # 3 grupos, bucketizados por seat count (activated_at not null):
+    # - g1: 5 seats -> free
+    # - g2: 20 seats -> pro
+    # - g3: 50 seats -> community
+    r1 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "tg-free", "name": "panela"},
+        headers=auth_headers(admin),
+    )
+    r2 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "tg-pro", "name": "crew"},
+        headers=auth_headers(admin),
+    )
+    r3 = await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "tg-community", "name": "streamer"},
+        headers=auth_headers(admin),
+    )
+    g1 = uuid.UUID(r1.json()["id"])
+    g2 = uuid.UUID(r2.json()["id"])
+    g3 = uuid.UUID(r3.json()["id"])
+
+    # criador ja conta 1 seat em cada (activated_at populado). adicionar o resto:
+    async def seat(group_id, n):
+        for _ in range(n):
+            u = await make_user()
+            db_session.add(GroupMembership(group_id=group_id, user_id=u.id, role="member"))
+        await db_session.commit()
+
+    await seat(g1, 4)  # 1 criador + 4 = 5 seats
+    await seat(g2, 19)  # 1 + 19 = 20 seats
+    await seat(g3, 49)  # 1 + 49 = 50 seats
+
+    # marca 2 dos 3 como legacy (como se fossem pre-cutoff)
+    from sqlalchemy import update
+
+    from app.models.group import Group as GroupModel
+
+    await db_session.execute(
+        update(GroupModel).where(GroupModel.id.in_([g1, g2])).values(legacy_free=True)
+    )
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+
+    tiers = body["groups_by_tier"]
+    assert tiers["free"] == 1
+    assert tiers["pro"] == 1
+    assert tiers["community"] == 1
+    assert tiers["creator"] == 0
+    assert tiers["over"] == 0
+
+    # MRR se todos pagassem (ignora legacy_free): 29 + 89 = 118
+    # free gera 0, over gera 0 (sem tier publico)
+    assert body["mrr_if_all_paid_brl"] == 118
+
+    # 2 dos 3 marcados como legacy
+    assert body["legacy_groups"] == 2
+
+
+async def test_metrics_tier_breakdown_empty(
+    make_user, auth_headers, client, db_session, as_sys_admin
+):
+    admin = await make_user(discord_id="admin-tier-empty", username="te")
+    as_sys_admin(admin.discord_id)
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    body = res.json()
+    assert body["groups_by_tier"] == {
+        "free": 0,
+        "pro": 0,
+        "community": 0,
+        "creator": 0,
+        "over": 0,
+    }
+    assert body["mrr_if_all_paid_brl"] == 0
+    assert body["legacy_groups"] == 0
+
+
 async def test_metrics_daily_series(make_user, auth_headers, client, db_session, as_sys_admin):
     admin = await make_user(discord_id="admin-4", username="boss4")
     as_sys_admin(admin.discord_id)
