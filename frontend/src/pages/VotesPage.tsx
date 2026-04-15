@@ -101,10 +101,14 @@ export function VotesPage() {
 
   // detecta auto-close (quorum ou admin) e dispara reveal
   const seenClosedRef = useRef<Set<string>>(new Set())
+  const seededRef = useRef(false)
   const pendingRevealRef = useRef<{ vote: VoteRow; game: Game } | null>(null)
   useEffect(() => {
     if (!votes.data) return
-    if (seenClosedRef.current.size === 0) {
+    // seed pass: marca tudo que ja veio fechado na 1a carga pra nao revelar retroativo.
+    // size===0 nao da: grupo sem historico nunca seedaria e 1o fechamento ficava silent.
+    if (!seededRef.current) {
+      seededRef.current = true
       for (const v of votes.data) if (v.status !== 'open') seenClosedRef.current.add(v.id)
       return
     }

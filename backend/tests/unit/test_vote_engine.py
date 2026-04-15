@@ -170,3 +170,105 @@ def test_advance_final_no_votes_returns_first():
     a, b = _ids(2)
     res = advance_stage([a, b], [], 2, {}, seed=1, is_final=True)
     assert res.winner_id == a
+
+
+# ---- cenarios unanimes / single-voter / sequencia full ----
+
+
+def test_advance_single_voter_on_n6_advances_top_3():
+    ids = _ids(6)
+    # 1 voter, aprova 3 (max_selections = floor(6/2) = 3)
+    ballots = [[ids[0], ids[1], ids[2]]]
+    res = advance_stage(ids, ballots, eligible_count=1, viability_by_id={}, seed=42, is_final=False)
+    assert res.winner_id is None
+    assert res.advance_ids is not None
+    assert len(res.advance_ids) == 3
+    assert set(res.advance_ids) == {ids[0], ids[1], ids[2]}
+
+
+def test_advance_single_voter_n3_unanimous_via_auto_check():
+    # quando eligible=1 e voter marca so 1 candidato no stage de N=3,
+    # early consensus dispara (1/1 todos em a)
+    a, b, c = _ids(3)
+    ballots = [[a]]
+    res = advance_stage(
+        [a, b, c], ballots, eligible_count=1, viability_by_id={}, seed=1, is_final=False
+    )
+    assert res.winner_id == a
+    assert res.early_consensus is True
+
+
+def test_advance_final_n2_picks_highest_count():
+    a, b = _ids(2)
+    ballots = [[a]]
+    res = advance_stage([a, b], ballots, 1, {}, seed=1, is_final=True)
+    assert res.winner_id == a
+    assert res.advance_ids is None
+
+
+def test_advance_forced_final_with_multiple_candidates():
+    # force_final (admin encerrou manual): viability desempata mesmo com 3+ cand
+    a, b, c = _ids(3)
+    ballots = [[a], [b]]  # 1x1 empate
+    res = advance_stage([a, b, c], ballots, 2, {a: 10.0, b: 80.0}, seed=1, is_final=True)
+    assert res.winner_id == b
+
+
+def test_advance_intermediate_single_high_vote_advances_minimum_two():
+    # caso extremo: so 1 candidato recebe voto, mas advance tem minimo 2
+    ids = _ids(4)
+    ballots = [[ids[0]]]  # so ids[0] tem voto
+    res = advance_stage(ids, ballots, 1, {}, seed=1, is_final=False)
+    assert res.winner_id is None
+    assert res.advance_ids is not None
+    assert len(res.advance_ids) == 2  # target_m = max(2, 4//2) = 2
+    assert ids[0] == res.advance_ids[0]  # mais votado em 1o
+
+
+def test_advance_unknown_candidates_in_ballot_are_ignored():
+    ids = _ids(3)
+    ghost = uuid.uuid4()
+    ballots = [[ids[0], ghost]]
+    res = advance_stage(ids, ballots, 1, {}, seed=1, is_final=False)
+    # ghost nao conta, ids[0] tem 1 voto
+    assert res.counts[ids[0]] == 1
+    assert ghost not in res.counts
+
+
+def test_advance_empty_candidates_returns_empty():
+    res = advance_stage([], [], 0, {}, seed=1, is_final=True)
+    assert res.winner_id is None
+    assert res.advance_ids is None
+    assert res.counts == {}
+
+
+def test_advance_seed_deterministic_same_input():
+    ids = _ids(4)
+    ballots = [[ids[0]], [ids[1]]]  # empate 2a vaga
+    r1 = advance_stage(ids, ballots, 2, {}, seed=42, is_final=False)
+    r2 = advance_stage(ids, ballots, 2, {}, seed=42, is_final=False)
+    assert r1.advance_ids == r2.advance_ids
+
+
+def test_advance_full_sequence_n10_to_winner():
+    # simula sequencia completa 10 -> 5 -> 2 com mesma rodada
+    ids = _ids(10)
+    # stage 1: todos votam nos 5 primeiros
+    b1 = [list(ids[:5]) for _ in range(3)]
+    r1 = advance_stage(ids, b1, 3, {}, seed=7, is_final=False)
+    assert r1.advance_ids is not None
+    assert len(r1.advance_ids) == 5
+    top5 = r1.advance_ids
+
+    # stage 2: 5 cand, todos votam nos 2 primeiros
+    b2 = [list(top5[:2]) for _ in range(3)]
+    r2 = advance_stage(top5, b2, 3, {}, seed=7, is_final=False)
+    assert r2.advance_ids is not None
+    assert len(r2.advance_ids) == 2
+    top2 = r2.advance_ids
+
+    # stage 3 final: viability desempata se preciso
+    b3 = [[top2[0]], [top2[1]], [top2[0]]]
+    r3 = advance_stage(top2, b3, 3, {top2[0]: 50.0, top2[1]: 90.0}, seed=7, is_final=True)
+    # top2[0] tem 2 votos, top2[1] tem 1, top2[0] ganha mesmo com menor viability
+    assert r3.winner_id == top2[0]
