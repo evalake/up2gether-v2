@@ -186,8 +186,8 @@ export function SessionsPage() {
           sessions={sessions.data ?? []}
           games={games.data ?? []}
           now={now}
-          canExpand={!fullDay}
-          onExpand={() => setFullDay(true)}
+          fullDay={fullDay}
+          onToggleFullDay={() => setFullDay((v) => !v)}
           onOpenSlot={openDraft}
           onOpenDetail={setDetailId}
         />

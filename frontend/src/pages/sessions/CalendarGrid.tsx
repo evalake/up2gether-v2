@@ -19,13 +19,13 @@ type Props = {
   sessions: PlaySession[]
   games: Game[]
   now: Date
-  canExpand: boolean
-  onExpand: () => void
+  fullDay: boolean
+  onToggleFullDay: () => void
   onOpenSlot: (start: Date) => void
   onOpenDetail: (sessionId: string) => void
 }
 
-export function CalendarGrid({ weekAnchor, hours, sessions, games, now, canExpand, onExpand, onOpenSlot, onOpenDetail }: Props) {
+export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay, onToggleFullDay, onOpenSlot, onOpenDetail }: Props) {
   return (
     <div className="overflow-x-auto rounded-sm border border-nerv-orange/15 bg-nerv-panel/30">
       <div className="grid min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(56px, auto)) auto` }}>
@@ -99,18 +99,16 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, canExpan
             })}
           </div>
         ))}
-        {canExpand && (
-          <div className="col-span-8 border-t border-nerv-orange/10 px-2 py-1.5 text-center">
-            <button
-              type="button"
-              onClick={onExpand}
-              className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
-              title="mostrar todas as horas do dia"
-            >
-              + mostrar 24h
-            </button>
-          </div>
-        )}
+        <div className="col-span-8 border-t border-nerv-orange/10 px-2 py-1.5 text-center">
+          <button
+            type="button"
+            onClick={onToggleFullDay}
+            className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
+            title={fullDay ? 'mostrar só horários relevantes' : 'mostrar todas as horas do dia'}
+          >
+            {fullDay ? '− compactar horários' : '+ mostrar 24h'}
+          </button>
+        </div>
       </div>
     </div>
   )
