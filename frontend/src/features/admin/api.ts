@@ -39,6 +39,8 @@ export type EventMetrics = {
   session_completion_rate_28d: number
   groups_by_tier: TierBreakdown
   mrr_if_all_paid_brl: number
+  mrr_billable_brl: number
+  groups_billable: number
   legacy_groups: number
   active_groups_1d: number
   active_groups_7d: number

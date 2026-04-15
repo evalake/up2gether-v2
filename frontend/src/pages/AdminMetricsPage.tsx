@@ -177,12 +177,19 @@ export function AdminMetricsPage() {
             )
           })}
         </div>
-        <div className="mt-4 border-t border-orange-500/20 pt-3 text-[11px] text-zinc-400">
-          MRR teorico se todos pagassem (ignora legacy):{' '}
-          <span className="font-mono text-base text-orange-300">
-            R$ {m.mrr_if_all_paid_brl}
-          </span>
-          <span className="ml-2 text-zinc-600">/ mes</span>
+        <div className="mt-4 space-y-1.5 border-t border-orange-500/20 pt-3 text-[11px] text-zinc-400">
+          <div>
+            MRR projetado se ligasse paywall hoje ({m.groups_billable} grupos billable):{' '}
+            <span className="font-mono text-base text-orange-300">
+              R$ {m.mrr_billable_brl}
+            </span>
+            <span className="ml-2 text-zinc-600">/ mes</span>
+          </div>
+          <div className="text-zinc-500">
+            teto teorico se todos pagassem (ignora legacy):{' '}
+            <span className="font-mono text-zinc-300">R$ {m.mrr_if_all_paid_brl}</span>
+            <span className="ml-2 text-zinc-600">/ mes</span>
+          </div>
         </div>
       </section>
 

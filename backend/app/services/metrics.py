@@ -184,11 +184,18 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
     seats_rows = (await db.execute(seats_stmt)).all()
     tiers = {"free": 0, "pro": 0, "community": 0, "creator": 0, "over": 0}
     mrr_if_all_paid = 0
+    mrr_billable = 0
+    groups_billable = 0
     legacy_groups = 0
     for _gid, seats, legacy in seats_rows:
         t = _tier_for_seats(int(seats or 0))
         tiers[t] += 1
         mrr_if_all_paid += TIER_PRICE_BRL[t]
+        # billable = non-legacy em tier pago. projecao realista de MRR se
+        # ligasse a cobranca hoje (so quem nao foi grandfathered).
+        if not legacy and TIER_PRICE_BRL[t] > 0:
+            mrr_billable += TIER_PRICE_BRL[t]
+            groups_billable += 1
         if legacy:
             legacy_groups += 1
 
@@ -207,6 +214,8 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "session_completion_rate_28d": session_completion_rate_28d,
         "groups_by_tier": tiers,
         "mrr_if_all_paid_brl": mrr_if_all_paid,
+        "mrr_billable_brl": mrr_billable,
+        "groups_billable": groups_billable,
         "legacy_groups": legacy_groups,
         "active_groups_1d": active_groups_1d,
         "active_groups_7d": active_groups_7d,

@@ -329,6 +329,11 @@ async def test_metrics_tier_breakdown(make_user, auth_headers, client, db_sessio
     # 2 dos 3 marcados como legacy
     assert body["legacy_groups"] == 2
 
+    # billable MRR: so g3 (community, nao legacy). g1 free nao conta, g2 pro e legacy.
+    # projecao realista se cobrar hoje = 89
+    assert body["mrr_billable_brl"] == 89
+    assert body["groups_billable"] == 1
+
 
 async def test_metrics_tier_breakdown_empty(
     make_user, auth_headers, client, db_session, as_sys_admin
@@ -347,6 +352,8 @@ async def test_metrics_tier_breakdown_empty(
         "over": 0,
     }
     assert body["mrr_if_all_paid_brl"] == 0
+    assert body["mrr_billable_brl"] == 0
+    assert body["groups_billable"] == 0
     assert body["legacy_groups"] == 0
 
 
