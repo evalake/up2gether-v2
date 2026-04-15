@@ -6,6 +6,11 @@ export type TopGroup = {
   events_28d: number
 }
 
+export type TopReferrer = {
+  ref: string
+  count: number
+}
+
 export type DailyPoint = {
   date: string
   count: number
@@ -39,6 +44,7 @@ export type EventMetrics = {
   active_groups_7d: number
   active_groups_28d: number
   active_users_7d: number
+  top_referrers: TopReferrer[]
 }
 
 export const fetchEventMetrics = () => api<EventMetrics>('/admin/metrics/events')

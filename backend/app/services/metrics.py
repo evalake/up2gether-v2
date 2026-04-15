@@ -150,6 +150,23 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         round(sessions_completed_28d / sessions_created_28d, 4) if sessions_created_28d else 0
     )
 
+    # top referrers: agrega payload->>'ref' dos events de signup.
+    # so aparece se ref nao for null. preserva nao-ativos pra futuro funnel.
+    ref_col = Event.payload["ref"].astext.label("ref")
+    ref_rows = (
+        await db.execute(
+            select(ref_col, func.count().label("n"))
+            .where(
+                Event.event_type == EVENT_MEMBER_ACTIVATED,
+                Event.payload["ref"].astext.isnot(None),
+            )
+            .group_by(ref_col)
+            .order_by(desc("n"))
+            .limit(10)
+        )
+    ).all()
+    top_referrers = [{"ref": r[0], "count": int(r[1])} for r in ref_rows]
+
     # tier breakdown + MRR potencial se todos pagassem (ignora legacy_free).
     # util pra validar pricing antes de ligar cobranca: onde a distribuicao
     # real dos grupos cai hoje, e quanto seria o MRR teorico.
@@ -195,4 +212,5 @@ async def compute_event_metrics(db: AsyncSession) -> dict:
         "active_groups_7d": active_groups_7d,
         "active_groups_28d": active_groups_28d,
         "active_users_7d": active_users_7d,
+        "top_referrers": top_referrers,
     }

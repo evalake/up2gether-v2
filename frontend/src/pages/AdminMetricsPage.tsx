@@ -284,6 +284,38 @@ export function AdminMetricsPage() {
           </div>
         </div>
       </section>
+
+      <section className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900/40 p-5">
+        <div className="mb-3 text-xs uppercase tracking-wide text-zinc-400">
+          top referrers (signups com ?ref=)
+        </div>
+        {m.top_referrers.length === 0 ? (
+          <div className="py-4 text-center text-[11px] text-zinc-500">
+            nenhum signup com ref ainda. compartilhe{' '}
+            <code className="text-zinc-400">up2gether.com.br/?ref=SEU_CANAL</code> em parcerias.
+          </div>
+        ) : (
+          <ul className="space-y-1.5 font-mono text-[12px]">
+            {m.top_referrers.map((r, i) => {
+              const max = m.top_referrers[0]?.count ?? 1
+              const pct = (r.count / max) * 100
+              return (
+                <li key={r.ref} className="flex items-center gap-2">
+                  <span className="w-5 text-right text-[10px] text-zinc-500">{i + 1}</span>
+                  <span className="min-w-0 flex-1 truncate text-zinc-200">{r.ref}</span>
+                  <div className="relative h-1.5 w-24 overflow-hidden rounded-sm bg-zinc-800">
+                    <div
+                      className="h-full bg-orange-400/70"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <span className="w-8 text-right text-orange-400">{r.count}</span>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
     </div>
   )
 }

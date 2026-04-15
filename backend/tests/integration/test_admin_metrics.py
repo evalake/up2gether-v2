@@ -185,6 +185,40 @@ async def test_metrics_health_kpis_empty_safe(
     )
 
 
+async def test_metrics_top_referrers(make_user, auth_headers, client, db_session, as_sys_admin):
+    """top_referrers: agrega payload->>'ref' dos events member_activated.
+    util pra saber qual streamer/canal trouxe signups.
+    """
+    admin = await make_user(discord_id="admin-ref", username="ref")
+    as_sys_admin(admin.discord_id)
+
+    u1 = await make_user()
+    u2 = await make_user()
+    u3 = await make_user()
+    u4 = await make_user()
+
+    await track_event(
+        db_session, EVENT_MEMBER_ACTIVATED, user_id=u1.id, payload={"ref": "streamerA"}
+    )
+    await track_event(
+        db_session, EVENT_MEMBER_ACTIVATED, user_id=u2.id, payload={"ref": "streamerA"}
+    )
+    await track_event(
+        db_session, EVENT_MEMBER_ACTIVATED, user_id=u3.id, payload={"ref": "streamerB"}
+    )
+    # sem ref nao conta
+    await track_event(db_session, EVENT_MEMBER_ACTIVATED, user_id=u4.id, payload={})
+    await db_session.commit()
+
+    res = await client.get("/api/admin/metrics/events", headers=auth_headers(admin))
+    assert res.status_code == 200
+    top = res.json()["top_referrers"]
+    by_ref = {t["ref"]: t["count"] for t in top}
+    assert by_ref["streamerA"] == 2
+    assert by_ref["streamerB"] == 1
+    assert len(top) == 2  # sem ref nao gera entry
+
+
 async def test_metrics_active_groups(make_user, auth_headers, client, db_session, as_sys_admin):
     """active_groups_1d / 7d / 28d: distinct groups com qualquer evento no periodo.
     metrica #1 do BUSINESS.md ("Servidores ativos" = DAU/WAU por server).
