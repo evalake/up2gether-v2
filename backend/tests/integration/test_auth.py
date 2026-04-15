@@ -178,3 +178,18 @@ async def test_me_with_unknown_user_returns_401(client):
     token = issue_access_token(uuid.uuid4(), discord_id="ghost")
     res = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert res.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_discord_callback_rate_limited(app, client):
+    """Bruteforce no /discord/callback eventualmente retorna 429.
+    Capacity e 10, entao a 11a chamada no mesmo burst deve bloquear.
+    """
+    fake = FakeDiscordClient(profile={"id": "rl", "username": "rl"})
+    app.dependency_overrides[get_discord_client] = _override_discord(fake)
+    # consome o burst inteiro (10 requests ok)
+    for _ in range(10):
+        r = await client.post("/api/auth/discord/callback", json={"code": "x"})
+        assert r.status_code == 200
+    r = await client.post("/api/auth/discord/callback", json={"code": "x"})
+    assert r.status_code == 429

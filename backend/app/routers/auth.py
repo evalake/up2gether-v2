@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import get_db
+from app.core.rate_limit import RateLimitAuth
 from app.core.security import CurrentUser, issue_access_token
 from app.integrations.discord import DiscordClient, get_discord_client
 from app.repositories.user_repo import UserRepository
@@ -28,6 +29,7 @@ def get_auth_service(
 async def discord_callback(
     payload: DiscordCallbackRequest,
     service: Annotated[AuthService, Depends(get_auth_service)],
+    _rl: RateLimitAuth,
 ) -> AuthTokenResponse:
     return await service.login_with_discord(payload.code, ref=payload.ref)
 
@@ -111,6 +113,7 @@ class DevLoginRequest(BaseModel):
 async def dev_login(
     payload: DevLoginRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _rl: RateLimitAuth,
 ) -> AuthTokenResponse:
     if not get_settings().dev_login_enabled:
         raise HTTPException(status_code=404, detail="not found")

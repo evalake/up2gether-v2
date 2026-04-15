@@ -20,7 +20,14 @@ os.environ.setdefault("JWT_SECRET", "test-secret-that-is-long-enough-for-validat
 os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://placeholder/placeholder")
 
 from app.core.database import Base, get_db
+from app.core.rate_limit import _auth_bucket
 from app.main import create_app
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limits() -> None:
+    # bucket e singleton de modulo, limpar entre testes pra nao herdar tokens gastos
+    _auth_bucket.reset()
 
 
 @pytest.fixture(scope="session")
