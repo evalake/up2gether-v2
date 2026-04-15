@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import {
   useArchiveGame,
   useGame,
@@ -11,18 +11,16 @@ import {
 } from '@/features/games/hooks'
 import { useGroup } from '@/features/groups/hooks'
 import { useMe } from '@/features/auth/hooks'
-import type { GameStage, HardwareTier } from '@/features/games/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EnergyBar } from '@/components/nerv/EnergyBar'
-import { Avatar } from '@/components/nerv/Avatar'
 import { useToast } from '@/components/ui/toast'
-import { formatPlayers } from '@/lib/players'
 import { steamGetDetails, builtinGetDetails } from '@/features/steam/api'
-import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
-import { SIGNALS, STAGES, TIERS } from '@/lib/constants'
 import { useTitle } from '@/lib/useTitle'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
+import { GameEditForm } from '@/components/games/GameEditForm'
+import { GameHero } from '@/components/games/GameHero'
+import { GameSidebar } from '@/components/games/GameSidebar'
 
 export function GameDetailPage() {
   const { id = '', gameId = '' } = useParams()
@@ -43,50 +41,6 @@ export function GameDetailPage() {
     group.data?.user_role === 'mod'
   const [editing, setEditing] = useState(false)
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
-  const [edit, setEdit] = useState({
-    name: '',
-    cover_url: '',
-    description: '',
-    is_free: false,
-    price_current: '',
-    player_min: 1,
-    player_max: null as number | null,
-    min_hardware_tier: 'unknown' as HardwareTier,
-  })
-
-  const startEdit = () => {
-    if (!game.data) return
-    setEdit({
-      name: game.data.name,
-      cover_url: game.data.cover_url ?? '',
-      description: game.data.description ?? '',
-      is_free: game.data.is_free,
-      price_current: game.data.price_current?.toString() ?? '',
-      player_min: game.data.player_min,
-      player_max: game.data.player_max,
-      min_hardware_tier: game.data.min_hardware_tier,
-    })
-    setEditing(true)
-  }
-
-  const saveEdit = async () => {
-    try {
-      await update.mutateAsync({
-        name: edit.name,
-        cover_url: edit.cover_url || null,
-        description: edit.description || null,
-        is_free: edit.is_free,
-        price_current: edit.is_free ? 0 : edit.price_current ? Number(edit.price_current) : null,
-        player_min: edit.player_min,
-        player_max: edit.player_max,
-        min_hardware_tier: edit.min_hardware_tier,
-      })
-      setEditing(false)
-      toast.success('jogo atualizado')
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao salvar')
-    }
-  }
 
   if (game.isLoading) return <Loading />
   if (game.error) return <ErrorBox error={game.error} />
@@ -94,7 +48,6 @@ export function GameDetailPage() {
 
   const g = game.data
   const v = g.viability
-  const hero = steamHeaderLarge(g.steam_appid) ?? steamCover(g)
 
   const refreshFromSteam = async () => {
     if (!g.steam_appid) return
@@ -118,7 +71,6 @@ export function GameDetailPage() {
     }
   }
 
-  // slug derivado do nome pra buscar no catalogo built-in
   const builtinSlug = g.source && g.source !== 'steam' && g.source !== 'manual'
     ? g.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     : null
@@ -142,15 +94,6 @@ export function GameDetailPage() {
     }
   }
 
-  const setStage = async (s: GameStage) => {
-    try {
-      await update.mutateAsync({ stage: s })
-      toast.success('estágio atualizado')
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha')
-    }
-  }
-
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3 text-[11px] uppercase tracking-wider text-nerv-dim">
@@ -163,7 +106,7 @@ export function GameDetailPage() {
             <button onClick={refreshFromCatalog} className="transition-colors hover:text-nerv-orange">atualizar do catalogo</button>
           )}
           {canManage && (
-            <button onClick={editing ? () => setEditing(false) : startEdit} className="transition-colors hover:text-nerv-orange">
+            <button onClick={() => setEditing((v) => !v)} className="transition-colors hover:text-nerv-orange">
               {editing ? 'cancelar' : 'editar'}
             </button>
           )}
@@ -189,176 +132,12 @@ export function GameDetailPage() {
       </header>
 
       <AnimatePresence>
-      {editing && (
-        <motion.section initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/30 p-5">
-          <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">editar jogo</div>
-          <div className="space-y-3">
-            <input
-              value={edit.name}
-              maxLength={150}
-              onChange={(e) => setEdit({ ...edit, name: e.target.value })}
-              placeholder="nome"
-              className="h-8 w-full rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
-            />
-            <div className="flex items-center gap-2">
-              {edit.cover_url && (
-                <img loading="lazy" src={edit.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-              )}
-              <input
-                value={edit.cover_url}
-                maxLength={500}
-                onChange={(e) => setEdit({ ...edit, cover_url: e.target.value })}
-                placeholder="url da capa (imagem)"
-                className="h-8 flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none"
-              />
-            </div>
-            <textarea
-              value={edit.description}
-              maxLength={2000}
-              onChange={(e) => setEdit({ ...edit, description: e.target.value })}
-              rows={3}
-              placeholder="descrição"
-              className="w-full rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs focus:border-nerv-orange focus:outline-none"
-            />
-            <div className="grid grid-cols-12 gap-2">
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="100000"
-                disabled={edit.is_free}
-                value={edit.is_free ? '' : edit.price_current}
-                onChange={(e) => {
-                  // limita a 2 casas decimais
-                  const v = e.target.value
-                  if (v === '' || /^\d+(\.\d{0,2})?$/.test(v)) setEdit({ ...edit, price_current: v })
-                }}
-                placeholder="R$"
-                className="col-span-3 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus:border-nerv-orange focus:outline-none disabled:opacity-40"
-              />
-              <button
-                type="button"
-                onClick={() => setEdit({ ...edit, is_free: !edit.is_free })}
-                className={`col-span-3 h-8 rounded-sm border text-[10px] uppercase tracking-wider ${
-                  edit.is_free ? 'border-nerv-green bg-nerv-green/10 text-nerv-green' : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-green/40'
-                }`}
-              >
-                {edit.is_free ? '✓ free' : 'free?'}
-              </button>
-              <div className="col-span-6 flex items-center gap-1 rounded-sm border border-nerv-line bg-black/40 px-2 h-8">
-                <span className="text-[10px] uppercase text-nerv-dim">players</span>
-                <input
-                  type="number"
-                  min="1"
-                  value={edit.player_min}
-                  onChange={(e) => setEdit({ ...edit, player_min: Number(e.target.value) || 1 })}
-                  className="w-10 bg-transparent text-center text-xs focus:outline-none"
-                />
-                <span className="text-nerv-dim">-</span>
-                <input
-                  type="number"
-                  min="1"
-                  value={edit.player_max ?? ''}
-                  onChange={(e) => setEdit({ ...edit, player_max: e.target.value ? Number(e.target.value) : null })}
-                  placeholder="∞"
-                  className="w-10 bg-transparent text-center text-xs focus:outline-none"
-                />
-              </div>
-            </div>
-            <div className="flex gap-1">
-              {TIERS.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setEdit({ ...edit, min_hardware_tier: t })}
-                  className={`h-8 flex-1 rounded-sm border text-[10px] uppercase tracking-wider transition-all ${
-                    edit.min_hardware_tier === t
-                      ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                      : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
-                  }`}
-                >
-                  hw: {t}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-end gap-2 pt-1">
-              <button
-                onClick={() => setEditing(false)}
-                className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/40"
-              >
-                cancelar
-              </button>
-              <button
-                onClick={saveEdit}
-                disabled={update.isPending || !edit.name}
-                className="rounded-sm border border-nerv-orange bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/20 disabled:opacity-40"
-              >
-                {update.isPending ? 'salvando...' : 'salvar'}
-              </button>
-            </div>
-          </div>
-        </motion.section>
-      )}
+        {editing && <GameEditForm game={g} update={update} onClose={() => setEditing(false)} />}
       </AnimatePresence>
 
-      {/* Hero */}
-      <div className="relative overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/30">
-        {hero && (
-          <div className="absolute inset-0">
-            <img
-              src={hero}
-              alt=""
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-              className="h-full w-full object-cover opacity-30"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/70 to-transparent" />
-          </div>
-        )}
-        <div className="relative flex items-end gap-4 p-5">
-          {steamCover(g) && (
-            <img
-              src={steamCover(g)!}
-              alt=""
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
-              className="hidden h-32 w-56 shrink-0 rounded-sm border border-nerv-orange/30 object-cover sm:block"
-            />
-          )}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="rounded-sm border border-nerv-orange/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-nerv-orange">{g.stage}</span>
-              {g.is_free && (
-                <span className="rounded-sm border border-nerv-green/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-nerv-green">free to play</span>
-              )}
-            </div>
-            <h1 className="mt-2 font-display text-3xl text-nerv-text">{g.name}</h1>
-            <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-wider text-nerv-dim">
-              {g.developer && <span className="text-nerv-text/70">{g.developer}</span>}
-              {g.release_date && <span>{g.release_date}</span>}
-              {g.metacritic_score != null && (
-                <span className={`rounded-sm px-1.5 py-0.5 ${g.metacritic_score >= 75 ? 'bg-nerv-green/15 text-nerv-green' : g.metacritic_score >= 50 ? 'bg-nerv-amber/15 text-nerv-amber' : 'bg-nerv-red/15 text-nerv-red'}`}>
-                  metacritic {g.metacritic_score}
-                </span>
-              )}
-              {g.steam_appid && <span>steam #{g.steam_appid}</span>}
-              {g.source && g.source !== 'steam' && (
-                <span className="rounded-sm border border-nerv-magenta/40 bg-nerv-magenta/10 px-1.5 py-0.5 text-nerv-magenta">{g.source}</span>
-              )}
-              <span>jogadores {formatPlayers(g.player_min, g.player_max, g.tags)}</span>
-              <span>hardware {g.min_hardware_tier}</span>
-            </div>
-            {!g.is_free && g.discount_percent != null && g.discount_percent > 0 && g.price_original && g.price_current && (
-              <div className="mt-2 flex items-center gap-2 text-xs">
-                <span className="text-nerv-dim line-through tabular-nums">R$ {g.price_original.toFixed(2)}</span>
-                <span className="text-nerv-green tabular-nums">R$ {g.price_current.toFixed(2)}</span>
-                <span className="rounded-sm bg-nerv-green/20 px-1.5 py-0.5 text-[10px] text-nerv-green">-{g.discount_percent}%</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <GameHero game={g} />
 
       <div className="grid gap-4 lg:grid-cols-3">
-        {/* viability */}
         <div className="lg:col-span-2 space-y-4">
           <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
             <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">viabilidade</div>
@@ -422,100 +201,17 @@ export function GameDetailPage() {
           )}
         </div>
 
-        {/* sidebar */}
-        <div className="space-y-4">
-          <section className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-5">
-            <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">seu status</div>
-            <div className="space-y-3">
-              <div>
-                <div className="mb-1.5 text-[10px] uppercase tracking-wider text-nerv-dim">interesse</div>
-                <div className="flex gap-1.5">
-                  {SIGNALS.map((s) => (
-                    <button
-                      key={s.value}
-                      disabled={setInt.isPending}
-                      onClick={() => setInt.mutate({ gameId: g.id, signal: s.value })}
-                      className={`flex-1 rounded-sm border px-2 py-1.5 text-[10px] uppercase tracking-wider transition-all disabled:opacity-40 ${
-                        g.user_interest === s.value
-                          ? `${s.color} bg-current/10`
-                          : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
-                      }`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button
-                disabled={toggleOwn.isPending}
-                onClick={() => toggleOwn.mutate({ gameId: g.id, owns: !g.user_owns_game })}
-                className={`w-full rounded-sm border px-2 py-2 text-xs uppercase tracking-wider transition-all disabled:opacity-40 ${
-                  g.user_owns_game
-                    ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
-                    : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
-                }`}
-              >
-                {g.user_owns_game ? '✓ você tem este jogo' : 'marcar como tenho'}
-              </button>
-            </div>
-          </section>
-
-          <section className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-5">
-            <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">estágio do grupo</div>
-            <div className="space-y-1">
-              {STAGES.map((s) => (
-                <button
-                  key={s.value}
-                  onClick={() => setStage(s.value)}
-                  className={`w-full rounded-sm border px-3 py-1.5 text-left text-xs uppercase tracking-wider transition-all ${
-                    g.stage === s.value
-                      ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                      : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
-                  }`}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-5">
-            <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">quem tem <span className="text-nerv-orange tabular-nums">{owners.data?.length ?? 0}</span></div>
-            {owners.isLoading && <Loading />}
-            {owners.data && owners.data.length === 0 && (
-              <p className="text-xs text-nerv-dim">ninguem marcou ainda.</p>
-            )}
-            <div className="space-y-1.5">
-              {owners.data?.map((o) => (
-                <button
-                  key={o.id}
-                  onClick={() => setProfileUserId(o.id)}
-                  className="flex w-full items-center gap-2 rounded-sm border border-nerv-line bg-black/30 px-2 py-1.5 text-left transition-colors hover:border-nerv-orange/40 hover:bg-black/40"
-                  title={o.discord_display_name ?? o.discord_username}
-                >
-                  <Avatar discordId={o.discord_id} hash={o.discord_avatar} name={o.discord_display_name ?? o.discord_username} size="sm" />
-                  <span className="truncate text-xs text-nerv-text">
-                    {o.discord_display_name ?? o.discord_username}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-5">
-            <div className="mb-3 text-[11px] uppercase tracking-wider text-nerv-dim">ficha</div>
-            <dl className="grid grid-cols-2 gap-y-2 text-xs">
-              <dt className="text-nerv-dim">preco</dt>
-              <dd className="text-right text-nerv-green tabular-nums">{g.is_free ? 'F2P' : g.price_current ? `R$ ${g.price_current.toFixed(2)}` : '?'}</dd>
-              <dt className="text-nerv-dim">jogadores</dt>
-              <dd className="text-right tabular-nums">{formatPlayers(g.player_min, g.player_max, g.tags)}</dd>
-              <dt className="text-nerv-dim">hardware</dt>
-              <dd className="text-right text-nerv-amber">{g.min_hardware_tier}</dd>
-              {g.steam_appid && <><dt className="text-nerv-dim">steam id</dt><dd className="text-right text-nerv-orange tabular-nums">{g.steam_appid}</dd></>}
-              {g.source && <><dt className="text-nerv-dim">fonte</dt><dd className="text-right text-nerv-magenta">{g.source}</dd></>}
-            </dl>
-          </section>
-        </div>
+        <GameSidebar
+          game={g}
+          owners={owners.data}
+          ownersLoading={owners.isLoading}
+          onOpenProfile={setProfileUserId}
+          onSetInterest={(gameId, signal) => setInt.mutate({ gameId, signal: signal as 'want' | 'ok' | 'pass' })}
+          onToggleOwnership={(gameId, owns) => toggleOwn.mutate({ gameId, owns })}
+          setInterestPending={setInt.isPending}
+          toggleOwnPending={toggleOwn.isPending}
+          update={update}
+        />
       </div>
       <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
     </div>
