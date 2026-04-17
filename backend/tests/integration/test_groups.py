@@ -126,10 +126,11 @@ async def test_update_webhook_only_owner(make_user, auth_headers, client):
         headers=auth_headers(other),
     )
 
+    valid = "https://discord.com/api/webhooks/123456789012345678/abc-DEF_123xyz"
     # owner consegue
     res = await client.put(
         f"/api/groups/{g['id']}/webhook",
-        json={"webhook_url": "https://hook.example.com"},
+        json={"webhook_url": valid},
         headers=auth_headers(owner),
     )
     assert res.status_code == 204
@@ -137,10 +138,18 @@ async def test_update_webhook_only_owner(make_user, auth_headers, client):
     # outro nao
     res = await client.put(
         f"/api/groups/{g['id']}/webhook",
-        json={"webhook_url": "https://x"},
+        json={"webhook_url": valid},
         headers=auth_headers(other),
     )
     assert res.status_code == 403
+
+    # webhook de dominio estranho e bloqueado (SSRF)
+    res = await client.put(
+        f"/api/groups/{g['id']}/webhook",
+        json={"webhook_url": "http://169.254.169.254/latest/meta-data/"},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 422
 
 
 async def test_leave_group_normal_case(make_user, auth_headers, client):

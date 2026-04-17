@@ -13,7 +13,11 @@ dependencies = [
     "pydantic-settings>=2.7.0",
     "pyjwt>=2.9.0",
     "httpx>=0.28.1",
-    "python-multipart>=0.0.20",
+    # python-multipart: bump fecha GHSA de DoS via preamble grande (0.0.21+)
+    "python-multipart>=0.0.25",
+    # mako: transitive via alembic, mas forca floor pra fechar path traversal
+    # double-slash em TemplateLookup (GHSA). 1.3.11+ tem o fix.
+    "mako>=1.3.11",
     "structlog>=24.4.0",
     "apscheduler>=3.11.0",
     "python-socketio>=5.12.1",

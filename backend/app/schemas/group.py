@@ -1,12 +1,27 @@
 from __future__ import annotations
 
+import re
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.domain.enums import GroupRole
 from app.schemas.user import UserResponse
+
+# whitelist SSRF: webhook tem que ser Discord de verdade (prefixos oficiais apenas).
+# se um dia precisar de outros providers, adiciona explicito; default e negar.
+_DISCORD_WEBHOOK_RE = re.compile(
+    r"^https://(?:ptb\.|canary\.)?discord(?:app)?\.com/api/webhooks/\d+/[\w-]+$"
+)
+
+
+def _validate_webhook_url(v: str | None) -> str | None:
+    if v is None or v == "":
+        return None
+    if not _DISCORD_WEBHOOK_RE.match(v):
+        raise ValueError("webhook_url precisa ser url oficial do Discord")
+    return v
 
 
 class GroupCreate(BaseModel):
@@ -15,6 +30,11 @@ class GroupCreate(BaseModel):
     icon_url: str | None = None
     webhook_url: str | None = None
     discord_permissions: str | None = None  # bitfield Discord, define se vira owner
+
+    @field_validator("webhook_url")
+    @classmethod
+    def _webhook(cls, v: str | None) -> str | None:
+        return _validate_webhook_url(v)
 
 
 class GroupResponse(BaseModel):
@@ -66,6 +86,11 @@ class GroupMembershipResponse(BaseModel):
 
 class WebhookUpdate(BaseModel):
     webhook_url: str | None = None
+
+    @field_validator("webhook_url")
+    @classmethod
+    def _webhook(cls, v: str | None) -> str | None:
+        return _validate_webhook_url(v)
 
 
 class CurrentGameUpdate(BaseModel):

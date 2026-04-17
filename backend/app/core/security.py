@@ -43,6 +43,26 @@ def decode_access_token(token: str) -> dict | None:
         return None
 
 
+def issue_scoped_token(user_id: uuid.UUID, scope: str, ttl_seconds: int) -> str:
+    """Token efemero com scope isolado. Nunca reutilizar access token como state de OAuth."""
+    settings = get_settings()
+    now = datetime.now(UTC)
+    payload = {
+        "sub": str(user_id),
+        "scope": scope,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(seconds=ttl_seconds)).timestamp()),
+    }
+    return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+
+
+def decode_scoped_token(token: str, expected_scope: str) -> dict | None:
+    payload = decode_access_token(token)
+    if not payload or payload.get("scope") != expected_scope:
+        return None
+    return payload
+
+
 async def get_current_user(
     creds: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
     db: Annotated[AsyncSession, Depends(get_db)],

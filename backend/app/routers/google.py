@@ -9,12 +9,17 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import CurrentUser, decode_access_token, issue_access_token
+from app.core.security import CurrentUser, decode_scoped_token, issue_scoped_token
 from app.domain.enums import AuthProvider
 from app.integrations.google_calendar import GoogleCalendarClient, get_google_calendar_client
 from app.models.user import IntegrationAccount
 
 router = APIRouter(tags=["google"], prefix="/google")
+
+# state do OAuth e token scoped, nao access token. TTL curto, escopo isolado
+# pra um JWT vazado nao virar link de conta arbitrario.
+_GOOGLE_LINK_SCOPE = "google-link"
+_GOOGLE_LINK_TTL_SECONDS = 600  # 10 min
 
 
 @router.get("/connect")
@@ -22,8 +27,7 @@ async def google_connect(
     actor: CurrentUser,
     client: Annotated[GoogleCalendarClient, Depends(get_google_calendar_client)],
 ) -> dict:
-    # state carrega jwt do actor pra o callback saber quem e
-    state = issue_access_token(actor.id, actor.discord_id)
+    state = issue_scoped_token(actor.id, _GOOGLE_LINK_SCOPE, _GOOGLE_LINK_TTL_SECONDS)
     return {"url": client.auth_url(state)}
 
 
@@ -34,10 +38,9 @@ async def google_callback(
     db: Annotated[AsyncSession, Depends(get_db)],
     client: Annotated[GoogleCalendarClient, Depends(get_google_calendar_client)],
 ) -> RedirectResponse:
-    try:
-        payload = decode_access_token(state)
-    except Exception as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "state invalido") from e
+    payload = decode_scoped_token(state, _GOOGLE_LINK_SCOPE)
+    if payload is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "state invalido")
     user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "state sem user")
