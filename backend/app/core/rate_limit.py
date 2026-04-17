@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import time
 from threading import Lock
 from typing import Annotated
@@ -47,16 +48,14 @@ _telemetry_bucket = TokenBucket(capacity=3, refill_per_sec=3 / 60)
 
 
 def _client_key(request: Request) -> str:
-    # Fly injeta Fly-Client-IP, Cloudflare injeta CF-Connecting-IP.
-    # cair pra X-Forwarded-For first hop, depois request.client.host.
-    h = request.headers
-    for name in ("fly-client-ip", "cf-connecting-ip"):
-        v = h.get(name)
+    # sempre que estamos no Fly (FLY_APP_NAME set pelo runtime), confiamos so no
+    # Fly-Client-IP — o proxy sobrescreve headers enviados pelo cliente. Fora do
+    # Fly, ignora headers externos e usa peer direto (evita spoof em dev ou se a
+    # app for movida pra trás de outro proxy sem updating dessa logica).
+    if os.environ.get("FLY_APP_NAME"):
+        v = request.headers.get("fly-client-ip")
         if v:
             return v
-    xff = h.get("x-forwarded-for")
-    if xff:
-        return xff.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
 

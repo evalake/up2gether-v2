@@ -4,7 +4,7 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,8 +20,9 @@ router = APIRouter(tags=["public"])
 
 
 class VisitPayload(BaseModel):
-    # ref capturado da query ?ref=. truncado pra 64 no backend. sem IP, sem user_id.
-    ref: str | None = None
+    # ref capturado da query ?ref=. max_length limita body antes do bucket gastar
+    # token em payload inflado. truncado de novo na escrita pra 64.
+    ref: str | None = Field(None, max_length=200)
 
 
 @router.post("/telemetry/visit", status_code=status.HTTP_204_NO_CONTENT)

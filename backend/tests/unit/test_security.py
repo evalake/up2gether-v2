@@ -2,7 +2,12 @@
 
 import uuid
 
-from app.core.security import decode_access_token, issue_access_token
+from app.core.security import (
+    decode_access_token,
+    decode_scoped_token,
+    issue_access_token,
+    issue_scoped_token,
+)
 
 
 def test_issue_and_decode_roundtrip():
@@ -26,3 +31,25 @@ def test_decode_tampered_token_returns_none():
     token = issue_access_token(user_id, discord_id="1")
     tampered = token[:-4] + "abcd"
     assert decode_access_token(tampered) is None
+
+
+def test_scoped_token_roundtrip():
+    uid = uuid.uuid4()
+    tok = issue_scoped_token(uid, "google-link", ttl_seconds=60)
+    payload = decode_scoped_token(tok, "google-link")
+    assert payload is not None
+    assert payload["sub"] == str(uid)
+    assert payload["scope"] == "google-link"
+
+
+def test_scoped_token_rejects_wrong_scope():
+    uid = uuid.uuid4()
+    tok = issue_scoped_token(uid, "google-link", ttl_seconds=60)
+    # passar um access_token em vez de scoped tb deve rejeitar
+    access = issue_access_token(uid, discord_id="x")
+    assert decode_scoped_token(tok, "sse-stream") is None
+    assert decode_scoped_token(access, "google-link") is None
+
+
+def test_scoped_token_rejects_garbage():
+    assert decode_scoped_token("not-a-jwt", "google-link") is None
