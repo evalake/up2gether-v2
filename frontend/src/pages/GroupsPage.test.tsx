@@ -51,6 +51,6 @@ describe('GroupsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Squad Alpha')).toBeInTheDocument()
     })
-    expect(screen.getAllByText(/members/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/membros/i).length).toBeGreaterThan(0)
   })
 })
