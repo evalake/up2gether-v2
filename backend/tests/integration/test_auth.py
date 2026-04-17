@@ -103,31 +103,20 @@ async def test_discord_callback_records_referrer_on_new_signup(app, client, db_s
 
 
 @pytest.mark.asyncio
-async def test_discord_callback_ref_truncated_to_64(app, client, db_session):
-    from sqlalchemy import select
-
-    from app.models.event import Event
-    from app.services.events import EVENT_MEMBER_ACTIVATED
-
+async def test_discord_callback_rejects_overlong_ref(app, client):
+    """ref > 64 chars agora e rejeitado com 422 (em vez de truncado server-side).
+    Pydantic bloqueia antes do handler — defesa contra payload amplification.
+    """
     fake = FakeDiscordClient(
         profile={"id": "778", "username": "long-ref", "global_name": "L", "avatar": None}
     )
     app.dependency_overrides[get_discord_client] = _override_discord(fake)
 
-    long_ref = "x" * 200
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "state": "x" * 32, "ref": long_ref},
+        json={"code": "any", "state": "x" * 32, "ref": "x" * 200},
     )
-    assert res.status_code == 200
-
-    rows = (
-        (await db_session.execute(select(Event).where(Event.event_type == EVENT_MEMBER_ACTIVATED)))
-        .scalars()
-        .all()
-    )
-    ev = next(e for e in rows if e.payload and e.payload.get("discord_id") == "778")
-    assert len(ev.payload["ref"]) == 64
+    assert res.status_code == 422
 
 
 @pytest.mark.asyncio

@@ -46,6 +46,11 @@ _auth_bucket = TokenBucket(capacity=10, refill_per_sec=10 / 60)
 # scanner martelando /telemetry/visit. 3 req burst, 3/min sustentado por IP.
 _telemetry_bucket = TokenBucket(capacity=3, refill_per_sec=3 / 60)
 
+# mutations que disparam notify_group (webhook Discord + SSE + push + row em
+# notifications): current-game toggle, webhook update, theme overrides, etc.
+# Burst 5, sustentado 1 req / 2s por (user, group). flood vector evitado.
+_mutation_bucket = TokenBucket(capacity=5, refill_per_sec=0.5)
+
 
 def _client_key(request: Request) -> str:
     # sempre que estamos no Fly (FLY_APP_NAME set pelo runtime), confiamos so no
@@ -72,6 +77,17 @@ def rate_limit_telemetry(request: Request) -> None:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="too many requests",
+        )
+
+
+def rate_limit_mutation(user_id: str, group_id: str) -> None:
+    """Bucket por (user, group). Usar em mutations que disparam notify_group
+    (webhook Discord + push + SSE): current-game toggle, webhook URL change, etc.
+    """
+    if not _mutation_bucket.allow(f"{user_id}:{group_id}"):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="muitas acoes seguidas, espera um pouco",
         )
 
 

@@ -7,9 +7,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ThemeCreate(BaseModel):
-    theme_name: str
-    description: str | None = None
-    image_url: str | None = None
+    theme_name: str = Field(max_length=80)
+    description: str | None = Field(None, max_length=2000)
+    image_url: str | None = Field(None, max_length=512)
     month_year: str | None = Field(
         None, pattern=r"^\d{4}-\d{2}$", description="YYYY-MM, default: mes atual"
     )
@@ -33,9 +33,9 @@ class ThemeResponse(BaseModel):
 
 
 class SuggestionCreate(BaseModel):
-    name: str
-    description: str | None = None
-    image_url: str | None = None
+    name: str = Field(max_length=80)
+    description: str | None = Field(None, max_length=2000)
+    image_url: str | None = Field(None, max_length=512)
 
 
 class SuggestionResponse(BaseModel):

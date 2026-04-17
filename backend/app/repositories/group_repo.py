@@ -6,6 +6,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.enums import GroupRole
+from app.models.base import utcnow
 from app.models.game import Game
 from app.models.group import Group, GroupMembership
 from app.models.session import PlaySession
@@ -109,8 +110,9 @@ class GroupRepository:
             webhook_url=webhook_url,
             owner_user_id=owner_user_id,
         )
+        # owner sempre ativado no create (ele acabou de logar via Discord pra criar o grupo).
         group.memberships = [
-            GroupMembership(user_id=owner_user_id, role=GroupRole.ADMIN),
+            GroupMembership(user_id=owner_user_id, role=GroupRole.ADMIN, activated_at=utcnow()),
         ]
         self.db.add(group)
         await self.db.commit()
@@ -118,9 +120,21 @@ class GroupRepository:
         return group
 
     async def add_member(
-        self, group: Group, user_id: uuid.UUID, role: GroupRole = GroupRole.MEMBER
+        self,
+        group: Group,
+        user_id: uuid.UUID,
+        role: GroupRole = GroupRole.MEMBER,
+        *,
+        activated: bool = True,
     ) -> GroupMembership:
-        membership = GroupMembership(group_id=group.id, user_id=user_id, role=role)
+        # activated=True: auto-join via OAuth Discord (user logou, conta seat).
+        # activated=False: admin-add / convite pendente (nao conta seat ate user logar).
+        membership = GroupMembership(
+            group_id=group.id,
+            user_id=user_id,
+            role=role,
+            activated_at=utcnow() if activated else None,
+        )
         self.db.add(membership)
         await self.db.commit()
         await self.db.refresh(membership)

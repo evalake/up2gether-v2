@@ -13,7 +13,9 @@ from app.core.config import get_settings
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events"
-SCOPES = "https://www.googleapis.com/auth/calendar.events"
+# scope minimo: so events criados pelo proprio app. .owned impede ler/editar
+# eventos de terceiros no calendario do user. antes era .events (full read/write).
+SCOPES = "https://www.googleapis.com/auth/calendar.events.owned"
 
 
 class GoogleCalendarClient(Protocol):

@@ -4,7 +4,7 @@ import re
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.domain.enums import GroupRole
 from app.schemas.user import UserResponse
@@ -25,11 +25,11 @@ def _validate_webhook_url(v: str | None) -> str | None:
 
 
 class GroupCreate(BaseModel):
-    discord_guild_id: str
-    name: str
-    icon_url: str | None = None
-    webhook_url: str | None = None
-    discord_permissions: str | None = None  # bitfield Discord, define se vira owner
+    discord_guild_id: str = Field(max_length=64)
+    name: str = Field(max_length=120)
+    icon_url: str | None = Field(None, max_length=512)
+    webhook_url: str | None = Field(None, max_length=512)
+    discord_permissions: str | None = Field(None, max_length=32)
 
     @field_validator("webhook_url")
     @classmethod
@@ -85,7 +85,7 @@ class GroupMembershipResponse(BaseModel):
 
 
 class WebhookUpdate(BaseModel):
-    webhook_url: str | None = None
+    webhook_url: str | None = Field(None, max_length=512)
 
     @field_validator("webhook_url")
     @classmethod

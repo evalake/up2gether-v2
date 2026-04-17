@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(min_length=16)
     database_url: str
 
+    # chave Fernet pra criptografar tokens OAuth em integration_accounts.
+    # se nao setada deriva do jwt_secret (dev/test). em prod SETAR explicita
+    # pra rotacionar jwt_secret sem invalidar tokens de integracao.
+    token_encryption_key: str = ""
+
     jwt_algorithm: str = "HS256"
     jwt_expiration_hours: int = 24 * 7
 

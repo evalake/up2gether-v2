@@ -81,8 +81,10 @@ class GroupMembership(Base):
     )
     # seat counter: populado no primeiro login via Discord no grupo.
     # convite pendente ou admin-add sem login nao conta ate user logar.
+    # default None porque a regra de negocio diz "so conta seat quem logou".
+    # callers (add_member) setam explicito quando e auto-join via OAuth Discord.
     activated_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), default=utcnow, nullable=True
+        DateTime(timezone=True), default=None, nullable=True
     )
 
     group: Mapped[Group] = relationship(back_populates="memberships")

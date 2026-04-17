@@ -15,6 +15,18 @@ class VoteRepository:
     async def get(self, vote_id: uuid.UUID) -> VoteSession | None:
         return await self.db.get(VoteSession, vote_id)
 
+    async def get_for_update(self, vote_id: uuid.UUID) -> VoteSession | None:
+        """Fetch com FOR UPDATE pra evitar race no close stage.
+
+        Quando dois ballots simultaneos completam elegibilidade, sem lock ambos
+        disparavam close -> duplicate webhook Discord + duplicate notify.
+        Serializa o close via row lock na sessao.
+        """
+        result = await self.db.execute(
+            select(VoteSession).where(VoteSession.id == vote_id).with_for_update()
+        )
+        return result.scalar_one_or_none()
+
     async def list_for_group(
         self, group_id: uuid.UUID, limit: int = 50, offset: int = 0
     ) -> list[VoteSession]:

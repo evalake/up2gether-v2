@@ -54,6 +54,7 @@ class PublicSessionCard(BaseModel):
 async def public_session(
     session_id: uuid.UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
+    _rl: RateLimitTelemetry,
 ) -> PublicSessionCard:
     s = await db.get(PlaySession, session_id)
     if s is None:

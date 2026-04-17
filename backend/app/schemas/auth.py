@@ -11,7 +11,7 @@ class DiscordCallbackRequest(BaseModel):
     state: str = Field(min_length=16, max_length=128)
     # attribution: string livre vindo de ?ref= na landing. max 64 chars pra
     # evitar abuso. so registra no event payload do signup inicial.
-    ref: str | None = None
+    ref: str | None = Field(None, max_length=64)
 
 
 class AuthTokenResponse(BaseModel):

@@ -244,11 +244,19 @@ class VoteService:
 
         get_broker().publish(session.group_id, kind="game_vote.ballot_cast")
 
-        # Auto-close stage: todos os eleitores votaram
-        ballots_count = await self.votes.count_ballots(vote_id, stage_id=stage.id)
-        if ballots_count >= session.eligible_voter_count:
-            await self._close_stage(session, stage)
-        return await self._to_response(session, actor)
+        # Auto-close stage: todos os eleitores votaram. Lock na session pra
+        # serializar close entre ballots paralelos. Sem isso dois ballots que
+        # fecham simultaneamente disparam 2x close -> 2 webhooks Discord.
+        locked = await self.votes.get_for_update(vote_id)
+        if locked is None or locked.status != VoteStatus.OPEN:
+            return await self._to_response(session, actor)
+        stage_locked = await self._current_stage(locked)
+        if stage_locked is None or stage_locked.status != VoteStatus.OPEN:
+            return await self._to_response(session, actor)
+        ballots_count = await self.votes.count_ballots(vote_id, stage_id=stage_locked.id)
+        if ballots_count >= locked.eligible_voter_count:
+            await self._close_stage(locked, stage_locked)
+        return await self._to_response(locked, actor)
 
     async def _current_stage(self, session: VoteSession) -> VoteStage | None:
         if session.current_stage_number is None:
