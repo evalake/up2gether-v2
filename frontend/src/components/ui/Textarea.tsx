@@ -44,7 +44,7 @@ export function Textarea({
       />
       {showCount && (
         <div
-          className={`pointer-events-none absolute bottom-1.5 right-2 font-mono text-[9px] tabular-nums ${
+          className={`pointer-events-none absolute bottom-1.5 right-2 font-mono text-[10px] tabular-nums ${
             near ? 'text-up-amber' : 'text-up-line'
           }`}
         >

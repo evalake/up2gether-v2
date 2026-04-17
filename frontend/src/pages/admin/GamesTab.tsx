@@ -159,7 +159,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm text-up-text">{g.name}</div>
-                  <div className="font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                  <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
                     {g.viability.interest_want_count}w · {g.viability.ownership_count}own
                   </div>
                 </div>

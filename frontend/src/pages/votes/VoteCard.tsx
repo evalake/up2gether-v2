@@ -165,10 +165,10 @@ export function VoteCard({
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm text-up-text">{g?.name ?? gid}</span>
                   {leading && !youPicked && (
-                    <span className="shrink-0 rounded-sm bg-up-orange/90 px-1 text-[9px] uppercase tracking-wider text-black">top</span>
+                    <span className="shrink-0 rounded-sm bg-up-orange/90 px-1 text-[10px] uppercase tracking-wider text-black">top</span>
                   )}
                   {youPicked && (
-                    <span className="shrink-0 rounded-sm bg-up-magenta/20 px-1 text-[9px] uppercase tracking-wider text-up-magenta">seu</span>
+                    <span className="shrink-0 rounded-sm bg-up-magenta/20 px-1 text-[10px] uppercase tracking-wider text-up-magenta">seu</span>
                   )}
                 </div>
                 <div className="mt-1.5 flex items-center gap-2">

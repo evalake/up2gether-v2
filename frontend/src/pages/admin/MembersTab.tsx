@@ -62,10 +62,10 @@ export function MembersTab({
               <button type="button" onClick={() => onOpenProfile(m.user_id)} className="min-w-0 flex-1 text-left">
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm text-up-text transition-colors hover:text-up-orange">{name}</span>
-                  {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-up-orange">você</span>}
-                  {isTargetOwner && <span className="font-mono text-[9px] uppercase tracking-wider text-up-magenta">dono</span>}
+                  {isMe && <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">você</span>}
+                  {isTargetOwner && <span className="font-mono text-[10px] uppercase tracking-wider text-up-magenta">dono</span>}
                 </div>
-                <div className={`font-mono text-[9px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
+                <div className={`font-mono text-[10px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
               </button>
               {canEdit && canTouchThisRole && (
                 <div className="flex shrink-0 gap-1">

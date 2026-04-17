@@ -31,9 +31,9 @@ export function CurrentGameHero({
       <div className="relative z-10 flex items-center justify-between border-b border-up-green/20 bg-black/40 px-4 py-1 font-mono text-[10px] uppercase tracking-[0.25em]">
         <span className="flex items-center gap-2 text-up-green">
           <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-up-green" />
-          now playing
+          jogando agora
           {isManual ? (
-            <span className="text-up-amber">· manual override</span>
+            <span className="text-up-amber">· travado manual</span>
           ) : (
             <span className="text-up-dim">· definido por votação</span>
           )}

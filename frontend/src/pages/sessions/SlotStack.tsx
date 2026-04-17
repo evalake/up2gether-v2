@@ -45,7 +45,7 @@ export function SlotStack({
           <span className={`truncate font-display text-[12px] leading-tight ${isPast ? 'text-up-dim' : 'text-up-text'}`}>
             {s.title}
           </span>
-          <span className={`mt-0.5 truncate font-mono text-[9px] uppercase tracking-wider ${isPast ? 'text-up-dim' : 'text-up-orange'}`}>
+          <span className={`mt-0.5 truncate font-mono text-[10px] uppercase tracking-wider ${isPast ? 'text-up-dim' : 'text-up-orange'}`}>
             {String(st.getHours()).padStart(2, '0')}:{String(st.getMinutes()).padStart(2, '0')} · {s.rsvp_yes} vao
           </span>
         </span>

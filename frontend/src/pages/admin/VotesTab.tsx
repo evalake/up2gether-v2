@@ -171,11 +171,11 @@ export function VotesTab({ groupId }: { groupId: string }) {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm text-up-text">{v.title}</span>
-                    <span className={`font-mono text-[9px] uppercase tracking-wider ${statusColor}`}>{v.status}</span>
+                    <span className={`font-mono text-[10px] uppercase tracking-wider ${statusColor}`}>{v.status}</span>
                   </div>
-                  <div className="truncate font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                  <div className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">
                     {v.candidate_game_ids.length} cand · {v.ballots_count}/{v.eligible_voter_count} votos
-                    {winner && <span className="text-up-orange"> · winner: {winner}</span>}
+                    {winner && <span className="text-up-orange"> · vencedor: {winner}</span>}
                   </div>
                 </div>
                 {v.status === 'open' && !confirming && (

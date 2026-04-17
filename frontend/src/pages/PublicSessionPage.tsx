@@ -147,7 +147,7 @@ export function PublicSessionPage() {
             </a>
           )}
         </div>
-        <div className="border-t border-up-orange/10 px-5 py-2 text-center text-[9px] uppercase tracking-[0.2em] text-up-dim">
+        <div className="border-t border-up-orange/10 px-5 py-2 text-center text-[10px] uppercase tracking-[0.2em] text-up-dim">
           up2gether
         </div>
       </motion.div>

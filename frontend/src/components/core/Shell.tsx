@@ -10,16 +10,16 @@ import { Avatar } from './Avatar'
 import { NotificationBell } from './NotificationBell'
 
 const TOP_NAV = [
-  { label: 'groups', to: '/groups' },
-  { label: 'settings', to: '/settings' },
+  { label: 'grupos', to: '/groups' },
+  { label: 'config', to: '/settings' },
 ]
 
 const GROUP_NAV = [
-  { label: 'overview', slug: '' },
-  { label: 'games', slug: '/games' },
-  { label: 'votes', slug: '/votes' },
-  { label: 'themes', slug: '/themes' },
-  { label: 'sessions', slug: '/sessions' },
+  { label: 'visao geral', slug: '' },
+  { label: 'jogos', slug: '/games' },
+  { label: 'votacoes', slug: '/votes' },
+  { label: 'temas', slug: '/themes' },
+  { label: 'sessoes', slug: '/sessions' },
 ]
 
 function ThemeToggle() {
@@ -31,7 +31,7 @@ function ThemeToggle() {
       onClick={toggle}
       title={mode === 'frost' ? 'mudar pra ember' : 'mudar pra frost'}
       aria-label="trocar tema"
-      className="flex items-center gap-1.5 rounded-sm border border-up-orange/30 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-up-orange transition-all hover:border-up-orange hover:bg-up-orange/10"
+      className="flex items-center gap-1.5 rounded-sm border border-up-orange/30 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-orange transition-colors hover:border-up-orange hover:bg-up-orange/10"
     >
       <span className={`inline-block h-1.5 w-1.5 rounded-full ${mode === 'frost' ? 'bg-up-orange' : 'bg-up-amber'}`} />
       {mode}
@@ -61,7 +61,7 @@ function GroupContext({ groupId }: { groupId: string }) {
   const nav = isAdmin ? [...GROUP_NAV, { label: 'admin', slug: '/admin' }] : GROUP_NAV
   return (
     <div className="border-t border-up-orange/15 px-3 py-3">
-      <div className="mb-2 text-[10px] uppercase tracking-wider text-up-dim">current group</div>
+      <div className="mb-2 text-[10px] uppercase tracking-wider text-up-dim">grupo atual</div>
       <div className="mb-3 truncate text-sm font-medium text-up-text">
         {group.data?.name ?? '...'}
       </div>
@@ -72,10 +72,10 @@ function GroupContext({ groupId }: { groupId: string }) {
             <Link
               key={item.slug}
               to={`/groups/${groupId}${item.slug}`}
-              className={`block rounded-sm border-l-2 px-2 py-1.5 text-xs lowercase transition-all ${
+              className={`block rounded-sm border-l-2 px-2 py-1.5 text-xs lowercase transition-colors ${
                 active
                   ? 'border-up-orange bg-up-orange/10 text-up-orange'
-                  : 'border-transparent text-up-dim transition-colors hover:border-up-orange hover:bg-up-orange/5 hover:text-up-text'
+                  : 'border-transparent text-up-dim hover:border-up-orange hover:bg-up-orange/5 hover:text-up-text'
               }`}
             >
               {item.label}
@@ -127,10 +127,10 @@ export function Shell({ children }: { children: ReactNode }) {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-all ${
+                className={`block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-colors ${
                   active && !inGroup
                     ? 'border-up-orange bg-up-orange/10 text-up-orange'
-                    : 'border-transparent text-up-dim transition-colors hover:border-up-orange hover:bg-up-orange/5 hover:text-up-text'
+                    : 'border-transparent text-up-dim hover:border-up-orange hover:bg-up-orange/5 hover:text-up-text'
                 }`}
               >
                 {item.label}
@@ -141,10 +141,10 @@ export function Shell({ children }: { children: ReactNode }) {
           {me.data?.is_sys_admin && (
             <Link
               to="/admin/metrics"
-              className={`mt-2 block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-all ${
+              className={`mt-2 block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-colors ${
                 loc.pathname.startsWith('/admin')
                   ? 'border-up-red bg-up-red/10 text-up-red'
-                  : 'border-transparent text-up-dim transition-colors hover:border-up-red hover:bg-up-red/5 hover:text-up-red'
+                  : 'border-transparent text-up-dim hover:border-up-red hover:bg-up-red/5 hover:text-up-red'
               }`}
             >
               metrics
@@ -176,9 +176,9 @@ export function Shell({ children }: { children: ReactNode }) {
           <button
             onClick={logout}
             aria-label="sair da conta"
-            className="mt-3 w-full rounded-sm border border-up-red/30 px-2 py-1.5 text-[10px] uppercase tracking-wider text-up-red transition-all hover:border-up-red hover:bg-up-red hover:text-up-bg"
+            className="mt-3 w-full rounded-sm border border-up-red/30 px-2 py-1.5 text-[10px] uppercase tracking-wider text-up-red transition-colors hover:border-up-red hover:bg-up-red hover:text-up-bg"
           >
-            disconnect
+            desconectar
           </button>
         </div>
       </aside>

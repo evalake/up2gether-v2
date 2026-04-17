@@ -138,11 +138,11 @@ export function SessionsTab({ groupId }: { groupId: string }) {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm text-up-text">{s.title}</span>
-                    <span className={`font-mono text-[9px] uppercase tracking-wider ${isPast ? 'text-up-dim' : 'text-up-green'}`}>
+                    <span className={`font-mono text-[10px] uppercase tracking-wider ${isPast ? 'text-up-dim' : 'text-up-green'}`}>
                       {isPast ? 'passada' : 'futura'}
                     </span>
                   </div>
-                  <div className="truncate font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                  <div className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">
                     {dt} · {gameName(s.game_id)} · {s.rsvp_yes}y/{s.rsvp_maybe}m/{s.rsvp_no}n
                   </div>
                 </div>

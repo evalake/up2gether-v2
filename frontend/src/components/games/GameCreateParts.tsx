@@ -109,7 +109,7 @@ export function SteamResultsList({ hits, onPick }: { hits: SteamSearchItem[]; on
 
 export function SteamPreview({ form, onClear }: { form: FormState; onClear: () => void }) {
   const priceLabel = form.is_free
-    ? 'free'
+    ? 'gratuito'
     : form.price_current
       ? `R$ ${Number(form.price_current).toFixed(2)}`
       : 'sem preco'
@@ -232,7 +232,7 @@ export function ManualForm({
                 : 'border-up-line text-up-dim hover:border-up-green'
             }`}
           >
-            {form.is_free ? 'free' : 'free?'}
+            {form.is_free ? 'gratis' : 'gratis?'}
           </button>
         </div>
         <div className="col-span-6">

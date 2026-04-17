@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { steamCover } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
@@ -143,9 +144,15 @@ export function SessionDraftModal({
     return () => window.removeEventListener('keydown', onKey)
   }, [onCancel])
 
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
   const dayLabel = start.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '')
 
-  return (
+  return createPortal(
     <motion.div
       key="draft-backdrop"
       initial={{ opacity: 0 }}
@@ -167,7 +174,7 @@ export function SessionDraftModal({
         <button
           onClick={onCancel}
           aria-label="fechar"
-          className="absolute right-2.5 top-2.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
+          className="absolute right-2.5 top-2.5 z-10 grid h-6 w-6 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
         </button>
@@ -198,7 +205,7 @@ export function SessionDraftModal({
           <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/85 to-up-panel/30" />
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-4 pb-2 pt-1">
             <div className="min-w-0">
-              <div className="font-mono text-[9px] uppercase tracking-wider text-up-orange">agendar</div>
+              <div className="font-mono text-[10px] uppercase tracking-wider text-up-orange">agendar</div>
               <div className="truncate font-display text-sm capitalize text-up-text">{dayLabel}</div>
             </div>
             <div className="font-mono text-[10px] tabular-nums text-up-orange">
@@ -293,7 +300,7 @@ export function SessionDraftModal({
                       key={h}
                       type="button"
                       onClick={() => setQuickTime(h)}
-                      className={`rounded-full border px-2 py-0.5 font-mono text-[9px] tabular-nums transition-colors ${
+                      className={`rounded-full border px-2 py-0.5 font-mono text-[10px] tabular-nums transition-colors ${
                         on
                           ? 'border-up-orange/60 bg-up-orange/10 text-up-orange'
                           : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
@@ -327,7 +334,7 @@ export function SessionDraftModal({
                       key={p.value}
                       type="button"
                       onClick={() => setDuration(p.value)}
-                      className={`rounded-full border px-2 py-0.5 font-mono text-[9px] tabular-nums transition-colors ${
+                      className={`rounded-full border px-2 py-0.5 font-mono text-[10px] tabular-nums transition-colors ${
                         on
                           ? 'border-up-orange/60 bg-up-orange/10 text-up-orange'
                           : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
@@ -359,6 +366,7 @@ export function SessionDraftModal({
           </motion.button>
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   )
 }

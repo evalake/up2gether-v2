@@ -119,16 +119,15 @@ export function discordLoginUrl(next?: string): string {
       `${window.location.origin}/auth/discord/callback`,
   )
   const scope = encodeURIComponent('identify email guilds')
-  // state pra fechar login-CSRF. stasha em sessionStorage e compara no callback.
-  // cada click gera um state novo (sobrescreve); ok pq a volta e imediata.
-  const state = genOauthState()
-  try {
-    sessionStorage.setItem('u2g-oauth-state', state)
-  } catch {
-    /* ignore */
+  // reusar state existente pra evitar mismatch quando multiplos <a href>
+  // chamam essa funcao no mesmo render (landing tem 3 botoes de login).
+  // callback remove do sessionStorage, entao o proximo login gera um novo.
+  let state: string | null = null
+  try { state = sessionStorage.getItem('u2g-oauth-state') } catch { /* ignore */ }
+  if (!state) {
+    state = genOauthState()
+    try { sessionStorage.setItem('u2g-oauth-state', state) } catch { /* ignore */ }
   }
-  // guarda next em sessionStorage pra recuperar no callback (state do oauth
-  // nao carrega URL inteira, so nonce)
   if (next) {
     try { sessionStorage.setItem('u2g-auth-next', next) } catch { /* ignore */ }
   }

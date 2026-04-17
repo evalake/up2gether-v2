@@ -39,7 +39,7 @@ export function CurrentGameSection({
               )}
               <div className="min-w-0">
                 <div className="truncate font-display text-base text-up-text">{currentGame.name}</div>
-                <div className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-up-dim">
                   {currentGame.source === 'manual' ? 'travado manual' : 'definido por votação'}
                 </div>
               </div>
@@ -116,9 +116,9 @@ export function OverviewCounters({
   onJump: (t: AdminTab) => void
 }) {
   const cards: { key: AdminTab; label: string; value: number }[] = [
-    { key: 'games', label: 'games', value: games },
+    { key: 'games', label: 'jogos', value: games },
     { key: 'members', label: 'membros', value: members },
-    { key: 'votes', label: 'votes', value: votes },
+    { key: 'votes', label: 'votacoes', value: votes },
     { key: 'sessions', label: 'sessoes', value: sessions },
     { key: 'themes', label: 'temas', value: themes },
   ]
@@ -128,7 +128,7 @@ export function OverviewCounters({
         <button
           key={c.key}
           onClick={() => onJump(c.key)}
-          className="rounded-sm border border-up-line bg-up-panel/20 p-4 text-left transition-all hover:-translate-y-0.5 hover:border-up-orange hover:shadow-lg hover:shadow-black/20"
+          className="rounded-sm border border-up-line bg-up-panel/20 p-4 text-left transition-[colors,box-shadow] duration-200 hover:border-up-orange hover:shadow-[0_0_20px_rgba(255,102,0,0.12)]"
         >
           <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{c.label}</div>
           <div className="mt-1 font-display text-2xl tabular-nums text-up-text">{c.value}</div>
@@ -139,11 +139,11 @@ export function OverviewCounters({
 }
 
 const TIER_LABEL: Record<GroupTier, string> = {
-  free: 'free',
+  free: 'gratis',
   pro: 'pro',
-  community: 'community',
-  creator: 'creator',
-  over: 'over',
+  community: 'comunidade',
+  creator: 'criador',
+  over: 'excedido',
 }
 
 export function SeatIndicator({ group }: { group: GroupWithStats }) {
@@ -156,14 +156,14 @@ export function SeatIndicator({ group }: { group: GroupWithStats }) {
     <section className="rounded-sm border border-up-line bg-up-panel/10 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">seats</span>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">vagas</span>
           <span className="font-display text-lg tabular-nums text-up-text">{seat_count}</span>
           <span className="font-mono text-[11px] text-up-dim">/ {seat_limit ?? '∞'}</span>
         </div>
         <div className="flex items-center gap-2">
           {legacy_free && (
-            <span className="rounded-sm border border-up-green/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-green">
-              legacy free
+            <span className="rounded-sm border border-up-green/40 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-green">
+              legado gratis
             </span>
           )}
           <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">

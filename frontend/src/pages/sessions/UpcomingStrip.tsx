@@ -41,7 +41,7 @@ export function UpcomingStrip({ upcoming, games, onOpen }: Props) {
                 <div className="grid h-full w-40 shrink-0 place-items-center bg-up-orange/15 font-display text-3xl text-up-orange/70">◈</div>
               )}
               <div className="flex min-w-0 flex-col justify-center gap-1 px-4 pr-6">
-                <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-up-orange/50 bg-up-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-orange">
+                <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-up-orange/50 bg-up-orange/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-orange">
                   próxima · {relLabel(st)}
                 </span>
                 <span className="truncate font-display text-lg leading-tight text-up-text group-hover/hero:text-up-orange">
@@ -79,7 +79,7 @@ export function UpcomingStrip({ upcoming, games, onOpen }: Props) {
             )}
             <span className="flex min-w-0 flex-col justify-center gap-0.5 px-3 pr-4">
               <span className="max-w-[160px] truncate text-sm text-up-text group-hover/chip:text-up-orange">{s.title}</span>
-              <span className="font-mono text-[9px] uppercase tracking-wider text-up-dim">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
                 {st.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
               </span>
               <span className="font-mono text-[10px] text-up-orange/80">

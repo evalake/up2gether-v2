@@ -9,7 +9,7 @@ type Props = {
 
 export function SettingsCard({ title, description, action, children }: Props) {
   return (
-    <section className="rounded-md border border-up-line bg-up-panel/40 p-5">
+    <section className="rounded-sm border border-up-line bg-up-panel/40 p-5">
       <header className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base text-up-text">{title}</h2>

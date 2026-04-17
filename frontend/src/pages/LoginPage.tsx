@@ -32,7 +32,7 @@ export function LoginPage() {
               </Button>
             </a>
 
-            <div className="border-t border-up-line pt-3 text-center text-[9px] uppercase tracking-wider text-up-dim">
+            <div className="border-t border-up-line pt-3 text-center text-[10px] uppercase tracking-wider text-up-dim">
               up2gether v2
             </div>
           </div>

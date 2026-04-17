@@ -147,7 +147,7 @@ export function ContactPage() {
                   </svg>
                   <span>{c.email}</span>
                   {c.subject && (
-                    <span className="rounded-sm border border-up-line bg-black/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-amber">
+                    <span className="rounded-sm border border-up-line bg-black/40 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-amber">
                       assunto: {c.subject}
                     </span>
                   )}

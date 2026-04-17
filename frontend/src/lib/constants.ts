@@ -9,7 +9,7 @@ export const SIGNALS: { value: InterestSignal; label: string; color: string }[] 
 export const STAGES: { value: GameStage; label: string }[] = [
   { value: 'exploring', label: 'explorando' },
   { value: 'campaign', label: 'campanha' },
-  { value: 'endgame', label: 'endgame' },
+  { value: 'endgame', label: 'fim de jogo' },
   { value: 'paused', label: 'pausado' },
   { value: 'abandoned', label: 'abandonado' },
 ]

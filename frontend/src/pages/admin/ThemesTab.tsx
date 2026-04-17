@@ -173,7 +173,7 @@ export function ThemesTab({ groupId }: { groupId: string }) {
                   <input type="checkbox" checked={on} onChange={() => toggleOne(t.id)} className="h-3.5 w-3.5 shrink-0 accent-up-orange" />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm text-up-text">{t.theme_name}</div>
-                    <div className="truncate font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                    <div className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">
                       {t.month_year}{t.description ? ` · ${t.description}` : ''}
                     </div>
                   </div>

@@ -4,7 +4,7 @@ import type { GameStage } from '@/features/games/api'
 const STAGE_LABEL: Record<GameStage, string> = {
   exploring: 'explorando',
   campaign: 'em campanha',
-  endgame: 'endgame',
+  endgame: 'fim de jogo',
   paused: 'pausados',
   abandoned: 'largados',
 }

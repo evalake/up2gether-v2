@@ -71,7 +71,7 @@ export function NotificationBell() {
                 {unread > 0 && (
                   <button
                     onClick={() => mark.mutate(undefined)}
-                    className="text-[9px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
+                    className="text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
                   >
                     marcar todas
                   </button>
@@ -79,7 +79,7 @@ export function NotificationBell() {
                 {items.length > 0 && (
                   <button
                     onClick={() => clear.mutate()}
-                    className="text-[9px] uppercase tracking-wider text-up-dim hover:text-up-red"
+                    className="text-[10px] uppercase tracking-wider text-up-dim hover:text-up-red"
                   >
                     limpar
                   </button>
@@ -103,7 +103,7 @@ export function NotificationBell() {
                   >
                     <div className="flex w-full items-baseline justify-between gap-2">
                       <span className={`truncate text-xs ${!n.read_at ? 'text-up-text' : 'text-up-dim'}`}>{n.title}</span>
-                      <span className="shrink-0 font-mono text-[9px] text-up-dim">{timeAgo(n.created_at)}</span>
+                      <span className="shrink-0 font-mono text-[10px] text-up-dim">{timeAgo(n.created_at)}</span>
                     </div>
                     {n.body && <div className="truncate text-[10px] text-up-dim">{n.body}</div>}
                   </button>

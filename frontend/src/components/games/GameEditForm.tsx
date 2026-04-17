@@ -182,7 +182,7 @@ export function GameEditForm({
                     edit.is_free ? 'border-up-green/60 bg-up-green/10 text-up-green' : 'border-up-line text-up-dim hover:border-up-green hover:text-up-green'
                   }`}
                 >
-                  {edit.is_free ? 'free' : 'free?'}
+                  {edit.is_free ? 'gratis' : 'gratis?'}
                 </button>
               </div>
             </Field>

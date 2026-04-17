@@ -42,7 +42,7 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay,
         })}
         {hours.map((h) => (
           <div key={h} className="contents">
-            <div className="border-t border-up-orange/5 px-1 py-0.5 text-right font-mono text-[9px] text-up-dim">
+            <div className="border-t border-up-orange/5 px-1 py-0.5 text-right font-mono text-[10px] text-up-dim">
               {String(h).padStart(2, '0')}
             </div>
             {WEEKDAYS.map((_, i) => {

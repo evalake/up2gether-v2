@@ -16,7 +16,7 @@ export function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl pb-24">
       <header className="mb-8">
-        <h1 className="text-2xl font-light text-up-text">Configurações</h1>
+        <h1 className="font-display text-3xl text-up-text">Configurações</h1>
         <p className="mt-1 text-sm text-up-dim">
           Perfil, integrações e preferências da sua conta.
         </p>

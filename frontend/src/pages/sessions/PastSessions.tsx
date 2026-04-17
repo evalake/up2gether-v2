@@ -42,7 +42,7 @@ export function PastSessions({ past, games, isOpen, onToggle, onOpenDetail }: Pr
                   key={s.id}
                   type="button"
                   onClick={() => onOpenDetail(s.id)}
-                  className="flex gap-3 rounded-sm border border-up-line bg-up-panel/30 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-up-orange hover:bg-up-panel/50 hover:shadow-lg hover:shadow-black/20"
+                  className="flex gap-3 rounded-sm border border-up-line bg-up-panel/30 p-3 text-left transition-[colors,box-shadow] duration-200 hover:border-up-orange hover:bg-up-panel/50 hover:shadow-[0_0_20px_rgba(255,102,0,0.12)]"
                 >
                   {cover ? (
                     <img loading="lazy" src={cover} alt="" className="h-20 w-32 shrink-0 rounded-sm object-cover opacity-70" onError={(e) => { e.currentTarget.style.display = 'none' }} />

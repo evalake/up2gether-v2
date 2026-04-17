@@ -33,9 +33,9 @@ import { useTitle } from '@/lib/useTitle'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 
 const TABS: { key: AdminTab; label: string; ownerOnly?: boolean }[] = [
-  { key: 'overview', label: 'overview' },
-  { key: 'games', label: 'games' },
-  { key: 'votes', label: 'votes' },
+  { key: 'overview', label: 'visao geral' },
+  { key: 'games', label: 'jogos' },
+  { key: 'votes', label: 'votacoes' },
   { key: 'sessions', label: 'sessoes' },
   { key: 'themes', label: 'temas' },
   { key: 'members', label: 'membros' },

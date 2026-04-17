@@ -104,7 +104,7 @@ export function HistoryPage() {
               <button
                 key={v.id}
                 onClick={() => setAuditId(v.id)}
-                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 ${
+                className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-[colors,box-shadow] duration-200 hover:shadow-[0_0_20px_rgba(255,102,0,0.12)] ${
                   isLatest
                     ? 'border-up-green/40 bg-up-green/5 hover:border-up-green/60 hover:bg-up-green/10'
                     : 'border-up-line bg-up-panel/20 hover:border-up-orange hover:bg-up-panel/40'
@@ -126,7 +126,7 @@ export function HistoryPage() {
                       {g ? g.name : v.winner_game_id ? '(jogo removido)' : '(sem vencedor)'}
                     </span>
                     {isLatest && (
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-up-green">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-up-green">
                         atual
                       </span>
                     )}
@@ -134,7 +134,7 @@ export function HistoryPage() {
                   <div className="mt-1 truncate text-[11px] text-up-dim">
                     {v.title}
                   </div>
-                  <div className="mt-1 font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
                     {dt} · {v.ballots_count} voto{v.ballots_count === 1 ? '' : 's'} · audit →
                   </div>
                 </div>

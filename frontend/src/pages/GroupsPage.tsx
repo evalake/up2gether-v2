@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -41,12 +42,18 @@ function GuildPickerModal({
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [open])
   const [q, setQ] = useState('')
   const filtered = useMemo(
     () => (guilds.data ?? []).filter((g) => g.name.toLowerCase().includes(q.toLowerCase())),
     [guilds.data, q],
   )
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -69,7 +76,7 @@ function GuildPickerModal({
             <button
               onClick={onClose}
               aria-label="fechar"
-              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
+              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
@@ -111,8 +118,8 @@ function GuildPickerModal({
                       </div>
                     )}
                     <span className="flex-1 truncate text-sm text-up-text">{g.name}</span>
-                    {g.owner && <span className="text-[9px] uppercase tracking-wider text-up-amber">owner</span>}
-                    {already && <span className="text-[9px] uppercase tracking-wider text-up-green">já registrado</span>}
+                    {g.owner && <span className="text-[10px] uppercase tracking-wider text-up-amber">dono</span>}
+                    {already && <span className="text-[10px] uppercase tracking-wider text-up-green">já registrado</span>}
                   </button>
                 )
               })}
@@ -130,7 +137,8 @@ function GuildPickerModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 
@@ -226,7 +234,7 @@ export function GroupsPage() {
             transition={{ delay: i * 0.04 }}
           >
             <Link to={`/groups/${g.id}`} className="block">
-              <div className="group relative flex min-h-[180px] flex-col overflow-hidden rounded-sm border border-up-orange/20 bg-up-panel/60 p-4 transition-all hover:border-up-orange hover:shadow-[0_0_30px_rgba(255,102,0,0.2)]">
+              <div className="group relative flex min-h-[180px] flex-col overflow-hidden rounded-sm border border-up-orange/20 bg-up-panel/60 p-4 transition-[colors,box-shadow] duration-200 hover:border-up-orange hover:shadow-[0_0_30px_rgba(255,102,0,0.2)]">
                 {(g.banner_url || g.icon_url) && (
                   <div className="pointer-events-none absolute inset-0">
                     <img
@@ -246,7 +254,7 @@ export function GroupsPage() {
                     )}
                     <div className="font-display text-xl text-up-text">{g.name}</div>
                   </div>
-                  <span className={`rounded-sm border px-1.5 py-0.5 text-[9px] uppercase tracking-wider ${
+                  <span className={`rounded-sm border px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${
                     g.user_role === 'admin'
                       ? 'border-up-orange text-up-orange'
                       : g.user_role === 'mod'
@@ -255,10 +263,10 @@ export function GroupsPage() {
                   }`}>{g.user_role}</span>
                 </div>
                 <div className="relative flex gap-4 text-[10px] uppercase tracking-wider text-up-dim">
-                  <span>members <span className="text-up-green">{g.member_count}</span></span>
-                  <span>games <span className="text-up-amber">{g.game_count}</span></span>
+                  <span>membros <span className="text-up-green">{g.member_count}</span></span>
+                  <span>jogos <span className="text-up-amber">{g.game_count}</span></span>
                   {g.active_vote_sessions > 0 && (
-                    <span>voting <span className="text-up-magenta">{g.active_vote_sessions}</span></span>
+                    <span>votando <span className="text-up-magenta">{g.active_vote_sessions}</span></span>
                   )}
                 </div>
               </div>

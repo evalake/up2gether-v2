@@ -195,7 +195,7 @@ export function OnboardingPage() {
                           <div key={g.id} className="flex items-center gap-3 rounded-sm border border-up-green/30 bg-up-green/5 px-3 py-2">
                             {guildIcon(g.icon_url)}
                             <span className="text-sm text-up-text">{g.name}</span>
-                            <span className="ml-auto text-[9px] uppercase tracking-wider text-up-green">ok</span>
+                            <span className="ml-auto text-[10px] uppercase tracking-wider text-up-green">ok</span>
                           </div>
                         ))}
                       </div>
@@ -277,7 +277,7 @@ export function OnboardingPage() {
                       }`}
                     >
                       <div className="text-sm uppercase tracking-wider">{t.label}</div>
-                      <div className="mt-0.5 text-[9px] text-up-dim/80">{t.hint}</div>
+                      <div className="mt-0.5 text-[10px] text-up-dim/80">{t.hint}</div>
                     </button>
                   ))}
                 </div>

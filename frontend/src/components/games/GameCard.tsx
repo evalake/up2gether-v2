@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Game } from '@/features/games/api'
 import { useSetInterest, useToggleOwnership } from '@/features/games/hooks'
 import { steamCover } from '@/lib/steamCover'
-import { SIGNALS, STAGE_COLOR } from '@/lib/constants'
+import { SIGNALS, STAGES, STAGE_COLOR } from '@/lib/constants'
 
 type Props = {
   game: Game
@@ -25,7 +25,7 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
     >
       <div
         onClick={() => navigate(`/groups/${groupId}/games/${g.id}`)}
-        className="group relative cursor-pointer overflow-hidden rounded-sm border border-up-orange/15 bg-up-panel/30 transition-[colors,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-up-orange hover:shadow-lg hover:shadow-black/20"
+        className="group relative z-0 cursor-pointer overflow-hidden rounded-sm border border-up-orange/15 bg-up-panel/30 transition-[colors,box-shadow] duration-200 hover:z-10 hover:border-up-orange hover:shadow-[0_0_20px_rgba(255,102,0,0.12)]"
       >
         {cover ? (
           <div className="relative h-26 overflow-hidden">
@@ -37,11 +37,11 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/30 to-transparent" />
             <div className={`absolute right-2 top-2 rounded-sm bg-black/70 px-2 py-0.5 text-[10px] uppercase tracking-wider backdrop-blur-sm ${STAGE_COLOR[g.stage]}`}>
-              {g.stage}
+              {STAGES.find((s) => s.value === g.stage)?.label ?? g.stage}
             </div>
             {g.is_free && (
               <div className="absolute left-2 top-2 rounded-sm border border-up-green/60 bg-black/70 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green backdrop-blur-sm">
-                free
+                gratuito
               </div>
             )}
           </div>

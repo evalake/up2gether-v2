@@ -38,7 +38,7 @@ export function GameHero({ game }: { game: Game }) {
               {STAGES.find((s) => s.value === game.stage)?.label ?? game.stage}
             </span>
             {game.is_free && (
-              <span className="rounded-sm border border-up-green/60 bg-up-green/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green">free to play</span>
+              <span className="rounded-sm border border-up-green/60 bg-up-green/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green">gratuito</span>
             )}
           </div>
 

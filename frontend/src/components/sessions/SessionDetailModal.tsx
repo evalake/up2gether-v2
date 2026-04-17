@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { useSessionAudit } from '@/features/sessions/hooks'
 import { useSetRsvp, useDeleteSession } from '@/features/sessions/hooks'
@@ -48,7 +49,14 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  return (
+  useEffect(() => {
+    if (!sessionId) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [sessionId])
+
+  return createPortal(
     <AnimatePresence>
       {sessionId && (
         <motion.div
@@ -74,7 +82,7 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
             <button
               onClick={onClose}
               aria-label="fechar"
-              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
+              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
@@ -103,7 +111,8 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 
@@ -166,12 +175,12 @@ function Body({
           className="absolute inset-x-0 bottom-0 p-5"
         >
           {countdown && !isPast && (
-            <span className="mb-2 inline-block rounded-full border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-orange">
+            <span className="mb-2 inline-block rounded-full border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-orange">
               {countdown}
             </span>
           )}
           {isPast && (
-            <span className="mb-2 inline-block rounded-full border border-up-line/60 bg-black/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-dim">
+            <span className="mb-2 inline-block rounded-full border border-up-line/60 bg-black/40 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-dim">
               já rolou
             </span>
           )}
@@ -255,7 +264,7 @@ function Body({
                     key={v}
                     whileTap={{ scale: 0.94 }}
                     onClick={() => onRsvp(v)}
-                    className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
+                    className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-colors ${
                       active
                         ? tone
                         : 'border-up-line/60 bg-black/20 text-up-dim transition-colors hover:border-up-orange hover:text-up-text'

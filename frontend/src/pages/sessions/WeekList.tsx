@@ -103,7 +103,7 @@ export function WeekList({ weekAnchor, sessions, games, now, onOpenSlot, onOpenD
                             {s.title}
                           </span>
                         </span>
-                        <span className="mt-0.5 flex items-center gap-3 font-mono text-[9px] uppercase tracking-wider text-up-dim">
+                        <span className="mt-0.5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
                           {game?.name && <span className="truncate">{game.name}</span>}
                           <span className="ml-auto shrink-0">
                             <span className="text-up-green">{s.rsvp_yes}</span>
