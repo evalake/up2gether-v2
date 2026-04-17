@@ -17,7 +17,7 @@ export type LoginResponse = {
   user: DiscordUser
 }
 
-export function discordCallback(code: string) {
+export function discordCallback(code: string, state: string) {
   // pega ref capturado em qualquer pagina (stashado pelo captureRef). so e usado
   // na primeira vez que o user loga (signup). o backend grava no payload do event.
   let ref: string | null = null
@@ -26,11 +26,12 @@ export function discordCallback(code: string) {
   } catch {
     /* ignore */
   }
-  const body: { code: string; ref?: string } = { code }
+  const body: { code: string; state: string; ref?: string } = { code, state }
   if (ref) body.ref = ref
   return api<LoginResponse>('/auth/discord/callback', { method: 'POST', body }).then((r) => {
     try {
       sessionStorage.removeItem('u2g-ref')
+      sessionStorage.removeItem('u2g-oauth-state')
     } catch {
       /* ignore */
     }
@@ -96,6 +97,21 @@ export function fetchMyGuilds() {
   return api<DiscordGuild[]>('/auth/discord/guilds')
 }
 
+function genOauthState(): string {
+  // crypto.randomUUID() sempre disponivel em contextos https (browsers modernos)
+  try {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID()
+    }
+  } catch {
+    /* fallthrough */
+  }
+  // fallback ultra-defensivo, ainda 32 chars random
+  const a = new Uint8Array(16)
+  crypto.getRandomValues(a)
+  return Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 export function discordLoginUrl(next?: string): string {
   const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID
   const redirect = encodeURIComponent(
@@ -103,10 +119,18 @@ export function discordLoginUrl(next?: string): string {
       `${window.location.origin}/auth/discord/callback`,
   )
   const scope = encodeURIComponent('identify email guilds')
+  // state pra fechar login-CSRF. stasha em sessionStorage e compara no callback.
+  // cada click gera um state novo (sobrescreve); ok pq a volta e imediata.
+  const state = genOauthState()
+  try {
+    sessionStorage.setItem('u2g-oauth-state', state)
+  } catch {
+    /* ignore */
+  }
   // guarda next em sessionStorage pra recuperar no callback (state do oauth
-  // tem caracteres restritos e seria mais frageis carregar URL inteira la)
+  // nao carrega URL inteira, so nonce)
   if (next) {
     try { sessionStorage.setItem('u2g-auth-next', next) } catch { /* ignore */ }
   }
-  return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}`
+  return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${encodeURIComponent(state)}`
 }

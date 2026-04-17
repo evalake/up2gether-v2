@@ -2,8 +2,9 @@ from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging
@@ -69,9 +70,29 @@ async def lifespan(_: FastAPI):
             set_bot(None)
 
 
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        resp = await call_next(request)
+        # HSTS so faz sentido sobre HTTPS. Fly serve via https, entao sempre.
+        resp.headers.setdefault(
+            "Strict-Transport-Security",
+            "max-age=63072000; includeSubDomains; preload",
+        )
+        resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+        resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        # API nao renderiza HTML, mas por garantia nega frame
+        resp.headers.setdefault("X-Frame-Options", "DENY")
+        return resp
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title="up2gether", version="2.0.0", lifespan=lifespan)
+    # em prod fecha swagger/redoc/openapi (reduz surface area pro scanner)
+    docs_kwargs: dict = (
+        {"docs_url": None, "redoc_url": None, "openapi_url": None} if settings.is_prod else {}
+    )
+    app = FastAPI(title="up2gether", version="2.0.0", lifespan=lifespan, **docs_kwargs)
+    app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

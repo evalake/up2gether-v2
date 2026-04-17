@@ -53,7 +53,10 @@ async def test_discord_callback_creates_new_user(app, client):
     )
     app.dependency_overrides[get_discord_client] = _override_discord(fake)
 
-    res = await client.post("/api/auth/discord/callback", json={"code": "any"})
+    res = await client.post(
+        "/api/auth/discord/callback",
+        json={"code": "any", "state": "x" * 32},
+    )
     assert res.status_code == 200, res.text
 
     body = res.json()
@@ -82,7 +85,7 @@ async def test_discord_callback_records_referrer_on_new_signup(app, client, db_s
 
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "ref": "streamer-foo"},
+        json={"code": "any", "state": "x" * 32, "ref": "streamer-foo"},
     )
     assert res.status_code == 200
     assert res.json()["user"]["is_new_user"] is True
@@ -114,7 +117,7 @@ async def test_discord_callback_ref_truncated_to_64(app, client, db_session):
     long_ref = "x" * 200
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "ref": long_ref},
+        json={"code": "any", "state": "x" * 32, "ref": long_ref},
     )
     assert res.status_code == 200
 
@@ -138,7 +141,10 @@ async def test_discord_callback_updates_existing_user(app, client, db_session):
     )
     app.dependency_overrides[get_discord_client] = _override_discord(fake)
 
-    res = await client.post("/api/auth/discord/callback", json={"code": "any"})
+    res = await client.post(
+        "/api/auth/discord/callback",
+        json={"code": "any", "state": "x" * 32},
+    )
     assert res.status_code == 200
     body = res.json()
     assert body["user"]["is_new_user"] is False
@@ -189,7 +195,13 @@ async def test_discord_callback_rate_limited(app, client):
     app.dependency_overrides[get_discord_client] = _override_discord(fake)
     # consome o burst inteiro (10 requests ok)
     for _ in range(10):
-        r = await client.post("/api/auth/discord/callback", json={"code": "x"})
+        r = await client.post(
+            "/api/auth/discord/callback",
+            json={"code": "x", "state": "x" * 32},
+        )
         assert r.status_code == 200
-    r = await client.post("/api/auth/discord/callback", json={"code": "x"})
+    r = await client.post(
+        "/api/auth/discord/callback",
+        json={"code": "x", "state": "x" * 32},
+    )
     assert r.status_code == 429

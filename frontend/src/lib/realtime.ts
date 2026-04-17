@@ -18,9 +18,19 @@
 
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { api } from '@/lib/api'
 import { useAuthStore } from '@/features/auth/store'
 
 const BASE = import.meta.env.VITE_API_URL ?? '/api'
+
+type SseTicket = { ticket: string; expires_in: number }
+
+async function fetchSseTicket(): Promise<string> {
+  // ticket vive 30s, scope so pra SSE. evita passar access_token em URL
+  // (que vazaria em logs de proxy Fly/Cloudflare).
+  const t = await api<SseTicket>('/events/ticket', { method: 'POST' })
+  return t.ticket
+}
 
 type Msg = { kind: string; group_id: string }
 
@@ -84,9 +94,19 @@ export function useRealtime() {
     let stopped = false
     let retryTimer: number | null = null
 
-    const connect = () => {
+    const connect = async () => {
       if (stopped) return
-      const url = `${BASE}/events/stream?token=${encodeURIComponent(token)}`
+      let ticket: string
+      try {
+        ticket = await fetchSseTicket()
+      } catch {
+        // backend fora do ar, reconecta dps
+        if (stopped) return
+        retryTimer = window.setTimeout(connect, 3000)
+        return
+      }
+      if (stopped) return
+      const url = `${BASE}/events/stream?ticket=${encodeURIComponent(ticket)}`
       es = new EventSource(url)
       es.onopen = () => {
         console.info('[realtime] SSE connected')
@@ -107,11 +127,12 @@ export function useRealtime() {
         es?.close()
         es = null
         if (stopped) return
+        // novo ticket a cada reconexao (o velho pode ter expirado)
         retryTimer = window.setTimeout(connect, 3000)
       }
     }
 
-    connect()
+    void connect()
     return () => {
       stopped = true
       if (retryTimer) window.clearTimeout(retryTimer)
