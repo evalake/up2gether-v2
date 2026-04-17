@@ -6,6 +6,8 @@ import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
+import { useT } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 
 type Props = {
   groupId: string
@@ -13,8 +15,8 @@ type Props = {
   onClose: () => void
 }
 
-const fmt = (iso: string) =>
-  new Date(iso).toLocaleString('pt-BR', {
+const fmt = (iso: string, locale: string) =>
+  new Date(iso).toLocaleString(locale === 'pt' ? 'pt-BR' : 'en-US', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -23,6 +25,7 @@ const fmt = (iso: string) =>
   })
 
 export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
+  const t = useT()
   const audit = useVoteAudit(groupId, voteId)
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
@@ -65,7 +68,7 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
           >
             <button
               onClick={onClose}
-              aria-label="fechar"
+              aria-label={t.common.close}
               className="absolute right-3 top-3 z-20 grid h-7 w-7 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -73,7 +76,7 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
 
             <div className="border-b border-up-orange/15 px-5 py-3">
               <div className="text-[11px] uppercase tracking-wider text-up-orange">
-                Auditoria da votação
+                {t.votes.auditTitle}
               </div>
             </div>
 
@@ -104,15 +107,17 @@ function AuditBody({
   data: NonNullable<ReturnType<typeof useVoteAudit>['data']>
   onOpenProfile: (userId: string) => void
 }) {
+  const t = useT()
+  const locale = useLocaleStore(s => s.locale)
   const { session, creator, games, voters, non_voters } = data
   const gameById = (gid: string) => games.find((g) => g.id === gid)
   const winner = session.winner_game_id ? gameById(session.winner_game_id) : null
 
   const timeline: { label: string; at: string | null }[] = [
-    { label: 'criada', at: session.created_at },
-    { label: 'aberta', at: session.opens_at },
-    { label: 'fechava em', at: session.closes_at },
-    { label: 'fechada', at: session.closed_at },
+    { label: t.votes.created, at: session.created_at },
+    { label: t.votes.opened, at: session.opens_at },
+    { label: t.votes.closedAt, at: session.closes_at },
+    { label: t.votes.closed, at: session.closed_at },
   ]
 
   // candidatos ordenados por votos (mais votado primeiro)
@@ -138,12 +143,12 @@ function AuditBody({
                 : 'border-up-dim/40'
             }`}
           >
-            {session.status === 'open' ? 'aberta' : 'encerrada'}
+            {session.status === 'open' ? t.votes.statusOpen : t.votes.statusClosed}
           </span>
-          <span className="tabular-nums">{voters.length}/{session.eligible_voter_count} votaram</span>
-          <span>{session.candidate_game_ids.length} candidatos</span>
+          <span className="tabular-nums">{voters.length}/{session.eligible_voter_count} {t.votes.voterCount}</span>
+          <span>{session.candidate_game_ids.length} {t.votes.candidateCount}</span>
           {session.total_stages && session.total_stages > 1 && (
-            <span>fase {session.current_stage_number}/{session.total_stages}</span>
+            <span>{t.votes.phaseLabel(session.current_stage_number!, session.total_stages)}</span>
           )}
         </div>
       </section>
@@ -161,12 +166,12 @@ function AuditBody({
           )}
           <div className="min-w-0 flex-1">
             <div className="text-[10px] uppercase tracking-wider text-up-green">
-              Vencedor
+              {t.votes.winnerLabel}
             </div>
             <div className="font-display text-base text-up-text">{winner.name}</div>
           </div>
           <span className="shrink-0 rounded-sm border border-up-green/40 bg-up-green/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-green">
-            {session.tallies[session.winner_game_id!] ?? 0} votos
+            {t.votes.voteCount(session.tallies[session.winner_game_id!] ?? 0)}
           </span>
         </section>
       )}
@@ -174,7 +179,7 @@ function AuditBody({
       {/* criador + timeline */}
       <section className="grid gap-4 sm:grid-cols-2">
         <div>
-          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-up-dim">Criador</div>
+          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-up-dim">{t.votes.creatorLabel}</div>
           <button
             type="button"
             onClick={() => creator.id && onOpenProfile(creator.id)}
@@ -188,19 +193,19 @@ function AuditBody({
               size="sm"
             />
             <span className="text-sm text-up-text">
-              {creator.display_name ?? '(desconhecido)'}
+              {creator.display_name ?? t.votes.unknown}
             </span>
           </button>
         </div>
         <div>
-          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-up-dim">Timeline</div>
+          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-up-dim">{t.votes.timeline}</div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-[11px]">
             {timeline.map(
-              (t) =>
-                t.at && (
-                  <div key={t.label}>
-                    <span className="text-up-dim">{t.label}</span>{' '}
-                    <span className="text-up-text">{fmt(t.at)}</span>
+              (tl) =>
+                tl.at && (
+                  <div key={tl.label}>
+                    <span className="text-up-dim">{tl.label}</span>{' '}
+                    <span className="text-up-text">{fmt(tl.at, locale)}</span>
                   </div>
                 ),
             )}
@@ -211,7 +216,7 @@ function AuditBody({
       {/* candidatos ordenados por votos */}
       <section>
         <div className="mb-2 text-[11px] uppercase tracking-wider text-up-dim">
-          Candidatos ({session.candidate_game_ids.length})
+          {t.votes.candidatesSection(session.candidate_game_ids.length)}
         </div>
         <div className="grid gap-1.5 sm:grid-cols-2">
           {sortedCandidates.map((gid) => {
@@ -239,7 +244,7 @@ function AuditBody({
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-xs text-up-text" title={g?.name ?? undefined}>
-                    {g?.name ?? '(removido)'}
+                    {g?.name ?? t.votes.removed}
                   </div>
                 </div>
                 <div className="shrink-0 font-mono text-[10px] uppercase tracking-wider tabular-nums text-up-orange">
@@ -258,11 +263,11 @@ function AuditBody({
 
       <section>
         <div className="mb-2 text-[11px] uppercase tracking-wider text-up-dim">
-          Quem votou ({voters.length})
+          {t.votes.whoVoted(voters.length)}
         </div>
         {voters.length === 0 ? (
           <div className="rounded-sm border border-up-line bg-black/20 py-4 text-center text-[11px] text-up-dim">
-            ninguém votou ainda
+            {t.votes.nobodyVoted}
           </div>
         ) : (
           <div className="space-y-1.5">
@@ -285,8 +290,8 @@ function AuditBody({
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm text-up-text" title={v.display_name ?? undefined}>{v.display_name}</div>
                     <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                      {fmt(v.submitted_at)}
-                      {v.stage_number != null && ` · stage ${v.stage_number}`}
+                      {fmt(v.submitted_at, locale)}
+                      {v.stage_number != null && ` · ${t.votes.stage(v.stage_number)}`}
                     </div>
                   </div>
                 </button>
@@ -302,7 +307,7 @@ function AuditBody({
                           {g?.cover_url && (
                             <img loading="lazy" src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-4 w-7 rounded-[2px] object-cover" />
                           )}
-                          {g?.name ?? 'removido'}
+                          {g?.name ?? t.votes.removed}
                         </span>
                       )
                     })}
@@ -310,7 +315,7 @@ function AuditBody({
                 )}
                 {v.approvals.length === 0 && (
                   <div className="mt-2 pl-10 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                    (voto em branco)
+                    {t.votes.blankVote}
                   </div>
                 )}
               </div>
@@ -322,7 +327,7 @@ function AuditBody({
       {non_voters.length > 0 && (
         <section>
           <div className="mb-2 text-[11px] uppercase tracking-wider text-up-dim">
-            Ainda não votaram ({non_voters.length})
+            {t.votes.didntVote(non_voters.length)}
           </div>
           <div className="flex flex-wrap gap-2">
             {non_voters.map((p, i) => (

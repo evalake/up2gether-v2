@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useT } from '@/i18n'
 
 export function ChipInput({
   label,
@@ -13,11 +14,12 @@ export function ChipInput({
   max: number
   placeholder: string
 }) {
+  const tr = useT()
   const [draft, setDraft] = useState('')
   const add = () => {
-    const t = draft.trim()
-    if (!t || value.includes(t) || value.length >= max) return
-    onChange([...value, t])
+    const trimmed = draft.trim()
+    if (!trimmed || value.includes(trimmed) || value.length >= max) return
+    onChange([...value, trimmed])
     setDraft('')
   }
   return (
@@ -29,13 +31,13 @@ export function ChipInput({
         </span>
       </div>
       <div className="flex flex-wrap gap-1.5 rounded-sm border border-up-line bg-black/40 p-2">
-        {value.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 text-[11px] text-up-orange">
-            {t}
+        {value.map((chip) => (
+          <span key={chip} className="inline-flex items-center gap-1 rounded-sm border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 text-[11px] text-up-orange">
+            {chip}
             <button
               type="button"
-              onClick={() => onChange(value.filter((x) => x !== t))}
-              title="remover filtro"
+              onClick={() => onChange(value.filter((x) => x !== chip))}
+              title={tr.common.remove}
               className="transition-colors hover:text-up-red"
             >
               ×

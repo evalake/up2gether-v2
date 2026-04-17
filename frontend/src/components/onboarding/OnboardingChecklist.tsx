@@ -1,19 +1,21 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useOnboarding } from '@/features/auth/hooks'
-
-const STEPS: {
-  key: 'has_group' | 'has_games' | 'has_session' | 'has_vote'
-  label: string
-  hint: string
-}[] = [
-  { key: 'has_group', label: 'conecta um servidor', hint: 'importa do discord em 1 clique' },
-  { key: 'has_games', label: 'cataloga 3 jogos', hint: 'adiciona os top games da galera' },
-  { key: 'has_session', label: 'cria uma sessão', hint: 'marca o próximo play' },
-  { key: 'has_vote', label: 'vota num game', hint: 'participa de uma enquete' },
-]
+import { useT } from '@/i18n'
 
 export function OnboardingChecklist() {
+  const t = useT()
   const q = useOnboarding()
+
+  const STEPS: {
+    key: 'has_group' | 'has_games' | 'has_session' | 'has_vote'
+    label: string
+    hint: string
+  }[] = [
+    { key: 'has_group', label: t.onboarding.connectServer, hint: t.onboarding.connectHint },
+    { key: 'has_games', label: t.onboarding.catalogGames, hint: t.onboarding.catalogHint },
+    { key: 'has_session', label: t.onboarding.createSession, hint: t.onboarding.sessionHint },
+    { key: 'has_vote', label: t.onboarding.voteGame, hint: t.onboarding.voteHint },
+  ]
   if (!q.data) return null
   const { complete, steps_done, steps_total } = q.data
   if (complete) return null
@@ -30,10 +32,10 @@ export function OnboardingChecklist() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-wider text-up-orange">
-              primeiro passo
+              {t.onboarding.firstStep}
             </div>
             <h2 className="mt-0.5 font-display text-lg text-up-text">
-              bora ligar sua comunidade
+              {t.onboarding.connectCommunity}
             </h2>
           </div>
           <div className="text-right">

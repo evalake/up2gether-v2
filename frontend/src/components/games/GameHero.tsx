@@ -1,11 +1,12 @@
 import type { Game } from '@/features/games/api'
 import { formatPlayers } from '@/lib/players'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
-import { STAGES, STAGE_COLOR, STAGE_BORDER } from '@/lib/constants'
-
-const HW_LABEL: Record<string, string> = { low: 'leve', mid: 'medio', high: 'pesado', unknown: 'n/a' }
+import { STAGE_COLOR, STAGE_BORDER } from '@/lib/constants'
+import { useStages, useT } from '@/i18n'
 
 export function GameHero({ game }: { game: Game }) {
+  const t = useT()
+  const stages = useStages()
   const hero = steamHeaderLarge(game.steam_appid) ?? steamCover(game)
   const cover = steamCover(game)
   const onSale = !game.is_free && game.discount_percent != null && game.discount_percent > 0 && game.price_original != null
@@ -35,10 +36,10 @@ export function GameHero({ game }: { game: Game }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className={`rounded-sm border px-2 py-0.5 text-[10px] uppercase tracking-wider ${STAGE_COLOR[game.stage] ?? 'text-up-dim'} ${STAGE_BORDER[game.stage] ?? 'border-up-dim'}`}>
-              {STAGES.find((s) => s.value === game.stage)?.label ?? game.stage}
+              {stages.find((s) => s.value === game.stage)?.label ?? game.stage}
             </span>
             {game.is_free && (
-              <span className="rounded-sm border border-up-green/60 bg-up-green/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green">gratuito</span>
+              <span className="rounded-sm border border-up-green/60 bg-up-green/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green">{t.games.freeToPlay}</span>
             )}
           </div>
 
@@ -60,9 +61,9 @@ export function GameHero({ game }: { game: Game }) {
               <><span className="text-up-line">&middot;</span><span className="rounded-sm border border-up-magenta/40 bg-up-magenta/10 px-1.5 py-0.5 text-up-magenta">{game.source}</span></>
             )}
             <span className="text-up-line">&middot;</span>
-            <span>{formatPlayers(game.player_min, game.player_max, game.tags)} jogadores</span>
+            <span>{formatPlayers(game.player_min, game.player_max, game.tags)} {t.games.players}</span>
             <span className="text-up-line">&middot;</span>
-            <span>Hardware {HW_LABEL[game.min_hardware_tier] ?? game.min_hardware_tier}</span>
+            <span>{t.games.hardware} {{ low: t.games.hwLight, mid: t.games.hwMedium, high: t.games.hwHeavyLabel, unknown: t.games.hwNA }[game.min_hardware_tier] ?? game.min_hardware_tier}</span>
           </div>
 
           {onSale && game.price_current != null && (

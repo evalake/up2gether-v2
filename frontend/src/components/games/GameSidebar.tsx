@@ -3,7 +3,8 @@ import type { Game, GameOwner, GameStage, GameUpdateInput } from '@/features/gam
 import { Loading } from '@/components/ui/Loading'
 import { Avatar } from '@/components/core/Avatar'
 import { useToast } from '@/components/ui/toast'
-import { STAGES, STAGE_COLOR, STAGE_BORDER } from '@/lib/constants'
+import { STAGE_COLOR, STAGE_BORDER } from '@/lib/constants'
+import { useStages, useT } from '@/i18n'
 
 export function GameSidebar({
   game,
@@ -22,13 +23,15 @@ export function GameSidebar({
   onOpenProfile: (userId: string) => void
   update: UseMutationResult<Game, Error, GameUpdateInput>
 }) {
+  const t = useT()
+  const stages = useStages()
   const toast = useToast()
   const g = game
 
   const setStage = async (s: GameStage) => {
     try {
       await update.mutateAsync({ stage: s })
-      toast.success('estágio atualizado')
+      toast.success(t.games.stageUpdated)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'falha')
     }
@@ -44,8 +47,8 @@ export function GameSidebar({
       <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-4">
         <div className="mb-2.5 text-[11px] uppercase tracking-wider text-up-dim">
           {owners && owners.length > 0
-            ? <span><span className="text-up-orange tabular-nums">{owners.length}</span> {owners.length === 1 ? 'pessoa' : 'pessoas'}{memberCount != null ? ` de ${memberCount}` : ''} no servidor {owners.length === 1 ? 'tem' : 'têm'} este jogo</span>
-            : <span>ninguém tem este jogo ainda</span>
+            ? <span>{t.games.ownershipCount(owners.length, memberCount ?? owners.length)}</span>
+            : <span>{t.games.ownershipCount(0, memberCount ?? 0)}</span>
           }
         </div>
         {memberCount != null && memberCount > 4 && owners && owners.length > 0 && (
@@ -74,10 +77,10 @@ export function GameSidebar({
       {canManage && (
         <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-4">
           <div className="mb-2 text-[10px] uppercase tracking-wider text-up-dim">
-            alterar estágio
+            {t.games.changeStage}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {STAGES.map((s) => {
+            {stages.map((s) => {
               const active = g.stage === s.value
               const color = STAGE_COLOR[s.value] ?? 'text-up-dim'
               const border = STAGE_BORDER[s.value] ?? 'border-up-dim'

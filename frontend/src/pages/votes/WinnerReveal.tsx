@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
+import { useT } from '@/i18n'
 
 type VoteRow = {
   id: string
@@ -20,6 +21,7 @@ export function WinnerReveal({
   candidates: Game[]
   onClose: () => void
 }) {
+  const t = useT()
   const cover = steamHeaderLarge(game.steam_appid) ?? steamCover(game)
   const [phase, setPhase] = useState<'scanning' | 'shuffling' | 'lockin' | 'winner'>('scanning')
   const [shuffleIdx, setShuffleIdx] = useState(0)
@@ -100,10 +102,10 @@ export function WinnerReveal({
               className={`h-1.5 w-1.5 rounded-full ${showWinner ? 'bg-up-orange' : 'bg-up-magenta'}`}
             />
             <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-up-orange">
-              {phase === 'scanning' && 'apurando votos...'}
-              {phase === 'shuffling' && 'computando resultado...'}
-              {phase === 'lockin' && 'finalizando...'}
-              {phase === 'winner' && 'resultado final'}
+              {phase === 'scanning' && t.votes.countingVotes}
+              {phase === 'shuffling' && t.votes.computingResult}
+              {phase === 'lockin' && t.votes.finalizing}
+              {phase === 'winner' && t.votes.finalResult}
             </span>
           </div>
           <span className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">{vote.title}</span>
@@ -121,7 +123,7 @@ export function WinnerReveal({
               >
                 <div className="text-center">
                   <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-dim">
-                    {vote.ballots_count} / {vote.eligible_voter_count} cédulas
+                    {t.votes.ballots(vote.ballots_count, vote.eligible_voter_count)}
                   </div>
                   <div className="mt-3 flex justify-center gap-1">
                     {[0, 1, 2, 3, 4].map((i) => (
@@ -200,7 +202,7 @@ export function WinnerReveal({
                 exit={{ opacity: 0 }}
                 className="font-mono text-xs uppercase tracking-[0.25em] text-up-dim"
               >
-                calculando consenso
+                {t.votes.computingConsensus}
               </motion.div>
             )}
             {phase === 'shuffling' && (
@@ -222,10 +224,10 @@ export function WinnerReveal({
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 18 }}
               >
-                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-dim">vencedor</div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-dim">{t.votes.winner}</div>
                 <div className="mt-0.5 font-display text-2xl text-up-orange">{game.name}</div>
                 <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                  {vote.ballots_count} / {vote.eligible_voter_count} votaram
+                  {t.votes.votersLabel(vote.ballots_count, vote.eligible_voter_count)}
                 </div>
               </motion.div>
             )}
@@ -239,7 +241,7 @@ export function WinnerReveal({
           onClick={onClose}
           className="block w-full border-t border-up-orange/30 bg-black/40 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-up-orange transition-colors hover:bg-up-orange/15 disabled:cursor-wait"
         >
-          {showWinner ? 'fechar' : 'aguarde...'}
+          {showWinner ? t.common.close : t.votes.wait}
         </motion.button>
       </motion.div>
     </motion.div>,

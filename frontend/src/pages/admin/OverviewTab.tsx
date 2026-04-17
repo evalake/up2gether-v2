@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { CurrentGameAudit, GroupTier, GroupWithStats } from '@/features/groups/api'
 import type { Game } from '@/features/games/api'
 import { useToast } from '@/components/ui/toast'
+import { useT } from '@/i18n'
 
 export type AdminTab = 'overview' | 'games' | 'votes' | 'sessions' | 'themes' | 'members' | 'config' | 'danger'
 
@@ -18,6 +19,7 @@ export function CurrentGameSection({
   games: Game[] | undefined
   setCurrent: UseMutationResult<unknown, Error, { gameId: string | null; lockManual?: boolean }>
 }) {
+  const t = useT()
   const toast = useToast()
   const [gameSearch, setGameSearch] = useState('')
 
@@ -25,9 +27,9 @@ export function CurrentGameSection({
     <section className="rounded-sm border border-up-green/20 bg-up-green/5 p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] uppercase tracking-wider text-up-green">Game atual</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-green">{t.admin.currentGame}</div>
           <p className="mt-1 text-[11px] text-up-dim">
-            Por padrão, o game da vez vira o vencedor da última votação. Aqui você pode travar manualmente, destravar ou trocar a qualquer momento.
+            {t.admin.currentGameHint}
           </p>
           {currentGame ? (
             <Link
@@ -40,12 +42,12 @@ export function CurrentGameSection({
               <div className="min-w-0">
                 <div className="truncate font-display text-base text-up-text">{currentGame.name}</div>
                 <div className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                  {currentGame.source === 'manual' ? 'travado manual' : 'definido por votação'}
+                  {currentGame.source === 'manual' ? t.admin.manualLock : t.admin.setByVote}
                 </div>
               </div>
             </Link>
           ) : (
-            <div className="mt-3 text-[11px] text-up-dim">Nenhum game atual definido.</div>
+            <div className="mt-3 text-[11px] text-up-dim">{t.admin.noCurrentGame}</div>
           )}
         </div>
         {currentGame && (
@@ -53,25 +55,25 @@ export function CurrentGameSection({
             onClick={async () => {
               try {
                 await setCurrent.mutateAsync({ gameId: null })
-                toast.success('destravado')
+                toast.success(t.admin.unlocked)
               } catch (e) {
-                toast.error(e instanceof Error ? e.message : 'falha')
+                toast.error(e instanceof Error ? e.message : t.common.fail)
               }
             }}
             disabled={setCurrent.isPending}
-            aria-label="destravar game atual"
+            aria-label={t.admin.unlock}
             className="shrink-0 rounded-sm border border-up-red/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10 disabled:opacity-40"
           >
-            destravar
+            {t.admin.unlock}
           </button>
         )}
       </div>
       <div className="mt-4">
-        <div className="text-[10px] uppercase tracking-wider text-up-dim">Trocar manualmente</div>
+        <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.admin.swapManually}</div>
         <input
           value={gameSearch}
           onChange={(e) => setGameSearch(e.target.value)}
-          placeholder="buscar jogo..."
+          placeholder={t.admin.searchGame}
           className="mt-1 h-8 w-full max-w-sm rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-green focus-visible:outline-none"
         />
         {gameSearch && games && (
@@ -85,10 +87,10 @@ export function CurrentGameSection({
                   onClick={async () => {
                     try {
                       await setCurrent.mutateAsync({ gameId: g.id, lockManual: true })
-                      toast.success(`${g.name} virou o game atual`)
+                      toast.success(t.admin.becameCurrent(g.name))
                       setGameSearch('')
                     } catch (e) {
-                      toast.error(e instanceof Error ? e.message : 'falha')
+                      toast.error(e instanceof Error ? e.message : t.common.fail)
                     }
                   }}
                   aria-label={`trocar game atual para ${g.name}`}
@@ -115,12 +117,13 @@ export function OverviewCounters({
   themes: number
   onJump: (t: AdminTab) => void
 }) {
+  const t = useT()
   const cards: { key: AdminTab; label: string; value: number }[] = [
-    { key: 'games', label: 'jogos', value: games },
-    { key: 'members', label: 'membros', value: members },
-    { key: 'votes', label: 'votacoes', value: votes },
-    { key: 'sessions', label: 'sessoes', value: sessions },
-    { key: 'themes', label: 'temas', value: themes },
+    { key: 'games', label: t.admin.counters.games, value: games },
+    { key: 'members', label: t.admin.counters.members, value: members },
+    { key: 'votes', label: t.admin.counters.votes, value: votes },
+    { key: 'sessions', label: t.admin.counters.sessions, value: sessions },
+    { key: 'themes', label: t.admin.counters.themes, value: themes },
   ]
   return (
     <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -138,15 +141,15 @@ export function OverviewCounters({
   )
 }
 
-const TIER_LABEL: Record<GroupTier, string> = {
-  free: 'gratis',
-  pro: 'pro',
-  community: 'comunidade',
-  creator: 'criador',
-  over: 'excedido',
-}
-
 export function SeatIndicator({ group }: { group: GroupWithStats }) {
+  const t = useT()
+  const TIER_LABEL: Record<GroupTier, string> = {
+    free: t.admin.tiers.free,
+    pro: t.admin.tiers.pro,
+    community: t.admin.tiers.community,
+    creator: t.admin.tiers.creator,
+    over: t.admin.tiers.over,
+  }
   const { seat_count, seat_limit, tier, legacy_free } = group
   const pct = seat_limit ? Math.min(100, (seat_count / seat_limit) * 100) : 100
   const over = seat_limit != null && seat_count > seat_limit
@@ -156,18 +159,18 @@ export function SeatIndicator({ group }: { group: GroupWithStats }) {
     <section className="rounded-sm border border-up-line bg-up-panel/10 px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-baseline gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">vagas</span>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.admin.seats}</span>
           <span className="font-display text-lg tabular-nums text-up-text">{seat_count}</span>
           <span className="font-mono text-[11px] text-up-dim">/ {seat_limit ?? '∞'}</span>
         </div>
         <div className="flex items-center gap-2">
           {legacy_free && (
             <span className="rounded-sm border border-up-green/40 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-green">
-              legado gratis
+              {t.admin.legacyFree}
             </span>
           )}
           <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">
-            tier: {TIER_LABEL[tier]}
+            {t.admin.tierLabel(TIER_LABEL[tier])}
           </span>
         </div>
       </div>
@@ -176,10 +179,10 @@ export function SeatIndicator({ group }: { group: GroupWithStats }) {
       </div>
       <p className="mt-1.5 font-mono text-[10px] text-up-dim">
         {over
-          ? 'acima do limite do tier atual'
+          ? t.admin.overLimit
           : seat_limit == null
-            ? 'sem limite de seats'
-            : `${seat_limit - seat_count} seats livres no tier ${TIER_LABEL[tier]}`}
+            ? t.admin.noSeatLimit
+            : t.admin.seatsAvailable(seat_limit - seat_count, TIER_LABEL[tier])}
       </p>
     </section>
   )

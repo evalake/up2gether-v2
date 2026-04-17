@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useT } from '@/i18n'
 import type { GroupMember, GroupRole } from '@/features/groups/api'
 import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
@@ -22,10 +23,11 @@ type Props = {
 }
 
 export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpenProfile, onPromote, onDemote, onKick }: Props) {
+  const t = useT()
   return (
     <motion.section {...fadeUp} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-3">
       <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-dim">
-        tripulacao <span className="tabular-nums text-up-orange">{members?.length ?? 0}</span>
+        {t.groupDetail.crew(members?.length ?? 0)}
       </div>
       {isLoading && <Loading />}
       {error && <ErrorBox error={error} />}
@@ -47,7 +49,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                 type="button"
                 onClick={() => onOpenProfile(m.user_id)}
                 className="shrink-0 rounded-full transition-transform hover:scale-105"
-                title="ver perfil"
+                title={t.groupDetail.viewProfile}
               >
                 <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
               </button>
@@ -58,7 +60,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
               >
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm text-up-text transition-colors hover:text-up-orange">{name}</span>
-                  {isMe && <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">você</span>}
+                  {isMe && <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">{t.groupDetail.you}</span>}
                 </div>
                 <div className={`font-mono text-[10px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
               </button>
@@ -68,7 +70,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                     <button
                       onClick={() => onPromote(m.user_id, m.role === 'mod' ? 'admin' : 'mod')}
                       className="rounded px-1.5 py-0.5 font-mono text-[10px] text-up-dim transition-colors hover:bg-up-green/20 hover:text-up-green"
-                      title="promover"
+                      title={t.groupDetail.promote}
                     >
                       ↑
                     </button>
@@ -77,7 +79,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                     <button
                       onClick={() => onDemote(m.user_id)}
                       className="rounded px-1.5 py-0.5 font-mono text-[10px] text-up-dim transition-colors hover:bg-up-amber/20 hover:text-up-amber"
-                      title="rebaixar"
+                      title={t.groupDetail.demote}
                     >
                       ↓
                     </button>
@@ -85,7 +87,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                   <button
                     onClick={() => onKick(m.user_id, name)}
                     className="rounded px-1.5 py-0.5 font-mono text-[10px] text-up-dim transition-colors hover:bg-up-red/20 hover:text-up-red"
-                    title="remover"
+                    title={t.common.remove}
                   >
                     ×
                   </button>

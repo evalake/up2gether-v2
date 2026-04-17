@@ -22,6 +22,7 @@ import { useToast } from '@/components/ui/toast'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 import type { GameStage } from '@/features/games/api'
 import { useTitle } from '@/lib/useTitle'
+import { useT } from '@/i18n'
 import { CurrentGameHero } from './group-detail/CurrentGameHero'
 import { GroupHero } from './group-detail/GroupHero'
 import { CommandDeck } from './group-detail/CommandDeck'
@@ -46,6 +47,7 @@ export function GroupDetailPage() {
   const demote = useDemote(id)
   const kick = useKick(id)
   const toast = useToast()
+  const t = useT()
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
   const [confirmAction, setConfirmAction] = useState<{ title: string; body: string; onConfirm: () => void } | null>(null)
 
@@ -82,19 +84,19 @@ export function GroupDetailPage() {
 
   const onLeave = () => {
     if (isSoleAdmin) {
-      toast.error('voce e o unico admin. promova alguem ou delete o servidor.')
+      toast.error(t.groupDetail.onlyAdminToast)
       return
     }
     setConfirmAction({
-      title: 'sair do grupo',
-      body: `Sair de ${group.data!.name}? Voce perde acesso a biblioteca, votacoes e sessoes do grupo.`,
+      title: t.groupDetail.leaveTitle,
+      body: t.groupDetail.leaveBody(group.data!.name),
       onConfirm: async () => {
         try {
           await leave.mutateAsync(id)
-          toast.success('saiu do grupo')
+          toast.success(t.groupDetail.leftGroup)
           navigate('/groups')
         } catch (e) {
-          toast.error(e instanceof Error ? e.message : 'falha ao sair')
+          toast.error(e instanceof Error ? e.message : t.groupDetail.leaveFail)
         }
       },
     })
@@ -153,8 +155,8 @@ export function GroupDetailPage() {
         onDemote={(userId) => demote.mutate(userId)}
         onKick={(userId, name) => {
           setConfirmAction({
-            title: 'remover membro',
-            body: `Remover ${name} do grupo? Essa pessoa perde acesso imediatamente.`,
+            title: t.groupDetail.removeMemberTitle,
+            body: t.groupDetail.removeMemberBody(name),
             onConfirm: () => kick.mutate(userId),
           })
         }}
@@ -182,6 +184,7 @@ function ConfirmModal({ title, body, onConfirm, onCancel }: {
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const t = useT()
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel() }
     window.addEventListener('keydown', handler)
@@ -222,14 +225,14 @@ function ConfirmModal({ title, body, onConfirm, onCancel }: {
             onClick={onCancel}
             className="rounded-sm border border-up-line/60 bg-black/30 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-text/40 hover:text-up-text"
           >
-            cancelar
+            {t.common.cancel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/20"
           >
-            confirmar
+            {t.common.confirm}
           </button>
         </div>
       </motion.div>

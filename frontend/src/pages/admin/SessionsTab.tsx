@@ -4,8 +4,10 @@ import { useSessions, useDeleteSession } from '@/features/sessions/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
+import { useT } from '@/i18n'
 
 export function SessionsTab({ groupId }: { groupId: string }) {
+  const t = useT()
   const sessions = useSessions(groupId)
   const del = useDeleteSession(groupId)
   const games = useGames(groupId)
@@ -39,7 +41,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
   const deleteOne = async (sid: string) => {
     try {
       await del.mutateAsync(sid)
-      toast.success('sessão apagada')
+      toast.success(t.admin.sessionDeleted)
       setPendingDelete(null)
       setSelected((prev) => {
         const n = new Set(prev)
@@ -47,7 +49,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
         return n
       })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha')
+      toast.error(e instanceof Error ? e.message : t.common.fail)
     }
   }
 
@@ -65,8 +67,8 @@ export function SessionsTab({ groupId }: { groupId: string }) {
         }
       }),
     )
-    if (fail === 0) toast.success(`${ok} sessão${ok === 1 ? '' : 'ões'} apagada${ok === 1 ? '' : 's'}`)
-    else toast.error(`${ok} apagadas, ${fail} falharam`)
+    if (fail === 0) toast.success(t.admin.sessionsDeleted(ok, fail))
+    else toast.error(t.admin.sessionsDeleted(ok, fail))
     setSelected(new Set())
     setBulkConfirm(false)
   }
@@ -78,9 +80,9 @@ export function SessionsTab({ groupId }: { groupId: string }) {
     <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-dim">Sessões do grupo</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-dim">{t.admin.sessionsTitle}</div>
           <p className="mt-1 text-[11px] text-up-dim">
-            Passadas e futuras. Busca por título ou nome do jogo.
+            {t.admin.sessionsSubtitle}
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
@@ -90,31 +92,31 @@ export function SessionsTab({ groupId }: { groupId: string }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <input
-          aria-label="buscar sessão"
+          aria-label={t.admin.searchSession}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar sessão..."
+          placeholder={t.admin.searchSession}
           className="h-8 min-w-[180px] flex-1 rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         {filtered.length > 0 && (
           <button onClick={toggleAll} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">
-            {selected.size === filtered.length ? 'limpar' : 'tudo'}
+            {selected.size === filtered.length ? t.common.clear : t.common.all}
           </button>
         )}
         {selected.size > 0 && (
           <button onClick={() => setBulkConfirm(true)} className="rounded-sm border border-up-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10">
-            apagar {selected.size}
+            {t.admin.deleteN(selected.size)}
           </button>
         )}
       </div>
 
       {bulkConfirm && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
-          <p className="text-xs text-up-red">apagar {selected.size} sessão{selected.size === 1 ? '' : 'ões'}?</p>
+          <p className="text-xs text-up-red">{t.admin.deleteSessionConfirm(selected.size)}</p>
           <div className="flex shrink-0 gap-2">
-            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
+            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">{t.common.cancel}</button>
             <button onClick={deleteBulk} disabled={del.isPending} className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40">
-              sim, apagar
+              {t.common.confirm}
             </button>
           </div>
         </div>

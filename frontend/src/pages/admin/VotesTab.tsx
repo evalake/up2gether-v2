@@ -6,8 +6,10 @@ import { closeVote } from '@/features/votes/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
+import { useT } from '@/i18n'
 
 export function VotesTab({ groupId }: { groupId: string }) {
+  const t = useT()
   const votes = useVotes(groupId)
   const del = useDeleteVote(groupId)
   const toast = useToast()
@@ -44,7 +46,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
   const deleteOne = async (vid: string) => {
     try {
       await del.mutateAsync(vid)
-      toast.success('votação apagada')
+      toast.success(t.admin.voteDeleted)
       setPendingDelete(null)
       setSelected((prev) => {
         const n = new Set(prev)
@@ -52,7 +54,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
         return n
       })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha')
+      toast.error(e instanceof Error ? e.message : t.common.fail)
     }
   }
 
@@ -70,8 +72,8 @@ export function VotesTab({ groupId }: { groupId: string }) {
         }
       }),
     )
-    if (fail === 0) toast.success(`${ok} votação${ok === 1 ? '' : 'ões'} apagada${ok === 1 ? '' : 's'}`)
-    else toast.error(`${ok} apagadas, ${fail} falharam`)
+    if (fail === 0) toast.success(t.admin.votesDeleted(ok, fail))
+    else toast.error(t.admin.votesDeleted(ok, fail))
     setSelected(new Set())
     setBulkConfirm(false)
   }
@@ -81,9 +83,9 @@ export function VotesTab({ groupId }: { groupId: string }) {
       await closeVote(groupId, vid)
       qc.invalidateQueries({ queryKey: ['groups', groupId, 'votes'] })
       qc.invalidateQueries({ queryKey: ['groups', groupId, 'current-game', 'audit'] })
-      toast.success('votação encerrada')
+      toast.success(t.admin.voteClosed)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha')
+      toast.error(e instanceof Error ? e.message : t.common.fail)
     }
   }
 
@@ -94,9 +96,9 @@ export function VotesTab({ groupId }: { groupId: string }) {
     <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-dim">Votações do grupo</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-dim">{t.admin.votesTitle}</div>
           <p className="mt-1 text-[11px] text-up-dim">
-            Histórico completo. Apagar votação limpa stages e ballots via cascade.
+            {t.admin.votesSubtitle}
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
@@ -106,10 +108,10 @@ export function VotesTab({ groupId }: { groupId: string }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <input
-          aria-label="buscar votação"
+          aria-label={t.admin.searchVote}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar votação..."
+          placeholder={t.admin.searchVote}
           className="h-8 min-w-[180px] flex-1 rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         {filtered.length > 0 && (
@@ -117,7 +119,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
             onClick={toggleAll}
             className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text"
           >
-            {selected.size === filtered.length ? 'limpar' : 'tudo'}
+            {selected.size === filtered.length ? t.common.clear : t.common.all}
           </button>
         )}
         {selected.size > 0 && (
@@ -125,7 +127,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
             onClick={() => setBulkConfirm(true)}
             className="rounded-sm border border-up-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10"
           >
-            apagar {selected.size}
+            {t.admin.deleteN(selected.size)}
           </button>
         )}
       </div>
@@ -133,16 +135,16 @@ export function VotesTab({ groupId }: { groupId: string }) {
       {bulkConfirm && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
           <p className="text-xs text-up-red">
-            apagar {selected.size} votação{selected.size === 1 ? '' : 'ões'}? não dá pra desfazer.
+            {t.admin.deleteVoteConfirm(selected.size)}
           </p>
           <div className="flex shrink-0 gap-2">
-            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
+            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">{t.common.cancel}</button>
             <button
               onClick={deleteBulk}
               disabled={del.isPending}
               className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40"
             >
-              sim, apagar
+              {t.common.confirm}
             </button>
           </div>
         </div>
@@ -150,7 +152,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
 
       {filtered.length === 0 ? (
         <div className="mt-4 py-6 text-center text-[11px] text-up-dim">
-          {q ? `nenhuma votação pra "${q}"` : 'nenhuma votação ainda'}
+          {q ? t.admin.noVotesFor(q) : t.admin.noVotesYet}
         </div>
       ) : (
         <div className="mt-4 divide-y divide-up-line/30">
@@ -175,7 +177,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
                   </div>
                   <div className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">
                     {v.candidate_game_ids.length} cand · {v.ballots_count}/{v.eligible_voter_count} votos
-                    {winner && <span className="text-up-orange"> · vencedor: {winner}</span>}
+                    {winner && <span className="text-up-orange"> · {t.admin.winnerPrefix}: {winner}</span>}
                   </div>
                 </div>
                 {v.status === 'open' && !confirming && (
@@ -183,20 +185,20 @@ export function VotesTab({ groupId }: { groupId: string }) {
                     onClick={() => forceClose(v.id)}
                     className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-amber/60 hover:text-up-amber"
                   >
-                    encerrar
+                    {t.votes.closeLabel}
                   </button>
                 )}
                 {confirming ? (
                   <div className="flex shrink-0 gap-1">
-                    <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim">cancelar</button>
-                    <button onClick={() => deleteOne(v.id)} className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red">confirmar</button>
+                    <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim">{t.common.cancel}</button>
+                    <button onClick={() => deleteOne(v.id)} className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red">{t.common.confirm}</button>
                   </div>
                 ) : (
                   <button
                     onClick={() => setPendingDelete(v.id)}
                     className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red"
                   >
-                    apagar
+                    {t.common.delete}
                   </button>
                 )}
               </div>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 import {
   useCancelCycle,
   useCastVote,
@@ -27,6 +29,8 @@ import { useTitle } from '@/lib/useTitle'
 import { TiebreakOverlay } from './themes/TiebreakOverlay'
 
 export function ThemesPage() {
+  const t = useT()
+  const locale = useLocaleStore(s => s.locale)
   useTitle('tema do mes')
   const { id = '' } = useParams()
   const me = useMe()
@@ -77,19 +81,19 @@ export function ThemesPage() {
   const decided = cycle.data?.phase === 'decided'
   const hasActive = cycle.data && cycle.data.phase !== 'cancelled' && cycle.data.phase !== 'decided'
 
-  const monthLabel = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  const monthLabel = new Date().toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US', { month: 'long', year: 'numeric' })
 
   const onOpenCycle = async () => {
-    try { await openC.mutateAsync(); toast.success(decided ? 'ciclo reaberto' : 'ciclo aberto') }
-    catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
+    try { await openC.mutateAsync(); toast.success(decided ? t.themes.cycleReopened : t.themes.cycleOpened) }
+    catch (e) { toast.error(e instanceof Error ? e.message : t.common.fail) }
   }
 
   return (
     <div className="space-y-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-up-text">tema do mês</h1>
-          <p className="mt-1 text-xs text-up-dim">um foco coletivo · qualquer um sugere, edita, vota e encerra</p>
+          <h1 className="font-display text-3xl text-up-text">{t.themes.title}</h1>
+          <p className="mt-1 text-xs text-up-dim">{t.themes.subtitle}</p>
         </div>
         {!hasActive && ((cycle.data ? isAdmin : isStaff)) && (
           <button
@@ -97,7 +101,7 @@ export function ThemesPage() {
             disabled={openC.isPending}
             className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:opacity-40"
           >
-            {openC.isPending ? 'abrindo...' : decided ? 'reabrir ciclo' : 'abrir ciclo do mês'}
+            {openC.isPending ? t.themes.opening : decided ? t.themes.reopenCycle : t.themes.openCycle}
           </button>
         )}
       </header>
@@ -122,32 +126,32 @@ export function ThemesPage() {
           onSubmitSuggestion={async (input) => {
             try {
               await upsert.mutateAsync({ cycleId: cycle.data!.id, input })
-              toast.success('sugestão salva')
+              toast.success(t.themes.suggestionSaved)
             } catch (e) {
-              toast.error(e instanceof Error ? e.message : 'falha')
+              toast.error(e instanceof Error ? e.message : t.common.fail)
             }
           }}
           onDeleteAny={async (sid) => {
-            if (!confirm('remover esta sugestão?')) return
-            try { await delSugById.mutateAsync({ cycleId: cycle.data!.id, suggestionId: sid }); toast.success('removida') }
-            catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
+            if (!confirm(t.themes.removeConfirm)) return
+            try { await delSugById.mutateAsync({ cycleId: cycle.data!.id, suggestionId: sid }); toast.success(t.themes.removed) }
+            catch (e) { toast.error(e instanceof Error ? e.message : t.common.fail) }
           }}
           onVote={async (suggestionId) => {
             try { await vote.mutateAsync({ cycleId: cycle.data!.id, suggestionId }) }
-            catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
+            catch (e) { toast.error(e instanceof Error ? e.message : t.common.fail) }
           }}
           onClose={async () => {
             try { await closeC.mutateAsync(cycle.data!.id) }
-            catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
+            catch (e) { toast.error(e instanceof Error ? e.message : t.common.fail) }
           }}
           onForce={async (suggestionId) => {
-            try { await force.mutateAsync({ cycleId: cycle.data!.id, suggestionId }); toast.success('decidido') }
-            catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
+            try { await force.mutateAsync({ cycleId: cycle.data!.id, suggestionId }); toast.success(t.themes.decided) }
+            catch (e) { toast.error(e instanceof Error ? e.message : t.common.fail) }
           }}
           onCancel={async () => {
-            if (!confirm('cancelar este ciclo? todas as sugestões serão descartadas.')) return
-            try { await cancelC.mutateAsync(cycle.data!.id); toast.success('cancelado') }
-            catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
+            if (!confirm(t.themes.cancelCycleConfirm)) return
+            try { await cancelC.mutateAsync(cycle.data!.id); toast.success(t.themes.canceled) }
+            catch (e) { toast.error(e instanceof Error ? e.message : t.common.fail) }
           }}
         />
       )}

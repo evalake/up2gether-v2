@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { steamCover } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
+import { useT } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 
 const TIME_PRESETS = [19, 20, 21, 22]
 const DURATION_PRESETS: { label: string; value: number }[] = [
@@ -43,7 +45,7 @@ function Stepper({
       <button
         type="button"
         onClick={onDec}
-        aria-label={`diminuir ${ariaLabel}`}
+        aria-label={ariaLabel}
         className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-up-line/50 text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
       >
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -65,7 +67,7 @@ function Stepper({
       <button
         type="button"
         onClick={onInc}
-        aria-label={`aumentar ${ariaLabel}`}
+        aria-label={ariaLabel}
         className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-up-line/50 text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
       >
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -101,6 +103,8 @@ export function SessionDraftModal({
   onSave: () => void
   isPending: boolean
 }) {
+  const t = useT()
+  const locale = useLocaleStore(s => s.locale)
   const [query, setQuery] = useState('')
   const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
   const q = norm(query.trim())
@@ -111,7 +115,7 @@ export function SessionDraftModal({
   const selected = games.find((g) => g.id === gameId) ?? null
   const selectedCover = selected ? steamCover(selected) : null
   const end = new Date(start.getTime() + duration * 60_000)
-  const hour = (d: Date) => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  const hour = (d: Date) => d.toLocaleTimeString(locale === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
   const hh = start.getHours()
   const mm = start.getMinutes()
 
@@ -150,7 +154,7 @@ export function SessionDraftModal({
     return () => { document.body.style.overflow = prev }
   }, [])
 
-  const dayLabel = start.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '')
+  const dayLabel = start.toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US', { weekday: 'short', day: '2-digit', month: 'short' }).replace('.', '')
 
   return createPortal(
     <motion.div
@@ -173,7 +177,7 @@ export function SessionDraftModal({
       >
         <button
           onClick={onCancel}
-          aria-label="fechar"
+          aria-label={t.common.close}
           className="absolute right-2.5 top-2.5 z-10 grid h-6 w-6 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -205,7 +209,7 @@ export function SessionDraftModal({
           <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/85 to-up-panel/30" />
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-4 pb-2 pt-1">
             <div className="min-w-0">
-              <div className="font-mono text-[10px] uppercase tracking-wider text-up-orange">agendar</div>
+              <div className="font-mono text-[10px] uppercase tracking-wider text-up-orange">{t.sessions.schedule}</div>
               <div className="truncate font-display text-sm capitalize text-up-text">{dayLabel}</div>
             </div>
             <div className="font-mono text-[10px] tabular-nums text-up-orange">
@@ -217,19 +221,19 @@ export function SessionDraftModal({
         <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
           <section>
             <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
-              <span>jogo</span>
+              <span>{t.sessions.gameLabel}</span>
               {selected && <span className="truncate text-up-orange">{selected.name}</span>}
             </div>
             <input
-              aria-label="buscar jogo"
+              aria-label={t.sessions.searchGame}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="buscar jogo..."
+              placeholder={t.sessions.searchGamePlaceholder}
               className="h-8 w-full rounded-sm border border-up-line bg-black/30 px-2.5 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
             />
             <div className="mt-1.5 max-h-32 overflow-y-auto rounded-sm border border-up-line/50 bg-black/20">
               {filtered.length === 0 ? (
-                <div className="py-4 text-center text-[11px] text-up-dim">nenhum jogo pra "{query}"</div>
+                <div className="py-4 text-center text-[11px] text-up-dim">{t.common.noResults(query)}</div>
               ) : (
                 <div className="grid gap-1 p-1.5 sm:grid-cols-2">
                   {filtered.map((g) => {
@@ -261,11 +265,11 @@ export function SessionDraftModal({
           </section>
 
           <section>
-            <div className="mb-1 text-[10px] uppercase tracking-wider text-up-dim">título <span className="text-up-dim">(opcional)</span></div>
+            <div className="mb-1 text-[10px] uppercase tracking-wider text-up-dim">{t.sessions.titleLabel} <span className="text-up-dim">{t.sessions.titleOptional}</span></div>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
+              placeholder={selected?.name ?? t.sessions.titlePlaceholder}
               className="h-8 w-full rounded-sm border border-up-line bg-black/30 px-2.5 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
             />
           </section>
@@ -273,7 +277,7 @@ export function SessionDraftModal({
           <div className="grid grid-cols-2 gap-3">
             <section>
               <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
-                <span>horário</span>
+                <span>{t.sessions.timeLabel}</span>
               </div>
               <div className="flex items-center justify-center gap-1">
                 <Stepper
@@ -315,7 +319,7 @@ export function SessionDraftModal({
 
             <section>
               <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
-                <span>duração</span>
+                <span>{t.sessions.durationLabel}</span>
               </div>
               <div className="flex items-center justify-center">
                 <Stepper
@@ -354,7 +358,7 @@ export function SessionDraftModal({
             onClick={onCancel}
             className="rounded-sm border border-up-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text"
           >
-            cancelar
+            {t.common.cancel}
           </button>
           <motion.button
             whileTap={{ scale: 0.96 }}
@@ -362,7 +366,7 @@ export function SessionDraftModal({
             disabled={!gameId || isPending}
             className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:opacity-40"
           >
-            {isPending ? 'salvando...' : 'agendar'}
+            {isPending ? t.sessions.savingDraft : t.sessions.schedule}
           </motion.button>
         </div>
       </motion.div>

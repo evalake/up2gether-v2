@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import type { UseMutationResult } from '@tanstack/react-query'
 import type { Game, GameUpdateInput, HardwareTier } from '@/features/games/api'
+import { useT } from '@/i18n'
 import { useToast } from '@/components/ui/toast'
 import { Textarea } from '@/components/ui/Textarea'
 import { TIERS } from '@/lib/constants'
@@ -43,6 +44,7 @@ export function GameEditForm({
   update: UseMutationResult<Game, Error, GameUpdateInput>
   onClose: () => void
 }) {
+  const t = useT()
   const toast = useToast()
   const [edit, setEdit] = useState<EditState>(() => initialEdit(game))
 
@@ -72,9 +74,9 @@ export function GameEditForm({
         min_hardware_tier: edit.min_hardware_tier,
       })
       onClose()
-      toast.success('jogo atualizado')
+      toast.success(t.games.gameUpdated)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao salvar')
+      toast.error(e instanceof Error ? e.message : t.games.saveFail)
     }
   }
 
@@ -96,15 +98,15 @@ export function GameEditForm({
         className="relative w-full max-w-lg overflow-y-auto rounded-lg border border-up-orange/25 bg-up-panel shadow-2xl shadow-black/40 max-h-[calc(100vh-4rem)]"
         role="dialog"
         aria-modal="true"
-        aria-label="editar jogo"
+        aria-label={t.games.editGame}
       >
         {/* header */}
         <div className="flex items-center justify-between border-b border-up-orange/15 px-6 py-4">
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">editar jogo</div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">{t.games.editGame}</div>
           <button
             onClick={onClose}
             className="grid h-7 w-7 place-items-center rounded-sm text-up-dim transition-colors hover:bg-up-line/30 hover:text-up-text"
-            aria-label="fechar"
+            aria-label={t.common.close}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -114,17 +116,17 @@ export function GameEditForm({
 
         <div className="space-y-4 p-6">
           {/* identidade */}
-          <Field label="nome">
+          <Field label={t.games.namePlaceholder}>
             <input
               value={edit.name}
               maxLength={150}
               onChange={(e) => setEdit({ ...edit, name: e.target.value })}
-              placeholder="nome do jogo"
+              placeholder={t.games.namePlaceholder}
               className={inputCls}
             />
           </Field>
 
-          <Field label="capa">
+          <Field label={t.games.coverUrl}>
             <div className="flex items-center gap-3">
               {edit.cover_url && (
                 <img
@@ -139,19 +141,19 @@ export function GameEditForm({
                 value={edit.cover_url}
                 maxLength={500}
                 onChange={(e) => setEdit({ ...edit, cover_url: e.target.value })}
-                placeholder="url da imagem"
+                placeholder={t.games.coverUrlPlaceholder}
                 className={`${inputCls} flex-1`}
               />
             </div>
           </Field>
 
-          <Field label="descricao">
+          <Field label={t.games.description}>
             <Textarea
               value={edit.description}
               maxLength={2000}
               onChange={(e) => setEdit({ ...edit, description: e.target.value })}
               rows={3}
-              placeholder="sobre o jogo"
+              placeholder={t.games.description}
               spellCheck={false}
               className="w-full resize-none rounded-sm border border-up-line bg-black/30 px-3 py-2 text-sm text-up-text transition-colors placeholder:text-up-dim focus-visible:border-up-orange focus-visible:outline-none"
             />
@@ -159,7 +161,7 @@ export function GameEditForm({
 
           {/* metricas */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="preco">
+            <Field label={t.games.price}>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -172,7 +174,7 @@ export function GameEditForm({
                     const v = e.target.value
                     if (v === '' || /^\d+(\.\d{0,2})?$/.test(v)) setEdit({ ...edit, price_current: v })
                   }}
-                  placeholder="R$"
+                  placeholder={t.games.pricePlaceholder}
                   className={`${inputCls} w-28 tabular-nums disabled:opacity-40`}
                 />
                 <button
@@ -182,12 +184,12 @@ export function GameEditForm({
                     edit.is_free ? 'border-up-green/60 bg-up-green/10 text-up-green' : 'border-up-line text-up-dim hover:border-up-green hover:text-up-green'
                   }`}
                 >
-                  {edit.is_free ? 'gratis' : 'gratis?'}
+                  {edit.is_free ? t.games.freeLabel : t.games.freeQ}
                 </button>
               </div>
             </Field>
 
-            <Field label="jogadores">
+            <Field label={t.games.players}>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -202,14 +204,14 @@ export function GameEditForm({
                   min="1"
                   value={edit.player_max ?? ''}
                   onChange={(e) => setEdit({ ...edit, player_max: e.target.value ? Number(e.target.value) : null })}
-                  placeholder="max"
+                  placeholder={t.games.maxPlayers}
                   className={`${inputCls} w-16 px-2 text-center tabular-nums`}
                 />
               </div>
             </Field>
           </div>
 
-          <Field label="hardware minimo">
+          <Field label={t.games.hardware}>
             <div className="flex gap-1.5">
               {TIERS.map((t) => (
                 <button
@@ -234,14 +236,14 @@ export function GameEditForm({
               onClick={onClose}
               className="rounded-sm border border-up-line px-4 py-2 text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-text hover:text-up-text"
             >
-              cancelar
+              {t.common.cancel}
             </button>
             <button
               onClick={save}
               disabled={update.isPending || !edit.name}
               className="rounded-sm border border-up-orange/60 bg-up-orange/10 px-4 py-2 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/20 disabled:opacity-40"
             >
-              {update.isPending ? 'salvando...' : 'salvar'}
+              {update.isPending ? t.common.saving : t.common.save}
             </button>
           </div>
         </div>

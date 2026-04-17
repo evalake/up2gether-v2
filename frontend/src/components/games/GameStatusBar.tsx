@@ -1,5 +1,6 @@
-import { SIGNALS } from '@/lib/constants'
 import type { Game } from '@/features/games/api'
+import { useSignals } from '@/i18n'
+import { useT } from '@/i18n'
 
 export function GameStatusBar({
   game,
@@ -14,13 +15,15 @@ export function GameStatusBar({
   setInterestPending: boolean
   toggleOwnPending: boolean
 }) {
+  const t = useT()
+  const signals = useSignals()
   return (
     <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 px-4 py-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* interesse */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-wider text-up-dim">seu interesse</span>
-          {SIGNALS.map((s) => (
+          <span className="text-[10px] uppercase tracking-wider text-up-dim">{t.games.yourInterest}</span>
+          {signals.map((s) => (
             <button
               key={s.value}
               disabled={setInterestPending}
@@ -39,7 +42,7 @@ export function GameStatusBar({
 
         {/* biblioteca */}
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-wider text-up-dim">biblioteca</span>
+          <span className="text-[10px] uppercase tracking-wider text-up-dim">{t.games.library}</span>
           <button
             disabled={toggleOwnPending}
             aria-pressed={game.user_owns_game}
@@ -50,7 +53,7 @@ export function GameStatusBar({
                 : 'border-up-line text-up-dim hover:border-up-green hover:text-up-green'
             }`}
           >
-            {game.user_owns_game ? 'tenho' : 'nao tenho'}
+            {game.user_owns_game ? t.games.haveIt : t.games.dontHaveIt}
           </button>
         </div>
       </div>

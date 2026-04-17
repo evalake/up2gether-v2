@@ -1,17 +1,12 @@
 import { motion } from 'framer-motion'
-import type { Game, GameStage } from '@/features/games/api'
+import { useT } from '@/i18n'
+import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
 import type { VoteSession } from '@/features/votes/api'
 import type { Theme } from '@/features/themes/api'
 import { DeckTile } from './DeckTile'
 
-const STAGE_LABEL: Record<GameStage, string> = {
-  exploring: 'explorando',
-  campaign: 'em campanha',
-  endgame: 'fim de jogo',
-  paused: 'pausados',
-  abandoned: 'largados',
-}
+// stage labels resolved at render time via t.stageLabels
 
 function formatCountdown(target: Date, now: Date): string {
   const ms = target.getTime() - now.getTime()
@@ -37,15 +32,16 @@ type Props = {
 }
 
 export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme, activeVote, topGame, onNavigate }: Props) {
+  const t = useT()
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <DeckTile
         i={0}
         tone="orange"
-        label="próxima sessão"
+        label={t.commandDeck.nextSession}
         empty={!nextSession}
-        emptyMsg="Nenhuma sessao agendada ainda"
-        emptyCta="agendar sessao"
+        emptyMsg={t.commandDeck.noSession}
+        emptyCta={t.commandDeck.scheduleSession}
         onClick={() => onNavigate(`/groups/${groupId}/sessions`)}
         cover={nextSessionGame?.cover_url ?? null}
       >
@@ -59,11 +55,11 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
               <div className="font-display text-xl text-up-text tabular-nums">
                 {formatCountdown(new Date(nextSession.start_at), now)}
               </div>
-              <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">ate o drop</div>
+              <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.commandDeck.untilDrop}</div>
             </div>
             <div className="mt-2 flex gap-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              <span><span className="text-up-green tabular-nums">{nextSession.rsvp_yes}</span> vão</span>
-              <span><span className="text-up-amber tabular-nums">{nextSession.rsvp_maybe}</span> talvez</span>
+              <span><span className="text-up-green tabular-nums">{nextSession.rsvp_yes}</span> {t.commandDeck.going}</span>
+              <span><span className="text-up-amber tabular-nums">{nextSession.rsvp_maybe}</span> {t.commandDeck.maybe}</span>
             </div>
           </>
         )}
@@ -72,10 +68,10 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
       <DeckTile
         i={1}
         tone="magenta"
-        label="tema do mês"
+        label={t.commandDeck.themeOfMonth}
         empty={!theme}
-        emptyMsg="Sem tema definido para este mes"
-        emptyCta="escolher tema"
+        emptyMsg={t.commandDeck.noTheme}
+        emptyCta={t.commandDeck.chooseTheme}
         onClick={() => onNavigate(`/groups/${groupId}/themes`)}
         cover={theme?.image_url ?? null}
       >
@@ -95,10 +91,10 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
       <DeckTile
         i={2}
         tone="amber"
-        label={activeVote ? 'votação ativa' : 'top viabilidade'}
+        label={activeVote ? t.commandDeck.activeVote : t.commandDeck.topViability}
         empty={!activeVote && !topGame}
-        emptyMsg="Adicione jogos para ver destaques"
-        emptyCta="explorar biblioteca"
+        emptyMsg={t.commandDeck.addGamesForHighlights}
+        emptyCta={t.commandDeck.exploreLibrary}
         onClick={() => onNavigate(activeVote ? `/groups/${groupId}/votes` : topGame ? `/groups/${groupId}/games/${topGame.id}` : `/groups/${groupId}/games`)}
         cover={activeVote ? null : topGame?.cover_url ?? null}
       >
@@ -106,7 +102,7 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
           <>
             <div className="line-clamp-2 font-display text-lg leading-tight text-up-amber">{activeVote.title}</div>
             <div className="mt-2 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              {activeVote.ballots_count}/{activeVote.eligible_voter_count} votos · quorum {activeVote.quorum_count}
+              {t.commandDeck.votesQuorum(activeVote.ballots_count, activeVote.eligible_voter_count, activeVote.quorum_count)}
             </div>
             <div className="mt-2 h-1 overflow-hidden rounded-full bg-up-line/30">
               <motion.div
@@ -123,7 +119,7 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
           <>
             <div className="line-clamp-2 font-display text-lg leading-tight text-up-amber">{topGame.name}</div>
             <div className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              {STAGE_LABEL[topGame.stage]} · {topGame.viability.interest_want_count} querem
+              {t.stageLabels[topGame.stage]} · {t.commandDeck.want(topGame.viability.interest_want_count)}
             </div>
             <div className="mt-2 flex items-center gap-3">
               <div className="font-display text-2xl tabular-nums text-up-amber">

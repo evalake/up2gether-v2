@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { steamCover } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
+import { useT } from '@/i18n'
 
 type VoteRow = {
   id: string
@@ -29,6 +30,7 @@ export function VoteCard({
   onClose: () => void
   onAudit: () => void
 }) {
+  const t = useT()
   const tallies = v.tallies ?? {}
   const totalVotes = Object.values(tallies).reduce((a, b) => a + b, 0)
   const maxCount = Math.max(...Object.values(tallies), 0)
@@ -65,11 +67,11 @@ export function VoteCard({
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-sm border border-up-magenta/40 bg-up-magenta/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-magenta">
               {v.total_stages && v.total_stages > 1 && v.current_stage_number
-                ? `fase ${v.current_stage_number}/${v.total_stages}`
-                : 'aberta'}
+                ? t.votes.phase(v.current_stage_number, v.total_stages)
+                : t.votes.open}
             </span>
             <span className="text-[10px] uppercase tracking-wider text-up-dim">
-              até {maxSel} {maxSel === 1 ? 'escolha' : 'escolhas'}
+              {t.votes.upTo(maxSel)}
             </span>
             {timeLeft && (
               <span className="text-[10px] uppercase tracking-wider text-up-dim">
@@ -82,7 +84,7 @@ export function VoteCard({
                 animate={{ scale: 1, opacity: 1 }}
                 className="rounded-sm border border-up-green/50 bg-up-green/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green"
               >
-                votou
+                {t.votes.voted}
               </motion.span>
             )}
           </div>
@@ -91,7 +93,7 @@ export function VoteCard({
         <div className="flex gap-2">
           <button
             onClick={onAudit}
-            title="ver detalhes da votação"
+            title={t.votes.viewDetails}
             className="inline-flex items-center gap-1.5 rounded-sm border border-up-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -101,21 +103,21 @@ export function VoteCard({
               <line x1="16" y1="17" x2="8" y2="17" />
               <polyline points="10 9 9 9 8 9" />
             </svg>
-            auditar
+            {t.votes.audit}
           </button>
           <button
             onClick={onClose}
-            title="encerrar votação manualmente"
+            title={t.votes.closeVote}
             className="rounded-sm border border-up-red/40 bg-up-red/5 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-red transition-colors hover:border-up-red hover:bg-up-red/10"
           >
-            encerrar
+            {t.votes.closeLabel}
           </button>
         </div>
       </div>
 
       {/* participation strip */}
       <div className="flex items-center gap-3 text-[10px] uppercase tracking-wider text-up-dim">
-        <span><span className="tabular-nums text-up-text">{v.ballots_count}</span>/<span className="tabular-nums">{v.eligible_voter_count}</span> votaram</span>
+        <span><span className="tabular-nums text-up-text">{v.ballots_count}</span>/<span className="tabular-nums">{v.eligible_voter_count}</span> {t.votes.votersCount}</span>
         <div className="h-1 max-w-[160px] flex-1 overflow-hidden rounded-full bg-up-line/30">
           <motion.div
             initial={{ width: 0 }}
@@ -125,7 +127,7 @@ export function VoteCard({
           />
         </div>
         <span className={quorumPct >= 100 ? 'text-up-green' : 'text-up-amber'}>
-          {quorumPct >= 100 ? 'quorum ok' : `quorum ${v.ballots_count}/${v.quorum_count}`}
+          {quorumPct >= 100 ? t.votes.quorumOk : t.votes.quorum(v.ballots_count, v.quorum_count)}
         </span>
       </div>
 
@@ -165,10 +167,10 @@ export function VoteCard({
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm text-up-text">{g?.name ?? gid}</span>
                   {leading && !youPicked && (
-                    <span className="shrink-0 rounded-sm bg-up-orange/90 px-1 text-[10px] uppercase tracking-wider text-black">top</span>
+                    <span className="shrink-0 rounded-sm bg-up-orange/90 px-1 text-[10px] uppercase tracking-wider text-black">{t.votes.top}</span>
                   )}
                   {youPicked && (
-                    <span className="shrink-0 rounded-sm bg-up-magenta/20 px-1 text-[10px] uppercase tracking-wider text-up-magenta">seu</span>
+                    <span className="shrink-0 rounded-sm bg-up-magenta/20 px-1 text-[10px] uppercase tracking-wider text-up-magenta">{t.votes.yours}</span>
                   )}
                 </div>
                 <div className="mt-1.5 flex items-center gap-2">
@@ -197,12 +199,12 @@ export function VoteCard({
 
       {!youVoted && (
         <p className="text-[10px] uppercase tracking-wider text-up-dim">
-          toque nos jogos pra votar · escolha até {maxSel} · dá pra mudar a qualquer hora
+          {t.votes.tapToVote(maxSel)}
         </p>
       )}
       {youVoted && v.your_approvals.length < maxSel && (
         <p className="text-[10px] uppercase tracking-wider text-up-dim">
-          selecionados: {v.your_approvals.length} de {maxSel}
+          {t.votes.selected(v.your_approvals.length, maxSel)}
         </p>
       )}
 
@@ -221,7 +223,7 @@ export function VoteCard({
         return (
           <details className="group rounded-sm border border-up-line bg-up-panel/20 p-2">
             <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">
-              eliminados nas fases anteriores ({eliminated.length})
+              {t.votes.eliminatedPrevious(eliminated.length)}
             </summary>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {eliminated.map((gid) => {
@@ -244,6 +246,7 @@ export function VoteCard({
 }
 
 export function LastClosedPreview({ vote, game, onAudit }: { vote: VoteRow; game: Game | null; onAudit: () => void }) {
+  const t = useT()
   const cover = game ? steamCover(game) : null
   return (
     <button
@@ -252,7 +255,7 @@ export function LastClosedPreview({ vote, game, onAudit }: { vote: VoteRow; game
       className="group w-full rounded-sm border border-up-line/60 bg-up-panel/20 p-4 text-left transition-[colors,box-shadow] duration-200 hover:border-up-orange hover:shadow-[0_0_24px_rgba(255,102,0,0.1)]"
     >
       <div className="flex items-center justify-between">
-        <div className="text-[10px] uppercase tracking-wider text-up-dim">última votação encerrada</div>
+        <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.votes.lastClosed}</div>
         <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-up-dim transition-colors group-hover:text-up-orange">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -261,7 +264,7 @@ export function LastClosedPreview({ vote, game, onAudit }: { vote: VoteRow; game
             <line x1="16" y1="17" x2="8" y2="17" />
             <polyline points="10 9 9 9 8 9" />
           </svg>
-          auditar
+          {t.votes.audit}
         </span>
       </div>
       <div className="mt-3 flex items-center gap-4">
@@ -281,11 +284,11 @@ export function LastClosedPreview({ vote, game, onAudit }: { vote: VoteRow; game
           {game ? (
             <div className="mt-1 truncate text-base text-up-orange">{game.name}</div>
           ) : (
-            <div className="mt-1 text-xs text-up-dim">sem vencedor</div>
+            <div className="mt-1 text-xs text-up-dim">{t.votes.noWinner}</div>
           )}
           <div className="mt-1 flex flex-wrap gap-x-3 text-[10px] uppercase tracking-wider text-up-dim">
-            <span><span className="tabular-nums text-up-text">{vote.ballots_count}</span>/{vote.eligible_voter_count} votaram</span>
-            <span>{vote.candidate_game_ids.length} candidatos</span>
+            <span><span className="tabular-nums text-up-text">{vote.ballots_count}</span>/{vote.eligible_voter_count} {t.votes.votersCount}</span>
+            <span>{vote.candidate_game_ids.length} {t.votes.candidates}</span>
           </div>
         </div>
       </div>

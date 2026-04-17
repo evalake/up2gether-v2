@@ -30,20 +30,22 @@ import { ConfigTab } from './admin/ConfigTab'
 import { DangerZone } from './admin/DangerZone'
 import { CurrentGameSection, OverviewCounters, SeatIndicator, type AdminTab } from './admin/OverviewTab'
 import { useTitle } from '@/lib/useTitle'
+import { useT } from '@/i18n'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
 
-const TABS: { key: AdminTab; label: string; ownerOnly?: boolean }[] = [
-  { key: 'overview', label: 'visao geral' },
-  { key: 'games', label: 'jogos' },
-  { key: 'votes', label: 'votacoes' },
-  { key: 'sessions', label: 'sessoes' },
-  { key: 'themes', label: 'temas' },
-  { key: 'members', label: 'membros' },
-  { key: 'config', label: 'config' },
-  { key: 'danger', label: 'perigo', ownerOnly: true },
-]
-
 export function GroupAdminPage() {
+  const t = useT()
+
+  const TABS: { key: AdminTab; label: string; ownerOnly?: boolean }[] = [
+    { key: 'overview', label: t.admin.tabs.overview },
+    { key: 'games', label: t.admin.tabs.games },
+    { key: 'votes', label: t.admin.tabs.votes },
+    { key: 'sessions', label: t.admin.tabs.sessions },
+    { key: 'themes', label: t.admin.tabs.themes },
+    { key: 'members', label: t.admin.tabs.members },
+    { key: 'config', label: t.admin.tabs.config },
+    { key: 'danger', label: t.admin.tabs.danger, ownerOnly: true },
+  ]
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const me = useMe()
@@ -77,10 +79,10 @@ export function GroupAdminPage() {
   if (!isAdmin) {
     return (
       <div className="space-y-4">
-        <h1 className="font-display text-2xl text-up-text">Painel do Admin</h1>
-        <p className="text-sm text-up-dim">Você não tem permissão pra acessar esse painel.</p>
+        <h1 className="font-display text-2xl text-up-text">{t.admin.panelTitle}</h1>
+        <p className="text-sm text-up-dim">{t.admin.noPermission}</p>
         <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">
-          ← voltar
+          {t.admin.backLabel}
         </Link>
       </div>
     )
@@ -89,19 +91,19 @@ export function GroupAdminPage() {
   const onReset = async () => {
     try {
       await purge.mutateAsync(id)
-      toast.success('dados do grupo resetados')
+      toast.success(t.admin.dataReset)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha')
+      toast.error(e instanceof Error ? e.message : t.common.fail)
     }
   }
 
   const onDelete = async () => {
     try {
       await del.mutateAsync(id)
-      toast.success('grupo excluido')
+      toast.success(t.admin.groupDeleted)
       navigate('/groups')
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha')
+      toast.error(e instanceof Error ? e.message : t.common.fail)
     }
   }
 
@@ -109,15 +111,15 @@ export function GroupAdminPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between gap-4">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-orange">Painel do Admin</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-orange">{t.admin.panelTitle}</div>
           <h1 className="mt-1 font-display text-3xl text-up-text">{group.data.name}</h1>
-          <p className="mt-1 text-xs text-up-dim">Controles avancados do servidor. So admin e sysadmin veem.</p>
+          <p className="mt-1 text-xs text-up-dim">{t.admin.panelSubtitle}</p>
         </div>
         <Link
           to={`/groups/${id}`}
           className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
         >
-          ← voltar
+          {t.admin.backLabel}
         </Link>
       </header>
 

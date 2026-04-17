@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { STAGE_VALUES } from '@/lib/constants'
+import { useStages, useT } from '@/i18n'
 
 const GENRE_LIMIT = 5
 
@@ -23,6 +24,8 @@ export function GameFilters({
   topGenres, totalShown, totalAll,
   onClear,
 }: Props) {
+  const t = useT()
+  const stages = useStages()
   const activeCount = stageFilter.size + genreFilter.size + (search ? 1 : 0)
   const hasActive = activeCount > 0
   return (
@@ -43,10 +46,10 @@ export function GameFilters({
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <input
-            aria-label="filtrar jogos na biblioteca"
+            aria-label={t.games.filterLibrary}
             value={search}
             onChange={(e) => onSearch(e.target.value)}
-            placeholder="filtrar na biblioteca..."
+            placeholder={t.games.filterPlaceholder}
             className="rounded-sm border border-up-line bg-black/40 py-1 pl-8 pr-3 text-xs placeholder:text-up-dim focus-visible:border-up-orange focus-visible:outline-none transition-colors"
           />
         </div>
@@ -62,7 +65,7 @@ export function GameFilters({
                   : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
               }`}
             >
-              {s}
+              {stages.find((st) => st.value === s)?.label ?? s}
             </button>
           )
         })}
@@ -71,7 +74,7 @@ export function GameFilters({
             onClick={onClear}
             className="rounded-sm border border-up-orange/40 bg-up-orange/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/15"
           >
-            limpar {activeCount > 1 ? `(${activeCount})` : ''}
+            {activeCount > 1 ? t.games.clearN(activeCount) : t.common.clear}
           </button>
         )}
         {totalShown < totalAll && (
@@ -88,13 +91,14 @@ export function GameFilters({
 }
 
 function GenreRow({ genres, genreFilter, toggleGenre }: { genres: string[]; genreFilter: Set<string>; toggleGenre: (g: string) => void }) {
+  const t = useT()
   const [expanded, setExpanded] = useState(false)
   const needsCollapse = genres.length > GENRE_LIMIT
   const visible = expanded || !needsCollapse ? genres : genres.slice(0, GENRE_LIMIT)
 
   return (
     <div className="flex flex-wrap items-center gap-1 pl-1">
-      <span className="mr-1 text-[10px] uppercase tracking-wider text-up-dim">generos</span>
+      <span className="mr-1 text-[10px] uppercase tracking-wider text-up-dim">{t.games.genres}</span>
       {visible.map((g) => {
         const active = genreFilter.has(g)
         return (
@@ -116,7 +120,7 @@ function GenreRow({ genres, genreFilter, toggleGenre }: { genres: string[]; genr
           onClick={() => setExpanded((v) => !v)}
           className="px-1 text-[10px] text-up-dim transition-colors hover:text-up-magenta"
         >
-          {expanded ? 'ver menos' : `+${genres.length - GENRE_LIMIT} mais`}
+          {expanded ? t.common.showLess : t.common.showMore(genres.length - GENRE_LIMIT)}
         </button>
       )}
     </div>

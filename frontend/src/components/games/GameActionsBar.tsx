@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import type { Game, GameUpdateInput } from '@/features/games/api'
 import { useArchiveGame } from '@/features/games/hooks'
 import { steamGetDetails, builtinGetDetails } from '@/features/steam/api'
+import { useT } from '@/i18n'
 import { useToast } from '@/components/ui/toast'
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
 }
 
 export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleEdit, update }: Props) {
+  const t = useT()
   const toast = useToast()
   const navigate = useNavigate()
   const archive = useArchiveGame(groupId)
@@ -30,7 +32,7 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
       : null
 
   const canRefresh = !!g.steam_appid || !!builtinSlug
-  const refreshLabel = g.steam_appid ? 'da steam' : builtinSlug ? 'do catálogo' : ''
+  const refreshLabel = g.steam_appid ? t.games.syncFromSteam : builtinSlug ? t.games.syncFromCatalog : ''
 
   const refresh = async () => {
     setRefreshing(true)
@@ -49,7 +51,7 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
           price_original: d.price_initial != null ? d.price_initial / 100 : g.price_original,
           discount_percent: d.discount_percent ?? g.discount_percent,
         })
-        toast.success('sincronizado com a steam')
+        toast.success(t.games.syncedSteam)
       } else if (builtinSlug) {
         const b = await builtinGetDetails(builtinSlug, g.name)
         await update.mutateAsync({
@@ -61,10 +63,10 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
           developer: b.developer ?? g.developer,
           release_date: b.release_date ?? g.release_date,
         })
-        toast.success('sincronizado com o catálogo')
+        toast.success(t.games.syncedCatalog)
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao sincronizar')
+      toast.error(e instanceof Error ? e.message : t.common.syncFail)
     } finally {
       setRefreshing(false)
     }
@@ -73,10 +75,10 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
   const remove = async () => {
     try {
       await archive.mutateAsync(g.id)
-      toast.success('jogo removido')
+      toast.success(t.games.gameRemoved)
       navigate(`/groups/${groupId}/games`)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao remover')
+      toast.error(e instanceof Error ? e.message : t.games.removeFail)
     }
   }
 
@@ -88,11 +90,11 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
             href={`https://store.steampowered.com/app/${g.steam_appid}`}
             target="_blank"
             rel="noopener noreferrer"
-            title="abrir na Steam"
+            title={t.games.openSteam}
             className="inline-flex items-center gap-1.5 rounded-sm border border-up-line/60 bg-black/30 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
           >
             <IconExternal />
-            steam
+            {t.games.steam}
           </a>
         )}
         {canManage && canRefresh && (
@@ -100,18 +102,18 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
             type="button"
             onClick={refresh}
             disabled={refreshing || update.isPending}
-            title={`sincronizar ${refreshLabel}`}
+            title={t.games.syncLabel(refreshLabel)}
             className="inline-flex items-center gap-1.5 rounded-sm border border-up-line/60 bg-black/30 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-orange hover:text-up-orange disabled:opacity-40"
           >
             <IconRefresh spinning={refreshing} />
-            {refreshing ? 'sincronizando...' : 'sincronizar'}
+            {refreshing ? t.common.syncing : t.common.sync}
           </button>
         )}
         {canManage && (
           <button
             type="button"
             onClick={onToggleEdit}
-            title={editing ? 'cancelar edição' : 'editar dados do jogo'}
+            title={editing ? t.games.cancelEdit : t.games.editGame}
             className={`inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
               editing
                 ? 'border-up-orange/60 bg-up-orange/10 text-up-orange'
@@ -119,14 +121,14 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
             }`}
           >
             <IconPencil />
-            {editing ? 'cancelar' : 'editar'}
+            {editing ? t.common.cancel : t.common.edit}
           </button>
         )}
         {canManage && (
           <button
             type="button"
             onClick={() => setConfirming(true)}
-            title="remover da biblioteca"
+            title={t.games.removeFromLibrary}
             className="inline-flex items-center gap-1 rounded-sm border border-transparent px-1.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-red/40 hover:text-up-red"
           >
             <IconTrash />
@@ -159,6 +161,7 @@ function ConfirmRemoveModal({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const t = useT()
   return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
@@ -178,13 +181,11 @@ function ConfirmRemoveModal({
         className="relative w-full max-w-md overflow-hidden rounded-lg border border-up-red/30 bg-up-panel shadow-[0_20px_80px_-20px_rgba(255,0,0,0.35)]"
       >
         <div className="border-b border-up-red/20 bg-up-red/5 px-5 py-4">
-          <div className="text-[10px] uppercase tracking-wider text-up-red">remover jogo</div>
-          <div className="mt-1 text-base text-up-text">Remover <span className="text-up-orange">{gameName}</span>?</div>
+          <div className="text-[10px] uppercase tracking-wider text-up-red">{t.games.removeGameTitle}</div>
+          <div className="mt-1 text-base text-up-text">{t.games.removeGameConfirm(gameName)}</div>
         </div>
         <div className="px-5 py-4 text-sm leading-relaxed text-up-dim">
-          O jogo some da biblioteca do grupo. Votações e sessões passadas
-          mantêm o registro, mas novos votos não podem mais incluir ele. Essa
-          ação não dá pra desfazer pelo app.
+          {t.games.removeGameHint}
         </div>
         <div className="flex items-center justify-end gap-2 border-t border-up-line bg-black/20 px-5 py-3">
           <button
@@ -193,7 +194,7 @@ function ConfirmRemoveModal({
             disabled={isPending}
             className="rounded-sm border border-up-line/60 bg-black/30 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-text/40 hover:text-up-text disabled:opacity-40"
           >
-            cancelar
+            {t.common.cancel}
           </button>
           <button
             type="button"
@@ -201,7 +202,7 @@ function ConfirmRemoveModal({
             disabled={isPending}
             className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/20 disabled:opacity-40"
           >
-            {isPending ? 'removendo...' : 'remover'}
+            {isPending ? t.common.removing : t.common.remove}
           </button>
         </div>
       </motion.div>

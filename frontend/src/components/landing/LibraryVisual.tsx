@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Cover } from './Cover'
 import { MOCK } from './mockGames'
+import { useT } from '@/i18n'
 
 // Matriz de compatibilidade: membros nas colunas, jogos nas linhas,
 // marcadores por celula (tem / quer / nao tem). Formato deliberadamente
@@ -36,6 +37,7 @@ function countOwns(r: Row) {
 }
 
 export function LibraryVisual() {
+  const t = useT()
   const [highlightRow, setHighlightRow] = useState<number | null>(null)
   const [tick, setTick] = useState(0)
 
@@ -56,10 +58,10 @@ export function LibraryVisual() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-up-green animate-pulse" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-up-dim">
-            Biblioteca cruzada · 6 membros
+            {t.landing.libraryCrossRef} · {t.landing.membersCount(6)}
           </span>
         </div>
-        <span className="font-mono text-[10px] text-up-green">312/340 sincronizados</span>
+        <span className="font-mono text-[10px] text-up-green">{t.landing.syncedCount(312, 340)}</span>
       </div>
 
       <div className="mb-2 grid grid-cols-[auto_auto_1fr_auto] items-center gap-x-3">
@@ -69,7 +71,7 @@ export function LibraryVisual() {
           {MEMBERS.map((m, i) => (
             <div
               key={i}
-              title={`membro ${i + 1}`}
+              title={t.landing.memberN(i + 1)}
               className={`grid h-5 w-5 place-items-center rounded-full border border-black/40 ${m.color} font-mono text-[9px] font-bold text-black/80`}
             >
               {m.initial}
@@ -77,7 +79,7 @@ export function LibraryVisual() {
           ))}
         </div>
         <div className="pl-2 text-right font-mono text-[9px] uppercase tracking-wider text-up-dim">
-          tem
+          {t.landing.has}
         </div>
       </div>
 
@@ -126,9 +128,9 @@ export function LibraryVisual() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-up-line/60 pt-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-        <LegendItem tone="has" label="tem" />
-        <LegendItem tone="want" label="quer" />
-        <LegendItem tone="none" label="sem" />
+        <LegendItem tone="has" label={t.landing.has} />
+        <LegendItem tone="want" label={t.landing.wants} />
+        <LegendItem tone="none" label={t.landing.none} />
       </div>
     </div>
   )

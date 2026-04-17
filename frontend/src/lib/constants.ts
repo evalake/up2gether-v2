@@ -1,18 +1,4 @@
-import type { GameStage, HardwareTier, InterestSignal } from '@/features/games/api'
-
-export const SIGNALS: { value: InterestSignal; label: string; color: string }[] = [
-  { value: 'want', label: 'quero', color: 'text-up-green border-up-green' },
-  { value: 'ok', label: 'topo', color: 'text-up-amber border-up-amber' },
-  { value: 'pass', label: 'passo', color: 'text-up-red border-up-red' },
-]
-
-export const STAGES: { value: GameStage; label: string }[] = [
-  { value: 'exploring', label: 'explorando' },
-  { value: 'campaign', label: 'campanha' },
-  { value: 'endgame', label: 'fim de jogo' },
-  { value: 'paused', label: 'pausado' },
-  { value: 'abandoned', label: 'abandonado' },
-]
+import type { HardwareTier } from '@/features/games/api'
 
 export const STAGE_COLOR: Record<string, string> = {
   exploring: 'text-up-amber',
@@ -30,7 +16,9 @@ export const STAGE_BORDER: Record<string, string> = {
   abandoned: 'border-up-red',
 }
 
-export const STAGE_VALUES = STAGES.map((s) => s.value)
+import type { GameStage } from '@/features/games/api'
+
+export const STAGE_VALUES: GameStage[] = ['exploring', 'campaign', 'endgame', 'paused', 'abandoned']
 
 export const TIERS: HardwareTier[] = ['low', 'mid', 'high', 'unknown']
 

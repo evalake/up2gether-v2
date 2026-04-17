@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { useT } from '@/i18n'
 
 type Step = {
   n: number
@@ -20,36 +21,37 @@ type Props = {
 
 export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount, hasTheme }: Props) {
   const navigate = useNavigate()
+  const t = useT()
   const steps: Step[] = [
     {
       n: 1,
-      title: 'monte o acervo',
-      hint: 'adicione os jogos que o grupo joga ou quer jogar. steam puxa metadata automático.',
-      cta: 'adicionar jogos',
+      title: t.firstSteps.buildLibrary,
+      hint: t.firstSteps.buildLibraryHint,
+      cta: t.firstSteps.addGames,
       path: `/groups/${groupId}/games`,
       done: gamesCount > 0,
     },
     {
       n: 2,
-      title: 'abra uma votação',
-      hint: 'com 2+ jogos o grupo pode votar pra decidir o próximo. engine estreita em stages.',
-      cta: 'nova votação',
+      title: t.firstSteps.openVote,
+      hint: t.firstSteps.openVoteHint,
+      cta: t.firstSteps.newVote,
       path: `/groups/${groupId}/votes`,
       done: votesCount > 0,
     },
     {
       n: 3,
-      title: 'agende a sessão',
-      hint: 'toque num horário livre no calendário. o grupo inteiro é notificado no discord.',
-      cta: 'ir pro calendário',
+      title: t.firstSteps.scheduleSession,
+      hint: t.firstSteps.scheduleSessionHint,
+      cta: t.firstSteps.goToCalendar,
       path: `/groups/${groupId}/sessions`,
       done: sessionsCount > 0,
     },
     {
       n: 4,
-      title: 'defina o tema do mês',
-      hint: 'opcional. ciclo mensal onde cada um sugere e o grupo vota no tema (ex: coop, indie).',
-      cta: 'ver tema',
+      title: t.firstSteps.setTheme,
+      hint: t.firstSteps.setThemeHint,
+      cta: t.firstSteps.viewTheme,
       path: `/groups/${groupId}/themes`,
       done: hasTheme,
     },
@@ -67,8 +69,8 @@ export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount
     >
       <div className="mb-4 flex items-baseline justify-between">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">primeiros passos</div>
-          <div className="mt-1 text-[12px] text-up-dim">conclua pra destravar o fluxo completo do grupo</div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">{t.firstSteps.title}</div>
+          <div className="mt-1 text-[12px] text-up-dim">{t.firstSteps.subtitle}</div>
         </div>
         <div className="font-mono text-[10px] tabular-nums text-up-dim">
           <span className="text-up-orange">{steps.filter((s) => s.done).length}</span>/{steps.length}

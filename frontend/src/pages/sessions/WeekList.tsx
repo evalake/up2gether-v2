@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
 import { steamCover } from '@/lib/steamCover'
+import { useT } from '@/i18n'
 
 const WEEKDAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
 
@@ -24,6 +25,7 @@ type Props = {
 }
 
 export function WeekList({ weekAnchor, sessions, games, now, onOpenSlot, onOpenDetail }: Props) {
+  const t = useT()
   const days = useMemo(() => {
     return WEEKDAYS.map((wd, i) => {
       const day = addDays(weekAnchor, i)
@@ -64,7 +66,7 @@ export function WeekList({ weekAnchor, sessions, games, now, onOpenSlot, onOpenD
                       : 'border-up-orange/25 text-up-dim hover:border-up-orange hover:text-up-orange'
                   }`}
                 >
-                  {isPastDay ? 'sem sessões' : '+ agendar'}
+                  {isPastDay ? t.sessions.noSessions : `+ ${t.sessions.schedule}`}
                 </button>
               ) : (
                 inDay.map((s) => {

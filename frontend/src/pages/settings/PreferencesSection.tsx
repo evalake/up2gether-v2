@@ -5,71 +5,8 @@ import { useToast } from '@/components/ui/toast'
 import { useMe } from '@/features/auth/hooks'
 import { useMySettings, usePatchSettings, useSetHardware } from '@/features/users/hooks'
 import type { HardwareTier } from '@/features/games/api'
+import { useT } from '@/i18n'
 import { SettingsCard } from './SettingsCard'
-
-const TZ_GROUPS: { region: string; zones: { id: string; label: string }[] }[] = [
-  {
-    region: 'Brasil',
-    zones: [
-      { id: 'America/Sao_Paulo', label: 'São Paulo' },
-      { id: 'America/Manaus', label: 'Manaus' },
-      { id: 'America/Belem', label: 'Belém' },
-      { id: 'America/Fortaleza', label: 'Fortaleza' },
-      { id: 'America/Recife', label: 'Recife' },
-      { id: 'America/Bahia', label: 'Salvador' },
-      { id: 'America/Cuiaba', label: 'Cuiabá' },
-      { id: 'America/Campo_Grande', label: 'Campo Grande' },
-      { id: 'America/Porto_Velho', label: 'Porto Velho' },
-      { id: 'America/Rio_Branco', label: 'Rio Branco' },
-      { id: 'America/Noronha', label: 'Fernando de Noronha' },
-    ],
-  },
-  {
-    region: 'Américas',
-    zones: [
-      { id: 'America/New_York', label: 'Nova York' },
-      { id: 'America/Chicago', label: 'Chicago' },
-      { id: 'America/Los_Angeles', label: 'Los Angeles' },
-    ],
-  },
-  {
-    region: 'Europa',
-    zones: [
-      { id: 'Europe/London', label: 'Londres' },
-      { id: 'Europe/Lisbon', label: 'Lisboa' },
-      { id: 'Europe/Berlin', label: 'Berlim' },
-      { id: 'Europe/Paris', label: 'Paris' },
-    ],
-  },
-  { region: 'Referência', zones: [{ id: 'UTC', label: 'UTC' }] },
-]
-
-const TIERS: { id: HardwareTier; codename: string; title: string; body: string }[] = [
-  {
-    id: 'low',
-    codename: 'CL-01',
-    title: 'Integrada ou notebook básico',
-    body: 'Sugere jogos leves, indies e competitivos que rodam em qualquer máquina.',
-  },
-  {
-    id: 'mid',
-    codename: 'CL-02',
-    title: 'GTX 1060 ou RX 580 em diante',
-    body: 'Libera o grosso da biblioteca moderna em 1080p sem abrir mão de FPS.',
-  },
-  {
-    id: 'high',
-    codename: 'CL-03',
-    title: 'RTX 3060 ou RX 6700 em diante',
-    body: 'Inclui lançamentos pesados, VR e títulos em 1440p ou superior.',
-  },
-  {
-    id: 'unknown',
-    codename: 'CL-00',
-    title: 'Prefiro não classificar',
-    body: 'Nenhuma sugestão de compatibilidade. Você vê todos os jogos sem filtro.',
-  },
-]
 
 function detectTimezone(): string {
   try {
@@ -80,11 +17,76 @@ function detectTimezone(): string {
 }
 
 export function PreferencesSection() {
+  const t = useT()
   const me = useMe()
   const settings = useMySettings()
   const patch = usePatchSettings()
   const setHw = useSetHardware()
   const toast = useToast()
+
+  const TZ_GROUPS: { region: string; zones: { id: string; label: string }[] }[] = [
+    {
+      region: t.settings.tzBrazil,
+      zones: [
+        { id: 'America/Sao_Paulo', label: 'São Paulo' },
+        { id: 'America/Manaus', label: 'Manaus' },
+        { id: 'America/Belem', label: 'Belém' },
+        { id: 'America/Fortaleza', label: 'Fortaleza' },
+        { id: 'America/Recife', label: 'Recife' },
+        { id: 'America/Bahia', label: 'Salvador' },
+        { id: 'America/Cuiaba', label: 'Cuiabá' },
+        { id: 'America/Campo_Grande', label: 'Campo Grande' },
+        { id: 'America/Porto_Velho', label: 'Porto Velho' },
+        { id: 'America/Rio_Branco', label: 'Rio Branco' },
+        { id: 'America/Noronha', label: 'Fernando de Noronha' },
+      ],
+    },
+    {
+      region: t.settings.tzAmericas,
+      zones: [
+        { id: 'America/New_York', label: 'New York' },
+        { id: 'America/Chicago', label: 'Chicago' },
+        { id: 'America/Los_Angeles', label: 'Los Angeles' },
+      ],
+    },
+    {
+      region: t.settings.tzEurope,
+      zones: [
+        { id: 'Europe/London', label: 'London' },
+        { id: 'Europe/Lisbon', label: 'Lisbon' },
+        { id: 'Europe/Berlin', label: 'Berlin' },
+        { id: 'Europe/Paris', label: 'Paris' },
+      ],
+    },
+    { region: t.settings.tzReference, zones: [{ id: 'UTC', label: 'UTC' }] },
+  ]
+
+  const TIERS: { id: HardwareTier; codename: string; title: string; body: string }[] = [
+    {
+      id: 'low',
+      codename: 'CL-01',
+      title: t.settings.tierLow,
+      body: t.settings.tierLowDesc,
+    },
+    {
+      id: 'mid',
+      codename: 'CL-02',
+      title: t.settings.tierMid,
+      body: t.settings.tierMidDesc,
+    },
+    {
+      id: 'high',
+      codename: 'CL-03',
+      title: t.settings.tierHigh,
+      body: t.settings.tierHighDesc,
+    },
+    {
+      id: 'unknown',
+      codename: 'CL-00',
+      title: t.settings.tierUnknown,
+      body: t.settings.tierUnknownDesc,
+    },
+  ]
 
   const [tz, setTz] = useState('America/Sao_Paulo')
   const [email, setEmail] = useState('')
@@ -104,7 +106,7 @@ export function PreferencesSection() {
   }, [me.data])
 
   const discordEmail = (me.data as any)?.discord_email as string | undefined
-  const name = me.data?.discord_display_name ?? me.data?.discord_username ?? 'sem nome'
+  const name = me.data?.discord_display_name ?? me.data?.discord_username ?? t.settings.noName
   const saving = patch.isPending || setHw.isPending
   const detected = useMemo(detectTimezone, [])
 
@@ -117,15 +119,15 @@ export function PreferencesSection() {
     try {
       await patch.mutateAsync({ timezone: tz, notification_email: email || null })
       await setHw.mutateAsync({ tier: hwTier, notes: null })
-      toast.success('preferências salvas')
+      toast.success(t.settings.prefsSaved)
       setDirty(false)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao salvar')
+      toast.error(e instanceof Error ? e.message : t.settings.saveFail)
     }
   }
 
   return (
-    <SettingsCard title="Perfil e preferências">
+    <SettingsCard title={t.settings.profile}>
       <div className="flex items-center gap-3 pb-5">
         <Avatar
           discordId={me.data?.discord_id ?? undefined}
@@ -135,11 +137,11 @@ export function PreferencesSection() {
         />
         <div className="min-w-0">
           <div className="truncate text-base text-up-text">{name}</div>
-          <div className="text-xs text-up-dim">Conectado via Discord</div>
+          <div className="text-xs text-up-dim">{t.settings.connectedVia}</div>
         </div>
       </div>
 
-      <Field label="Fuso horário">
+      <Field label={t.settings.timezone}>
         <div className="flex flex-wrap items-center gap-3">
           <select
             value={tz}
@@ -162,31 +164,31 @@ export function PreferencesSection() {
               onClick={() => update(setTz)(detected)}
               className="text-xs text-up-orange underline underline-offset-4 transition-colors hover:text-up-text"
             >
-              Usar do navegador
+              {t.settings.useBrowser}
             </button>
           )}
         </div>
       </Field>
 
-      <Field label="E-mail de aviso" hint="Usamos este e-mail para notificações importantes.">
+      <Field label={t.settings.emailLabel} hint={t.settings.emailHint}>
         <input
           type="email"
           value={email}
           onChange={(e) => update(setEmail)(e.target.value)}
-          placeholder={discordEmail ?? 'voce@dominio.com'}
+          placeholder={discordEmail ?? t.settings.emailPlaceholder}
           className="h-9 w-full max-w-sm rounded-sm border border-up-line bg-black/50 px-3 text-sm text-up-text placeholder:text-up-dim focus-visible:border-up-orange focus-visible:outline-none"
         />
       </Field>
 
-      <Field label="Classe de máquina" hint="Filtra sugestões de jogo por compatibilidade.">
+      <Field label={t.settings.machineClass} hint={t.settings.machineHint}>
         <div className="grid gap-2 md:grid-cols-2">
-          {TIERS.map((t) => {
-            const active = hwTier === t.id
+          {TIERS.map((tier) => {
+            const active = hwTier === tier.id
             return (
               <button
-                key={t.id}
+                key={tier.id}
                 type="button"
-                onClick={() => update(setHwTier)(t.id)}
+                onClick={() => update(setHwTier)(tier.id)}
                 className={`flex flex-col gap-1 rounded-sm border px-3 py-2.5 text-left transition-colors ${
                   active
                     ? 'border-up-orange bg-up-orange/10'
@@ -197,16 +199,16 @@ export function PreferencesSection() {
                   <span
                     className={`font-mono text-xs ${active ? 'text-up-orange' : 'text-up-dim'}`}
                   >
-                    {t.codename}
+                    {tier.codename}
                   </span>
                   {active && (
-                    <span className="text-xs text-up-orange">selecionado</span>
+                    <span className="text-xs text-up-orange">{t.settings.selected}</span>
                   )}
                 </div>
                 <div className={`text-sm ${active ? 'text-up-text' : 'text-up-dim'}`}>
-                  {t.title}
+                  {tier.title}
                 </div>
-                <div className="text-xs leading-snug text-up-dim">{t.body}</div>
+                <div className="text-xs leading-snug text-up-dim">{tier.body}</div>
               </button>
             )
           })}
@@ -215,10 +217,10 @@ export function PreferencesSection() {
 
       <div className="mt-6 flex items-center justify-between border-t border-up-line pt-4">
         <span className={`text-xs ${dirty ? 'text-up-amber' : 'text-up-dim'}`}>
-          {dirty ? 'Alterações não salvas.' : 'Tudo sincronizado.'}
+          {dirty ? t.settings.unsavedChanges : t.settings.allSynced}
         </span>
         <Button onClick={save} disabled={saving || !dirty} size="sm">
-          {saving ? 'Salvando...' : 'Salvar'}
+          {saving ? t.common.saving : t.common.save}
         </Button>
       </div>
     </SettingsCard>

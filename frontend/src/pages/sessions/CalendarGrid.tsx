@@ -1,6 +1,7 @@
 import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
 import { SlotStack } from './SlotStack'
+import { useT } from '@/i18n'
 
 const WEEKDAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
 
@@ -26,6 +27,7 @@ type Props = {
 }
 
 export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay, onToggleFullDay, onOpenSlot, onOpenDetail }: Props) {
+  const t = useT()
   return (
     <div className="overflow-x-auto rounded-sm border border-up-orange/15 bg-up-panel/30">
       <div className="grid min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(56px, auto)) auto` }}>
@@ -66,7 +68,7 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay,
                     onClick={() => !isPast && onOpenSlot(slot)}
                     disabled={isPast}
                     aria-label="novo horário"
-                    title={isPast ? undefined : 'agendar sessão'}
+                    title={isPast ? undefined : t.sessions.schedule}
                     className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'group/empty transition-colors hover:bg-up-orange/5' : ''}`}
                   >
                     {!isPast && inSlot.length === 0 && (
@@ -104,9 +106,9 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay,
             type="button"
             onClick={onToggleFullDay}
             className="font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
-            title={fullDay ? 'mostrar só horários relevantes' : 'mostrar todas as horas do dia'}
+            title={fullDay ? t.common.showLess : t.common.showMore(24)}
           >
-            {fullDay ? '− compactar horários' : '+ mostrar 24h'}
+            {fullDay ? t.common.showLess : t.common.showMore(24)}
           </button>
         </div>
       </div>

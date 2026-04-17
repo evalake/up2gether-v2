@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
+import { useT } from '@/i18n'
 import { useGames } from '@/features/games/hooks'
 import { GameGridSkeleton } from '@/components/ui/CardSkeletons'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -12,7 +13,8 @@ import { GameFilters } from '@/components/games/GameFilters'
 import { GameCreateForm } from '@/components/games/GameCreateForm'
 
 export function GamesPage() {
-  useTitle('biblioteca')
+  const t = useT()
+  useTitle(t.games.library)
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const games = useGames(id)
@@ -60,17 +62,17 @@ export function GamesPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-up-text">biblioteca</h1>
+          <h1 className="font-display text-3xl text-up-text">{t.games.library}</h1>
           <p className="mt-1 text-xs text-up-dim">
             <Link to={`/groups/${id}`} className="text-up-dim transition-colors hover:text-up-orange">
-              grupo
+              {t.games.group}
             </Link>
             {' · '}
-            <span className="tabular-nums">{games.data?.length ?? 0}</span> jogos
+            <span className="tabular-nums">{games.data?.length ?? 0}</span> {t.games.gamesLabel}
           </p>
         </div>
         <Button variant="subtle" size="sm" onClick={() => setShowForm(true)}>
-          + adicionar jogo
+          {t.games.addGame}
         </Button>
       </header>
 
@@ -111,9 +113,9 @@ export function GamesPage() {
       {games.data && games.data.length === 0 && (
         <EmptyState
           glyph="◇"
-          title="biblioteca vazia"
-          hint="adicione jogos pra virar candidatos em votações e sessões. dá pra buscar pelo Steam ou cadastrar na mão."
-          action={<Button onClick={() => setShowForm(true)}>+ adicionar primeiro jogo</Button>}
+          title={t.games.emptyLibrary}
+          hint={t.games.emptyHint}
+          action={<Button onClick={() => setShowForm(true)}>{t.games.addFirstGame}</Button>}
         />
       )}
 

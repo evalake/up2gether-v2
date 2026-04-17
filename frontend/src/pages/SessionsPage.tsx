@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
+import { useT } from '@/i18n'
 import { useGames } from '@/features/games/hooks'
 import { useCreateSession, useSessions } from '@/features/sessions/hooks'
 import { SessionDetailModal } from '@/components/sessions/SessionDetailModal'
@@ -37,6 +38,7 @@ const addDays = (d: Date, n: number) => {
 }
 
 export function SessionsPage() {
+  const t = useT()
   const { id = '' } = useParams()
   const sessions = useSessions(id)
   const games = useGames(id)
@@ -104,13 +106,13 @@ export function SessionsPage() {
   const onSave = async () => {
     if (!draft || !gameId) return
     if (draft.start < new Date()) {
-      toast.error('passado não dá pra agendar, viajante')
+      toast.error(t.sessions.pastCantSchedule)
       return
     }
     const limit = new Date()
     limit.setFullYear(limit.getFullYear() + MAX_FUTURE_YEARS)
     if (draft.start > limit) {
-      toast.error('as chances de todos os amigos estarem vivos é de 0.000000001%, melhor não')
+      toast.error(t.sessions.tooFarAhead)
       return
     }
     try {
@@ -121,9 +123,9 @@ export function SessionsPage() {
         duration_minutes: duration,
       })
       setDraft(null)
-      toast.success('agendado')
+      toast.success(t.sessions.scheduled)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao agendar')
+      toast.error(e instanceof Error ? e.message : t.sessions.scheduleFail)
     }
   }
 
@@ -145,8 +147,8 @@ export function SessionsPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-up-text">sessões</h1>
-          <p className="mt-1 text-xs text-up-dim">toque num horário livre para agendar</p>
+          <h1 className="font-display text-3xl text-up-text">{t.sessions.title}</h1>
+          <p className="mt-1 text-xs text-up-dim">{t.sessions.hint}</p>
         </div>
         <WeekHeader
           weekAnchor={weekAnchor}
@@ -165,8 +167,8 @@ export function SessionsPage() {
       {!sessions.isLoading && (sessions.data?.length ?? 0) === 0 && (
         <EmptyState
           glyph="◈"
-          title="nada agendado ainda"
-          hint="toca num horário livre no calendário abaixo pra marcar a primeira sessão. o grupo inteiro é notificado."
+          title={t.sessions.noSessions}
+          hint={t.sessions.noSessionsHint}
         />
       )}
 

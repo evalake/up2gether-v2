@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import type { HardwareTier } from '@/features/games/api'
 import type { SteamSearchItem } from '@/features/steam/api'
+import { useT } from '@/i18n'
 import { Textarea } from '@/components/ui/Textarea'
 import { SteamThumb } from '@/components/SteamThumb'
 import { TIERS } from '@/lib/constants'
@@ -20,7 +21,7 @@ function steamItemTag(name: string): string | null {
   return null
 }
 
-const HW_LABEL: Record<string, string> = { low: 'leve', mid: 'medio', high: 'pesado', unknown: 'n/a' }
+// hw labels are now derived from translations in each component
 
 export type FormState = {
   name: string
@@ -64,6 +65,7 @@ export const emptyForm: FormState = {
 // -- Steam results list (inline, not dropdown) --
 
 export function SteamResultsList({ hits, onPick }: { hits: SteamSearchItem[]; onPick: (it: SteamSearchItem) => void }) {
+  const t = useT()
   return (
     <div>
       {hits.map((it, i) => {
@@ -91,7 +93,7 @@ export function SteamResultsList({ hits, onPick }: { hits: SteamSearchItem[]; on
                     {tag ? (
                       <span className="rounded-sm border border-up-amber/40 bg-up-amber/10 px-1.5 py-px font-semibold uppercase text-up-amber">{tag}</span>
                     ) : (
-                      <span className="rounded-sm border border-up-green/40 bg-up-green/10 px-1.5 py-px text-up-green">jogo</span>
+                      <span className="rounded-sm border border-up-green/40 bg-up-green/10 px-1.5 py-px text-up-green">{t.games.gameBadge}</span>
                     )}
                     <span className="text-up-dim">#{it.appid}</span>
                   </>
@@ -108,17 +110,19 @@ export function SteamResultsList({ hits, onPick }: { hits: SteamSearchItem[]; on
 // -- Steam preview after picking --
 
 export function SteamPreview({ form, onClear }: { form: FormState; onClear: () => void }) {
+  const t = useT()
+  const hwLabel: Record<string, string> = { low: t.games.hwLight, mid: t.games.hwMedium, high: t.games.hwHeavyLabel, unknown: t.games.hwNA }
   const priceLabel = form.is_free
-    ? 'gratuito'
+    ? t.games.freeToPlay
     : form.price_current
       ? `R$ ${Number(form.price_current).toFixed(2)}`
-      : 'sem preco'
+      : t.games.noPrice
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
       <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-green">
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-up-green mr-1.5" />
-        pronto para adicionar
+        {t.games.readyToAdd}
       </div>
 
       {form.cover_url && (
@@ -141,18 +145,18 @@ export function SteamPreview({ form, onClear }: { form: FormState; onClear: () =
 
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="rounded-sm border border-up-line/40 bg-up-panel/30 py-1.5">
-          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">preco</div>
+          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.previewPrice}</div>
           <div className={`mt-0.5 text-sm font-semibold ${form.is_free ? 'text-up-green' : 'text-up-text'}`}>{priceLabel}</div>
         </div>
         <div className="rounded-sm border border-up-line/40 bg-up-panel/30 py-1.5">
-          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">jogadores</div>
+          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.previewPlayers}</div>
           <div className="mt-0.5 text-sm font-semibold text-up-text">
             {form.player_min}{form.player_max ? `-${form.player_max}` : '+'}
           </div>
         </div>
         <div className="rounded-sm border border-up-line/40 bg-up-panel/30 py-1.5">
-          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">hardware</div>
-          <div className="mt-0.5 text-sm font-semibold text-up-text">{HW_LABEL[form.min_hardware_tier]}</div>
+          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.previewHw}</div>
+          <div className="mt-0.5 text-sm font-semibold text-up-text">{hwLabel[form.min_hardware_tier]}</div>
         </div>
       </div>
 
@@ -176,7 +180,7 @@ export function SteamPreview({ form, onClear }: { form: FormState; onClear: () =
         onClick={onClear}
         className="text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
       >
-        buscar outro
+        {t.games.searchAnother}
       </button>
     </motion.div>
   )
@@ -192,25 +196,26 @@ export function ManualForm({
   showAdvanced: boolean
   setShowAdvanced: (v: boolean) => void
 }) {
+  const t = useT()
   return (
     <div className="space-y-3">
-      <p className="text-xs text-up-dim">Preencha os dados basicos. Use "mais opcoes" para campos extras.</p>
+      <p className="text-xs text-up-dim">{t.games.manualHint}</p>
 
       <div>
-        <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">nome *</label>
+        <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.nameRequired}</label>
         <input
           autoFocus
           value={form.name}
           maxLength={150}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="nome do jogo"
+          placeholder={t.games.namePlaceholder}
           className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-3 text-sm focus-visible:border-up-orange focus-visible:outline-none"
         />
       </div>
 
       <div className="grid grid-cols-12 gap-2">
         <div className="col-span-4">
-          <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">preco</label>
+          <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.price}</label>
           <input
             type="number"
             step="0.01"
@@ -218,7 +223,7 @@ export function ManualForm({
             disabled={form.is_free}
             value={form.is_free ? '' : form.price_current}
             onChange={(e) => setForm({ ...form, price_current: e.target.value })}
-            placeholder="R$"
+            placeholder={t.games.pricePlaceholder}
             className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-3 text-sm focus-visible:border-up-orange focus-visible:outline-none disabled:opacity-40"
           />
         </div>
@@ -232,11 +237,11 @@ export function ManualForm({
                 : 'border-up-line text-up-dim hover:border-up-green'
             }`}
           >
-            {form.is_free ? 'gratis' : 'gratis?'}
+            {form.is_free ? t.games.freeLabel : t.games.freeQ}
           </button>
         </div>
         <div className="col-span-6">
-          <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">jogadores</label>
+          <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.players}</label>
           <div className="flex h-9 items-center gap-1 rounded-sm border border-up-line bg-black/40 px-3">
             <input
               type="number"
@@ -251,7 +256,7 @@ export function ManualForm({
               min="1"
               value={form.player_max ?? ''}
               onChange={(e) => setForm({ ...form, player_max: e.target.value ? Number(e.target.value) : null })}
-              placeholder="max"
+              placeholder={t.games.maxPlayers}
               className="w-10 bg-transparent text-center text-sm focus-visible:outline-none"
             />
           </div>
@@ -259,13 +264,13 @@ export function ManualForm({
       </div>
 
       <div>
-        <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">descricao</label>
+        <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.description}</label>
         <Textarea
           value={form.description}
           maxLength={2000}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
           rows={2}
-          placeholder="opcional"
+          placeholder={t.games.optional}
           spellCheck={false}
         />
       </div>
@@ -279,7 +284,7 @@ export function ManualForm({
             className="space-y-3 overflow-hidden"
           >
             <div>
-              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">hardware</label>
+              <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.hardware}</label>
               <div className="flex gap-1">
                 {TIERS.map((t) => (
                   <button
@@ -299,26 +304,26 @@ export function ManualForm({
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <ChipInput label="generos" value={form.genres} onChange={(v) => setForm({ ...form, genres: v })} max={10} placeholder="FPS, RPG..." />
-              <ChipInput label="tags" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} max={20} placeholder="Co-op..." />
+              <ChipInput label={t.games.genres} value={form.genres} onChange={(v) => setForm({ ...form, genres: v })} max={10} placeholder={t.games.genresPlaceholder} />
+              <ChipInput label={t.games.categories} value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} max={20} placeholder={t.games.tagsPlaceholder} />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">steam appid</label>
+                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.steamAppId}</label>
                 <input
                   value={form.steam_appid}
                   onChange={(e) => setForm({ ...form, steam_appid: e.target.value })}
-                  placeholder="opcional"
+                  placeholder={t.games.optional}
                   className="h-8 w-full rounded-sm border border-up-line bg-black/40 px-2 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">cover url</label>
+                <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.games.coverUrl}</label>
                 <input
                   value={form.cover_url}
                   onChange={(e) => setForm({ ...form, cover_url: e.target.value })}
-                  placeholder="opcional"
+                  placeholder={t.games.coverUrlPlaceholder}
                   className="h-8 w-full rounded-sm border border-up-line bg-black/40 px-2 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                 />
               </div>
@@ -332,7 +337,7 @@ export function ManualForm({
         onClick={() => setShowAdvanced(!showAdvanced)}
         className="text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
       >
-        {showAdvanced ? '- menos opcoes' : '+ mais opcoes'}
+        {showAdvanced ? t.games.lessOptions : t.games.moreOptions}
       </button>
     </div>
   )

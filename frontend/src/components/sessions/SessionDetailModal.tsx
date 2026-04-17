@@ -9,6 +9,8 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
+import { useT } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 
 type Props = {
   groupId: string
@@ -17,14 +19,14 @@ type Props = {
   onClose: () => void
 }
 
-const weekday = (d: Date) =>
-  d.toLocaleDateString('pt-BR', { weekday: 'long' })
+const weekday = (d: Date, locale: string) =>
+  d.toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US', { weekday: 'long' })
 
-const dateLine = (d: Date) =>
-  d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
+const dateLine = (d: Date, locale: string) =>
+  d.toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'long' })
 
-const hourLine = (d: Date) =>
-  d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+const hourLine = (d: Date, locale: string) =>
+  d.toLocaleTimeString(locale === 'pt' ? 'pt-BR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
 
 function relFuture(ms: number) {
   if (ms <= 0) return null
@@ -37,6 +39,7 @@ function relFuture(ms: number) {
 }
 
 export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: Props) {
+  const t = useT()
   const audit = useSessionAudit(groupId, sessionId)
   const rsvp = useSetRsvp(groupId)
   const del = useDeleteSession(groupId)
@@ -81,7 +84,7 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
           >
             <button
               onClick={onClose}
-              aria-label="fechar"
+              aria-label={t.common.close}
               className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -102,7 +105,7 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
                   rsvp.mutate({ sessionId: audit.data!.session.id, status: v })
                 }
                 onDelete={async () => {
-                  if (!confirm('remover esta sessão?')) return
+                  if (!confirm(t.sessions.removeConfirm)) return
                   await del.mutateAsync(audit.data!.session.id)
                   onClose()
                 }}
@@ -129,6 +132,8 @@ function Body({
   onDelete: () => void
   canDelete?: boolean
 }) {
+  const t = useT()
+  const locale = useLocaleStore(s => s.locale)
   const toast = useToast()
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
   const { session, game, creator, rsvps, non_respondents } = data
@@ -181,7 +186,7 @@ function Body({
           )}
           {isPast && (
             <span className="mb-2 inline-block rounded-full border border-up-line/60 bg-black/40 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              já rolou
+              {t.sessions.alreadyHappened}
             </span>
           )}
           <h2 className="font-display text-2xl leading-tight text-up-text">
@@ -204,13 +209,13 @@ function Body({
       >
         <div className="flex items-center gap-1.5">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-          <span className="capitalize">{weekday(start)}</span>
+          <span className="capitalize">{weekday(start, locale)}</span>
           <span>·</span>
-          <span>{dateLine(start)}</span>
+          <span>{dateLine(start, locale)}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-          <span>{hourLine(start)} → {hourLine(end)}</span>
+          <span>{hourLine(start, locale)} → {hourLine(end, locale)}</span>
         </div>
         {creator.display_name && (
           <button
@@ -247,12 +252,12 @@ function Body({
             className="space-y-1.5"
           >
             <div className="text-[10px] uppercase tracking-wider text-up-dim">
-              você vai?
+              {t.sessions.yourRsvp}
             </div>
             <div className="flex gap-1.5">
               {(['yes', 'maybe', 'no'] as const).map((v) => {
                 const active = session.user_rsvp === v
-                const label = v === 'yes' ? 'bora' : v === 'maybe' ? 'talvez' : 'não rola'
+                const label = v === 'yes' ? t.sessions.rsvpYes : v === 'maybe' ? t.sessions.rsvpMaybe : t.sessions.rsvpNo
                 const tone =
                   v === 'yes'
                     ? 'border-up-green/60 bg-up-green/10 text-up-green'
@@ -285,15 +290,15 @@ function Body({
           animate="animate"
           className="space-y-3"
         >
-          <Group title="bora" tone="text-up-green" people={yes} pop={pop} onClickMember={setProfileUserId} />
+          <Group title={t.sessions.rsvpYes} tone="text-up-green" people={yes} pop={pop} onClickMember={setProfileUserId} />
           {maybe.length > 0 && (
-            <Group title="talvez" tone="text-up-amber" people={maybe} pop={pop} onClickMember={setProfileUserId} />
+            <Group title={t.sessions.rsvpMaybe} tone="text-up-amber" people={maybe} pop={pop} onClickMember={setProfileUserId} />
           )}
           {no.length > 0 && (
-            <Group title="não rola" tone="text-up-red" people={no} pop={pop} onClickMember={setProfileUserId} />
+            <Group title={t.sessions.rsvpNo} tone="text-up-red" people={no} pop={pop} onClickMember={setProfileUserId} />
           )}
           {non_respondents.length > 0 && (
-            <GroupMuted title="silenciosos" people={non_respondents} pop={pop} onClickMember={setProfileUserId} />
+            <GroupMuted title={t.sessions.silent} people={non_respondents} pop={pop} onClickMember={setProfileUserId} />
           )}
         </motion.div>
       </div>
@@ -306,21 +311,21 @@ function Body({
               await navigator.clipboard.writeText(
                 `${window.location.origin}/share/sessions/${session.id}`,
               )
-              toast.success('link copiado')
+              toast.success(t.sessions.copied)
             } catch {
-              toast.error('falha ao copiar')
+              toast.error(t.sessions.copyFail)
             }
           }}
           className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
         >
-          convite
+          {t.sessions.invite}
         </button>
         {canDelete && (
           <button
             onClick={onDelete}
             className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-red hover:text-up-red"
           >
-            remover
+            {t.sessions.removeSession}
           </button>
         )}
       </div>
@@ -350,13 +355,14 @@ function Group({
   pop: Variants
   onClickMember: (userId: string) => void
 }) {
+  const t = useT()
   if (people.length === 0) {
     return (
       <div>
         <div className={`mb-1.5 text-[10px] uppercase tracking-wider ${tone}`}>
           {title} <span className="tabular-nums text-up-dim">0</span>
         </div>
-        <div className="text-[11px] text-up-dim">ninguém ainda</div>
+        <div className="text-[11px] text-up-dim">{t.sessions.nobodyYet}</div>
       </div>
     )
   }

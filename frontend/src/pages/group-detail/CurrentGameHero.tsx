@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useT } from '@/i18n'
 import type { CurrentGameAudit } from '@/features/groups/api'
 
 export function CurrentGameHero({
@@ -14,6 +15,7 @@ export function CurrentGameHero({
   now: Date
 }) {
   const navigate = useNavigate()
+  const t = useT()
   const setSince = audit.set_at ? new Date(audit.set_at) : null
   const daysSince = setSince ? Math.floor((now.getTime() - setSince.getTime()) / 86400000) : null
   const isManual = audit.source === 'manual'
@@ -31,16 +33,16 @@ export function CurrentGameHero({
       <div className="relative z-10 flex items-center justify-between border-b border-up-green/20 bg-black/40 px-4 py-1 font-mono text-[10px] uppercase tracking-[0.25em]">
         <span className="flex items-center gap-2 text-up-green">
           <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-up-green" />
-          jogando agora
+          {t.currentGameHero.nowPlaying}
           {isManual ? (
-            <span className="text-up-amber">· travado manual</span>
+            <span className="text-up-amber">· {t.currentGameHero.manualOverride}</span>
           ) : (
-            <span className="text-up-dim">· definido por votação</span>
+            <span className="text-up-dim">· {t.currentGameHero.setByVote}</span>
           )}
         </span>
         {daysSince !== null && (
           <span className="text-up-dim tabular-nums">
-            há {daysSince === 0 ? 'hoje' : daysSince === 1 ? '1 dia' : `${daysSince} dias`}
+            {daysSince === 0 ? t.currentGameHero.today : daysSince === 1 ? t.currentGameHero.dayAgo : t.currentGameHero.daysAgo(daysSince)}
           </span>
         )}
       </div>
@@ -65,7 +67,7 @@ export function CurrentGameHero({
 
       <div className="relative z-10 p-4 md:p-5">
         <div className="min-w-0">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-green">game da vez</div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-green">{t.currentGameHero.gameOfMoment}</div>
           <motion.h2
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
@@ -78,19 +80,19 @@ export function CurrentGameHero({
           <div className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px] uppercase tracking-wider sm:grid-cols-4">
             {audit.added_by_user_name && (
               <div>
-                <div className="text-[10px] text-up-dim">sugerido por</div>
+                <div className="text-[10px] text-up-dim">{t.currentGameHero.suggestedBy}</div>
                 <div className="mt-0.5 truncate text-up-text">{audit.added_by_user_name}</div>
               </div>
             )}
             {audit.vote_title && (
               <div>
-                <div className="text-[10px] text-up-dim">vencedor de</div>
+                <div className="text-[10px] text-up-dim">{t.currentGameHero.winnerOf}</div>
                 <div className="mt-0.5 truncate text-up-text">{audit.vote_title}</div>
               </div>
             )}
             {audit.vote_ballots_count !== null && audit.vote_eligible_count !== null && (
               <div>
-                <div className="text-[10px] text-up-dim">participação</div>
+                <div className="text-[10px] text-up-dim">{t.currentGameHero.participation}</div>
                 <div className="mt-0.5 tabular-nums text-up-text">
                   {audit.vote_ballots_count}/{audit.vote_eligible_count}
                 </div>
@@ -98,7 +100,7 @@ export function CurrentGameHero({
             )}
             {isManual && audit.set_by_user_name && (
               <div>
-                <div className="text-[10px] text-up-dim">travado por</div>
+                <div className="text-[10px] text-up-dim">{t.currentGameHero.lockedBy}</div>
                 <div className="mt-0.5 truncate text-up-amber">{audit.set_by_user_name}</div>
               </div>
             )}
@@ -107,8 +109,8 @@ export function CurrentGameHero({
           {audit.vote_winner_approvals !== null && audit.vote_winner_approvals > 0 && (
             <div className="mt-2.5 space-y-1">
               <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                <span>resultado</span>
-                {audit.vote_was_tiebreak && <span className="text-up-amber">· desempate</span>}
+                <span>{t.currentGameHero.result}</span>
+                {audit.vote_was_tiebreak && <span className="text-up-amber">· {t.currentGameHero.tiebreak}</span>}
               </div>
               <div className="flex items-center gap-3">
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-up-line/40">
@@ -120,7 +122,7 @@ export function CurrentGameHero({
                   />
                 </div>
                 <span className="font-mono text-[10px] tabular-nums text-up-green">
-                  {audit.vote_winner_approvals} votos
+                  {audit.vote_winner_approvals} {t.currentGameHero.votes}
                 </span>
               </div>
               {audit.vote_runner_ups.length > 0 && (
@@ -148,12 +150,12 @@ export function CurrentGameHero({
           )}
 
           <div className="mt-2.5 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-            <span><span className="tabular-nums text-up-green">{audit.interest_want_count}</span> querem</span>
-            <span><span className="tabular-nums text-up-amber">{audit.interest_meh_count}</span> ok</span>
-            <span><span className="tabular-nums text-up-red">{audit.interest_nope_count}</span> pass</span>
+            <span><span className="tabular-nums text-up-green">{audit.interest_want_count}</span> {t.currentGameHero.wantLabel}</span>
+            <span><span className="tabular-nums text-up-amber">{audit.interest_meh_count}</span> {t.currentGameHero.okLabel}</span>
+            <span><span className="tabular-nums text-up-red">{audit.interest_nope_count}</span> {t.currentGameHero.passLabel}</span>
             <span className="text-up-line">|</span>
-            <span><span className="tabular-nums text-up-orange">{audit.owners_count}</span> têm na steam</span>
-            <span><span className="tabular-nums text-up-magenta">{audit.sessions_count}</span> sessões</span>
+            <span><span className="tabular-nums text-up-orange">{audit.owners_count}</span> {t.currentGameHero.ownSteam}</span>
+            <span><span className="tabular-nums text-up-magenta">{audit.sessions_count}</span> {t.currentGameHero.sessionsLabel}</span>
           </div>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-wider">
@@ -161,28 +163,28 @@ export function CurrentGameHero({
               onClick={() => navigate(`/groups/${groupId}/games/${audit.game_id}`)}
               className="rounded-sm border border-up-green/40 bg-up-green/5 px-2 py-1 text-up-green transition-colors hover:bg-up-green/15"
             >
-              detalhes do jogo
+              {t.currentGameHero.gameDetails}
             </button>
             {audit.vote_id && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/votes`)}
                 className="text-up-dim transition-colors hover:text-up-orange"
               >
-                votacao
+                {t.currentGameHero.voting}
               </button>
             )}
             <button
               onClick={() => navigate(`/groups/${groupId}/history`)}
               className="text-up-dim transition-colors hover:text-up-orange"
             >
-              historico
+              {t.currentGameHero.historyLabel}
             </button>
             {isAdmin && (
               <button
                 onClick={() => navigate(`/groups/${groupId}/admin`)}
                 className="text-up-line transition-colors hover:text-up-amber"
               >
-                {isManual ? 'gerenciar' : 'admin'}
+                {isManual ? t.currentGameHero.manage : 'admin'}
               </button>
             )}
           </div>

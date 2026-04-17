@@ -5,8 +5,10 @@ import type { Game } from '@/features/games/api'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
+import { useT } from '@/i18n'
 
 export function GamesTab({ groupId }: { groupId: string }) {
+  const t = useT()
   const games = useGames(groupId)
   const archive = useArchiveGame(groupId)
   const toast = useToast()
@@ -36,7 +38,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
   const deleteOne = async (g: Game) => {
     try {
       await archive.mutateAsync(g.id)
-      toast.success(`${g.name} apagado`)
+      toast.success(t.admin.gameDeleted(g.name))
       setPendingDelete(null)
       setSelected((prev) => {
         const n = new Set(prev)
@@ -44,7 +46,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
         return n
       })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao apagar')
+      toast.error(e instanceof Error ? e.message : t.common.fail)
     }
   }
 
@@ -62,8 +64,8 @@ export function GamesTab({ groupId }: { groupId: string }) {
         }
       }),
     )
-    if (fail === 0) toast.success(`${ok} jogo${ok === 1 ? '' : 's'} apagado${ok === 1 ? '' : 's'}`)
-    else toast.error(`${ok} apagados, ${fail} falharam`)
+    if (fail === 0) toast.success(t.admin.gamesDeleted(ok, fail))
+    else toast.error(t.admin.gamesDeleted(ok, fail))
     setSelected(new Set())
     setBulkConfirm(false)
   }
@@ -75,9 +77,9 @@ export function GamesTab({ groupId }: { groupId: string }) {
     <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-dim">Games do grupo</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-dim">{t.admin.gamesTitle}</div>
           <p className="mt-1 text-[11px] text-up-dim">
-            Lista completa. Use busca pra filtrar, selecione varios pra apagar em lote.
+            {t.admin.gamesSubtitle}
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
@@ -87,10 +89,10 @@ export function GamesTab({ groupId }: { groupId: string }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <input
-          aria-label="buscar jogo"
+          aria-label={t.admin.searchGame}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar jogo..."
+          placeholder={t.admin.searchGame}
           className="h-8 min-w-[180px] flex-1 rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         {filtered.length > 0 && (
@@ -98,7 +100,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
             onClick={toggleAll}
             className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text"
           >
-            {selected.size === filtered.length ? 'limpar' : 'tudo'}
+            {selected.size === filtered.length ? t.common.clear : t.common.all}
           </button>
         )}
         {selected.size > 0 && (
@@ -106,7 +108,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
             onClick={() => setBulkConfirm(true)}
             className="rounded-sm border border-up-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10"
           >
-            apagar {selected.size}
+            {t.admin.deleteN(selected.size)}
           </button>
         )}
       </div>
@@ -116,18 +118,18 @@ export function GamesTab({ groupId }: { groupId: string }) {
         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
         <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
           <p className="text-xs text-up-red">
-            apagar {selected.size} jogo{selected.size === 1 ? '' : 's'}? não dá pra desfazer.
+            {t.admin.deleteConfirm(selected.size)}
           </p>
           <div className="flex shrink-0 gap-2">
             <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">
-              cancelar
+              {t.common.cancel}
             </button>
             <button
               onClick={deleteBulk}
               disabled={archive.isPending}
               className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40"
             >
-              sim, apagar
+              {t.common.confirm}
             </button>
           </div>
         </div>
@@ -137,7 +139,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
 
       {filtered.length === 0 ? (
         <div className="mt-4 py-6 text-center text-[11px] text-up-dim">
-          {q ? `nenhum jogo pra "${q}"` : 'nenhum jogo ainda'}
+          {q ? t.admin.noGamesFor(q) : t.admin.noGamesYet}
         </div>
       ) : (
         <div className="mt-4 divide-y divide-up-line/30">
@@ -169,13 +171,13 @@ export function GamesTab({ groupId }: { groupId: string }) {
                       onClick={() => setPendingDelete(null)}
                       className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:text-up-text"
                     >
-                      cancelar
+                      {t.common.cancel}
                     </button>
                     <button
                       onClick={() => deleteOne(g)}
                       className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red"
                     >
-                      confirmar
+                      {t.common.confirm}
                     </button>
                   </div>
                 ) : (
@@ -183,7 +185,7 @@ export function GamesTab({ groupId }: { groupId: string }) {
                     onClick={() => setPendingDelete(g.id)}
                     className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red"
                   >
-                    apagar
+                    {t.common.delete}
                   </button>
                 )}
               </div>

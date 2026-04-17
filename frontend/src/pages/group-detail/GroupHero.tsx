@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useT } from '@/i18n'
 import type { GroupWithStats } from '@/features/groups/api'
 
 const fadeUp = {
@@ -17,6 +18,7 @@ type Props = {
 }
 
 export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallbackGameCover, onLeave }: Props) {
+  const t = useT()
   const hasBanner = !!group.banner_url
   const hasSplash = !!group.splash_url
   const hasIcon = !!group.icon_url
@@ -64,7 +66,7 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
       <span className="pointer-events-none absolute left-1 top-1 h-4 w-4 border-l-2 border-t-2 border-up-orange/60" />
       <span className="pointer-events-none absolute bottom-1 right-1 h-4 w-4 border-b-2 border-r-2 border-up-orange/60" />
       <div className="absolute left-0 right-0 top-0 flex items-center justify-between border-b border-up-orange/20 bg-black/30 px-4 py-1 font-mono text-[10px] uppercase tracking-[0.25em] text-up-orange">
-        <span>group monitor // {group.name}</span>
+        <span>{t.groupDetail.monitor(group.name)}</span>
         <span className="tabular-nums text-up-green">{now.toLocaleTimeString('pt-BR', { hour12: false })}</span>
       </div>
       <div className="h-3" />
@@ -87,15 +89,15 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-magenta">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-up-green up-pulse" />
             <span>{group.user_role}</span>
-            {isSoleAdmin && <span className="text-up-dim">· único admin</span>}
-            {isSysAdmin && <span className="text-up-red">· sys admin</span>}
+            {isSoleAdmin && <span className="text-up-dim">· {t.groupDetail.onlyAdmin}</span>}
+            {isSysAdmin && <span className="text-up-red">· {t.groupDetail.sysAdmin}</span>}
           </div>
           <h1 className="mt-2 font-display text-3xl leading-none text-up-text sm:text-4xl">{group.name}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-4 font-mono text-[11px] text-up-dim">
-            <Stat n={stats.members} label="membros" tone="text-up-green" />
-            <Stat n={stats.games} label="jogos" tone="text-up-amber" />
-            <Stat n={stats.votes} label="votacoes" tone="text-up-magenta" />
-            <Stat n={stats.sessions} label="sessoes" tone="text-up-orange" />
+            <Stat n={stats.members} label={t.groupDetail.membersLabel} tone="text-up-green" />
+            <Stat n={stats.games} label={t.groupDetail.gamesLabel} tone="text-up-amber" />
+            <Stat n={stats.votes} label={t.groupDetail.votesLabel} tone="text-up-magenta" />
+            <Stat n={stats.sessions} label={t.groupDetail.sessionsLabel} tone="text-up-orange" />
           </div>
         </div>
         {!isSoleAdmin && (
@@ -103,7 +105,7 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
             onClick={onLeave}
             className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-red hover:text-up-red"
           >
-            sair do grupo
+            {t.groupDetail.leaveGroup}
           </button>
         )}
       </div>

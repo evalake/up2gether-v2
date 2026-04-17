@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
+import { useT } from '@/i18n'
 import { useCreateGame } from '@/features/games/hooks'
 import { steamSearch, steamGetDetails, builtinGetDetails, type SteamSearchItem } from '@/features/steam/api'
 import { useToast } from '@/components/ui/toast'
@@ -16,6 +17,7 @@ export function GameCreateForm({
   onCreated: (createdId: string) => void
   onCancel: () => void
 }) {
+  const t = useT()
   const create = useCreateGame(groupId)
   const toast = useToast()
 
@@ -117,7 +119,7 @@ export function GameCreateForm({
       }
       setPicked(true)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao buscar detalhes')
+      toast.error(e instanceof Error ? e.message : t.games.detailFail)
     } finally {
       setFilling(false)
     }
@@ -147,11 +149,11 @@ export function GameCreateForm({
       },
       {
         onSuccess: (created) => {
-          toast.success('jogo adicionado')
+          toast.success(t.games.gameAdded)
           onCreated(created.id)
         },
         onError: (err) => {
-          toast.error(err instanceof Error ? err.message : 'falha ao criar jogo')
+          toast.error(err instanceof Error ? err.message : t.games.createFail)
         },
       },
     )
@@ -182,7 +184,7 @@ export function GameCreateForm({
       onClick={(e) => { if (e.target === e.currentTarget) close() }}
       role="dialog"
       aria-modal="true"
-      aria-label="adicionar novo jogo"
+      aria-label={t.games.addNewGame}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 12 }}
@@ -195,9 +197,9 @@ export function GameCreateForm({
         <div className="shrink-0 flex items-center justify-between border-b border-up-orange/20 bg-black/40 px-4 py-2">
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-up-orange" />
-            adicionar novo jogo
+            {t.games.addNewGame}
           </div>
-          <button onClick={close} className="p-1 text-up-dim transition-colors hover:text-up-text" aria-label="fechar">
+          <button onClick={close} className="p-1 text-up-dim transition-colors hover:text-up-text" aria-label={t.common.close}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -210,7 +212,7 @@ export function GameCreateForm({
               mode === 'steam' ? 'border-b-2 border-up-orange text-up-orange' : 'text-up-dim hover:text-up-text'
             }`}
           >
-            importar
+            {t.games.importTab}
           </button>
           <button
             onClick={switchToManual}
@@ -218,7 +220,7 @@ export function GameCreateForm({
               mode === 'manual' ? 'border-b-2 border-up-orange text-up-orange' : 'text-up-dim hover:text-up-text'
             }`}
           >
-            manual
+            {t.games.manualTab}
           </button>
         </div>
 
@@ -233,14 +235,14 @@ export function GameCreateForm({
                 </svg>
                 <input
                   autoFocus
-                  aria-label="buscar jogo na Steam"
+                  aria-label={t.games.searchSteam}
                   value={steamQ}
                   onChange={(e) => setSteamQ(e.target.value)}
-                  placeholder="buscar jogo na Steam..."
+                  placeholder={t.games.searchSteamPlaceholder}
                   className="h-9 flex-1 bg-transparent text-sm focus-visible:outline-none"
                 />
                 {(steamLoading || filling) && (
-                  <span className="text-[10px] text-up-dim animate-pulse">buscando...</span>
+                  <span className="text-[10px] text-up-dim animate-pulse">{t.games.searching}</span>
                 )}
               </div>
             </div>
@@ -251,27 +253,27 @@ export function GameCreateForm({
                 <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                   <span className="font-display text-3xl text-up-orange/20">?</span>
                   <p className="text-xs text-up-dim">
-                    Busque na Steam ou catalogo integrado para importar automaticamente.
+                    {t.games.importHint}
                   </p>
                   <button
                     type="button"
                     onClick={switchToManual}
                     className="mt-1 text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
                   >
-                    ou adicionar manualmente
+                    {t.games.orAddManually}
                   </button>
                 </div>
               )}
 
               {steamSearching && steamHits.length === 0 && !steamLoading && (
                 <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
-                  <p className="text-xs text-up-dim">Nenhum resultado para "{steamQ}"</p>
+                  <p className="text-xs text-up-dim">{t.common.noResults(steamQ)}</p>
                   <button
                     type="button"
                     onClick={switchToManual}
                     className="text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
                   >
-                    adicionar manualmente
+                    {t.games.addManually}
                   </button>
                 </div>
               )}
@@ -303,14 +305,14 @@ export function GameCreateForm({
         {/* footer: always pinned at bottom */}
         <div className="shrink-0 flex items-center justify-end gap-2 border-t border-up-line/40 px-4 py-3">
           <Button type="button" variant="subtle" size="sm" onClick={close}>
-            cancelar
+            {t.common.cancel}
           </Button>
           <Button
             size="sm"
             disabled={create.isPending || !form.name}
             onClick={doSubmit}
           >
-            {create.isPending ? 'salvando...' : 'adicionar'}
+            {create.isPending ? t.common.saving : t.games.add}
           </Button>
         </div>
       </motion.div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
+import { useT } from '@/i18n'
 import { useGames } from '@/features/games/hooks'
 import {
   useCloseVote,
@@ -24,6 +25,7 @@ import { VoteHistory } from './votes/VoteHistory'
 type VoteRow = NonNullable<ReturnType<typeof useVotes>['data']>[number]
 
 export function VotesPage() {
+  const t = useT()
   useTitle('votacoes')
   const { id = '' } = useParams()
   const votes = useVotes(id)
@@ -48,7 +50,7 @@ export function VotesPage() {
     try {
       await submit.mutateAsync({ voteId, approvals: next })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao registrar voto')
+      toast.error(e instanceof Error ? e.message : t.votes.voteFail)
     }
   }
 
@@ -59,9 +61,9 @@ export function VotesPage() {
       setTitle('')
       setPicked([])
       setDraft(false)
-      toast.success('votação criada')
+      toast.success(t.votes.voteCreated)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao criar votação')
+      toast.error(e instanceof Error ? e.message : t.votes.createFail)
     }
   }
 
@@ -92,10 +94,10 @@ export function VotesPage() {
       if (winnerGame) {
         setReveal({ vote: closed, game: winnerGame })
       } else {
-        toast.success('encerrada sem vencedor')
+        toast.success(t.votes.closedNoWinner)
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao encerrar')
+      toast.error(e instanceof Error ? e.message : t.votes.closeFail)
     }
   }
 
@@ -149,16 +151,16 @@ export function VotesPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-up-text">votações</h1>
-          <p className="mt-1 text-xs text-up-dim">decida com o grupo o próximo jogo</p>
+          <h1 className="font-display text-3xl text-up-text">{t.votes.title}</h1>
+          <p className="mt-1 text-xs text-up-dim">{t.votes.subtitle}</p>
         </div>
         <button
           onClick={() => setDraft(true)}
           disabled={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2}
-          title={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2 ? 'precisa de pelo menos 2 jogos ativos' : undefined}
+          title={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2 ? t.votes.needMinGames : undefined}
           className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          nova votação
+          {t.votes.newVote}
         </button>
       </header>
 
@@ -171,23 +173,23 @@ export function VotesPage() {
         return (
           <EmptyState
             glyph="▲"
-            title="nenhuma votação ainda"
+            title={t.votes.noVotesYet}
             hint={needsGames
-              ? `precisa de pelo menos 2 jogos ativos no acervo pra abrir uma votação. hoje tem ${activeGames}.`
-              : 'abre a primeira pro grupo decidir o que jogar. tudo que tem no acervo vira candidato e o engine estreita em stages até sobrar 1.'}
+              ? t.votes.noVotesHint(activeGames)
+              : t.votes.noVotesSubhint}
             action={needsGames ? (
               <Link
                 to={`/groups/${id}/games`}
                 className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25"
               >
-                ir pro acervo
+                {t.votes.goToLibrary}
               </Link>
             ) : (
               <button
                 onClick={() => setDraft(true)}
                 className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25"
               >
-                abrir primeira votação
+                {t.votes.openFirstVote}
               </button>
             )}
           />

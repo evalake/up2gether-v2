@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/core/Button'
 import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
+import { useT } from '@/i18n'
 import type { HardwareTier } from '@/features/games/api'
 
 type DiscoverResult = {
@@ -16,12 +17,7 @@ type DiscoverResult = {
   available: { discord_guild_id: string; name: string; icon_url: string | null }[]
 }
 
-const TIERS: { id: HardwareTier; label: string; hint: string }[] = [
-  { id: 'low', label: 'low', hint: 'integrada / notebook básico' },
-  { id: 'mid', label: 'mid', hint: 'gtx 1060+ / rx 580+' },
-  { id: 'high', label: 'high', hint: 'rtx 3060+ / rx 6700+' },
-  { id: 'unknown', label: '?', hint: 'não sei' },
-]
+// TIERS moved inside component to access t.*
 
 const TIMEZONES = [
   'America/Sao_Paulo',
@@ -56,9 +52,17 @@ function guildIcon(url: string | null) {
 }
 
 export function OnboardingPage() {
+  const t = useT()
   const navigate = useNavigate()
   const me = useMe()
   const toast = useToast()
+
+  const TIERS: { id: HardwareTier; label: string; hint: string }[] = [
+    { id: 'low', label: 'low', hint: t.onboarding.hwTierLow },
+    { id: 'mid', label: 'mid', hint: t.onboarding.hwTierMid },
+    { id: 'high', label: 'high', hint: t.onboarding.hwTierHigh },
+    { id: 'unknown', label: '?', hint: t.onboarding.hwTierUnknown },
+  ]
   const patch = usePatchSettings()
   const setHw = useSetHardware()
   const createGroup = useCreateGroup()
@@ -102,7 +106,7 @@ export function OnboardingPage() {
         }
       })
     } catch {
-      toast.error('falha ao entrar no server')
+      toast.error(t.onboarding.joinFail)
     }
     setJoining((s) => { const n = new Set(s); n.delete(g.discord_guild_id); return n })
   }
@@ -115,9 +119,9 @@ export function OnboardingPage() {
         method: 'POST',
         body: { steam_id_or_vanity: steamUrl.trim() },
       })
-      toast.success(`dos ${r.owned_count} jogos na sua steam, ${r.matched_count} batem com o catálogo`)
+      toast.success(t.onboarding.steamImported(r.owned_count, r.matched_count))
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao importar')
+      toast.error(e instanceof Error ? e.message : t.onboarding.importFail)
     } finally {
       setSteamLoading(false)
     }
@@ -166,31 +170,31 @@ export function OnboardingPage() {
               <div className="space-y-6 text-center">
                 <Avatar discordId={me.data?.discord_id} hash={me.data?.discord_avatar} name={name} size="xl" />
                 <div>
-                  <h1 className="font-display text-3xl text-up-text">fala, {name}</h1>
+                  <h1 className="font-display text-3xl text-up-text">{t.onboarding.hi(name)}</h1>
                   <p className="mt-2 text-sm text-up-dim">
-                    vamos configurar tudo em menos de um minuto pra você já sair jogando com a galera.
+                    {t.onboarding.setupHint}
                   </p>
                 </div>
-                <Button onClick={next} className="mx-auto">bora</Button>
+                <Button onClick={next} className="mx-auto">{t.onboarding.letsGo}</Button>
               </div>
             )}
 
             {step === 'servers' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-up-text">seus servers</h2>
+                  <h2 className="font-display text-2xl text-up-text">{t.onboarding.yourServers}</h2>
                   <p className="mt-1 text-sm text-up-dim">
-                    encontramos esses servers no seu Discord. os que já estão no up2gether foram vinculados automaticamente.
+                    {t.onboarding.foundServers}
                   </p>
                 </div>
 
-                {discoverLoading && <Loading label="buscando servers..." />}
+                {discoverLoading && <Loading label={t.onboarding.searchingServers} />}
 
                 {discover && (
                   <div className="space-y-3">
                     {discover.joined.length > 0 && (
                       <div className="space-y-1.5">
-                        <div className="text-[10px] uppercase tracking-wider text-up-green">já conectados</div>
+                        <div className="text-[10px] uppercase tracking-wider text-up-green">{t.onboarding.alreadyConnected}</div>
                         {discover.joined.map((g) => (
                           <div key={g.id} className="flex items-center gap-3 rounded-sm border border-up-green/30 bg-up-green/5 px-3 py-2">
                             {guildIcon(g.icon_url)}
@@ -203,7 +207,7 @@ export function OnboardingPage() {
 
                     {discover.available.length > 0 && (
                       <div className="space-y-1.5">
-                        <div className="text-[10px] uppercase tracking-wider text-up-dim">disponíveis pra registrar</div>
+                        <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.onboarding.availableToRegister}</div>
                         {discover.available.map((g) => (
                           <div key={g.discord_guild_id} className="flex items-center gap-3 rounded-sm border border-up-line bg-up-panel/30 px-3 py-2">
                             {guildIcon(g.icon_url)}
@@ -213,7 +217,7 @@ export function OnboardingPage() {
                               disabled={joining.has(g.discord_guild_id)}
                               className="shrink-0 rounded-sm border border-up-orange/40 px-2 py-1 text-[10px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/10 disabled:opacity-40"
                             >
-                              {joining.has(g.discord_guild_id) ? '...' : 'registrar'}
+                              {joining.has(g.discord_guild_id) ? '...' : t.onboarding.register}
                             </button>
                           </div>
                         ))}
@@ -222,15 +226,15 @@ export function OnboardingPage() {
 
                     {discover.joined.length === 0 && discover.available.length === 0 && (
                       <div className="py-6 text-center text-xs text-up-dim">
-                        nenhum server encontrado. você pode adicionar depois na tela de grupos.
+                        {t.onboarding.noServersFound}
                       </div>
                     )}
                   </div>
                 )}
 
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
-                  <Button onClick={next}>próximo</Button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.back}</button>
+                  <Button onClick={next}>{t.onboarding.next}</Button>
                 </div>
               </div>
             )}
@@ -238,9 +242,9 @@ export function OnboardingPage() {
             {step === 'timezone' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-up-text">fuso horário</h2>
+                  <h2 className="font-display text-2xl text-up-text">{t.onboarding.timezoneLabel}</h2>
                   <p className="mt-1 text-sm text-up-dim">
-                    todos os horários de sessão vão aparecer nesse fuso. detectamos o seu automaticamente.
+                    {t.onboarding.timezoneHint}
                   </p>
                 </div>
                 <select
@@ -251,8 +255,8 @@ export function OnboardingPage() {
                   {TIMEZONES.map((z) => <option key={z} value={z}>{z}</option>)}
                 </select>
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
-                  <Button onClick={next}>próximo</Button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.back}</button>
+                  <Button onClick={next}>{t.onboarding.next}</Button>
                 </div>
               </div>
             )}
@@ -260,9 +264,9 @@ export function OnboardingPage() {
             {step === 'hardware' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-up-text">seu PC</h2>
+                  <h2 className="font-display text-2xl text-up-text">{t.onboarding.yourPC}</h2>
                   <p className="mt-1 text-sm text-up-dim">
-                    isso ajuda a sugerir jogos que rodam na sua máquina e mostra pro grupo quem consegue jogar o quê.
+                    {t.onboarding.pcHint}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -282,8 +286,8 @@ export function OnboardingPage() {
                   ))}
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
-                  <Button onClick={next}>próximo</Button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.back}</button>
+                  <Button onClick={next}>{t.onboarding.next}</Button>
                 </div>
               </div>
             )}
@@ -291,9 +295,9 @@ export function OnboardingPage() {
             {step === 'steam' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-up-text">Steam</h2>
+                  <h2 className="font-display text-2xl text-up-text">{t.onboarding.steamLabel}</h2>
                   <p className="mt-1 text-sm text-up-dim">
-                    importe sua biblioteca pra marcar automaticamente os jogos que você já tem. seu perfil precisa estar público.
+                    {t.onboarding.steamHint}
                   </p>
                 </div>
                 <div className="space-y-3">
@@ -301,11 +305,11 @@ export function OnboardingPage() {
                     <input
                       value={steamUrl}
                       onChange={(e) => setSteamUrl(e.target.value)}
-                      placeholder="cole a URL do seu perfil Steam"
+                      placeholder={t.onboarding.steamPlaceholder}
                       className="h-9 flex-1 rounded-sm border border-up-line bg-black/40 px-3 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                     />
                     <Button onClick={importSteam} disabled={steamLoading || !steamUrl.trim()}>
-                      {steamLoading ? '...' : 'importar'}
+                      {steamLoading ? '...' : t.settings.importLabel}
                     </Button>
                   </div>
                   <a
@@ -314,13 +318,13 @@ export function OnboardingPage() {
                     rel="noreferrer"
                     className="inline-block text-[11px] text-up-orange/70 transition-colors hover:text-up-orange"
                   >
-                    abrir meu perfil Steam
+                    {t.onboarding.openSteamProfile}
                   </a>
                 </div>
                 <div className="flex items-center justify-between pt-2">
                   <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
                   <div className="flex gap-2">
-                    <button onClick={next} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">pular</button>
+                    <button onClick={next} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.skip}</button>
                     <Button onClick={next}>próximo</Button>
                   </div>
                 </div>
@@ -329,12 +333,12 @@ export function OnboardingPage() {
 
             {step === 'done' && (
               <div className="space-y-6 text-center">
-                <div className="font-display text-4xl text-up-orange">pronto</div>
+                <div className="font-display text-4xl text-up-orange">{t.onboarding.done}</div>
                 <p className="text-sm text-up-dim">
-                  tudo configurado. você pode alterar qualquer coisa depois em configurações.
+                  {t.onboarding.allSet}
                 </p>
                 <Button onClick={finish} className="mx-auto">
-                  {patch.isPending ? 'salvando...' : 'ir pros grupos'}
+                  {patch.isPending ? t.common.saving : t.onboarding.goToGroups}
                 </Button>
               </div>
             )}

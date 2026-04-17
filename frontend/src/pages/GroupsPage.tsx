@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/core/Button'
 import { KanjiLabel } from '@/components/core/KanjiLabel'
 import { useTitle } from '@/lib/useTitle'
+import { useT } from '@/i18n'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 
 function guildIconUrl(g: DiscordGuild): string | null {
@@ -48,6 +49,7 @@ function GuildPickerModal({
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev }
   }, [open])
+  const t = useT()
   const [q, setQ] = useState('')
   const filtered = useMemo(
     () => (guilds.data ?? []).filter((g) => g.name.toLowerCase().includes(q.toLowerCase())),
@@ -75,24 +77,24 @@ function GuildPickerModal({
           >
             <button
               onClick={onClose}
-              aria-label="fechar"
+              aria-label={t.common.close}
               className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
             <div className="border-b border-up-orange/20 px-4 py-3">
               <div className="font-display text-sm uppercase tracking-wider text-up-text">
-                selecione um server do discord
+                {t.groups.selectDiscord}
               </div>
-              <div className="mt-0.5 text-[11px] text-up-dim">escolha um servidor da sua conta discord</div>
+              <div className="mt-0.5 text-[11px] text-up-dim">{t.groups.chooseServer}</div>
             </div>
             <div className="border-b border-up-orange/20 px-4 py-2">
               <input
                 autoFocus
-                aria-label="buscar servers"
+                aria-label={t.groups.searchServers}
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="buscar servers..."
+                placeholder={t.groups.searchServers}
                 className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-3 text-xs focus-visible:border-up-orange focus-visible:outline-none"
               />
             </div>
@@ -118,13 +120,13 @@ function GuildPickerModal({
                       </div>
                     )}
                     <span className="flex-1 truncate text-sm text-up-text">{g.name}</span>
-                    {g.owner && <span className="text-[10px] uppercase tracking-wider text-up-amber">dono</span>}
-                    {already && <span className="text-[10px] uppercase tracking-wider text-up-green">já registrado</span>}
+                    {g.owner && <span className="text-[10px] uppercase tracking-wider text-up-amber">{t.groups.owner}</span>}
+                    {already && <span className="text-[10px] uppercase tracking-wider text-up-green">{t.groups.alreadyRegistered}</span>}
                   </button>
                 )
               })}
               {!guilds.isLoading && filtered.length === 0 && (
-                <div className="p-6 text-center text-xs text-up-dim">nenhum server encontrado</div>
+                <div className="p-6 text-center text-xs text-up-dim">{t.groups.noServerFound}</div>
               )}
             </div>
             <button
@@ -132,7 +134,7 @@ function GuildPickerModal({
               onClick={onClose}
               className="block w-full border-t border-up-orange/30 bg-black/40 py-3 text-xs uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/10"
             >
-              cancelar
+              {t.common.cancel}
             </button>
           </motion.div>
         </motion.div>
@@ -143,7 +145,8 @@ function GuildPickerModal({
 }
 
 export function GroupsPage() {
-  useTitle('grupos')
+  const t = useT()
+  useTitle(t.groups.title)
   const { data, isLoading, error } = useGroups()
   const create = useCreateGroup()
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -175,9 +178,9 @@ export function GroupsPage() {
         discord_permissions: g.permissions ?? null,
         webhook_url: null,
       })
-      toast.success(`${g.name} registrado`)
+      toast.success(t.groups.registered(g.name))
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao registrar grupo')
+      toast.error(e instanceof Error ? e.message : t.groups.registerFail)
     }
   }
 
@@ -191,10 +194,10 @@ export function GroupsPage() {
       <header className="flex items-end justify-between">
         <div>
           <KanjiLabel jp="グループ" en="groups" />
-          <h1 className="mt-1 font-display text-3xl text-up-text">seus grupos</h1>
+          <h1 className="mt-1 font-display text-3xl text-up-text">{t.groups.title}</h1>
         </div>
         <Button onClick={() => setPickerOpen(true)}>
-          + adicionar server
+          {t.groups.addServer}
         </Button>
       </header>
 
@@ -208,10 +211,10 @@ export function GroupsPage() {
       <OnboardingChecklist />
 
 <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-wider text-up-dim">
-        <span><span className="text-up-orange tabular-nums">{total}</span> grupos</span>
-        <span><span className="text-up-green tabular-nums">{totalMembers}</span> membros</span>
-        <span><span className="text-up-amber tabular-nums">{totalGames}</span> jogos</span>
-        {activeVotes > 0 && <span><span className="text-up-magenta tabular-nums">{activeVotes}</span> votações abertas</span>}
+        <span><span className="text-up-orange tabular-nums">{total}</span> {t.nav.groups}</span>
+        <span><span className="text-up-green tabular-nums">{totalMembers}</span> {t.groups.members}</span>
+        <span><span className="text-up-amber tabular-nums">{totalGames}</span> {t.groups.games}</span>
+        {activeVotes > 0 && <span><span className="text-up-magenta tabular-nums">{activeVotes}</span> {t.groups.openVotes}</span>}
       </div>
 
       {isLoading && <Loading />}
@@ -219,9 +222,9 @@ export function GroupsPage() {
 
       {data && data.length === 0 && (
         <EmptyState
-          title="nenhum grupo ainda"
-          hint="cria o primeiro pra começar a coordenar sessões"
-          action={<Button onClick={() => setPickerOpen(true)}>+ adicionar server</Button>}
+          title={t.groups.noGroupsYet}
+          hint={t.groups.createFirst}
+          action={<Button onClick={() => setPickerOpen(true)}>{t.groups.addServer}</Button>}
         />
       )}
 
@@ -263,10 +266,10 @@ export function GroupsPage() {
                   }`}>{g.user_role}</span>
                 </div>
                 <div className="relative flex gap-4 text-[10px] uppercase tracking-wider text-up-dim">
-                  <span>membros <span className="text-up-green">{g.member_count}</span></span>
-                  <span>jogos <span className="text-up-amber">{g.game_count}</span></span>
+                  <span>{t.groups.members} <span className="text-up-green">{g.member_count}</span></span>
+                  <span>{t.groups.games} <span className="text-up-amber">{g.game_count}</span></span>
                   {g.active_vote_sessions > 0 && (
-                    <span>votando <span className="text-up-magenta">{g.active_vote_sessions}</span></span>
+                    <span>{t.groups.openVotes} <span className="text-up-magenta">{g.active_vote_sessions}</span></span>
                   )}
                 </div>
               </div>

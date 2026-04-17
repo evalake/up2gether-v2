@@ -2,17 +2,19 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useClearNotifications, useDeleteNotification, useMarkRead, useNotifications } from '@/features/notifications/hooks'
+import { useT } from '@/i18n'
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, nowLabel: string): string {
   const d = new Date(iso)
   const secs = Math.floor((Date.now() - d.getTime()) / 1000)
-  if (secs < 60) return 'agora'
+  if (secs < 60) return nowLabel
   if (secs < 3600) return `${Math.floor(secs / 60)}m`
   if (secs < 86400) return `${Math.floor(secs / 3600)}h`
   return `${Math.floor(secs / 86400)}d`
 }
 
 export function NotificationBell() {
+  const t = useT()
   const q = useNotifications()
   const mark = useMarkRead()
   const del = useDeleteNotification()
@@ -43,7 +45,7 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="notificacoes"
+        aria-label={t.notifications.label}
         className="relative grid h-8 w-8 place-items-center rounded-full text-up-dim transition-colors hover:bg-up-orange/10 hover:text-up-orange"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -66,14 +68,14 @@ export function NotificationBell() {
             className="absolute right-0 top-full z-[100] mt-2 w-80 overflow-hidden rounded-sm border border-up-orange/30 bg-up-panel shadow-[0_0_40px_rgba(255,102,0,0.15)]"
           >
             <div className="flex items-center justify-between border-b border-up-orange/15 px-3 py-2">
-              <div className="text-[10px] uppercase tracking-wider text-up-dim">notificacoes</div>
+              <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.notifications.label}</div>
               <div className="flex items-center gap-2">
                 {unread > 0 && (
                   <button
                     onClick={() => mark.mutate(undefined)}
                     className="text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
                   >
-                    marcar todas
+                    {t.notifications.markAll}
                   </button>
                 )}
                 {items.length > 0 && (
@@ -81,14 +83,14 @@ export function NotificationBell() {
                     onClick={() => clear.mutate()}
                     className="text-[10px] uppercase tracking-wider text-up-dim hover:text-up-red"
                   >
-                    limpar
+                    {t.notifications.clear}
                   </button>
                 )}
               </div>
             </div>
             <div className="max-h-96 overflow-y-auto">
               {items.length === 0 && (
-                <div className="px-3 py-8 text-center text-[11px] text-up-dim">sem notificacoes</div>
+                <div className="px-3 py-8 text-center text-[11px] text-up-dim">{t.notifications.empty}</div>
               )}
               {items.map((n) => (
                 <div
@@ -103,7 +105,7 @@ export function NotificationBell() {
                   >
                     <div className="flex w-full items-baseline justify-between gap-2">
                       <span className={`truncate text-xs ${!n.read_at ? 'text-up-text' : 'text-up-dim'}`}>{n.title}</span>
-                      <span className="shrink-0 font-mono text-[10px] text-up-dim">{timeAgo(n.created_at)}</span>
+                      <span className="shrink-0 font-mono text-[10px] text-up-dim">{timeAgo(n.created_at, t.notifications.now)}</span>
                     </div>
                     {n.body && <div className="truncate text-[10px] text-up-dim">{n.body}</div>}
                   </button>
@@ -112,7 +114,7 @@ export function NotificationBell() {
                       e.stopPropagation()
                       del.mutate(n.id)
                     }}
-                    aria-label="remover"
+                    aria-label={t.notifications.remove}
                     className="absolute right-2 top-1/2 -translate-y-1/2 grid h-5 w-5 place-items-center rounded-sm text-up-dim opacity-0 transition-opacity hover:bg-up-red/10 hover:text-up-red group-hover:opacity-100"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

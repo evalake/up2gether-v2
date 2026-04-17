@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import type { Game } from '@/features/games/api'
 import { useSetInterest, useToggleOwnership } from '@/features/games/hooks'
 import { steamCover } from '@/lib/steamCover'
-import { SIGNALS, STAGES, STAGE_COLOR } from '@/lib/constants'
+import { STAGE_COLOR } from '@/lib/constants'
+import { useSignals, useStages, useT } from '@/i18n'
 
 type Props = {
   game: Game
@@ -13,6 +14,9 @@ type Props = {
 
 export function GameCard({ game: g, index: i, groupId }: Props) {
   const navigate = useNavigate()
+  const t = useT()
+  const signals = useSignals()
+  const stages = useStages()
   const setInt = useSetInterest(groupId)
   const toggleOwn = useToggleOwnership(groupId)
   const cover = steamCover(g)
@@ -37,11 +41,11 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/30 to-transparent" />
             <div className={`absolute right-2 top-2 rounded-sm bg-black/70 px-2 py-0.5 text-[10px] uppercase tracking-wider backdrop-blur-sm ${STAGE_COLOR[g.stage]}`}>
-              {STAGES.find((s) => s.value === g.stage)?.label ?? g.stage}
+              {stages.find((s) => s.value === g.stage)?.label ?? g.stage}
             </div>
             {g.is_free && (
               <div className="absolute left-2 top-2 rounded-sm border border-up-green/60 bg-black/70 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green backdrop-blur-sm">
-                gratuito
+                {t.games.freeToPlay}
               </div>
             )}
           </div>
@@ -56,7 +60,7 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
 
           <div className="mb-1">
             <div className="mb-0.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
-              <span>viabilidade</span>
+              <span>{t.games.viability}</span>
               <span className="text-up-orange tabular-nums">{g.viability.viability_score.toFixed(0)}%</span>
             </div>
             <div className="h-1 overflow-hidden rounded-sm bg-up-line/30">
@@ -70,12 +74,12 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
           </div>
 
           <div className="mb-1 flex gap-3 text-[10px] uppercase tracking-wider text-up-dim">
-            <span>quero <span className="text-up-green tabular-nums">{g.viability.interest_want_count}</span></span>
-            <span>tem <span className="text-up-amber tabular-nums">{g.viability.ownership_count}</span></span>
+            <span>{t.games.wantCount} <span className="text-up-green tabular-nums">{g.viability.interest_want_count}</span></span>
+            <span>{t.games.ownCount} <span className="text-up-amber tabular-nums">{g.viability.ownership_count}</span></span>
           </div>
 
           <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-            {SIGNALS.map((s) => (
+            {signals.map((s) => (
               <button
                 key={s.value}
                 onClick={() => setInt.mutate({ gameId: g.id, signal: s.value })}
@@ -98,7 +102,7 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
                 : 'border-up-line/60 text-up-dim hover:border-up-green/40 hover:text-up-green'
             }`}
           >
-            {g.user_owns_game ? 'tenho' : 'nao tenho'}
+            {g.user_owns_game ? t.games.haveIt : t.games.dontHaveIt}
           </button>
         </div>
       </div>
