@@ -6,8 +6,8 @@ import { usePatchSettings, useSetHardware } from '@/features/users/hooks'
 import { useCreateGroup } from '@/features/groups/hooks'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
-import { Button } from '@/components/nerv/Button'
-import { Avatar } from '@/components/nerv/Avatar'
+import { Button } from '@/components/core/Button'
+import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import type { HardwareTier } from '@/features/games/api'
 
@@ -115,7 +115,7 @@ export function OnboardingPage() {
         method: 'POST',
         body: { steam_id_or_vanity: steamUrl.trim() },
       })
-      toast.success(`${r.matched_count} de ${r.owned_count} jogos vinculados`)
+      toast.success(`dos ${r.owned_count} jogos na sua steam, ${r.matched_count} batem com o catálogo`)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'falha ao importar')
     } finally {
@@ -143,13 +143,13 @@ export function OnboardingPage() {
   const name = me.data?.discord_display_name ?? me.data?.discord_username ?? ''
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-nerv-grid px-4">
-      <div className="absolute inset-0 nerv-scan pointer-events-none" />
+    <div className="relative flex min-h-screen items-center justify-center bg-up-grid px-4">
+      <div className="absolute inset-0 up-scan pointer-events-none" />
 
       {/* progress dots */}
       <div className="fixed left-1/2 top-6 z-30 flex -translate-x-1/2 gap-2">
         {STEPS.map((s, i) => (
-          <div key={s} className={`h-1.5 rounded-full transition-all ${i <= stepIdx ? 'w-6 bg-nerv-orange' : 'w-1.5 bg-nerv-line/40'}`} />
+          <div key={s} className={`h-1.5 rounded-full transition-all ${i <= stepIdx ? 'w-6 bg-up-orange' : 'w-1.5 bg-up-line/40'}`} />
         ))}
       </div>
 
@@ -166,8 +166,8 @@ export function OnboardingPage() {
               <div className="space-y-6 text-center">
                 <Avatar discordId={me.data?.discord_id} hash={me.data?.discord_avatar} name={name} size="xl" />
                 <div>
-                  <h1 className="font-display text-3xl text-nerv-text">fala, {name}</h1>
-                  <p className="mt-2 text-sm text-nerv-dim">
+                  <h1 className="font-display text-3xl text-up-text">fala, {name}</h1>
+                  <p className="mt-2 text-sm text-up-dim">
                     vamos configurar tudo em menos de um minuto pra você já sair jogando com a galera.
                   </p>
                 </div>
@@ -178,8 +178,8 @@ export function OnboardingPage() {
             {step === 'servers' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-nerv-text">seus servers</h2>
-                  <p className="mt-1 text-sm text-nerv-dim">
+                  <h2 className="font-display text-2xl text-up-text">seus servers</h2>
+                  <p className="mt-1 text-sm text-up-dim">
                     encontramos esses servers no seu Discord. os que já estão no up2gether foram vinculados automaticamente.
                   </p>
                 </div>
@@ -190,12 +190,12 @@ export function OnboardingPage() {
                   <div className="space-y-3">
                     {discover.joined.length > 0 && (
                       <div className="space-y-1.5">
-                        <div className="text-[10px] uppercase tracking-wider text-nerv-green">já conectados</div>
+                        <div className="text-[10px] uppercase tracking-wider text-up-green">já conectados</div>
                         {discover.joined.map((g) => (
-                          <div key={g.id} className="flex items-center gap-3 rounded-sm border border-nerv-green/30 bg-nerv-green/5 px-3 py-2">
+                          <div key={g.id} className="flex items-center gap-3 rounded-sm border border-up-green/30 bg-up-green/5 px-3 py-2">
                             {guildIcon(g.icon_url)}
-                            <span className="text-sm text-nerv-text">{g.name}</span>
-                            <span className="ml-auto text-[9px] uppercase tracking-wider text-nerv-green">ok</span>
+                            <span className="text-sm text-up-text">{g.name}</span>
+                            <span className="ml-auto text-[9px] uppercase tracking-wider text-up-green">ok</span>
                           </div>
                         ))}
                       </div>
@@ -203,15 +203,15 @@ export function OnboardingPage() {
 
                     {discover.available.length > 0 && (
                       <div className="space-y-1.5">
-                        <div className="text-[10px] uppercase tracking-wider text-nerv-dim">disponíveis pra registrar</div>
+                        <div className="text-[10px] uppercase tracking-wider text-up-dim">disponíveis pra registrar</div>
                         {discover.available.map((g) => (
-                          <div key={g.discord_guild_id} className="flex items-center gap-3 rounded-sm border border-nerv-line/40 bg-nerv-panel/30 px-3 py-2">
+                          <div key={g.discord_guild_id} className="flex items-center gap-3 rounded-sm border border-up-line bg-up-panel/30 px-3 py-2">
                             {guildIcon(g.icon_url)}
-                            <span className="flex-1 truncate text-sm text-nerv-text">{g.name}</span>
+                            <span className="flex-1 truncate text-sm text-up-text">{g.name}</span>
                             <button
                               onClick={() => joinServer(g)}
                               disabled={joining.has(g.discord_guild_id)}
-                              className="shrink-0 rounded-sm border border-nerv-orange/40 px-2 py-1 text-[10px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/10 disabled:opacity-40"
+                              className="shrink-0 rounded-sm border border-up-orange/40 px-2 py-1 text-[10px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/10 disabled:opacity-40"
                             >
                               {joining.has(g.discord_guild_id) ? '...' : 'registrar'}
                             </button>
@@ -221,7 +221,7 @@ export function OnboardingPage() {
                     )}
 
                     {discover.joined.length === 0 && discover.available.length === 0 && (
-                      <div className="py-6 text-center text-xs text-nerv-dim">
+                      <div className="py-6 text-center text-xs text-up-dim">
                         nenhum server encontrado. você pode adicionar depois na tela de grupos.
                       </div>
                     )}
@@ -229,7 +229,7 @@ export function OnboardingPage() {
                 )}
 
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">voltar</button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
                   <Button onClick={next}>próximo</Button>
                 </div>
               </div>
@@ -238,20 +238,20 @@ export function OnboardingPage() {
             {step === 'timezone' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-nerv-text">fuso horário</h2>
-                  <p className="mt-1 text-sm text-nerv-dim">
+                  <h2 className="font-display text-2xl text-up-text">fuso horário</h2>
+                  <p className="mt-1 text-sm text-up-dim">
                     todos os horários de sessão vão aparecer nesse fuso. detectamos o seu automaticamente.
                   </p>
                 </div>
                 <select
                   value={tz}
                   onChange={(e) => setTz(e.target.value)}
-                  className="mx-auto block h-10 w-full max-w-xs rounded-sm border border-nerv-orange/30 bg-black/40 px-3 text-sm text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
+                  className="mx-auto block h-10 w-full max-w-xs rounded-sm border border-up-orange/30 bg-black/40 px-3 text-sm text-up-text focus-visible:border-up-orange focus-visible:outline-none"
                 >
                   {TIMEZONES.map((z) => <option key={z} value={z}>{z}</option>)}
                 </select>
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">voltar</button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
                   <Button onClick={next}>próximo</Button>
                 </div>
               </div>
@@ -260,8 +260,8 @@ export function OnboardingPage() {
             {step === 'hardware' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-nerv-text">seu PC</h2>
-                  <p className="mt-1 text-sm text-nerv-dim">
+                  <h2 className="font-display text-2xl text-up-text">seu PC</h2>
+                  <p className="mt-1 text-sm text-up-dim">
                     isso ajuda a sugerir jogos que rodam na sua máquina e mostra pro grupo quem consegue jogar o quê.
                   </p>
                 </div>
@@ -272,17 +272,17 @@ export function OnboardingPage() {
                       onClick={() => setHwTier(t.id)}
                       className={`rounded-sm border px-3 py-3 text-left transition-all ${
                         hwTier === t.id
-                          ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                          : 'border-nerv-line text-nerv-dim hover:border-nerv-orange/40'
+                          ? 'border-up-orange bg-up-orange/10 text-up-orange'
+                          : 'border-up-line text-up-dim hover:border-up-orange'
                       }`}
                     >
                       <div className="text-sm uppercase tracking-wider">{t.label}</div>
-                      <div className="mt-0.5 text-[9px] text-nerv-dim/80">{t.hint}</div>
+                      <div className="mt-0.5 text-[9px] text-up-dim/80">{t.hint}</div>
                     </button>
                   ))}
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">voltar</button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
                   <Button onClick={next}>próximo</Button>
                 </div>
               </div>
@@ -291,8 +291,8 @@ export function OnboardingPage() {
             {step === 'steam' && (
               <div className="space-y-5">
                 <div className="text-center">
-                  <h2 className="font-display text-2xl text-nerv-text">Steam</h2>
-                  <p className="mt-1 text-sm text-nerv-dim">
+                  <h2 className="font-display text-2xl text-up-text">Steam</h2>
+                  <p className="mt-1 text-sm text-up-dim">
                     importe sua biblioteca pra marcar automaticamente os jogos que você já tem. seu perfil precisa estar público.
                   </p>
                 </div>
@@ -302,7 +302,7 @@ export function OnboardingPage() {
                       value={steamUrl}
                       onChange={(e) => setSteamUrl(e.target.value)}
                       placeholder="cole a URL do seu perfil Steam"
-                      className="h-9 flex-1 rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
+                      className="h-9 flex-1 rounded-sm border border-up-line bg-black/40 px-3 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                     />
                     <Button onClick={importSteam} disabled={steamLoading || !steamUrl.trim()}>
                       {steamLoading ? '...' : 'importar'}
@@ -312,15 +312,15 @@ export function OnboardingPage() {
                     href="https://steamcommunity.com/my/profile"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-block text-[11px] text-nerv-orange/70 transition-colors hover:text-nerv-orange"
+                    className="inline-block text-[11px] text-up-orange/70 transition-colors hover:text-up-orange"
                   >
                     abrir meu perfil Steam
                   </a>
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">voltar</button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
                   <div className="flex gap-2">
-                    <button onClick={next} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">pular</button>
+                    <button onClick={next} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">pular</button>
                     <Button onClick={next}>próximo</Button>
                   </div>
                 </div>
@@ -329,8 +329,8 @@ export function OnboardingPage() {
 
             {step === 'done' && (
               <div className="space-y-6 text-center">
-                <div className="font-display text-4xl text-nerv-orange">pronto</div>
-                <p className="text-sm text-nerv-dim">
+                <div className="font-display text-4xl text-up-orange">pronto</div>
+                <p className="text-sm text-up-dim">
                   tudo configurado. você pode alterar qualquer coisa depois em configurações.
                 </p>
                 <Button onClick={finish} className="mx-auto">

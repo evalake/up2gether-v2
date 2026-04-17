@@ -63,15 +63,15 @@ export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="rounded-sm border border-nerv-orange/20 bg-nerv-panel/40 p-5"
+      className="rounded-sm border border-up-orange/30 bg-up-panel/40 p-5"
     >
       <div className="mb-4 flex items-baseline justify-between">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-nerv-orange/80">primeiros passos</div>
-          <div className="mt-1 text-[12px] text-nerv-dim">conclua pra destravar o fluxo completo do grupo</div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">primeiros passos</div>
+          <div className="mt-1 text-[12px] text-up-dim">conclua pra destravar o fluxo completo do grupo</div>
         </div>
-        <div className="font-mono text-[10px] tabular-nums text-nerv-dim">
-          <span className="text-nerv-orange">{steps.filter((s) => s.done).length}</span>/{steps.length}
+        <div className="font-mono text-[10px] tabular-nums text-up-dim">
+          <span className="text-up-orange">{steps.filter((s) => s.done).length}</span>/{steps.length}
         </div>
       </div>
       <ol className="grid gap-2 md:grid-cols-2">
@@ -86,29 +86,29 @@ export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount
               type="button"
               onClick={() => navigate(s.path)}
               disabled={s.done}
-              className={`group flex w-full items-start gap-3 rounded-sm border p-3 text-left transition-all ${
+              className={`group flex w-full items-start gap-3 rounded-sm border p-3 text-left transition-colors ${
                 s.done
-                  ? 'cursor-default border-nerv-green/30 bg-nerv-green/5 opacity-70'
-                  : 'border-nerv-line/40 bg-black/20 hover:border-nerv-orange/60 hover:bg-nerv-orange/5'
+                  ? 'cursor-default border-up-green/40 bg-up-green/5'
+                  : 'border-up-line bg-black/20 hover:border-up-orange hover:bg-up-orange/5'
               }`}
             >
               <span
                 className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border font-mono text-xs tabular-nums ${
                   s.done
-                    ? 'border-nerv-green/60 bg-nerv-green/10 text-nerv-green'
-                    : 'border-nerv-orange/40 bg-nerv-orange/5 text-nerv-orange'
+                    ? 'border-up-green/60 bg-up-green/15 text-up-green'
+                    : 'border-up-orange/50 bg-up-orange/10 text-up-orange'
                 }`}
               >
-                {s.done ? '✓' : s.n}
+                {s.done ? '·' : s.n}
               </span>
               <span className="min-w-0 flex-1">
-                <span className={`block font-display text-sm ${s.done ? 'text-nerv-dim line-through' : 'text-nerv-text'}`}>
+                <span className={`block font-display text-sm ${s.done ? 'text-up-dim line-through' : 'text-up-text'}`}>
                   {s.title}
                 </span>
-                <span className="mt-0.5 block text-[11px] leading-relaxed text-nerv-dim">{s.hint}</span>
+                <span className="mt-0.5 block text-[11px] leading-relaxed text-up-dim">{s.hint}</span>
                 {!s.done && (
-                  <span className="mt-2 inline-block font-mono text-[10px] uppercase tracking-wider text-nerv-orange/80 transition-colors group-hover:text-nerv-orange">
-                    {s.cta} →
+                  <span className="mt-2 inline-block font-mono text-[10px] uppercase tracking-wider text-up-orange transition-colors group-hover:text-up-amber">
+                    {s.cta}
                   </span>
                 )}
               </span>

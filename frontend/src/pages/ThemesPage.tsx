@@ -7,7 +7,6 @@ import {
   useCloseCycle,
   useCurrentTheme,
   useCycle,
-  useDeleteSuggestion,
   useDeleteSuggestionById,
   useDeleteTheme,
   useForceDecide,
@@ -38,7 +37,6 @@ export function ThemesPage() {
   const del = useDeleteTheme(id)
   const openC = useOpenCycle(id)
   const upsert = useUpsertSuggestion(id)
-  const delSug = useDeleteSuggestion(id)
   const delSugById = useDeleteSuggestionById(id)
   const vote = useCastVote(id)
   const closeC = useCloseCycle(id)
@@ -79,8 +77,10 @@ export function ThemesPage() {
   const decided = cycle.data?.phase === 'decided'
   const hasActive = cycle.data && cycle.data.phase !== 'cancelled' && cycle.data.phase !== 'decided'
 
+  const monthLabel = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+
   const onOpenCycle = async () => {
-    try { await openC.mutateAsync(); toast.success(decided ? 'reaberto' : 'ciclo aberto') }
+    try { await openC.mutateAsync(); toast.success(decided ? 'ciclo reaberto' : 'ciclo aberto') }
     catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
   }
 
@@ -88,16 +88,16 @@ export function ThemesPage() {
     <div className="space-y-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-nerv-text">tema do mês</h1>
-          <p className="mt-1 text-xs text-nerv-dim">um foco coletivo · qualquer um sugere, edita, vota e encerra</p>
+          <h1 className="font-display text-3xl text-up-text">tema do mês</h1>
+          <p className="mt-1 text-xs text-up-dim">um foco coletivo · qualquer um sugere, edita, vota e encerra</p>
         </div>
         {!hasActive && ((cycle.data ? isAdmin : isStaff)) && (
           <button
             onClick={onOpenCycle}
             disabled={openC.isPending}
-            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+            className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:opacity-40"
           >
-            {openC.isPending ? 'abrindo' : decided ? 'reabrir e sobrescrever' : current.data ? 'iniciar novo ciclo' : 'iniciar ciclo'}
+            {openC.isPending ? 'abrindo...' : decided ? 'reabrir ciclo' : 'abrir ciclo do mês'}
           </button>
         )}
       </header>
@@ -105,28 +105,20 @@ export function ThemesPage() {
       {(cycle.isLoading || current.isLoading) && <Loading />}
       {cycle.error && <ErrorBox error={cycle.error} />}
 
-      {/* hero do tema decidido */}
+      {/* hero do tema vigente */}
       {current.data && (!cycle.data || cycle.data.phase === 'decided') && (
-        <CurrentThemeHero theme={current.data} onReopen={onOpenCycle} reopening={openC.isPending} canReopen={isAdmin} />
+        <CurrentThemeHero theme={current.data} />
       )}
 
-      {/* ciclo ativo (voting) ou reaberto */}
+      {/* ciclo ativo */}
       {cycle.data && cycle.data.phase !== 'cancelled' && cycle.data.phase !== 'decided' && (
-        <>
-        <div className="flex justify-end">
-          <button
-            onClick={() => setAuditTarget({ cycleId: cycle.data!.id })}
-            className="rounded-sm border border-nerv-line px-2 py-0.5 text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-orange"
-          >
-            audit
-          </button>
-        </div>
         <CycleSection
           cycle={cycle.data}
           isStaff={isStaff}
           isAdmin={isAdmin}
           isSysAdmin={isSysAdmin}
           meId={me.data?.id ?? null}
+          onAudit={() => setAuditTarget({ cycleId: cycle.data!.id })}
           onSubmitSuggestion={async (input) => {
             try {
               await upsert.mutateAsync({ cycleId: cycle.data!.id, input })
@@ -134,10 +126,6 @@ export function ThemesPage() {
             } catch (e) {
               toast.error(e instanceof Error ? e.message : 'falha')
             }
-          }}
-          onDeleteSuggestion={async () => {
-            try { await delSug.mutateAsync(cycle.data!.id); toast.success('removida') }
-            catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
           }}
           onDeleteAny={async (sid) => {
             if (!confirm('remover esta sugestão?')) return
@@ -162,37 +150,36 @@ export function ThemesPage() {
             catch (e) { toast.error(e instanceof Error ? e.message : 'falha') }
           }}
         />
-        </>
       )}
 
-      {!current.data && !cycle.data && (
+      {!current.data && !cycle.data && !cycle.isLoading && (
         <EmptyState
           glyph="✦"
           title="nenhum tema definido"
           hint={isStaff
-            ? 'abre o ciclo mensal. cada membro sugere 1 nome (tipo "cooperativo", "indie 2010s"), e o grupo vota. o tema vencedor guia as sugestões de jogos do mês.'
-            : 'só admin ou mod pode abrir o ciclo mensal. chama alguém com permissão.'}
+            ? `abre o ciclo de ${monthLabel}. o fluxo: qualquer membro sugere um tema, o grupo vota, e staff encerra pra decidir o vencedor.`
+            : `o ciclo de ${monthLabel} ainda não foi aberto. só admin ou mod pode iniciar.`}
           action={isStaff ? (
             <button
               onClick={onOpenCycle}
               disabled={openC.isPending}
-              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+              className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:opacity-40"
             >
-              {openC.isPending ? 'abrindo...' : 'iniciar primeiro ciclo'}
+              {openC.isPending ? 'abrindo...' : 'abrir primeiro ciclo'}
             </button>
           ) : undefined}
         />
       )}
 
       {past.length > 0 && (
-        <section className="space-y-4">
+        <section className="space-y-3">
           <button
             onClick={() => setOpenHistory((v) => !v)}
-            className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
+            className="flex items-center gap-2 text-xs uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
           >
-            <span className="text-nerv-orange">{openHistory ? '−' : '+'}</span>
+            <span className="text-up-orange">{openHistory ? '−' : '+'}</span>
             <span>histórico</span>
-            <span className="tabular-nums text-nerv-orange">{past.length}</span>
+            <span className="tabular-nums text-up-orange">{past.length}</span>
           </button>
           <AnimatePresence>
           {openHistory && (
@@ -200,46 +187,48 @@ export function ThemesPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="grid gap-4 overflow-hidden sm:grid-cols-2 lg:grid-cols-3"
+              className="overflow-hidden"
             >
-              {past.map((t) => (
-                <button
-                  type="button"
-                  onClick={() => setAuditTarget({ themeId: t.id })}
-                  key={t.id}
-                  className="group relative overflow-hidden rounded-sm border border-nerv-line/50 bg-nerv-panel/30 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:shadow-lg hover:shadow-black/20"
-                >
-                  {t.image_url && (
-                    <div className="relative h-28 w-full overflow-hidden">
-                      <img
-                        src={t.image_url}
-                        alt=""
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                        className="h-full w-full object-cover opacity-70 transition-opacity group-hover:opacity-100"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/50 to-transparent" />
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between gap-3 p-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">{t.month_year}</div>
-                      <div className="mt-1 truncate font-display text-lg text-nerv-orange/90">{t.theme_name}</div>
-                      {t.description && (
-                        <p className="mt-2 line-clamp-2 text-xs text-nerv-text/60">{t.description}</p>
+              <div className="grid gap-4 py-1 sm:grid-cols-2 lg:grid-cols-3">
+                {past.map((t) => (
+                  <button
+                    type="button"
+                    onClick={() => setAuditTarget({ themeId: t.id })}
+                    key={t.id}
+                    className="group relative z-0 overflow-hidden rounded-sm border border-up-line/50 bg-up-panel/30 text-left transition-[colors,box-shadow] duration-200 hover:z-10 hover:border-up-orange hover:shadow-[0_0_20px_rgba(255,102,0,0.12)]"
+                  >
+                    {t.image_url && (
+                      <div className="relative h-28 w-full overflow-hidden">
+                        <img
+                          src={t.image_url}
+                          alt=""
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                          className="h-full w-full object-cover opacity-70 transition-opacity group-hover:opacity-100"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/50 to-transparent" />
+                      </div>
+                    )}
+                    <div className="flex items-start justify-between gap-3 p-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.month_year}</div>
+                        <div className="mt-1 truncate font-display text-lg text-up-orange">{t.theme_name}</div>
+                        {t.description && (
+                          <p className="mt-2 line-clamp-2 text-xs text-up-dim">{t.description}</p>
+                        )}
+                      </div>
+                      {isStaff && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); del.mutate(t.id) }}
+                          className="shrink-0 text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-up-dim hover:!text-up-red"
+                        >
+                          remover
+                        </button>
                       )}
                     </div>
-                    {isStaff && (
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); del.mutate(t.id) }}
-                        className="shrink-0 text-[10px] uppercase tracking-wider text-transparent transition-colors group-hover:text-nerv-dim hover:!text-nerv-red"
-                      >
-                        remover
-                      </button>
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
             </motion.div>
           )}
           </AnimatePresence>
@@ -251,34 +240,25 @@ export function ThemesPage() {
           <TiebreakOverlay data={showTiebreak} onClose={() => setShowTiebreak(null)} />
         )}
       </AnimatePresence>
-      {auditTarget && (
-        <ThemeAuditModal
-          groupId={id}
-          themeId={auditTarget.themeId}
-          cycleId={auditTarget.cycleId}
-          onClose={() => setAuditTarget(null)}
-        />
-      )}
+
+      <ThemeAuditModal
+        groupId={id}
+        themeId={auditTarget?.themeId ?? null}
+        cycleId={auditTarget?.cycleId ?? null}
+        onClose={() => setAuditTarget(null)}
+      />
     </div>
   )
 }
 
-function CurrentThemeHero({
-  theme,
-  onReopen,
-  reopening,
-  canReopen,
-}: {
-  theme: { month_year: string; theme_name: string; description: string | null; image_url: string | null }
-  onReopen: () => void
-  reopening: boolean
-  canReopen: boolean
+function CurrentThemeHero({ theme }: {
+  theme: { month_year: string; theme_name: string; description: string | null; image_url: string | null; decided_at: string }
 }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-sm border border-nerv-orange/30 bg-nerv-panel/40"
+      className="relative overflow-hidden rounded-sm border border-up-orange/30 bg-up-panel/40"
     >
       {theme.image_url && (
         <div className="absolute inset-0">
@@ -288,31 +268,25 @@ function CurrentThemeHero({
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             className="h-full w-full object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-nerv-panel via-nerv-panel/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel/90 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-up-panel via-up-panel/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-up-panel/90 to-transparent" />
         </div>
       )}
-      <div className="relative flex flex-col gap-5 p-8 sm:flex-row sm:items-end sm:justify-between">
+      <div className="relative p-8">
         <div className="min-w-0">
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-nerv-magenta">tema vigente · {theme.month_year}</div>
-          <div className="mt-2 font-display text-4xl text-nerv-orange sm:text-5xl">{theme.theme_name}</div>
-          {theme.description && (
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-nerv-text/80">{theme.description}</p>
-          )}
-        </div>
-        {canReopen && (
-          <div className="shrink-0">
-            <button
-              onClick={onReopen}
-              disabled={reopening}
-              className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
-            >
-              {reopening ? 'reabrindo' : 'reabrir e sobrescrever'}
-            </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-magenta">tema vigente</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{theme.month_year}</span>
           </div>
-        )}
+          <div className="mt-2 font-display text-4xl text-up-orange sm:text-5xl">{theme.theme_name}</div>
+          {theme.description && (
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-up-text">{theme.description}</p>
+          )}
+          <div className="mt-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
+            decidido em {new Date(theme.decided_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          </div>
+        </div>
       </div>
     </motion.section>
   )
 }
-

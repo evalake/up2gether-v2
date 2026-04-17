@@ -1105,57 +1105,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/notifications/push/vapid-public-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Vapid Public Key */
-        get: operations["vapid_public_key_api_notifications_push_vapid_public_key_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/notifications/push/subscribe": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Push Subscribe */
-        post: operations["push_subscribe_api_notifications_push_subscribe_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/notifications/push/unsubscribe": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Push Unsubscribe */
-        post: operations["push_unsubscribe_api_notifications_push_unsubscribe_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/notifications/test": {
         parameters: {
             query?: never;
@@ -1969,24 +1918,6 @@ export interface components {
             rsvp_yes: number;
             /** Rsvp Maybe */
             rsvp_maybe: number;
-        };
-        /** PushKeys */
-        PushKeys: {
-            /** P256Dh */
-            p256dh: string;
-            /** Auth */
-            auth: string;
-        };
-        /** PushSubscribeIn */
-        PushSubscribeIn: {
-            /** Endpoint */
-            endpoint: string;
-            keys: components["schemas"]["PushKeys"];
-        };
-        /** PushUnsubscribeIn */
-        PushUnsubscribeIn: {
-            /** Endpoint */
-            endpoint: string;
         };
         /** RsvpResponse */
         RsvpResponse: {
@@ -4993,98 +4924,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    vapid_public_key_api_notifications_push_vapid_public_key_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-        };
-    };
-    push_subscribe_api_notifications_push_subscribe_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PushSubscribeIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    push_unsubscribe_api_notifications_push_unsubscribe_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PushUnsubscribeIn"];
-            };
-        };
         responses: {
             /** @description Successful Response */
             200: {

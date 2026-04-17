@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
 import { GameGridSkeleton } from '@/components/ui/CardSkeletons'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { Button } from '@/components/nerv/Button'
+import { Button } from '@/components/core/Button'
 import { useTitle } from '@/lib/useTitle'
 import { GameCard } from '@/components/games/GameCard'
 import { GameFilters } from '@/components/games/GameFilters'
@@ -59,30 +60,32 @@ export function GamesPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-nerv-text">biblioteca</h1>
-          <p className="mt-1 text-xs text-nerv-dim">
-            <Link to={`/groups/${id}`} className="text-nerv-dim/70 transition-colors hover:text-nerv-orange">
+          <h1 className="font-display text-3xl text-up-text">biblioteca</h1>
+          <p className="mt-1 text-xs text-up-dim">
+            <Link to={`/groups/${id}`} className="text-up-dim transition-colors hover:text-up-orange">
               grupo
             </Link>
             {' · '}
-            {games.data?.length ?? 0} jogos
+            <span className="tabular-nums">{games.data?.length ?? 0}</span> jogos
           </p>
         </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          {showForm ? 'cancelar' : 'adicionar jogo'}
+        <Button variant="subtle" size="sm" onClick={() => setShowForm(true)}>
+          + adicionar jogo
         </Button>
       </header>
 
-      {showForm && (
-        <GameCreateForm
-          groupId={id}
-          onCreated={(createdId) => {
-            setShowForm(false)
-            navigate(`/groups/${id}/games/${createdId}`)
-          }}
-          onCancel={() => setShowForm(false)}
-        />
-      )}
+      <AnimatePresence>
+        {showForm && (
+          <GameCreateForm
+            groupId={id}
+            onCreated={(createdId) => {
+              setShowForm(false)
+              navigate(`/groups/${id}/games/${createdId}`)
+            }}
+            onCancel={() => setShowForm(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {games.data && games.data.length > 0 && (
         <GameFilters

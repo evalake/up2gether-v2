@@ -11,13 +11,13 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const styles: Record<Variant, string> = {
   primary:
-    'border-nerv-orange/80 bg-nerv-orange/15 text-nerv-orange hover:bg-nerv-orange hover:text-nerv-bg hover:shadow-[0_0_20px_rgba(255,102,0,0.4)]',
+    'border-up-orange/80 bg-up-orange/15 text-up-orange hover:bg-up-orange hover:text-up-bg hover:shadow-[0_0_20px_rgba(255,102,0,0.4)]',
   subtle:
-    'border-nerv-orange/30 bg-transparent text-nerv-orange hover:bg-nerv-orange/10 hover:border-nerv-orange/60',
+    'border-up-orange/30 bg-transparent text-up-orange hover:bg-up-orange/10 hover:border-up-orange',
   ghost:
-    'border-nerv-line bg-transparent text-nerv-text hover:border-nerv-orange/60 hover:text-nerv-orange',
+    'border-up-line bg-transparent text-up-text hover:border-up-orange hover:text-up-orange',
   danger:
-    'border-nerv-red/60 bg-nerv-red/10 text-nerv-red hover:bg-nerv-red hover:text-nerv-bg',
+    'border-up-red/60 bg-up-red/10 text-up-red hover:bg-up-red hover:text-up-bg',
 }
 
 const sizes: Record<Size, string> = {
@@ -36,7 +36,7 @@ export function Button({
   return (
     <button
       {...rest}
-      className={`rounded-sm border font-medium uppercase tracking-wider transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${styles[variant]} ${sizes[size]} ${className}`}
+      className={`rounded-sm border font-medium uppercase tracking-wider transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${styles[variant]} ${sizes[size]} ${className}`}
     >
       {children}
     </button>

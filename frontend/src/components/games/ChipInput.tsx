@@ -22,21 +22,21 @@ export function ChipInput({
   }
   return (
     <div>
-      <div className="mb-1.5 flex items-center justify-between text-xs uppercase tracking-wider text-nerv-dim">
+      <div className="mb-1.5 flex items-center justify-between text-xs uppercase tracking-wider text-up-dim">
         <span>{label}</span>
         <span className="text-[10px]">
           {value.length}/{max}
         </span>
       </div>
-      <div className="flex flex-wrap gap-1.5 rounded-sm border border-nerv-line bg-black/40 p-2">
+      <div className="flex flex-wrap gap-1.5 rounded-sm border border-up-line bg-black/40 p-2">
         {value.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-nerv-orange/40 bg-nerv-orange/10 px-2 py-0.5 text-[11px] text-nerv-orange">
+          <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 text-[11px] text-up-orange">
             {t}
             <button
               type="button"
               onClick={() => onChange(value.filter((x) => x !== t))}
               title="remover filtro"
-              className="transition-colors hover:text-nerv-red"
+              className="transition-colors hover:text-up-red"
             >
               ×
             </button>
@@ -53,7 +53,7 @@ export function ChipInput({
           }}
           onBlur={add}
           placeholder={value.length === 0 ? placeholder : ''}
-          className="min-w-[120px] flex-1 bg-transparent text-xs text-nerv-text placeholder:text-nerv-dim/60 focus-visible:outline-none"
+          className="min-w-[120px] flex-1 bg-transparent text-xs text-up-text placeholder:text-up-dim focus-visible:outline-none"
         />
       </div>
     </div>

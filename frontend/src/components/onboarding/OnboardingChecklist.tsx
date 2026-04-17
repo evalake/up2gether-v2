@@ -25,27 +25,27 @@ export function OnboardingChecklist() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -4 }}
         transition={{ duration: 0.18 }}
-        className="rounded-sm border border-nerv-orange/25 bg-nerv-panel/20 p-4"
+        className="rounded-sm border border-up-orange/25 bg-up-panel/20 p-4"
       >
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-orange/80">
+            <div className="font-mono text-[10px] uppercase tracking-wider text-up-orange">
               primeiro passo
             </div>
-            <h2 className="mt-0.5 font-display text-lg text-nerv-text">
+            <h2 className="mt-0.5 font-display text-lg text-up-text">
               bora ligar sua comunidade
             </h2>
           </div>
           <div className="text-right">
-            <div className="font-display text-2xl tabular-nums text-nerv-orange">
+            <div className="font-display text-2xl tabular-nums text-up-orange">
               {steps_done}
-              <span className="text-nerv-dim">/{steps_total}</span>
+              <span className="text-up-dim">/{steps_total}</span>
             </div>
           </div>
         </div>
-        <div className="mt-3 h-1 overflow-hidden rounded-full bg-nerv-line/30">
+        <div className="mt-3 h-1 overflow-hidden rounded-full bg-up-line/30">
           <div
-            className="h-full bg-nerv-orange transition-all"
+            className="h-full bg-up-orange transition-all"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -57,28 +57,28 @@ export function OnboardingChecklist() {
                 key={s.key}
                 className={`flex items-start gap-2.5 rounded-sm border p-2.5 transition-colors ${
                   done
-                    ? 'border-nerv-green/25 bg-nerv-green/5'
-                    : 'border-nerv-line/30 bg-nerv-panel/10'
+                    ? 'border-up-green/25 bg-up-green/5'
+                    : 'border-up-line/50 bg-up-panel/10'
                 }`}
               >
                 <span
                   className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[10px] ${
                     done
-                      ? 'border-nerv-green/60 bg-nerv-green/20 text-nerv-green'
-                      : 'border-nerv-line/50 text-nerv-dim'
+                      ? 'border-up-green/60 bg-up-green/20 text-up-green'
+                      : 'border-up-line/50 text-up-dim'
                   }`}
                 >
-                  {done ? '✓' : ''}
+                  {done ? '·' : ''}
                 </span>
                 <div className="min-w-0">
                   <div
                     className={`font-mono text-[11px] uppercase tracking-wider ${
-                      done ? 'text-nerv-green/90' : 'text-nerv-text'
+                      done ? 'text-up-green' : 'text-up-text'
                     }`}
                   >
                     {s.label}
                   </div>
-                  <div className="mt-0.5 text-[11px] text-nerv-dim">{s.hint}</div>
+                  <div className="mt-0.5 text-[11px] text-up-dim">{s.hint}</div>
                 </div>
               </li>
             )

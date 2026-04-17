@@ -90,23 +90,23 @@ export function ThemesTab({ groupId }: { groupId: string }) {
   return (
     <div className="space-y-4">
       {activeCycle && (
-        <section className="rounded-sm border border-nerv-orange/30 bg-nerv-panel/30 p-4">
+        <section className="rounded-sm border border-up-orange/30 bg-up-panel/30 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Ciclo ativo</div>
-              <div className="mt-1 text-sm text-nerv-text">
-                {cycle.data!.month_year} · fase <span className="text-nerv-orange">{cycle.data!.phase}</span> · {cycle.data!.suggestions.length} sugestoes · {cycle.data!.total_votes} votos
+              <div className="text-[11px] uppercase tracking-wider text-up-dim">Ciclo ativo</div>
+              <div className="mt-1 text-sm text-up-text">
+                {cycle.data!.month_year} · fase <span className="text-up-orange">{cycle.data!.phase}</span> · {cycle.data!.suggestions.length} sugestoes · {cycle.data!.total_votes} votos
               </div>
             </div>
             {cancelConfirm ? (
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setCancelConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
-                <button onClick={doCancel} disabled={cancel.isPending} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40">
+                <button onClick={() => setCancelConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
+                <button onClick={doCancel} disabled={cancel.isPending} className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40">
                   sim, cancelar ciclo
                 </button>
               </div>
             ) : (
-              <button onClick={() => setCancelConfirm(true)} className="shrink-0 rounded-sm border border-nerv-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10">
+              <button onClick={() => setCancelConfirm(true)} className="shrink-0 rounded-sm border border-up-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10">
                 cancelar ciclo
               </button>
             )}
@@ -114,16 +114,16 @@ export function ThemesTab({ groupId }: { groupId: string }) {
         </section>
       )}
 
-      <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
+      <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Temas do grupo</div>
-            <p className="mt-1 text-[11px] text-nerv-dim/80">
+            <div className="text-[11px] uppercase tracking-wider text-up-dim">Temas do grupo</div>
+            <p className="mt-1 text-[11px] text-up-dim">
               Historico mensal. Busca por nome ou mes.
             </p>
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
-            <span className="tabular-nums text-nerv-orange">{list.length}</span> total
+          <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
+            <span className="tabular-nums text-up-orange">{list.length}</span> total
           </div>
         </div>
 
@@ -133,26 +133,26 @@ export function ThemesTab({ groupId }: { groupId: string }) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="buscar tema..."
-            className="h-8 min-w-[180px] flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
+            className="h-8 min-w-[180px] flex-1 rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
           />
           {filtered.length > 0 && (
-            <button onClick={toggleAll} className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">
+            <button onClick={toggleAll} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">
               {selected.size === filtered.length ? 'limpar' : 'tudo'}
             </button>
           )}
           {selected.size > 0 && (
-            <button onClick={() => setBulkConfirm(true)} className="rounded-sm border border-nerv-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10">
+            <button onClick={() => setBulkConfirm(true)} className="rounded-sm border border-up-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10">
               apagar {selected.size}
             </button>
           )}
         </div>
 
         {bulkConfirm && (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
-            <p className="text-xs text-nerv-red">apagar {selected.size} tema{selected.size === 1 ? '' : 's'}?</p>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
+            <p className="text-xs text-up-red">apagar {selected.size} tema{selected.size === 1 ? '' : 's'}?</p>
             <div className="flex shrink-0 gap-2">
-              <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
-              <button onClick={deleteBulk} disabled={del.isPending} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40">
+              <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
+              <button onClick={deleteBulk} disabled={del.isPending} className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40">
                 sim, apagar
               </button>
             </div>
@@ -160,30 +160,30 @@ export function ThemesTab({ groupId }: { groupId: string }) {
         )}
 
         {filtered.length === 0 ? (
-          <div className="mt-4 py-6 text-center text-[11px] text-nerv-dim">
+          <div className="mt-4 py-6 text-center text-[11px] text-up-dim">
             {q ? `nenhum tema pra "${q}"` : 'nenhum tema ainda'}
           </div>
         ) : (
-          <div className="mt-4 divide-y divide-nerv-line/30">
+          <div className="mt-4 divide-y divide-up-line/30">
             {filtered.map((t) => {
               const on = selected.has(t.id)
               const confirming = pendingDelete === t.id
               return (
                 <div key={t.id} className="flex items-center gap-3 py-2">
-                  <input type="checkbox" checked={on} onChange={() => toggleOne(t.id)} className="h-3.5 w-3.5 shrink-0 accent-nerv-orange" />
+                  <input type="checkbox" checked={on} onChange={() => toggleOne(t.id)} className="h-3.5 w-3.5 shrink-0 accent-up-orange" />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm text-nerv-text">{t.theme_name}</div>
-                    <div className="truncate font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+                    <div className="truncate text-sm text-up-text">{t.theme_name}</div>
+                    <div className="truncate font-mono text-[9px] uppercase tracking-wider text-up-dim">
                       {t.month_year}{t.description ? ` · ${t.description}` : ''}
                     </div>
                   </div>
                   {confirming ? (
                     <div className="flex shrink-0 gap-1">
-                      <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim">cancelar</button>
-                      <button onClick={() => deleteOne(t.id)} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-2 py-1 font-mono text-[10px] text-nerv-red">confirmar</button>
+                      <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim">cancelar</button>
+                      <button onClick={() => deleteOne(t.id)} className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red">confirmar</button>
                     </div>
                   ) : (
-                    <button onClick={() => setPendingDelete(t.id)} className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red">
+                    <button onClick={() => setPendingDelete(t.id)} className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red">
                       apagar
                     </button>
                   )}

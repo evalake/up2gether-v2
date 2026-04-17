@@ -8,7 +8,7 @@ from app.models.game import (
     SteamGameOwnership,
 )
 from app.models.group import Group, GroupMembership
-from app.models.notification import Notification, PushSubscription
+from app.models.notification import Notification
 from app.models.session import PlaySession, SessionRsvpRow
 from app.models.theme import MonthlyTheme, ThemeCycle, ThemeSuggestion, ThemeVote
 from app.models.user import IntegrationAccount, User, UserHardwareProfile
@@ -25,7 +25,6 @@ __all__ = [
     "MonthlyTheme",
     "Notification",
     "PlaySession",
-    "PushSubscription",
     "SessionRsvpRow",
     "SteamGameOwnership",
     "ThemeCycle",

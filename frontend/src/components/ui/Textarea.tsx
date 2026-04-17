@@ -39,13 +39,13 @@ export function Textarea({
         {...rest}
         className={
           className ??
-          'w-full resize-none rounded-sm border border-nerv-line bg-black/40 px-2 py-1.5 text-xs transition-colors focus-visible:border-nerv-orange focus-visible:outline-none'
+          'w-full resize-none rounded-sm border border-up-line bg-black/40 px-2 py-1.5 text-xs transition-colors focus-visible:border-up-orange focus-visible:outline-none'
         }
       />
       {showCount && (
         <div
           className={`pointer-events-none absolute bottom-1.5 right-2 font-mono text-[9px] tabular-nums ${
-            near ? 'text-nerv-amber' : 'text-nerv-dim/60'
+            near ? 'text-up-amber' : 'text-up-line'
           }`}
         >
           {len}/{maxLength}

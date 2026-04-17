@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { useGames } from '@/features/games/hooks'
 import {
   useCloseVote,
@@ -19,6 +19,7 @@ import { useTitle } from '@/lib/useTitle'
 import { VoteCard, LastClosedPreview } from './votes/VoteCard'
 import { DraftModal } from './votes/DraftModal'
 import { WinnerReveal } from './votes/WinnerReveal'
+import { VoteHistory } from './votes/VoteHistory'
 
 type VoteRow = NonNullable<ReturnType<typeof useVotes>['data']>[number]
 
@@ -33,7 +34,6 @@ export function VotesPage() {
   const [draft, setDraft] = useState(false)
   const [title, setTitle] = useState('')
   const [picked, setPicked] = useState<string[]>([])
-  const [openHistory, setOpenHistory] = useState(false)
   const [reveal, setReveal] = useState<{ vote: VoteRow; game: Game } | null>(null)
   const [auditId, setAuditId] = useState<string | null>(null)
   const toast = useToast()
@@ -149,14 +149,14 @@ export function VotesPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-nerv-text">votações</h1>
-          <p className="mt-1 text-xs text-nerv-dim">decida com o grupo o próximo jogo</p>
+          <h1 className="font-display text-3xl text-up-text">votações</h1>
+          <p className="mt-1 text-xs text-up-dim">decida com o grupo o próximo jogo</p>
         </div>
         <button
           onClick={() => setDraft(true)}
           disabled={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2}
           title={(games.data?.filter(g => !g.archived_at).length ?? 0) < 2 ? 'precisa de pelo menos 2 jogos ativos' : undefined}
-          className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:cursor-not-allowed disabled:opacity-40"
         >
           nova votação
         </button>
@@ -178,14 +178,14 @@ export function VotesPage() {
             action={needsGames ? (
               <Link
                 to={`/groups/${id}/games`}
-                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25"
+                className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25"
               >
                 ir pro acervo
               </Link>
             ) : (
               <button
                 onClick={() => setDraft(true)}
-                className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25"
+                className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25"
               >
                 abrir primeira votação
               </button>
@@ -198,6 +198,7 @@ export function VotesPage() {
         <LastClosedPreview
           vote={closed[0]}
           game={closed[0].winner_game_id ? gameOf(closed[0].winner_game_id) ?? null : null}
+          onAudit={() => setAuditId(closed[0].id)}
         />
       )}
 
@@ -216,63 +217,7 @@ export function VotesPage() {
         </section>
       )}
 
-      {closed.length > 0 && (
-        <section className="space-y-3">
-          <button
-            onClick={() => setOpenHistory((x) => !x)}
-            className="flex items-center gap-2 text-xs uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
-          >
-            <span>{openHistory ? '−' : '+'}</span>
-            <span>histórico</span>
-            <span className="text-nerv-orange tabular-nums">{closed.length}</span>
-          </button>
-          <AnimatePresence>
-          {openHistory && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="grid gap-3 overflow-hidden sm:grid-cols-2"
-            >
-              {closed.map((v) => {
-                const winner = v.winner_game_id ? gameOf(v.winner_game_id) : null
-                const cover = winner ? steamCover(winner) : null
-                return (
-                  <button
-                    key={v.id}
-                    onClick={() => setAuditId(v.id)}
-                    className="group relative flex gap-3 overflow-hidden rounded-sm border border-nerv-line/60 bg-nerv-panel/30 p-3 text-left transition-all hover:-translate-y-0.5 hover:border-nerv-orange/40 hover:bg-nerv-panel/50 hover:shadow-lg hover:shadow-black/20"
-                  >
-                    {cover ? (
-                      <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-20 w-32 shrink-0 rounded-sm object-cover" />
-                    ) : (
-                      <div className="h-20 w-32 shrink-0 rounded-sm bg-nerv-line/20" />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[10px] uppercase tracking-wider text-nerv-dim">votação encerrada</div>
-                      <div className="mt-0.5 truncate text-sm text-nerv-text">{v.title}</div>
-                      {winner ? (
-                        <div className="mt-2">
-                          <div className="text-[9px] uppercase tracking-wider text-nerv-green/80">vencedor</div>
-                          <div className="truncate text-sm text-nerv-orange">{winner.name}</div>
-                        </div>
-                      ) : (
-                        <div className="mt-2 text-xs text-nerv-dim">sem vencedor</div>
-                      )}
-                      <div className="mt-2 flex items-center gap-3 text-[10px] uppercase tracking-wider text-nerv-dim">
-                        <span><span className="text-nerv-text tabular-nums">{v.ballots_count}</span>/{v.eligible_voter_count} votos</span>
-                        <span>{v.candidate_game_ids.length} candidatos</span>
-                        <span className="text-nerv-orange">audit →</span>
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </motion.div>
-          )}
-          </AnimatePresence>
-        </section>
-      )}
+      <VoteHistory closed={closed} gameOf={gameOf} onAudit={setAuditId} />
 
       <AnimatePresence>
         {draft && (
@@ -289,13 +234,11 @@ export function VotesPage() {
         )}
       </AnimatePresence>
 
-      {auditId && (
-        <VoteAuditModal
-          groupId={id}
-          voteId={auditId}
-          onClose={() => setAuditId(null)}
-        />
-      )}
+      <VoteAuditModal
+        groupId={id}
+        voteId={auditId}
+        onClose={() => setAuditId(null)}
+      />
 
       <AnimatePresence>
         {reveal && (

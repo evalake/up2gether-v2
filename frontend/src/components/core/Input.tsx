@@ -12,14 +12,14 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
   return (
     <label className="block">
       {label && (
-        <div className="mb-1.5 text-xs uppercase tracking-wider text-nerv-dim">{label}</div>
+        <div className="mb-1.5 text-xs uppercase tracking-wider text-up-dim">{label}</div>
       )}
       <input
         ref={ref}
         {...rest}
-        className={`w-full rounded-sm border border-nerv-line bg-black/50 px-3 py-2 text-sm text-nerv-text placeholder:text-nerv-dim/60 transition-colors focus-visible:border-nerv-orange focus-visible:bg-black/70 focus-visible:outline-none ${className}`}
+        className={`w-full rounded-sm border border-up-line bg-black/50 px-3 py-2 text-sm text-up-text placeholder:text-up-dim transition-colors focus-visible:border-up-orange focus-visible:bg-black/70 focus-visible:outline-none ${className}`}
       />
-      {error && <p className="mt-1 text-xs text-nerv-red">! {error}</p>}
+      {error && <p className="mt-1 text-xs text-up-red">! {error}</p>}
     </label>
   )
 })

@@ -53,12 +53,6 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     google_redirect_uri: str = ""
 
-    # web push
-    vapid_public_key: str = ""
-    vapid_private_key: str = ""  # PEM direto como env (preferencia em prod)
-    vapid_private_key_file: str = ""  # fallback: caminho de arquivo (dev)
-    vapid_claims_email: str = "mailto:admin@up2gether.app"
-
 
 @lru_cache
 def get_settings() -> Settings:

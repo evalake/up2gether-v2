@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVoteAudit } from '@/features/votes/hooks'
-import { Avatar } from '@/components/nerv/Avatar'
+import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
@@ -26,14 +27,20 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!voteId) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [onClose, voteId])
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {voteId && (
         <motion.div
@@ -54,18 +61,18 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
             exit={{ opacity: 0, scale: 0.97, y: 6 }}
             transition={{ type: 'spring', stiffness: 340, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative my-8 w-full max-w-3xl overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
+            className="relative my-8 w-full max-w-3xl overflow-hidden rounded-lg border border-up-orange/25 bg-up-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
           >
             <button
               onClick={onClose}
               aria-label="fechar"
-              className="absolute right-3 top-3 z-20 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+              className="absolute right-3 top-3 z-20 grid h-7 w-7 place-items-center rounded-sm bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
 
-            <div className="border-b border-nerv-line/40 px-5 py-3">
-              <div className="text-[11px] uppercase tracking-wider text-nerv-orange">
+            <div className="border-b border-up-orange/15 px-5 py-3">
+              <div className="text-[11px] uppercase tracking-wider text-up-orange">
                 Auditoria da votação
               </div>
             </div>
@@ -85,7 +92,8 @@ export function VoteAuditModal({ groupId, voteId, onClose }: Props) {
         userId={profileUserId}
         onClose={() => setProfileUserId(null)}
       />
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 
@@ -107,98 +115,106 @@ function AuditBody({
     { label: 'fechada', at: session.closed_at },
   ]
 
+  // candidatos ordenados por votos (mais votado primeiro)
+  const sortedCandidates = [...session.candidate_game_ids].sort((a, b) => {
+    const ca = session.tallies[a] ?? 0
+    const cb = session.tallies[b] ?? 0
+    return cb - ca
+  })
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* header enriquecido */}
       <section>
-        <h2 className="font-display text-xl text-nerv-text">{session.title}</h2>
+        <h2 className="font-display text-xl text-up-text">{session.title}</h2>
         {session.description && (
-          <p className="mt-1 text-[11px] text-nerv-dim/80">{session.description}</p>
+          <p className="mt-1 text-[11px] text-up-dim">{session.description}</p>
         )}
-        <div className="mt-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
+        <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-up-dim">
           <span
             className={`rounded-sm border px-2 py-0.5 ${
               session.status === 'open'
-                ? 'border-nerv-green/40 text-nerv-green'
-                : 'border-nerv-dim/40'
+                ? 'border-up-green/40 text-up-green'
+                : 'border-up-dim/40'
             }`}
           >
-            {session.status}
+            {session.status === 'open' ? 'aberta' : 'encerrada'}
           </span>
+          <span className="tabular-nums">{voters.length}/{session.eligible_voter_count} votaram</span>
+          <span>{session.candidate_game_ids.length} candidatos</span>
           {session.total_stages && session.total_stages > 1 && (
-            <span>
-              stage {session.current_stage_number}/{session.total_stages}
-            </span>
+            <span>fase {session.current_stage_number}/{session.total_stages}</span>
           )}
-          <span>
-            quorum {session.quorum_count}/{session.eligible_voter_count}
-          </span>
         </div>
       </section>
 
+      {/* vencedor */}
       {winner && (
-        <section className="flex items-center gap-3 rounded-sm border border-nerv-green/30 bg-nerv-green/5 p-3">
+        <section className="flex items-center gap-3 rounded-sm border border-up-green/30 bg-up-green/5 p-3">
           {winner.cover_url && (
             <img
               src={winner.cover_url}
               alt=""
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-              className="h-12 w-20 rounded-sm border border-nerv-green/30 object-cover"
+              className="h-12 w-20 rounded-sm border border-up-green/30 object-cover"
             />
           )}
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-nerv-green">
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] uppercase tracking-wider text-up-green">
               Vencedor
             </div>
-            <div className="font-display text-base text-nerv-text">{winner.name}</div>
+            <div className="font-display text-base text-up-text">{winner.name}</div>
           </div>
+          <span className="shrink-0 rounded-sm border border-up-green/40 bg-up-green/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-green">
+            {session.tallies[session.winner_game_id!] ?? 0} votos
+          </span>
         </section>
       )}
 
-      <section>
-        <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
-          Criador
+      {/* criador + timeline */}
+      <section className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-up-dim">Criador</div>
+          <button
+            type="button"
+            onClick={() => creator.id && onOpenProfile(creator.id)}
+            disabled={!creator.id}
+            className="flex items-center gap-2 rounded-sm transition-colors hover:text-up-orange disabled:cursor-default"
+          >
+            <Avatar
+              discordId={creator.discord_id}
+              hash={creator.avatar_url}
+              name={creator.display_name}
+              size="sm"
+            />
+            <span className="text-sm text-up-text">
+              {creator.display_name ?? '(desconhecido)'}
+            </span>
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => creator.id && onOpenProfile(creator.id)}
-          disabled={!creator.id}
-          className="flex items-center gap-2 rounded-sm transition-colors hover:text-nerv-orange disabled:cursor-default"
-        >
-          <Avatar
-            discordId={creator.discord_id}
-            hash={creator.avatar_url}
-            name={creator.display_name}
-            size="sm"
-          />
-          <span className="text-sm text-nerv-text">
-            {creator.display_name ?? '(desconhecido)'}
-          </span>
-        </button>
-      </section>
-
-      <section>
-        <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
-          Timeline
-        </div>
-        <div className="space-y-1 font-mono text-[11px]">
-          {timeline.map(
-            (t) =>
-              t.at && (
-                <div key={t.label} className="flex gap-3">
-                  <span className="w-24 text-nerv-dim">{t.label}</span>
-                  <span className="text-nerv-text">{fmt(t.at)}</span>
-                </div>
-              ),
-          )}
+        <div>
+          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-up-dim">Timeline</div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-[11px]">
+            {timeline.map(
+              (t) =>
+                t.at && (
+                  <div key={t.label}>
+                    <span className="text-up-dim">{t.label}</span>{' '}
+                    <span className="text-up-text">{fmt(t.at)}</span>
+                  </div>
+                ),
+            )}
+          </div>
         </div>
       </section>
 
+      {/* candidatos ordenados por votos */}
       <section>
-        <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
+        <div className="mb-2 text-[11px] uppercase tracking-wider text-up-dim">
           Candidatos ({session.candidate_game_ids.length})
         </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {session.candidate_game_ids.map((gid) => {
+        <div className="grid gap-1.5 sm:grid-cols-2">
+          {sortedCandidates.map((gid) => {
             const g = gameById(gid)
             const count = session.tallies[gid] ?? 0
             const isWinner = gid === session.winner_game_id
@@ -207,26 +223,33 @@ function AuditBody({
                 key={gid}
                 className={`flex items-center gap-2 rounded-sm border p-2 ${
                   isWinner
-                    ? 'border-nerv-green/40 bg-nerv-green/5'
-                    : 'border-nerv-line/40 bg-black/20'
+                    ? 'border-up-green/40 bg-up-green/5'
+                    : 'border-up-line bg-black/20'
                 }`}
               >
-                {g?.cover_url && (
+                {g?.cover_url ? (
                   <img
                     src={g.cover_url}
                     alt=""
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                     className="h-8 w-14 shrink-0 rounded-sm object-cover"
                   />
+                ) : (
+                  <div className="h-8 w-14 shrink-0 rounded-sm bg-up-line/20" />
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs text-nerv-text" title={g?.name ?? undefined}>
+                  <div className="truncate text-xs text-up-text" title={g?.name ?? undefined}>
                     {g?.name ?? '(removido)'}
                   </div>
                 </div>
-                <div className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-nerv-orange tabular-nums">
+                <div className="shrink-0 font-mono text-[10px] uppercase tracking-wider tabular-nums text-up-orange">
                   {count}
                 </div>
+                {isWinner && (
+                  <span className="shrink-0 rounded-sm bg-up-green/15 px-1 py-0.5 text-[10px] uppercase tracking-wider text-up-green">
+                    W
+                  </span>
+                )}
               </div>
             )
           })}
@@ -234,24 +257,24 @@ function AuditBody({
       </section>
 
       <section>
-        <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
+        <div className="mb-2 text-[11px] uppercase tracking-wider text-up-dim">
           Quem votou ({voters.length})
         </div>
         {voters.length === 0 ? (
-          <div className="rounded-sm border border-nerv-line/40 bg-black/20 py-4 text-center text-[11px] text-nerv-dim">
+          <div className="rounded-sm border border-up-line bg-black/20 py-4 text-center text-[11px] text-up-dim">
             ninguém votou ainda
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {voters.map((v, i) => (
               <div
                 key={`${v.user_id}-${v.stage_id ?? 'legacy'}-${i}`}
-                className="rounded-sm border border-nerv-line/40 bg-black/20 p-3"
+                className="rounded-sm border border-up-line bg-black/20 px-3 py-2"
               >
                 <button
                   type="button"
                   onClick={() => onOpenProfile(v.user_id)}
-                  className="flex w-full items-center gap-2 text-left transition-colors hover:text-nerv-orange"
+                  className="flex w-full items-center gap-2 text-left transition-colors hover:text-up-orange"
                 >
                   <Avatar
                     discordId={v.discord_id}
@@ -260,8 +283,8 @@ function AuditBody({
                     size="sm"
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm text-nerv-text" title={v.display_name ?? undefined}>{v.display_name}</div>
-                    <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+                    <div className="truncate text-sm text-up-text" title={v.display_name ?? undefined}>{v.display_name}</div>
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
                       {fmt(v.submitted_at)}
                       {v.stage_number != null && ` · stage ${v.stage_number}`}
                     </div>
@@ -274,7 +297,7 @@ function AuditBody({
                       return (
                         <span
                           key={gid}
-                          className="inline-flex items-center gap-1.5 rounded-sm border border-nerv-orange/30 bg-nerv-orange/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange"
+                          className="inline-flex items-center gap-1.5 rounded-sm border border-up-orange/30 bg-up-orange/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-orange"
                         >
                           {g?.cover_url && (
                             <img loading="lazy" src={g.cover_url} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-4 w-7 rounded-[2px] object-cover" />
@@ -286,7 +309,7 @@ function AuditBody({
                   </div>
                 )}
                 {v.approvals.length === 0 && (
-                  <div className="mt-2 pl-10 font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+                  <div className="mt-2 pl-10 font-mono text-[10px] uppercase tracking-wider text-up-dim">
                     (voto em branco)
                   </div>
                 )}
@@ -298,17 +321,17 @@ function AuditBody({
 
       {non_voters.length > 0 && (
         <section>
-          <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-dim">
+          <div className="mb-2 text-[11px] uppercase tracking-wider text-up-dim">
             Ainda não votaram ({non_voters.length})
           </div>
           <div className="flex flex-wrap gap-2">
-            {non_voters.map((p) => (
+            {non_voters.map((p, i) => (
               <button
-                key={p.id ?? Math.random()}
+                key={p.id ?? p.discord_id ?? `nv-${i}`}
                 type="button"
                 onClick={() => p.id && onOpenProfile(p.id)}
                 disabled={!p.id}
-                className="flex items-center gap-2 rounded-sm border border-nerv-line/40 bg-black/20 px-2 py-1 transition-colors hover:border-nerv-orange/40 disabled:cursor-default"
+                className="flex items-center gap-2 rounded-sm border border-up-line bg-black/20 px-2 py-1 transition-colors hover:border-up-orange disabled:cursor-default"
               >
                 <Avatar
                   discordId={p.discord_id}
@@ -316,7 +339,7 @@ function AuditBody({
                   name={p.display_name}
                   size="xs"
                 />
-                <span className="text-[11px] text-nerv-dim">
+                <span className="text-[11px] text-up-dim">
                   {p.display_name ?? '?'}
                 </span>
               </button>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { useSessionAudit } from '@/features/sessions/hooks'
 import { useSetRsvp, useDeleteSession } from '@/features/sessions/hooks'
 import type { SessionRsvp } from '@/features/sessions/api'
-import { Avatar } from '@/components/nerv/Avatar'
+import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
@@ -69,12 +69,12 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
             exit={{ opacity: 0, scale: 0.97, y: 6 }}
             transition={{ type: 'spring', stiffness: 340, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-xl overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
+            className="relative w-full max-w-xl overflow-hidden rounded-lg border border-up-orange/25 bg-up-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
           >
             <button
               onClick={onClose}
               aria-label="fechar"
-              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
@@ -154,10 +154,10 @@ function Body({
               alt=""
               className="h-full w-full scale-110 object-cover blur-[2px]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/70 to-nerv-panel/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/70 to-up-panel/20" />
           </>
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-nerv-orange/20 via-nerv-panel to-nerv-magenta/10" />
+          <div className="h-full w-full bg-gradient-to-br from-up-orange/20 via-up-panel to-up-magenta/10" />
         )}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -166,20 +166,20 @@ function Body({
           className="absolute inset-x-0 bottom-0 p-5"
         >
           {countdown && !isPast && (
-            <span className="mb-2 inline-block rounded-full border border-nerv-orange/40 bg-nerv-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-orange">
+            <span className="mb-2 inline-block rounded-full border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-orange">
               {countdown}
             </span>
           )}
           {isPast && (
-            <span className="mb-2 inline-block rounded-full border border-nerv-line/60 bg-black/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+            <span className="mb-2 inline-block rounded-full border border-up-line/60 bg-black/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-dim">
               já rolou
             </span>
           )}
-          <h2 className="font-display text-2xl leading-tight text-nerv-text">
+          <h2 className="font-display text-2xl leading-tight text-up-text">
             {session.title}
           </h2>
           {game && game.name !== session.title && (
-            <div className="mt-0.5 truncate text-[11px] text-nerv-orange/80">
+            <div className="mt-0.5 truncate text-[11px] text-up-orange">
               {game.name}
             </div>
           )}
@@ -191,7 +191,7 @@ function Body({
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.14 }}
-        className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-nerv-line/30 px-5 py-3 text-[11px] text-nerv-dim"
+        className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-up-line/50 px-5 py-3 text-[11px] text-up-dim"
       >
         <div className="flex items-center gap-1.5">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
@@ -207,11 +207,11 @@ function Body({
           <button
             type="button"
             onClick={() => creator.id && setProfileUserId(creator.id)}
-            className="ml-auto flex items-center gap-1.5 transition-colors hover:text-nerv-orange"
+            className="ml-auto flex items-center gap-1.5 transition-colors hover:text-up-orange"
           >
-            <span className="text-nerv-dim/70">por</span>
+            <span className="text-up-dim">por</span>
             <Avatar discordId={creator.discord_id} hash={creator.avatar_url} name={creator.display_name} size="xs" />
-            <span className="text-nerv-text/80">{creator.display_name}</span>
+            <span className="text-up-text">{creator.display_name}</span>
           </button>
         )}
       </motion.div>
@@ -223,7 +223,7 @@ function Body({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.18 }}
-            className="whitespace-pre-wrap text-[12px] text-nerv-text/70"
+            className="whitespace-pre-wrap text-[12px] text-up-text/80"
           >
             {session.description}
           </motion.p>
@@ -237,7 +237,7 @@ function Body({
             transition={{ delay: 0.2 }}
             className="space-y-1.5"
           >
-            <div className="text-[10px] uppercase tracking-wider text-nerv-dim">
+            <div className="text-[10px] uppercase tracking-wider text-up-dim">
               você vai?
             </div>
             <div className="flex gap-1.5">
@@ -246,10 +246,10 @@ function Body({
                 const label = v === 'yes' ? 'bora' : v === 'maybe' ? 'talvez' : 'não rola'
                 const tone =
                   v === 'yes'
-                    ? 'border-nerv-green/60 bg-nerv-green/10 text-nerv-green'
+                    ? 'border-up-green/60 bg-up-green/10 text-up-green'
                     : v === 'maybe'
-                      ? 'border-nerv-amber/60 bg-nerv-amber/10 text-nerv-amber'
-                      : 'border-red-500/60 bg-red-500/10 text-red-400'
+                      ? 'border-up-amber/60 bg-up-amber/10 text-up-amber'
+                      : 'border-up-red/60 bg-up-red/10 text-up-red'
                 return (
                   <motion.button
                     key={v}
@@ -258,7 +258,7 @@ function Body({
                     className={`flex-1 rounded-sm border px-3 py-2 text-[11px] uppercase tracking-wider transition-all ${
                       active
                         ? tone
-                        : 'border-nerv-line/60 bg-black/20 text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
+                        : 'border-up-line/60 bg-black/20 text-up-dim transition-colors hover:border-up-orange hover:text-up-text'
                     }`}
                   >
                     {label}
@@ -276,12 +276,12 @@ function Body({
           animate="animate"
           className="space-y-3"
         >
-          <Group title="bora" tone="text-nerv-green" people={yes} pop={pop} onClickMember={setProfileUserId} />
+          <Group title="bora" tone="text-up-green" people={yes} pop={pop} onClickMember={setProfileUserId} />
           {maybe.length > 0 && (
-            <Group title="talvez" tone="text-nerv-amber" people={maybe} pop={pop} onClickMember={setProfileUserId} />
+            <Group title="talvez" tone="text-up-amber" people={maybe} pop={pop} onClickMember={setProfileUserId} />
           )}
           {no.length > 0 && (
-            <Group title="não rola" tone="text-red-400/80" people={no} pop={pop} onClickMember={setProfileUserId} />
+            <Group title="não rola" tone="text-up-red" people={no} pop={pop} onClickMember={setProfileUserId} />
           )}
           {non_respondents.length > 0 && (
             <GroupMuted title="silenciosos" people={non_respondents} pop={pop} onClickMember={setProfileUserId} />
@@ -290,7 +290,7 @@ function Body({
       </div>
 
       {/* footer */}
-      <div className="flex items-center gap-2 border-t border-nerv-line/30 px-5 py-3">
+      <div className="flex items-center gap-2 border-t border-up-line/50 px-5 py-3">
         <button
           onClick={async () => {
             try {
@@ -302,14 +302,14 @@ function Body({
               toast.error('falha ao copiar')
             }
           }}
-          className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-orange"
+          className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
         >
           convite
         </button>
         {canDelete && (
           <button
             onClick={onDelete}
-            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red hover:text-nerv-red"
+            className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-red hover:text-up-red"
           >
             remover
           </button>
@@ -345,9 +345,9 @@ function Group({
     return (
       <div>
         <div className={`mb-1.5 text-[10px] uppercase tracking-wider ${tone}`}>
-          {title} <span className="tabular-nums text-nerv-dim">0</span>
+          {title} <span className="tabular-nums text-up-dim">0</span>
         </div>
-        <div className="text-[11px] text-nerv-dim/60">ninguém ainda</div>
+        <div className="text-[11px] text-up-dim">ninguém ainda</div>
       </div>
     )
   }
@@ -365,7 +365,7 @@ function Group({
               variants={pop}
               type="button"
               onClick={() => uid && onClickMember(uid)}
-              className="flex items-center gap-1.5 rounded-full border border-nerv-line/40 bg-black/20 px-2 py-1 transition-colors hover:border-nerv-orange/40 hover:bg-black/30"
+              className="flex items-center gap-1.5 rounded-full border border-up-line bg-black/20 px-2 py-1 transition-colors hover:border-up-orange hover:bg-black/30"
             >
               <Avatar
                 discordId={p.discord_id}
@@ -373,7 +373,7 @@ function Group({
                 name={p.display_name}
                 size="xs"
               />
-              <span className="text-[11px] text-nerv-text/80">
+              <span className="text-[11px] text-up-text">
                 {p.display_name ?? '?'}
               </span>
             </motion.button>
@@ -397,7 +397,7 @@ function GroupMuted({
 }) {
   return (
     <div>
-      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-nerv-dim/60">
+      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-up-dim">
         {title} <span className="tabular-nums">{people.length}</span>
       </div>
       <div className="flex flex-wrap gap-1">

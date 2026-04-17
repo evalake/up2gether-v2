@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useMe } from '@/features/auth/hooks'
 import { useToast } from '@/components/ui/toast'
+import { SettingsCard } from '@/pages/settings/SettingsCard'
 
 export function InviteLinkSection() {
   const me = useMe()
   const toast = useToast()
   const [copied, setCopied] = useState(false)
   if (!me.data) return null
+
   const url = `${window.location.origin}/?ref=${me.data.id}`
+
   const onCopy = async () => {
     try {
       await navigator.clipboard.writeText(url)
@@ -15,32 +18,29 @@ export function InviteLinkSection() {
       toast.success('link copiado')
       setTimeout(() => setCopied(false), 1800)
     } catch {
-      toast.error('não rolou copiar, selecione à mão')
+      toast.error('falha ao copiar')
     }
   }
+
   return (
-    <section className="rounded-sm border border-nerv-green/20 bg-nerv-green/5 p-5">
-      <div className="mb-2 text-[11px] uppercase tracking-wider text-nerv-green/80">
-        convide a galera
-      </div>
-      <p className="mb-3 text-xs leading-relaxed text-nerv-text/70">
-        manda esse link pra comunidade. cada signup através dele fica creditado pra você no painel
-        (e ajuda a gente a entender de onde vem o pessoal bom).
-      </p>
+    <SettingsCard
+      title="Seu link de convite"
+      description="Cada pessoa que entra por este link fica creditada como sua indicação."
+    >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <code
           title={url}
-          className="flex-1 truncate rounded-sm border border-nerv-line/40 bg-black/40 px-3 py-2 font-mono text-[11px] text-nerv-text"
+          className="flex-1 truncate rounded-sm border border-up-line bg-black/60 px-3 py-2 font-mono text-xs text-up-text"
         >
           {url}
         </code>
         <button
           onClick={onCopy}
-          className="rounded-sm border border-nerv-green/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-green transition-colors hover:bg-nerv-green/10"
+          className="rounded-sm border border-up-orange/40 bg-up-orange/5 px-4 py-2 text-xs text-up-orange transition-colors hover:bg-up-orange/15"
         >
-          {copied ? 'copiado' : 'copiar'}
+          {copied ? 'Copiado' : 'Copiar'}
         </button>
       </div>
-    </section>
+    </SettingsCard>
   )
 }

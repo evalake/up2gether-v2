@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   useGroup,
   useLeaveGroup,
@@ -45,6 +46,7 @@ export function GroupDetailPage() {
   const kick = useKick(id)
   const toast = useToast()
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
+  const [confirmAction, setConfirmAction] = useState<{ title: string; body: string; onConfirm: () => void } | null>(null)
 
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
@@ -77,23 +79,28 @@ export function GroupDetailPage() {
     .map((stage) => ({ stage, count: activeGames.filter((g) => g.stage === stage).length }))
     .filter((s) => s.count > 0)
 
-  const onLeave = async () => {
+  const onLeave = () => {
     if (isSoleAdmin) {
-      toast.error('você é o único admin. promova alguém ou delete o servidor.')
+      toast.error('voce e o unico admin. promova alguem ou delete o servidor.')
       return
     }
-    if (!confirm('sair do grupo?')) return
-    try {
-      await leave.mutateAsync(id)
-      toast.success('saiu do grupo')
-      navigate('/groups')
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao sair')
-    }
+    setConfirmAction({
+      title: 'sair do grupo',
+      body: `Sair de ${group.data!.name}? Voce perde acesso a biblioteca, votacoes e sessoes do grupo.`,
+      onConfirm: async () => {
+        try {
+          await leave.mutateAsync(id)
+          toast.success('saiu do grupo')
+          navigate('/groups')
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : 'falha ao sair')
+        }
+      },
+    })
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <GroupHero
         group={group.data}
         isSoleAdmin={isSoleAdmin}
@@ -144,11 +151,81 @@ export function GroupDetailPage() {
         onPromote={(userId, role) => promote.mutate({ userId, role })}
         onDemote={(userId) => demote.mutate(userId)}
         onKick={(userId, name) => {
-          if (confirm(`remover ${name} do grupo?`)) kick.mutate(userId)
+          setConfirmAction({
+            title: 'remover membro',
+            body: `Remover ${name} do grupo? Essa pessoa perde acesso imediatamente.`,
+            onConfirm: () => kick.mutate(userId),
+          })
         }}
       />
 
       <MemberProfileModal groupId={id} userId={profileUserId} onClose={() => setProfileUserId(null)} />
+
+      <AnimatePresence>
+        {confirmAction && (
+          <ConfirmModal
+            title={confirmAction.title}
+            body={confirmAction.body}
+            onConfirm={() => { confirmAction.onConfirm(); setConfirmAction(null) }}
+            onCancel={() => setConfirmAction(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  )
+}
+
+function ConfirmModal({ title, body, onConfirm, onCancel }: {
+  title: string
+  body: string
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onCancel])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onCancel}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.97 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md overflow-hidden rounded-lg border border-up-orange/25 bg-up-panel shadow-2xl shadow-black/40"
+      >
+        <div className="border-b border-up-orange/15 px-5 py-4">
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">{title}</div>
+        </div>
+        <div className="px-5 py-4 text-sm leading-relaxed text-up-dim">{body}</div>
+        <div className="flex items-center justify-end gap-2 border-t border-up-orange/15 bg-black/20 px-5 py-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-sm border border-up-line/60 bg-black/30 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-text/40 hover:text-up-text"
+          >
+            cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/20"
+          >
+            confirmar
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }

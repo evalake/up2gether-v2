@@ -12,10 +12,10 @@ const SIZE: Record<Size, { px: number; cls: string; text: string; dot: string }>
 }
 
 const DOT_COLOR: Record<PresenceStatus, string> = {
-  online: 'bg-nerv-green',
-  idle: 'bg-nerv-amber',
-  dnd: 'bg-nerv-red',
-  offline: 'bg-nerv-dim/50',
+  online: 'bg-up-green',
+  idle: 'bg-up-amber',
+  dnd: 'bg-up-red',
+  offline: 'bg-up-dim/50',
 }
 
 export function Avatar({
@@ -44,11 +44,11 @@ export function Avatar({
       src={url}
       alt=""
       onError={() => setBroken(true)}
-      className={`${s.cls} shrink-0 rounded-full border border-nerv-orange/20 object-cover ${className}`}
+      className={`${s.cls} shrink-0 rounded-full border border-up-orange/20 object-cover ${className}`}
     />
   ) : (
     <div
-      className={`${s.cls} ${s.text} shrink-0 flex items-center justify-center rounded-full border border-nerv-orange/30 bg-black/40 font-display text-nerv-orange ${className}`}
+      className={`${s.cls} ${s.text} shrink-0 flex items-center justify-center rounded-full border border-up-orange/30 bg-black/40 font-display text-up-orange ${className}`}
     >
       {initial}
     </div>
@@ -58,7 +58,7 @@ export function Avatar({
     <span className="relative inline-block shrink-0">
       {avatarEl}
       <span
-        className={`absolute bottom-0 right-0 block rounded-full ring-nerv-panel ${s.dot} ${DOT_COLOR[presence]}`}
+        className={`absolute bottom-0 right-0 block rounded-full ring-up-panel ${s.dot} ${DOT_COLOR[presence]}`}
         title={presence}
       />
     </span>

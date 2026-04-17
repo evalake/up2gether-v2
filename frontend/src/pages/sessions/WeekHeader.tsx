@@ -20,7 +20,7 @@ function fmtRange(anchor: Date): string {
   const sameMonth = anchor.getMonth() === end.getMonth()
   const a = `${MONTHS_SHORT[anchor.getMonth()]} ${anchor.getDate()}`
   const b = sameMonth ? `${end.getDate()}` : `${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`
-  return `${a} — ${b}`
+  return `${a} a ${b}`
 }
 
 export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJump, onViewChange }: Props) {
@@ -41,13 +41,13 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="flex items-center gap-0.5 rounded-full border border-nerv-line/60 bg-nerv-panel/40 p-1 text-nerv-dim">
+      <div className="flex items-center gap-0.5 rounded-full border border-up-line/60 bg-up-panel/40 p-1 text-up-dim">
         <button
           type="button"
           onClick={onPrev}
           aria-label="semana anterior"
           title="semana anterior"
-          className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange"
+          className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-up-orange/10 hover:text-up-orange"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </button>
@@ -55,7 +55,7 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
           type="button"
           onClick={openPicker}
           title="escolher data"
-          className="relative min-w-[110px] rounded-full px-3 py-0.5 text-center text-[12px] text-nerv-text/90 tabular-nums transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange"
+          className="relative min-w-[110px] rounded-full px-3 py-0.5 text-center text-[12px] text-up-text/90 tabular-nums transition-colors hover:bg-up-orange/10 hover:text-up-orange"
         >
           {fmtRange(weekAnchor)}
           <input
@@ -73,7 +73,7 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
           onClick={onNext}
           aria-label="próxima semana"
           title="próxima semana"
-          className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange"
+          className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-up-orange/10 hover:text-up-orange"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </button>
@@ -83,18 +83,18 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
           disabled={isThisWeek}
           aria-label="semana de hoje"
           title="ir pra semana de hoje"
-          className="ml-0.5 grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-nerv-orange/10 hover:text-nerv-orange disabled:cursor-default disabled:text-nerv-dim/40 disabled:hover:bg-transparent disabled:hover:text-nerv-dim/40"
+          className="ml-0.5 grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-up-orange/10 hover:text-up-orange disabled:cursor-default disabled:text-up-dim/40 disabled:hover:bg-transparent disabled:hover:text-up-dim/40"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z" /></svg>
         </button>
       </div>
-      <div className="flex items-center rounded-full border border-nerv-line/60 bg-nerv-panel/40 p-1 text-[10px] uppercase tracking-wider text-nerv-dim">
+      <div className="flex items-center rounded-full border border-up-line/60 bg-up-panel/40 p-1 text-[10px] uppercase tracking-wider text-up-dim">
         <button
           type="button"
           onClick={() => onViewChange('grid')}
           aria-pressed={viewMode === 'grid'}
           title="grade por horário"
-          className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'grid' ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:text-nerv-orange'}`}
+          className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'grid' ? 'bg-up-orange/15 text-up-orange' : 'hover:text-up-orange'}`}
         >
           grade
         </button>
@@ -103,7 +103,7 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
           onClick={() => onViewChange('list')}
           aria-pressed={viewMode === 'list'}
           title="lista por dia"
-          className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'list' ? 'bg-nerv-orange/15 text-nerv-orange' : 'hover:text-nerv-orange'}`}
+          className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'list' ? 'bg-up-orange/15 text-up-orange' : 'hover:text-up-orange'}`}
         >
           lista
         </button>

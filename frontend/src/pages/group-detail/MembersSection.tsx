@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { GroupMember, GroupRole } from '@/features/groups/api'
-import { Avatar } from '@/components/nerv/Avatar'
+import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 
@@ -24,9 +24,8 @@ type Props = {
 export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpenProfile, onPromote, onDemote, onKick }: Props) {
   return (
     <motion.section {...fadeUp} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-3">
-      <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-nerv-dim">
-        <span>tripulação</span>
-        <span className="tabular-nums text-nerv-orange">{members?.length ?? 0}</span>
+      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-dim">
+        tripulacao <span className="tabular-nums text-up-orange">{members?.length ?? 0}</span>
       </div>
       {isLoading && <Loading />}
       {error && <ErrorBox error={error} />}
@@ -35,14 +34,14 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
           const name = m.user?.discord_display_name ?? m.user?.discord_username ?? m.user_id
           const isMe = meId === m.user_id
           const roleColor =
-            m.role === 'admin' ? 'text-nerv-orange' : m.role === 'mod' ? 'text-nerv-amber' : 'text-nerv-dim'
+            m.role === 'admin' ? 'text-up-orange' : m.role === 'mod' ? 'text-up-amber' : 'text-up-dim'
           return (
             <motion.div
               key={m.id}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.35 + i * 0.03 }}
-              className="group flex items-center gap-3 rounded-sm border border-nerv-line/40 bg-nerv-panel/20 px-3 py-2.5 transition-all hover:border-nerv-orange/40 hover:bg-nerv-panel/40"
+              className="group flex items-center gap-3 rounded-sm border border-up-line bg-up-panel/20 px-3 py-2.5 transition-colors hover:border-up-orange hover:bg-up-panel/50"
             >
               <button
                 type="button"
@@ -58,17 +57,17 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                 className="min-w-0 flex-1 text-left"
               >
                 <div className="flex items-center gap-2">
-                  <span className="truncate text-sm text-nerv-text transition-colors hover:text-nerv-orange">{name}</span>
-                  {isMe && <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange">você</span>}
+                  <span className="truncate text-sm text-up-text transition-colors hover:text-up-orange">{name}</span>
+                  {isMe && <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">você</span>}
                 </div>
-                <div className={`font-mono text-[9px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
+                <div className={`font-mono text-[10px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
               </button>
               {isAdmin && !isMe && (
-                <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex gap-1 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
                   {m.role !== 'admin' && (
                     <button
                       onClick={() => onPromote(m.user_id, m.role === 'mod' ? 'admin' : 'mod')}
-                      className="rounded px-1 py-0.5 font-mono text-[10px] text-nerv-dim transition-all hover:bg-nerv-green/15 hover:text-nerv-green"
+                      className="rounded px-1.5 py-0.5 font-mono text-[10px] text-up-dim transition-colors hover:bg-up-green/20 hover:text-up-green"
                       title="promover"
                     >
                       ↑
@@ -77,7 +76,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                   {m.role !== 'member' && (
                     <button
                       onClick={() => onDemote(m.user_id)}
-                      className="rounded px-1 py-0.5 font-mono text-[10px] text-nerv-dim transition-all hover:bg-nerv-amber/15 hover:text-nerv-amber"
+                      className="rounded px-1.5 py-0.5 font-mono text-[10px] text-up-dim transition-colors hover:bg-up-amber/20 hover:text-up-amber"
                       title="rebaixar"
                     >
                       ↓
@@ -85,7 +84,7 @@ export function MembersSection({ members, isLoading, error, isAdmin, meId, onOpe
                   )}
                   <button
                     onClick={() => onKick(m.user_id, name)}
-                    className="rounded px-1 py-0.5 font-mono text-[10px] text-nerv-dim transition-all hover:bg-nerv-red/15 hover:text-nerv-red"
+                    className="rounded px-1.5 py-0.5 font-mono text-[10px] text-up-dim transition-colors hover:bg-up-red/20 hover:text-up-red"
                     title="remover"
                   >
                     ×

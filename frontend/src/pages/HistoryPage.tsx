@@ -53,17 +53,17 @@ export function HistoryPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between gap-4">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-nerv-orange/80">Histórico</div>
-          <h1 className="mt-1 font-display text-3xl text-nerv-text">
+          <div className="text-[11px] uppercase tracking-wider text-up-orange">Histórico</div>
+          <h1 className="mt-1 font-display text-3xl text-up-text">
             {group.data?.name ?? 'Grupo'}
           </h1>
-          <p className="mt-1 text-xs text-nerv-dim">
+          <p className="mt-1 text-xs text-up-dim">
             Games que já foram escolhidos pelo grupo. Derivado das votações fechadas.
           </p>
         </div>
         <Link
           to={`/groups/${id}`}
-          className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
+          className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
         >
           ← voltar
         </Link>
@@ -75,10 +75,10 @@ export function HistoryPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="buscar por jogo ou título da votação..."
-          className="h-9 w-full max-w-md rounded-sm border border-nerv-line bg-black/40 px-3 text-xs text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
+          className="h-9 w-full max-w-md rounded-sm border border-up-line bg-black/40 px-3 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
-        <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
-          <span className="tabular-nums text-nerv-orange">{chapters.length}</span> capítulos
+        <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
+          <span className="tabular-nums text-up-orange">{chapters.length}</span> capítulos
         </div>
       </div>
 
@@ -106,8 +106,8 @@ export function HistoryPage() {
                 onClick={() => setAuditId(v.id)}
                 className={`flex w-full items-center gap-4 rounded-sm border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 ${
                   isLatest
-                    ? 'border-nerv-green/40 bg-nerv-green/5 hover:border-nerv-green/60 hover:bg-nerv-green/10'
-                    : 'border-nerv-line/40 bg-nerv-panel/20 hover:border-nerv-orange/40 hover:bg-nerv-panel/40'
+                    ? 'border-up-green/40 bg-up-green/5 hover:border-up-green/60 hover:bg-up-green/10'
+                    : 'border-up-line bg-up-panel/20 hover:border-up-orange hover:bg-up-panel/40'
                 }`}
               >
                 {g?.cover_url ? (
@@ -115,26 +115,26 @@ export function HistoryPage() {
                     src={g.cover_url}
                     alt=""
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                    className="h-16 w-28 shrink-0 rounded-sm border border-nerv-line object-cover"
+                    className="h-16 w-28 shrink-0 rounded-sm border border-up-line object-cover"
                   />
                 ) : (
-                  <div className="h-16 w-28 shrink-0 rounded-sm border border-nerv-line bg-black/40" />
+                  <div className="h-16 w-28 shrink-0 rounded-sm border border-up-line bg-black/40" />
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`truncate font-display text-lg ${g ? 'text-nerv-text' : 'text-nerv-dim'}`}>
+                    <span className={`truncate font-display text-lg ${g ? 'text-up-text' : 'text-up-dim'}`}>
                       {g ? g.name : v.winner_game_id ? '(jogo removido)' : '(sem vencedor)'}
                     </span>
                     {isLatest && (
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-nerv-green">
+                      <span className="font-mono text-[9px] uppercase tracking-wider text-up-green">
                         atual
                       </span>
                     )}
                   </div>
-                  <div className="mt-1 truncate text-[11px] text-nerv-dim">
+                  <div className="mt-1 truncate text-[11px] text-up-dim">
                     {v.title}
                   </div>
-                  <div className="mt-1 font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+                  <div className="mt-1 font-mono text-[9px] uppercase tracking-wider text-up-dim">
                     {dt} · {v.ballots_count} voto{v.ballots_count === 1 ? '' : 's'} · audit →
                   </div>
                 </div>

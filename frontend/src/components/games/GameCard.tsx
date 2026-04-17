@@ -25,53 +25,53 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
     >
       <div
         onClick={() => navigate(`/groups/${groupId}/games/${g.id}`)}
-        className="group relative cursor-pointer overflow-hidden rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 transition-all hover:-translate-y-0.5 hover:border-nerv-orange/50 hover:shadow-lg hover:shadow-black/20"
+        className="group relative cursor-pointer overflow-hidden rounded-sm border border-up-orange/15 bg-up-panel/30 transition-[colors,transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-up-orange hover:shadow-lg hover:shadow-black/20"
       >
         {cover ? (
-          <div className="relative h-32 overflow-hidden">
+          <div className="relative h-26 overflow-hidden">
             <img
               src={cover}
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
               alt={g.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/30 to-transparent" />
             <div className={`absolute right-2 top-2 rounded-sm bg-black/70 px-2 py-0.5 text-[10px] uppercase tracking-wider backdrop-blur-sm ${STAGE_COLOR[g.stage]}`}>
               {g.stage}
             </div>
             {g.is_free && (
-              <div className="absolute left-2 top-2 rounded-sm border border-nerv-green/60 bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-wider text-nerv-green backdrop-blur-sm">
+              <div className="absolute left-2 top-2 rounded-sm border border-up-green/60 bg-black/70 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-green backdrop-blur-sm">
                 free
               </div>
             )}
           </div>
         ) : (
-          <div className="flex h-32 items-center justify-center bg-gradient-to-br from-nerv-line to-black">
-            <span className="font-display text-4xl text-nerv-orange/30">?</span>
+          <div className="flex h-26 items-center justify-center bg-gradient-to-br from-up-line to-black">
+            <span className="font-display text-4xl text-up-orange/30">?</span>
           </div>
         )}
 
-        <div className="p-3">
-          <div className="mb-2 truncate text-sm font-semibold text-nerv-text">{g.name}</div>
+        <div className="px-2.5 pb-2 pt-2">
+          <div className="mb-1 line-clamp-2 min-h-[2.25rem] text-sm font-semibold leading-tight text-up-text">{g.name}</div>
 
-          <div className="mb-2">
-            <div className="mb-1 flex items-center justify-between text-[9px] uppercase tracking-wider text-nerv-dim">
+          <div className="mb-1">
+            <div className="mb-0.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
               <span>viabilidade</span>
-              <span className="text-nerv-orange">{g.viability.viability_score.toFixed(0)}%</span>
+              <span className="text-up-orange tabular-nums">{g.viability.viability_score.toFixed(0)}%</span>
             </div>
-            <div className="h-1 overflow-hidden rounded-sm bg-nerv-line">
+            <div className="h-1 overflow-hidden rounded-sm bg-up-line/30">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${g.viability.viability_score}%` }}
                 transition={{ duration: 0.6, delay: i * 0.03 }}
-                className="h-full bg-gradient-to-r from-nerv-orange to-nerv-amber"
+                className="h-full bg-gradient-to-r from-up-orange to-up-amber"
               />
             </div>
           </div>
 
-          <div className="mb-2 flex gap-3 text-[9px] uppercase tracking-wider text-nerv-dim">
-            <span>quero <span className="text-nerv-green">{g.viability.interest_want_count}</span></span>
-            <span>tem <span className="text-nerv-amber">{g.viability.ownership_count}</span></span>
+          <div className="mb-1 flex gap-3 text-[10px] uppercase tracking-wider text-up-dim">
+            <span>quero <span className="text-up-green tabular-nums">{g.viability.interest_want_count}</span></span>
+            <span>tem <span className="text-up-amber tabular-nums">{g.viability.ownership_count}</span></span>
           </div>
 
           <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
@@ -80,10 +80,10 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
                 key={s.value}
                 onClick={() => setInt.mutate({ gameId: g.id, signal: s.value })}
                 aria-label={`marcar interesse: ${s.label}`}
-                className={`flex-1 rounded-sm border px-1 py-1 text-[9px] uppercase tracking-wider transition-all ${
+                className={`flex-1 rounded-sm border px-1 py-0.5 text-[10px] uppercase tracking-wider min-h-[44px] sm:min-h-0 transition-colors ${
                   g.user_interest === s.value
                     ? `${s.color} bg-current/10`
-                    : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:text-nerv-text'
+                    : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
                 }`}
               >
                 {s.label}
@@ -92,13 +92,13 @@ export function GameCard({ game: g, index: i, groupId }: Props) {
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); toggleOwn.mutate({ gameId: g.id, owns: !g.user_owns_game }) }}
-            className={`mt-1.5 w-full rounded-sm border px-2 py-1 text-[9px] uppercase tracking-wider transition-all ${
+            className={`mt-1 w-full rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider min-h-[44px] sm:min-h-0 transition-colors ${
               g.user_owns_game
-                ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
-                : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
+                ? 'border-up-green/40 text-up-green'
+                : 'border-up-line/60 text-up-dim hover:border-up-green/40 hover:text-up-green'
             }`}
           >
-            {g.user_owns_game ? '✓ na biblioteca' : 'marcar como tenho'}
+            {g.user_owns_game ? 'tenho' : 'nao tenho'}
           </button>
         </div>
       </div>

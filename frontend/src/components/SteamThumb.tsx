@@ -16,7 +16,7 @@ export function SteamThumb({ appid, alt = '', className = '' }: Props) {
 
   if (urls.length === 0 || idx >= urls.length) {
     return (
-      <div className={`grid place-items-center bg-nerv-line/30 text-[10px] uppercase text-nerv-dim ${className}`}>
+      <div className={`grid place-items-center bg-up-line/30 text-[10px] uppercase text-up-dim ${className}`}>
         {alt.slice(0, 2) || '?'}
       </div>
     )

@@ -44,25 +44,26 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
         tone="orange"
         label="próxima sessão"
         empty={!nextSession}
-        emptyMsg="nada agendado"
+        emptyMsg="Nenhuma sessao agendada ainda"
+        emptyCta="agendar sessao"
         onClick={() => onNavigate(`/groups/${groupId}/sessions`)}
         cover={nextSessionGame?.cover_url ?? null}
       >
         {nextSession && (
           <>
-            <div className="truncate font-display text-xl text-nerv-orange">{nextSession.title}</div>
-            <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
+            <div className="line-clamp-2 font-display text-lg leading-tight text-up-orange">{nextSession.title}</div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
               {new Date(nextSession.start_at).toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
             </div>
-            <div className="mt-3 flex items-baseline gap-2">
-              <div className="font-display text-2xl text-nerv-text tabular-nums">
+            <div className="mt-2 flex items-baseline gap-2">
+              <div className="font-display text-xl text-up-text tabular-nums">
                 {formatCountdown(new Date(nextSession.start_at), now)}
               </div>
-              <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim">até o drop</div>
+              <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">ate o drop</div>
             </div>
-            <div className="mt-3 flex gap-3 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
-              <span><span className="text-nerv-green tabular-nums">{nextSession.rsvp_yes}</span> vão</span>
-              <span><span className="text-nerv-amber tabular-nums">{nextSession.rsvp_maybe}</span> talvez</span>
+            <div className="mt-2 flex gap-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
+              <span><span className="text-up-green tabular-nums">{nextSession.rsvp_yes}</span> vão</span>
+              <span><span className="text-up-amber tabular-nums">{nextSession.rsvp_maybe}</span> talvez</span>
             </div>
           </>
         )}
@@ -73,16 +74,19 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
         tone="magenta"
         label="tema do mês"
         empty={!theme}
-        emptyMsg="sem tema definido"
+        emptyMsg="Sem tema definido para este mes"
+        emptyCta="escolher tema"
         onClick={() => onNavigate(`/groups/${groupId}/themes`)}
         cover={theme?.image_url ?? null}
       >
         {theme && (
           <>
-            <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim">{theme.month_year}</div>
-            <div className="mt-1 truncate font-display text-xl text-nerv-magenta">{theme.theme_name}</div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-sm border border-up-magenta/30 bg-up-magenta/10 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-up-magenta">{theme.month_year}</span>
+            </div>
+            <div className="mt-1.5 line-clamp-2 font-display text-xl leading-tight text-up-magenta">{theme.theme_name}</div>
             {theme.description && (
-              <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-nerv-text/70">{theme.description}</p>
+              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-up-dim">{theme.description}</p>
             )}
           </>
         )}
@@ -93,38 +97,46 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
         tone="amber"
         label={activeVote ? 'votação ativa' : 'top viabilidade'}
         empty={!activeVote && !topGame}
-        emptyMsg="sem destaques"
+        emptyMsg="Adicione jogos para ver destaques"
+        emptyCta="explorar biblioteca"
         onClick={() => onNavigate(activeVote ? `/groups/${groupId}/votes` : topGame ? `/groups/${groupId}/games/${topGame.id}` : `/groups/${groupId}/games`)}
         cover={activeVote ? null : topGame?.cover_url ?? null}
       >
         {activeVote ? (
           <>
-            <div className="truncate font-display text-xl text-nerv-amber">{activeVote.title}</div>
-            <div className="mt-2 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
+            <div className="line-clamp-2 font-display text-lg leading-tight text-up-amber">{activeVote.title}</div>
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-wider text-up-dim">
               {activeVote.ballots_count}/{activeVote.eligible_voter_count} votos · quorum {activeVote.quorum_count}
             </div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-nerv-line/30">
+            <div className="mt-2 h-1 overflow-hidden rounded-full bg-up-line/30">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{
                   width: `${activeVote.eligible_voter_count > 0 ? Math.min(100, (activeVote.ballots_count / activeVote.eligible_voter_count) * 100) : 0}%`,
                 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="h-full bg-gradient-to-r from-nerv-amber to-nerv-magenta"
+                className="h-full bg-gradient-to-r from-up-amber to-up-magenta"
               />
             </div>
           </>
         ) : topGame ? (
           <>
-            <div className="truncate font-display text-xl text-nerv-amber">{topGame.name}</div>
-            <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
+            <div className="line-clamp-2 font-display text-lg leading-tight text-up-amber">{topGame.name}</div>
+            <div className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-up-dim">
               {STAGE_LABEL[topGame.stage]} · {topGame.viability.interest_want_count} querem
             </div>
-            <div className="mt-3 flex items-baseline gap-2">
-              <div className="font-display text-3xl tabular-nums text-nerv-amber">
-                {Math.round(topGame.viability.viability_score)}
+            <div className="mt-2 flex items-center gap-3">
+              <div className="font-display text-2xl tabular-nums text-up-amber">
+                {Math.round(topGame.viability.viability_score)}%
               </div>
-              <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-dim">viabilidade</div>
+              <div className="h-1 flex-1 overflow-hidden rounded-full bg-up-line/30">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.min(100, topGame.viability.viability_score)}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                  className="h-full bg-up-amber"
+                />
+              </div>
             </div>
           </>
         ) : null}

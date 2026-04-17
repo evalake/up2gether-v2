@@ -29,11 +29,11 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      title={mode === 'nerv' ? 'mudar pra lcl' : 'mudar pra nerv'}
+      title={mode === 'frost' ? 'mudar pra ember' : 'mudar pra frost'}
       aria-label="trocar tema"
-      className="flex items-center gap-1.5 rounded-sm border border-nerv-orange/30 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-nerv-orange transition-all hover:border-nerv-orange hover:bg-nerv-orange/10"
+      className="flex items-center gap-1.5 rounded-sm border border-up-orange/30 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-up-orange transition-all hover:border-up-orange hover:bg-up-orange/10"
     >
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${mode === 'nerv' ? 'bg-nerv-orange' : 'bg-nerv-amber'}`} />
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${mode === 'frost' ? 'bg-up-orange' : 'bg-up-amber'}`} />
       {mode}
     </button>
   )
@@ -46,7 +46,7 @@ function Clock() {
     return () => clearInterval(id)
   }, [])
   return (
-    <span className="font-mono text-xs tabular-nums text-nerv-orange/80">
+    <span className="font-mono text-xs tabular-nums text-up-orange">
       {now.toLocaleTimeString('pt-BR', { hour12: false })}
     </span>
   )
@@ -60,9 +60,9 @@ function GroupContext({ groupId }: { groupId: string }) {
   const isAdmin = group.data?.user_role === 'admin' || !!me.data?.is_sys_admin
   const nav = isAdmin ? [...GROUP_NAV, { label: 'admin', slug: '/admin' }] : GROUP_NAV
   return (
-    <div className="border-t border-nerv-orange/15 px-3 py-3">
-      <div className="mb-2 text-[10px] uppercase tracking-wider text-nerv-dim">current group</div>
-      <div className="mb-3 truncate text-sm font-medium text-nerv-text">
+    <div className="border-t border-up-orange/15 px-3 py-3">
+      <div className="mb-2 text-[10px] uppercase tracking-wider text-up-dim">current group</div>
+      <div className="mb-3 truncate text-sm font-medium text-up-text">
         {group.data?.name ?? '...'}
       </div>
       <div className="space-y-0.5">
@@ -74,8 +74,8 @@ function GroupContext({ groupId }: { groupId: string }) {
               to={`/groups/${groupId}${item.slug}`}
               className={`block rounded-sm border-l-2 px-2 py-1.5 text-xs lowercase transition-all ${
                 active
-                  ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                  : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:bg-nerv-orange/5 hover:text-nerv-text'
+                  ? 'border-up-orange bg-up-orange/10 text-up-orange'
+                  : 'border-transparent text-up-dim transition-colors hover:border-up-orange hover:bg-up-orange/5 hover:text-up-text'
               }`}
             >
               {item.label}
@@ -108,13 +108,13 @@ export function Shell({ children }: { children: ReactNode }) {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[13.5rem] shrink-0 flex-col border-r border-nerv-orange/20 bg-nerv-panel/95 backdrop-blur-sm transition-transform md:static md:translate-x-0 ${navOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[13.5rem] shrink-0 flex-col border-r border-up-orange/20 bg-up-panel/95 backdrop-blur-sm transition-transform md:static md:translate-x-0 ${navOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <Link to="/groups" className="flex items-center gap-3 border-b border-nerv-orange/20 p-4">
+        <Link to="/groups" className="flex items-center gap-3 border-b border-up-orange/20 p-4">
           <img src="/up2gether-mark.png" alt="" className="h-10 w-10 shrink-0 rounded-sm object-cover" />
           <div className="min-w-0">
-            <div className="font-display text-xl leading-none text-nerv-orange">up2gether</div>
-            <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-nerv-dim">
+            <div className="font-display text-xl leading-none text-up-orange">up2gether</div>
+            <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-up-dim">
               session ops
             </div>
           </div>
@@ -129,8 +129,8 @@ export function Shell({ children }: { children: ReactNode }) {
                 to={item.to}
                 className={`block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-all ${
                   active && !inGroup
-                    ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                    : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-orange/40 hover:bg-nerv-orange/5 hover:text-nerv-text'
+                    ? 'border-up-orange bg-up-orange/10 text-up-orange'
+                    : 'border-transparent text-up-dim transition-colors hover:border-up-orange hover:bg-up-orange/5 hover:text-up-text'
                 }`}
               >
                 {item.label}
@@ -143,8 +143,8 @@ export function Shell({ children }: { children: ReactNode }) {
               to="/admin/metrics"
               className={`mt-2 block border-l-2 px-4 py-2 text-xs lowercase tracking-wider transition-all ${
                 loc.pathname.startsWith('/admin')
-                  ? 'border-nerv-red bg-nerv-red/10 text-nerv-red'
-                  : 'border-transparent text-nerv-dim transition-colors hover:border-nerv-red/40 hover:bg-nerv-red/5 hover:text-nerv-red'
+                  ? 'border-up-red bg-up-red/10 text-up-red'
+                  : 'border-transparent text-up-dim transition-colors hover:border-up-red hover:bg-up-red/5 hover:text-up-red'
               }`}
             >
               metrics
@@ -152,7 +152,7 @@ export function Shell({ children }: { children: ReactNode }) {
           )}
         </nav>
 
-        <div className="border-t border-nerv-orange/20 p-3">
+        <div className="border-t border-up-orange/20 p-3">
           <div className="flex items-center gap-2">
             <Avatar
               discordId={me.data?.discord_id}
@@ -161,12 +161,12 @@ export function Shell({ children }: { children: ReactNode }) {
               size="sm"
             />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm text-nerv-text">
+              <div className="truncate text-sm text-up-text">
                 {me.data?.discord_display_name ?? me.data?.discord_username ?? '---'}
               </div>
-              <div className="text-[10px] uppercase tracking-wider text-nerv-dim">
+              <div className="text-[10px] uppercase tracking-wider text-up-dim">
                 {me.data?.is_sys_admin ? (
-                  <span className="text-nerv-red">sys_admin // cyberbandolero</span>
+                  <span className="text-up-red">sys_admin // cyberbandolero</span>
                 ) : (
                   'online'
                 )}
@@ -176,7 +176,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <button
             onClick={logout}
             aria-label="sair da conta"
-            className="mt-3 w-full rounded-sm border border-nerv-red/30 px-2 py-1.5 text-[10px] uppercase tracking-wider text-nerv-red/80 transition-all hover:border-nerv-red hover:bg-nerv-red hover:text-nerv-bg"
+            className="mt-3 w-full rounded-sm border border-up-red/30 px-2 py-1.5 text-[10px] uppercase tracking-wider text-up-red transition-all hover:border-up-red hover:bg-up-red hover:text-up-bg"
           >
             disconnect
           </button>
@@ -184,18 +184,18 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-nerv-orange/15 bg-nerv-panel/80 px-4 py-2.5 backdrop-blur-sm md:px-6">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-up-orange/15 bg-up-panel/80 px-4 py-2.5 backdrop-blur-sm md:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setNavOpen(true)}
               aria-label="abrir menu"
-              className="flex h-8 w-8 items-center justify-center rounded-sm border border-nerv-orange/30 text-nerv-orange md:hidden"
+              className="flex h-8 w-8 items-center justify-center rounded-sm border border-up-orange/30 text-up-orange md:hidden"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <div className="flex items-center gap-2 text-[11px] lowercase tracking-wider text-nerv-green">
-              <span className="inline-block h-1.5 w-1.5 rounded-full nerv-pulse" style={{ background: 'currentColor' }} />
+            <div className="flex items-center gap-2 text-[11px] lowercase tracking-wider text-up-green">
+              <span className="inline-block h-1.5 w-1.5 rounded-full up-pulse" style={{ background: 'currentColor' }} />
               online
             </div>
           </div>

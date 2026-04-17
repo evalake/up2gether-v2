@@ -13,15 +13,15 @@ export function EnergyBar({
 }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100))
   const colorMap = {
-    orange: 'bg-nerv-orange',
-    green: 'bg-nerv-green',
-    amber: 'bg-nerv-amber',
-    magenta: 'bg-nerv-magenta',
+    orange: 'bg-up-orange',
+    green: 'bg-up-green',
+    amber: 'bg-up-amber',
+    magenta: 'bg-up-magenta',
   }
   return (
     <div className="flex items-center gap-3 font-mono text-[10px]">
-      <span className="w-24 shrink-0 uppercase tracking-wider text-nerv-dim">{label}</span>
-      <div className="relative h-2 flex-1 overflow-hidden rounded-sm border border-nerv-line bg-black/40">
+      <span className="w-20 shrink-0 uppercase tracking-wider text-up-dim">{label}</span>
+      <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-up-line/30">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -29,7 +29,7 @@ export function EnergyBar({
           className={`h-full ${colorMap[color]}`}
         />
       </div>
-      <span className="w-10 shrink-0 text-right tabular-nums text-nerv-text">{Math.round(value)}</span>
+      <span className="w-10 shrink-0 text-right tabular-nums text-up-text">{Math.round(value)}</span>
     </div>
   )
 }

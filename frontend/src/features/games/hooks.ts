@@ -199,6 +199,9 @@ export function useToggleOwnership(groupId: string) {
       })
     },
     onError: (_e, vars, ctx) => restoreGame(qc, groupId, vars.gameId, ctx),
-    onSuccess: (fresh) => syncGameFromServer(qc, groupId, fresh),
+    onSuccess: (fresh, vars) => {
+      syncGameFromServer(qc, groupId, fresh)
+      qc.invalidateQueries({ queryKey: gameOwnersKey(vars.gameId) })
+    },
   })
 }

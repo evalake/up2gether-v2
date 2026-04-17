@@ -1,9 +1,9 @@
 import type { GameStage, HardwareTier, InterestSignal } from '@/features/games/api'
 
 export const SIGNALS: { value: InterestSignal; label: string; color: string }[] = [
-  { value: 'want', label: 'quero', color: 'text-nerv-green border-nerv-green' },
-  { value: 'ok', label: 'topo', color: 'text-nerv-amber border-nerv-amber' },
-  { value: 'pass', label: 'passo', color: 'text-nerv-dim border-nerv-line' },
+  { value: 'want', label: 'quero', color: 'text-up-green border-up-green' },
+  { value: 'ok', label: 'topo', color: 'text-up-amber border-up-amber' },
+  { value: 'pass', label: 'passo', color: 'text-up-red border-up-red' },
 ]
 
 export const STAGES: { value: GameStage; label: string }[] = [
@@ -15,11 +15,19 @@ export const STAGES: { value: GameStage; label: string }[] = [
 ]
 
 export const STAGE_COLOR: Record<string, string> = {
-  exploring: 'text-nerv-amber',
-  campaign: 'text-nerv-green',
-  endgame: 'text-nerv-orange',
-  paused: 'text-nerv-dim',
-  abandoned: 'text-nerv-red',
+  exploring: 'text-up-amber',
+  campaign: 'text-up-green',
+  endgame: 'text-up-orange',
+  paused: 'text-up-dim',
+  abandoned: 'text-up-red',
+}
+
+export const STAGE_BORDER: Record<string, string> = {
+  exploring: 'border-up-amber',
+  campaign: 'border-up-green',
+  endgame: 'border-up-orange',
+  paused: 'border-up-dim',
+  abandoned: 'border-up-red',
 }
 
 export const STAGE_VALUES = STAGES.map((s) => s.value)

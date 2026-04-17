@@ -11,7 +11,7 @@ Live: https://up2gether.com.br
 - Gestao de grupos, jogos e sessoes agendadas
 - Votacao multi-stage (30 -> 15 -> 7 -> 3 -> 2) com desempate deterministico por viabilidade
 - Temas mensais com ciclo de sugestao + votacao
-- Notificacoes realtime + web push
+- Notificacoes realtime in-app + webhook Discord do grupo
 
 ## Stack
 

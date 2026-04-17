@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { STAGE_VALUES } from '@/lib/constants'
+
+const GENRE_LIMIT = 5
 
 type Props = {
   search: string
@@ -20,27 +23,43 @@ export function GameFilters({
   topGenres, totalShown, totalAll,
   onClear,
 }: Props) {
-  const hasActive = stageFilter.size > 0 || genreFilter.size > 0 || !!search
+  const activeCount = stageFilter.size + genreFilter.size + (search ? 1 : 0)
+  const hasActive = activeCount > 0
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5 rounded-sm border border-up-line/40 bg-up-panel/20 p-2.5">
       <div className="flex flex-wrap items-center gap-2">
-        <input
-          aria-label="buscar jogo"
-          value={search}
-          onChange={(e) => onSearch(e.target.value)}
-          placeholder="buscar..."
-          className="rounded-sm border border-nerv-line bg-black/40 px-3 py-1 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
-        />
+        <div className="relative">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-up-dim"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            aria-label="filtrar jogos na biblioteca"
+            value={search}
+            onChange={(e) => onSearch(e.target.value)}
+            placeholder="filtrar na biblioteca..."
+            className="rounded-sm border border-up-line bg-black/40 py-1 pl-8 pr-3 text-xs placeholder:text-up-dim focus-visible:border-up-orange focus-visible:outline-none transition-colors"
+          />
+        </div>
         {STAGE_VALUES.map((s) => {
           const active = stageFilter.has(s)
           return (
             <button
               key={s}
               onClick={() => toggleStage(s)}
-              className={`rounded-sm border px-2 py-1 text-[10px] uppercase tracking-wider transition-all ${
+              className={`rounded-sm border px-2 py-1 text-[10px] uppercase tracking-wider transition-colors ${
                 active
-                  ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                  : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
+                  ? 'border-up-orange bg-up-orange/10 text-up-orange'
+                  : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
               }`}
             >
               {s}
@@ -50,35 +69,55 @@ export function GameFilters({
         {hasActive && (
           <button
             onClick={onClear}
-            className="text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
+            className="rounded-sm border border-up-orange/40 bg-up-orange/5 px-2 py-0.5 text-[10px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/15"
           >
-            limpar
+            limpar {activeCount > 1 ? `(${activeCount})` : ''}
           </button>
         )}
-        <span className="ml-auto text-[10px] uppercase tracking-wider text-nerv-dim">
-          {totalShown} de {totalAll}
-        </span>
+        {totalShown < totalAll && (
+          <span className="ml-auto font-mono text-[10px] tabular-nums uppercase tracking-wider text-up-dim">
+            {totalShown}/{totalAll}
+          </span>
+        )}
       </div>
       {topGenres.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 pl-1">
-          <span className="text-[9px] uppercase tracking-wider text-nerv-dim/60">gêneros</span>
-          {topGenres.map((g) => {
-            const active = genreFilter.has(g)
-            return (
-              <button
-                key={g}
-                onClick={() => toggleGenre(g)}
-                className={`rounded-full border px-2.5 py-0.5 text-[10px] transition-all ${
-                  active
-                    ? 'border-nerv-magenta/60 bg-nerv-magenta/10 text-nerv-magenta'
-                    : 'border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-magenta/40 hover:text-nerv-magenta/80'
-                }`}
-              >
-                {g}
-              </button>
-            )
-          })}
-        </div>
+        <GenreRow genres={topGenres} genreFilter={genreFilter} toggleGenre={toggleGenre} />
+      )}
+    </div>
+  )
+}
+
+function GenreRow({ genres, genreFilter, toggleGenre }: { genres: string[]; genreFilter: Set<string>; toggleGenre: (g: string) => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const needsCollapse = genres.length > GENRE_LIMIT
+  const visible = expanded || !needsCollapse ? genres : genres.slice(0, GENRE_LIMIT)
+
+  return (
+    <div className="flex flex-wrap items-center gap-1 pl-1">
+      <span className="mr-1 text-[10px] uppercase tracking-wider text-up-dim">generos</span>
+      {visible.map((g) => {
+        const active = genreFilter.has(g)
+        return (
+          <button
+            key={g}
+            onClick={() => toggleGenre(g)}
+            className={`rounded-sm border px-2 py-0.5 text-[10px] transition-colors ${
+              active
+                ? 'border-up-magenta/60 bg-up-magenta/10 text-up-magenta'
+                : 'border-up-line text-up-dim hover:border-up-magenta hover:text-up-magenta'
+            }`}
+          >
+            {g}
+          </button>
+        )
+      })}
+      {needsCollapse && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="px-1 text-[10px] text-up-dim transition-colors hover:text-up-magenta"
+        >
+          {expanded ? 'ver menos' : `+${genres.length - GENRE_LIMIT} mais`}
+        </button>
       )}
     </div>
   )

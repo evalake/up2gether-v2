@@ -8,4 +8,3 @@ tests
 .env
 .env.*
 !.env.example
-vapid_private.pem

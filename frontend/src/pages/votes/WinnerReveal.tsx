@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { steamCover, steamHeaderLarge } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
@@ -25,6 +26,12 @@ export function WinnerReveal({
   const [imgReady, setImgReady] = useState(false)
 
   useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
+  useEffect(() => {
     if (!cover) { setImgReady(true); return }
     const img = new Image()
     img.onload = () => setImgReady(true)
@@ -32,11 +39,11 @@ export function WinnerReveal({
     img.src = cover
   }, [cover])
 
-  // fases: scanning (1.2s) -> shuffling (2.4s) -> lockin (0.7s) -> winner
+  // fases: scanning (0.8s) -> shuffling (1.6s) -> lockin (0.5s) -> winner (~2.9s total)
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('shuffling'), 1200)
-    const t2 = setTimeout(() => setPhase('lockin'), 1200 + 2400)
-    const t3 = setTimeout(() => setPhase('winner'), 1200 + 2400 + 700)
+    const t1 = setTimeout(() => setPhase('shuffling'), 800)
+    const t2 = setTimeout(() => setPhase('lockin'), 800 + 1600)
+    const t3 = setTimeout(() => setPhase('winner'), 800 + 1600 + 500)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [])
 
@@ -63,7 +70,7 @@ export function WinnerReveal({
     ? steamHeaderLarge(shown.steam_appid) ?? steamCover(shown)
     : cover
 
-  return (
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -79,27 +86,27 @@ export function WinnerReveal({
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-lg overflow-hidden rounded-sm border bg-nerv-panel transition-all ${
+        className={`relative w-full max-w-lg overflow-hidden rounded-sm border bg-up-panel transition-[colors,border-color,box-shadow] duration-300 ${
           showWinner
-            ? 'border-nerv-orange shadow-[0_0_180px_rgba(255,102,0,0.55)]'
-            : 'border-nerv-orange/40 shadow-[0_0_80px_rgba(255,102,0,0.25)]'
+            ? 'border-up-orange shadow-[0_0_180px_rgba(255,102,0,0.55)]'
+            : 'border-up-orange/40 shadow-[0_0_80px_rgba(255,102,0,0.25)]'
         }`}
       >
-        <div className="flex items-center justify-between border-b border-nerv-orange/20 bg-black/40 px-4 py-2">
+        <div className="flex items-center justify-between border-b border-up-orange/20 bg-black/40 px-4 py-2">
           <div className="flex items-center gap-2">
             <motion.span
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 1.2, repeat: Infinity }}
-              className={`h-1.5 w-1.5 rounded-full ${showWinner ? 'bg-nerv-orange' : 'bg-nerv-magenta'}`}
+              className={`h-1.5 w-1.5 rounded-full ${showWinner ? 'bg-up-orange' : 'bg-up-magenta'}`}
             />
-            <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-nerv-orange/80">
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-up-orange">
               {phase === 'scanning' && 'apurando votos...'}
               {phase === 'shuffling' && 'computando resultado...'}
               {phase === 'lockin' && 'finalizando...'}
               {phase === 'winner' && 'resultado final'}
             </span>
           </div>
-          <span className="truncate font-mono text-[9px] uppercase tracking-wider text-nerv-dim">{vote.title}</span>
+          <span className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">{vote.title}</span>
         </div>
 
         <div className="relative aspect-[16/9] overflow-hidden bg-black">
@@ -113,7 +120,7 @@ export function WinnerReveal({
                 className="absolute inset-0 flex items-center justify-center"
               >
                 <div className="text-center">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-nerv-orange/60">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-dim">
                     {vote.ballots_count} / {vote.eligible_voter_count} cédulas
                   </div>
                   <div className="mt-3 flex justify-center gap-1">
@@ -122,7 +129,7 @@ export function WinnerReveal({
                         key={i}
                         animate={{ scaleY: [1, 2.2, 1] }}
                         transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12 }}
-                        className="h-4 w-1 origin-bottom bg-nerv-orange"
+                        className="h-4 w-1 origin-bottom bg-up-orange"
                       />
                     ))}
                   </div>
@@ -130,7 +137,7 @@ export function WinnerReveal({
                 <motion.div
                   animate={{ y: ['0%', '100%'] }}
                   transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-nerv-orange to-transparent"
+                  className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-up-orange to-transparent"
                 />
               </motion.div>
             )}
@@ -156,7 +163,7 @@ export function WinnerReveal({
               <motion.div
                 animate={{ y: ['-5%', '105%'] }}
                 transition={{ duration: 0.6, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-x-0 h-8 bg-gradient-to-b from-transparent via-nerv-orange/20 to-transparent"
+                className="absolute inset-x-0 h-8 bg-gradient-to-b from-transparent via-up-orange/20 to-transparent"
               />
               <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent_0,transparent_4px,rgba(255,0,102,0.08)_4px,rgba(255,0,102,0.08)_5px)]" />
             </>
@@ -167,7 +174,7 @@ export function WinnerReveal({
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 1, 0.3, 1, 0] }}
               transition={{ duration: 0.7 }}
-              className="absolute inset-0 bg-nerv-orange/80"
+              className="absolute inset-0 bg-up-orange/80"
             />
           )}
 
@@ -180,7 +187,7 @@ export function WinnerReveal({
             />
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-transparent to-transparent" />
         </div>
 
         <div className="min-h-[72px] px-6 py-4 text-center">
@@ -191,7 +198,7 @@ export function WinnerReveal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="font-mono text-xs uppercase tracking-[0.25em] text-nerv-dim"
+                className="font-mono text-xs uppercase tracking-[0.25em] text-up-dim"
               >
                 calculando consenso
               </motion.div>
@@ -203,7 +210,7 @@ export function WinnerReveal({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.08 }}
-                className="font-display text-xl text-nerv-text/80"
+                className="font-display text-xl text-up-text"
               >
                 {shown.name}
               </motion.div>
@@ -215,9 +222,9 @@ export function WinnerReveal({
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 18 }}
               >
-                <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-nerv-orange/70">vencedor</div>
-                <div className="mt-0.5 font-display text-2xl text-nerv-orange">{game.name}</div>
-                <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-up-dim">vencedor</div>
+                <div className="mt-0.5 font-display text-2xl text-up-orange">{game.name}</div>
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
                   {vote.ballots_count} / {vote.eligible_voter_count} votaram
                 </div>
               </motion.div>
@@ -230,11 +237,12 @@ export function WinnerReveal({
           animate={{ opacity: showWinner ? 1 : 0.3 }}
           disabled={!showWinner}
           onClick={onClose}
-          className="block w-full border-t border-nerv-orange/30 bg-black/40 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-nerv-orange transition-colors hover:bg-nerv-orange/15 disabled:cursor-wait"
+          className="block w-full border-t border-up-orange/30 bg-black/40 py-3 font-mono text-[10px] uppercase tracking-[0.25em] text-up-orange transition-colors hover:bg-up-orange/15 disabled:cursor-wait"
         >
           {showWinner ? 'fechar' : 'aguarde...'}
         </motion.button>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   )
 }

@@ -43,7 +43,7 @@ function Stepper({
         type="button"
         onClick={onDec}
         aria-label={`diminuir ${ariaLabel}`}
-        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
+        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-up-line/50 text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
       >
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
       </button>
@@ -55,7 +55,7 @@ function Stepper({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 3 }}
             transition={{ duration: 0.12 }}
-            className="block font-display text-xl tabular-nums text-nerv-text"
+            className="block font-display text-xl tabular-nums text-up-text"
           >
             {display}
           </motion.span>
@@ -65,7 +65,7 @@ function Stepper({
         type="button"
         onClick={onInc}
         aria-label={`aumentar ${ariaLabel}`}
-        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-nerv-line/50 text-nerv-dim transition-colors hover:border-nerv-orange/60 hover:text-nerv-orange"
+        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-up-line/50 text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
       >
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
       </button>
@@ -162,12 +162,12 @@ export function SessionDraftModal({
         exit={{ opacity: 0, scale: 0.97, y: 4 }}
         transition={{ type: 'spring', stiffness: 360, damping: 32 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
+        className="relative flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-up-orange/25 bg-up-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
       >
         <button
           onClick={onCancel}
           aria-label="fechar"
-          className="absolute right-2.5 top-2.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+          className="absolute right-2.5 top-2.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
         </button>
@@ -191,17 +191,17 @@ export function SessionDraftModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-gradient-to-br from-nerv-orange/20 via-nerv-panel to-nerv-magenta/10"
+                className="absolute inset-0 bg-gradient-to-br from-up-orange/20 via-up-panel to-up-magenta/10"
               />
             )}
           </AnimatePresence>
-          <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/85 to-nerv-panel/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/85 to-up-panel/30" />
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 px-4 pb-2 pt-1">
             <div className="min-w-0">
-              <div className="font-mono text-[9px] uppercase tracking-wider text-nerv-orange/80">agendar</div>
-              <div className="truncate font-display text-sm capitalize text-nerv-text">{dayLabel}</div>
+              <div className="font-mono text-[9px] uppercase tracking-wider text-up-orange">agendar</div>
+              <div className="truncate font-display text-sm capitalize text-up-text">{dayLabel}</div>
             </div>
-            <div className="font-mono text-[10px] tabular-nums text-nerv-orange/80">
+            <div className="font-mono text-[10px] tabular-nums text-up-orange">
               {hour(start)} {'\u2192'} {hour(end)} · {fmtDuration(duration)}
             </div>
           </div>
@@ -209,20 +209,20 @@ export function SessionDraftModal({
 
         <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
           <section>
-            <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+            <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
               <span>jogo</span>
-              {selected && <span className="truncate text-nerv-orange/80">{selected.name}</span>}
+              {selected && <span className="truncate text-up-orange">{selected.name}</span>}
             </div>
             <input
               aria-label="buscar jogo"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="buscar jogo..."
-              className="h-8 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-2.5 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
+              className="h-8 w-full rounded-sm border border-up-line bg-black/30 px-2.5 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
             />
-            <div className="mt-1.5 max-h-32 overflow-y-auto rounded-sm border border-nerv-line/30 bg-black/20">
+            <div className="mt-1.5 max-h-32 overflow-y-auto rounded-sm border border-up-line/50 bg-black/20">
               {filtered.length === 0 ? (
-                <div className="py-4 text-center text-[11px] text-nerv-dim">nenhum jogo pra "{query}"</div>
+                <div className="py-4 text-center text-[11px] text-up-dim">nenhum jogo pra "{query}"</div>
               ) : (
                 <div className="grid gap-1 p-1.5 sm:grid-cols-2">
                   {filtered.map((g) => {
@@ -235,14 +235,14 @@ export function SessionDraftModal({
                         onClick={() => setGameId(g.id)}
                         className={`flex items-center gap-2 rounded-sm border px-1.5 py-1 text-left transition-colors ${
                           on
-                            ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                            : 'border-transparent text-nerv-text hover:border-nerv-orange/30 hover:bg-nerv-orange/5'
+                            ? 'border-up-orange bg-up-orange/10 text-up-orange'
+                            : 'border-transparent text-up-text hover:border-up-orange/30 hover:bg-up-orange/5'
                         }`}
                       >
                         {cover ? (
                           <img loading="lazy" src={cover} alt="" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} className="h-5 w-9 shrink-0 rounded-sm object-cover" />
                         ) : (
-                          <div className="h-5 w-9 shrink-0 rounded-sm bg-nerv-line/30" />
+                          <div className="h-5 w-9 shrink-0 rounded-sm bg-up-line/30" />
                         )}
                         <span className="truncate text-[11px]">{g.name}</span>
                       </button>
@@ -254,18 +254,18 @@ export function SessionDraftModal({
           </section>
 
           <section>
-            <div className="mb-1 text-[10px] uppercase tracking-wider text-nerv-dim">título <span className="text-nerv-dim/50">(opcional)</span></div>
+            <div className="mb-1 text-[10px] uppercase tracking-wider text-up-dim">título <span className="text-up-dim">(opcional)</span></div>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={selected?.name ?? 'usa o nome do jogo se vazio'}
-              className="h-8 w-full rounded-sm border border-nerv-line/40 bg-black/30 px-2.5 text-xs text-nerv-text placeholder:text-nerv-dim focus-visible:border-nerv-orange/60 focus-visible:outline-none"
+              className="h-8 w-full rounded-sm border border-up-line bg-black/30 px-2.5 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
             />
           </section>
 
           <div className="grid grid-cols-2 gap-3">
             <section>
-              <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+              <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
                 <span>horário</span>
               </div>
               <div className="flex items-center justify-center gap-1">
@@ -276,7 +276,7 @@ export function SessionDraftModal({
                   onInc={() => setHour(hh + 1)}
                   ariaLabel="hora"
                 />
-                <span className="font-display text-xl text-nerv-dim/40">:</span>
+                <span className="font-display text-xl text-up-dim/40">:</span>
                 <Stepper
                   display={String(mm).padStart(2, '0')}
                   width="w-7"
@@ -295,8 +295,8 @@ export function SessionDraftModal({
                       onClick={() => setQuickTime(h)}
                       className={`rounded-full border px-2 py-0.5 font-mono text-[9px] tabular-nums transition-colors ${
                         on
-                          ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
-                          : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                          ? 'border-up-orange/60 bg-up-orange/10 text-up-orange'
+                          : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
                       }`}
                     >
                       {String(h).padStart(2, '0')}h
@@ -307,7 +307,7 @@ export function SessionDraftModal({
             </section>
 
             <section>
-              <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-nerv-dim">
+              <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-up-dim">
                 <span>duração</span>
               </div>
               <div className="flex items-center justify-center">
@@ -329,8 +329,8 @@ export function SessionDraftModal({
                       onClick={() => setDuration(p.value)}
                       className={`rounded-full border px-2 py-0.5 font-mono text-[9px] tabular-nums transition-colors ${
                         on
-                          ? 'border-nerv-orange/60 bg-nerv-orange/10 text-nerv-orange'
-                          : 'border-nerv-line/40 text-nerv-dim hover:border-nerv-orange/40 hover:text-nerv-text'
+                          ? 'border-up-orange/60 bg-up-orange/10 text-up-orange'
+                          : 'border-up-line text-up-dim hover:border-up-orange hover:text-up-text'
                       }`}
                     >
                       {p.label}
@@ -342,10 +342,10 @@ export function SessionDraftModal({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-nerv-line/30 px-4 py-2.5">
+        <div className="flex shrink-0 items-center justify-end gap-2 border-t border-up-line/50 px-4 py-2.5">
           <button
             onClick={onCancel}
-            className="rounded-sm border border-nerv-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
+            className="rounded-sm border border-up-line px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text"
           >
             cancelar
           </button>
@@ -353,7 +353,7 @@ export function SessionDraftModal({
             whileTap={{ scale: 0.96 }}
             onClick={onSave}
             disabled={!gameId || isPending}
-            className="rounded-sm border border-nerv-orange/60 bg-nerv-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/25 disabled:opacity-40"
+            className="rounded-sm border border-up-orange/60 bg-up-orange/15 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/25 disabled:opacity-40"
           >
             {isPending ? 'salvando...' : 'agendar'}
           </motion.button>

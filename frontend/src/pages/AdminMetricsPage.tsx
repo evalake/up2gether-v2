@@ -206,7 +206,7 @@ export function AdminMetricsPage() {
                   {m.groups_by_tier[t]}
                 </div>
                 <div className="mt-0.5 text-[10px] text-zinc-500">
-                  {price > 0 ? `R$ ${price}/mes` : '—'}
+                  {price > 0 ? `R$ ${price}/mes` : '-'}
                 </div>
               </div>
             )
@@ -347,7 +347,7 @@ export function AdminMetricsPage() {
                   <span className="min-w-0 flex-1 truncate text-zinc-200" title={r.user_name ? `@${r.user_name} (${r.ref})` : r.ref}>
                     {r.user_name ? (
                       <>
-                        <span className="text-nerv-green/90">@{r.user_name}</span>
+                        <span className="text-up-green/90">@{r.user_name}</span>
                         <span className="ml-1.5 text-[10px] text-zinc-500">{r.ref.slice(0, 8)}</span>
                       </>
                     ) : (

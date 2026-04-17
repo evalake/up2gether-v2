@@ -33,24 +33,3 @@ export const deleteNotification = (id: string) =>
 
 export const clearNotifications = () =>
   api<{ ok: boolean }>('/notifications', { method: 'DELETE' })
-
-export const getVapidKey = () =>
-  api<{ key: string }>('/notifications/push/vapid-public-key')
-
-export const subscribePush = (sub: PushSubscriptionJSON) =>
-  api<{ ok: boolean }>('/notifications/push/subscribe', {
-    method: 'POST',
-    body: {
-      endpoint: sub.endpoint,
-      keys: {
-        p256dh: (sub.keys as Record<string, string>).p256dh,
-        auth: (sub.keys as Record<string, string>).auth,
-      },
-    },
-  })
-
-export const unsubscribePush = (endpoint: string) =>
-  api<{ ok: boolean }>('/notifications/push/unsubscribe', {
-    method: 'POST',
-    body: { endpoint },
-  })

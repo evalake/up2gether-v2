@@ -145,8 +145,8 @@ export function SessionsPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-nerv-text">sessões</h1>
-          <p className="mt-1 text-xs text-nerv-dim">toque num horário livre para agendar</p>
+          <h1 className="font-display text-3xl text-up-text">sessões</h1>
+          <p className="mt-1 text-xs text-up-dim">toque num horário livre para agendar</p>
         </div>
         <WeekHeader
           weekAnchor={weekAnchor}

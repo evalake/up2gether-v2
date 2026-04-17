@@ -1,53 +1,11 @@
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
+import { motion } from 'framer-motion'
 import { useCreateGame } from '@/features/games/hooks'
-import type { HardwareTier, GameSource } from '@/features/games/api'
 import { steamSearch, steamGetDetails, builtinGetDetails, type SteamSearchItem } from '@/features/steam/api'
 import { useToast } from '@/components/ui/toast'
-import { Textarea } from '@/components/ui/Textarea'
-import { Button } from '@/components/nerv/Button'
-import { SteamThumb } from '@/components/SteamThumb'
-import { TIERS } from '@/lib/constants'
-import { ChipInput } from './ChipInput'
-
-type FormState = {
-  name: string
-  steam_appid: string
-  description: string
-  is_free: boolean
-  price_current: string
-  cover_url: string
-  genres: string[]
-  tags: string[]
-  player_min: number
-  player_max: number | null
-  min_hardware_tier: HardwareTier
-  developer: string | null
-  release_date: string | null
-  metacritic_score: number | null
-  price_original: number | null
-  discount_percent: number | null
-  source?: GameSource
-}
-
-const emptyForm: FormState = {
-  name: '',
-  steam_appid: '',
-  description: '',
-  is_free: false,
-  price_current: '',
-  cover_url: '',
-  genres: [],
-  tags: [],
-  player_min: 1,
-  player_max: null,
-  min_hardware_tier: 'unknown',
-  developer: null,
-  release_date: null,
-  metacritic_score: null,
-  price_original: null,
-  discount_percent: null,
-}
+import { Button } from '@/components/core/Button'
+import { SteamResultsList, SteamPreview, ManualForm, emptyForm, type FormState } from './GameCreateParts'
 
 export function GameCreateForm({
   groupId,
@@ -61,13 +19,37 @@ export function GameCreateForm({
   const create = useCreateGame(groupId)
   const toast = useToast()
 
+  const [mode, setMode] = useState<'steam' | 'manual'>('steam')
   const [form, setForm] = useState<FormState>(emptyForm)
+  const [picked, setPicked] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [steamQ, setSteamQ] = useState('')
   const [steamHits, setSteamHits] = useState<SteamSearchItem[]>([])
   const [steamLoading, setSteamLoading] = useState(false)
   const [filling, setFilling] = useState(false)
 
+  const close = useCallback(() => {
+    setForm(emptyForm)
+    setPicked(false)
+    setShowAdvanced(false)
+    setSteamQ('')
+    setSteamHits([])
+    onCancel()
+  }, [onCancel])
+
+  // lock body scroll + escape
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    document.addEventListener('keydown', handler)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener('keydown', handler)
+    }
+  }, [close])
+
+  // steam debounced search
   useEffect(() => {
     if (steamQ.trim().length < 2) {
       setSteamHits([])
@@ -133,6 +115,7 @@ export function GameCreateForm({
           discount_percent: d.discount_percent ?? null,
         })
       }
+      setPicked(true)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'falha ao buscar detalhes')
     } finally {
@@ -140,8 +123,7 @@ export function GameCreateForm({
     }
   }
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const doSubmit = () => {
     if (!form.name) return
     create.mutate(
       {
@@ -165,7 +147,6 @@ export function GameCreateForm({
       },
       {
         onSuccess: (created) => {
-          setForm(emptyForm)
           toast.success('jogo adicionado')
           onCreated(created.id)
         },
@@ -176,170 +157,164 @@ export function GameCreateForm({
     )
   }
 
-  return (
-    <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-      <div className="rounded-sm border border-nerv-orange/40 bg-nerv-panel/60 p-5 shadow-lg shadow-black/30">
-        <div className="mb-4 text-[11px] uppercase tracking-wider text-nerv-dim">novo jogo</div>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="relative">
-            <div className="flex items-center gap-2 rounded-sm border border-nerv-orange/30 bg-black/40 px-2">
-              {form.cover_url && (
-                <img loading="lazy" src={form.cover_url} alt="" className="h-8 w-14 shrink-0 rounded-sm object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
-              )}
-              <input
-                aria-label="buscar jogo"
-                value={steamQ}
-                onChange={(e) => setSteamQ(e.target.value)}
-                placeholder={form.name ? form.name : 'buscar jogo pra autopreencher...'}
-                className="h-8 flex-1 bg-transparent text-xs focus-visible:outline-none"
-              />
-              {(steamLoading || filling) && <span className="text-[10px] text-nerv-dim">...</span>}
-            </div>
-            <AnimatePresence>
-              {steamHits.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }} className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-sm border border-nerv-orange/40 bg-nerv-panel shadow-lg">
-                  {steamHits.map((it, i) => (
-                    <button
-                      key={it.slug ?? it.appid ?? i}
-                      type="button"
-                      onClick={() => pickSteam(it)}
-                      className="flex w-full items-center gap-2 border-b border-nerv-line/60 px-2 py-1.5 text-left transition-colors hover:bg-nerv-orange/10"
-                    >
-                      {it.appid ? (
-                        <SteamThumb appid={it.appid} alt={it.name} className="h-7 w-14 rounded-sm object-cover" />
-                      ) : (
-                        <img loading="lazy" src={it.header_image ?? ''} alt={it.name} className="h-7 w-14 rounded-sm object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-xs">{it.name}</div>
-                        <div className="flex items-center gap-1.5 text-[9px] text-nerv-dim">
-                          {it.source && it.source !== 'steam' ? (
-                            <span className="rounded-sm border border-nerv-magenta/40 bg-nerv-magenta/10 px-1 text-nerv-magenta">{it.source}</span>
-                          ) : (
-                            <span>#{it.appid}</span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+  const clearPick = () => {
+    setForm(emptyForm)
+    setPicked(false)
+    setSteamQ('')
+  }
 
-          <AnimatePresence>
-            {showAdvanced && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3 overflow-hidden">
-                <div className="grid grid-cols-12 gap-2">
-                  <input
-                    value={form.name}
-                    maxLength={150}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="nome do jogo *"
-                    className="col-span-6 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
-                  />
-                  <input
-                    value={form.steam_appid}
-                    onChange={(e) => setForm({ ...form, steam_appid: e.target.value })}
-                    placeholder="appid"
-                    className="col-span-2 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
-                  />
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    disabled={form.is_free}
-                    value={form.is_free ? '' : form.price_current}
-                    onChange={(e) => setForm({ ...form, price_current: e.target.value })}
-                    placeholder="R$"
-                    className="col-span-2 h-8 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs focus-visible:border-nerv-orange focus-visible:outline-none disabled:opacity-40"
-                  />
+  const switchToManual = () => {
+    setMode('manual')
+    setPicked(false)
+    if (!form.name) setForm(emptyForm)
+  }
+
+  // steam search: is there content to show?
+  const steamEmpty = steamQ.trim().length < 2 && steamHits.length === 0
+  const steamSearching = steamQ.trim().length >= 2
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md"
+      onClick={(e) => { if (e.target === e.currentTarget) close() }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="adicionar novo jogo"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        className="relative mx-4 flex h-[min(520px,85vh)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-up-orange/25 bg-up-bg shadow-2xl shadow-black/50"
+      >
+        {/* header */}
+        <div className="shrink-0 flex items-center justify-between border-b border-up-orange/20 bg-black/40 px-4 py-2">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-up-orange">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-up-orange" />
+            adicionar novo jogo
+          </div>
+          <button onClick={close} className="p-1 text-up-dim transition-colors hover:text-up-text" aria-label="fechar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
+
+        {/* tabs */}
+        <div className="shrink-0 flex border-b border-up-line/40">
+          <button
+            onClick={() => { setMode('steam'); setPicked(false) }}
+            className={`flex-1 py-2 text-center font-mono text-[10px] uppercase tracking-wider transition-colors ${
+              mode === 'steam' ? 'border-b-2 border-up-orange text-up-orange' : 'text-up-dim hover:text-up-text'
+            }`}
+          >
+            importar
+          </button>
+          <button
+            onClick={switchToManual}
+            className={`flex-1 py-2 text-center font-mono text-[10px] uppercase tracking-wider transition-colors ${
+              mode === 'manual' ? 'border-b-2 border-up-orange text-up-orange' : 'text-up-dim hover:text-up-text'
+            }`}
+          >
+            manual
+          </button>
+        </div>
+
+        {/* body: steam search tab uses flex layout with pinned input, manual uses scroll */}
+        {mode === 'steam' && !picked && (
+          <div className="flex min-h-0 flex-1 flex-col">
+            {/* pinned search input */}
+            <div className="shrink-0 border-b border-up-line/20 px-4 py-3">
+              <div className="flex items-center gap-2 rounded-sm border border-up-orange/30 bg-black/40 px-2.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="shrink-0 text-up-dim">
+                  <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  autoFocus
+                  aria-label="buscar jogo na Steam"
+                  value={steamQ}
+                  onChange={(e) => setSteamQ(e.target.value)}
+                  placeholder="buscar jogo na Steam..."
+                  className="h-9 flex-1 bg-transparent text-sm focus-visible:outline-none"
+                />
+                {(steamLoading || filling) && (
+                  <span className="text-[10px] text-up-dim animate-pulse">buscando...</span>
+                )}
+              </div>
+            </div>
+
+            {/* results area: fills remaining space, only this scrolls */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {steamEmpty && !steamLoading && (
+                <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+                  <span className="font-display text-3xl text-up-orange/20">?</span>
+                  <p className="text-xs text-up-dim">
+                    Busque na Steam ou catalogo integrado para importar automaticamente.
+                  </p>
                   <button
                     type="button"
-                    onClick={() => setForm({ ...form, is_free: !form.is_free })}
-                    className={`col-span-2 h-8 rounded-sm border text-[10px] uppercase tracking-wider transition-all ${
-                      form.is_free
-                        ? 'border-nerv-green bg-nerv-green/10 text-nerv-green'
-                        : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-green/40'
-                    }`}
+                    onClick={switchToManual}
+                    className="mt-1 text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
                   >
-                    {form.is_free ? '✓ free' : 'free?'}
+                    ou adicionar manualmente
                   </button>
                 </div>
+              )}
 
-                <div className="grid grid-cols-12 gap-2">
-                  <div className="col-span-3 flex items-center gap-1 rounded-sm border border-nerv-line bg-black/40 px-2 h-8">
-                    <span className="text-[10px] uppercase text-nerv-dim">players</span>
-                    <input
-                      type="number"
-                      min="1"
-                      value={form.player_min}
-                      onChange={(e) => setForm({ ...form, player_min: Number(e.target.value) || 1 })}
-                      className="w-8 bg-transparent text-center text-xs focus-visible:outline-none"
-                    />
-                    <span className="text-nerv-dim">-</span>
-                    <input
-                      type="number"
-                      min="1"
-                      value={form.player_max ?? ''}
-                      onChange={(e) => setForm({ ...form, player_max: e.target.value ? Number(e.target.value) : null })}
-                      placeholder="∞"
-                      className="w-8 bg-transparent text-center text-xs focus-visible:outline-none"
-                    />
-                  </div>
-                  <div className="col-span-9 flex gap-1">
-                    {TIERS.map((t) => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => setForm({ ...form, min_hardware_tier: t })}
-                        className={`h-8 flex-1 rounded-sm border text-[10px] uppercase tracking-wider transition-all ${
-                          form.min_hardware_tier === t
-                            ? 'border-nerv-orange bg-nerv-orange/10 text-nerv-orange'
-                            : 'border-nerv-line text-nerv-dim transition-colors hover:border-nerv-orange/40'
-                        }`}
-                      >
-                        hw: {t}
-                      </button>
-                    ))}
-                  </div>
+              {steamSearching && steamHits.length === 0 && !steamLoading && (
+                <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
+                  <p className="text-xs text-up-dim">Nenhum resultado para "{steamQ}"</p>
+                  <button
+                    type="button"
+                    onClick={switchToManual}
+                    className="text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
+                  >
+                    adicionar manualmente
+                  </button>
                 </div>
+              )}
 
-                <Textarea
-                  value={form.description}
-                  maxLength={2000}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  rows={2}
-                  placeholder="descrição (opcional)"
-                />
-
-                <div className="grid grid-cols-2 gap-2">
-                  <ChipInput label="gêneros" value={form.genres} onChange={(v) => setForm({ ...form, genres: v })} max={10} placeholder="FPS, RPG..." />
-                  <ChipInput label="tags" value={form.tags} onChange={(v) => setForm({ ...form, tags: v })} max={20} placeholder="Co-op..." />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex items-center justify-between gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
-              className="text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
-            >
-              {showAdvanced ? '− menos opções' : '+ mais opções'}
-            </button>
-            <div className="flex gap-2">
-              <Button type="button" variant="subtle" onClick={() => { setForm(emptyForm); setShowAdvanced(false); onCancel() }}>
-                cancelar
-              </Button>
-              <Button type="submit" disabled={create.isPending || !form.name}>
-                {create.isPending ? 'salvando...' : 'adicionar'}
-              </Button>
+              {steamHits.length > 0 && (
+                <SteamResultsList hits={steamHits} onPick={pickSteam} />
+              )}
             </div>
           </div>
-        </form>
-      </div>
-    </motion.div>
+        )}
+
+        {mode === 'steam' && picked && (
+          <div className="min-h-0 flex-1 overflow-y-auto p-4">
+            <SteamPreview form={form} onClear={clearPick} />
+          </div>
+        )}
+
+        {mode === 'manual' && (
+          <div className="min-h-0 flex-1 overflow-y-auto p-4">
+            <ManualForm
+              form={form}
+              setForm={setForm}
+              showAdvanced={showAdvanced}
+              setShowAdvanced={setShowAdvanced}
+            />
+          </div>
+        )}
+
+        {/* footer: always pinned at bottom */}
+        <div className="shrink-0 flex items-center justify-end gap-2 border-t border-up-line/40 px-4 py-3">
+          <Button type="button" variant="subtle" size="sm" onClick={close}>
+            cancelar
+          </Button>
+          <Button
+            size="sm"
+            disabled={create.isPending || !form.name}
+            onClick={doSubmit}
+          >
+            {create.isPending ? 'salvando...' : 'adicionar'}
+          </Button>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body,
   )
 }

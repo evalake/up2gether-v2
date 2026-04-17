@@ -4,15 +4,14 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import CurrentUser
-from app.models.notification import Notification, PushSubscription
+from app.models.notification import Notification
 from app.services.notifications import notify
 
 router = APIRouter(tags=["notifications"], prefix="/notifications")
@@ -31,16 +30,6 @@ class NotificationOut(BaseModel):
 
 class MarkReadIn(BaseModel):
     ids: list[uuid.UUID] | None = None  # None = mark all
-
-
-class PushKeys(BaseModel):
-    p256dh: str
-    auth: str
-
-
-class PushSubscribeIn(BaseModel):
-    endpoint: str
-    keys: PushKeys
 
 
 @router.get("", response_model=list[NotificationOut])
@@ -116,64 +105,6 @@ async def clear_notifications(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
     await db.execute(delete(Notification).where(Notification.user_id == actor.id))
-    await db.commit()
-    return {"ok": True}
-
-
-@router.get("/push/vapid-public-key")
-async def vapid_public_key(_: CurrentUser) -> dict:
-    key = get_settings().vapid_public_key
-    if not key:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "push nao configurado")
-    return {"key": key}
-
-
-@router.post("/push/subscribe")
-async def push_subscribe(
-    payload: PushSubscribeIn,
-    actor: CurrentUser,
-    db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
-    existing = (
-        await db.execute(
-            select(PushSubscription).where(
-                PushSubscription.user_id == actor.id,
-                PushSubscription.endpoint == payload.endpoint,
-            )
-        )
-    ).scalar_one_or_none()
-    if existing:
-        existing.p256dh = payload.keys.p256dh
-        existing.auth = payload.keys.auth
-    else:
-        db.add(
-            PushSubscription(
-                user_id=actor.id,
-                endpoint=payload.endpoint,
-                p256dh=payload.keys.p256dh,
-                auth=payload.keys.auth,
-            )
-        )
-    await db.commit()
-    return {"ok": True}
-
-
-class PushUnsubscribeIn(BaseModel):
-    endpoint: str
-
-
-@router.post("/push/unsubscribe")
-async def push_unsubscribe(
-    payload: PushUnsubscribeIn,
-    actor: CurrentUser,
-    db: Annotated[AsyncSession, Depends(get_db)],
-) -> dict:
-    await db.execute(
-        delete(PushSubscription).where(
-            PushSubscription.user_id == actor.id,
-            PushSubscription.endpoint == payload.endpoint,
-        )
-    )
     await db.commit()
     return {"ok": True}
 

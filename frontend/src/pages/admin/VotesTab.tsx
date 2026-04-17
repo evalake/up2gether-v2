@@ -91,16 +91,16 @@ export function VotesTab({ groupId }: { groupId: string }) {
   if (votes.error) return <ErrorBox error={votes.error} />
 
   return (
-    <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
+    <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Votações do grupo</div>
-          <p className="mt-1 text-[11px] text-nerv-dim/80">
+          <div className="text-[11px] uppercase tracking-wider text-up-dim">Votações do grupo</div>
+          <p className="mt-1 text-[11px] text-up-dim">
             Histórico completo. Apagar votação limpa stages e ballots via cascade.
           </p>
         </div>
-        <div className="font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
-          <span className="tabular-nums text-nerv-orange">{list.length}</span> total
+        <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
+          <span className="tabular-nums text-up-orange">{list.length}</span> total
         </div>
       </div>
 
@@ -110,12 +110,12 @@ export function VotesTab({ groupId }: { groupId: string }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="buscar votação..."
-          className="h-8 min-w-[180px] flex-1 rounded-sm border border-nerv-line bg-black/40 px-2 text-xs text-nerv-text focus-visible:border-nerv-orange focus-visible:outline-none"
+          className="h-8 min-w-[180px] flex-1 rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         {filtered.length > 0 && (
           <button
             onClick={toggleAll}
-            className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text"
+            className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text"
           >
             {selected.size === filtered.length ? 'limpar' : 'tudo'}
           </button>
@@ -123,7 +123,7 @@ export function VotesTab({ groupId }: { groupId: string }) {
         {selected.size > 0 && (
           <button
             onClick={() => setBulkConfirm(true)}
-            className="rounded-sm border border-nerv-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10"
+            className="rounded-sm border border-up-red/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10"
           >
             apagar {selected.size}
           </button>
@@ -131,16 +131,16 @@ export function VotesTab({ groupId }: { groupId: string }) {
       </div>
 
       {bulkConfirm && (
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
-          <p className="text-xs text-nerv-red">
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
+          <p className="text-xs text-up-red">
             apagar {selected.size} votação{selected.size === 1 ? '' : 'ões'}? não dá pra desfazer.
           </p>
           <div className="flex shrink-0 gap-2">
-            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
+            <button onClick={() => setBulkConfirm(false)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
             <button
               onClick={deleteBulk}
               disabled={del.isPending}
-              className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40"
+              className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40"
             >
               sim, apagar
             </button>
@@ -149,16 +149,16 @@ export function VotesTab({ groupId }: { groupId: string }) {
       )}
 
       {filtered.length === 0 ? (
-        <div className="mt-4 py-6 text-center text-[11px] text-nerv-dim">
+        <div className="mt-4 py-6 text-center text-[11px] text-up-dim">
           {q ? `nenhuma votação pra "${q}"` : 'nenhuma votação ainda'}
         </div>
       ) : (
-        <div className="mt-4 divide-y divide-nerv-line/30">
+        <div className="mt-4 divide-y divide-up-line/30">
           {filtered.map((v) => {
             const on = selected.has(v.id)
             const confirming = pendingDelete === v.id
             const statusColor =
-              v.status === 'open' ? 'text-nerv-green' : v.status === 'closed' ? 'text-nerv-dim' : 'text-nerv-amber'
+              v.status === 'open' ? 'text-up-green' : v.status === 'closed' ? 'text-up-dim' : 'text-up-amber'
             const winner = gameName(v.winner_game_id)
             return (
               <div key={v.id} className="flex items-center gap-3 py-2">
@@ -166,35 +166,35 @@ export function VotesTab({ groupId }: { groupId: string }) {
                   type="checkbox"
                   checked={on}
                   onChange={() => toggleOne(v.id)}
-                  className="h-3.5 w-3.5 shrink-0 accent-nerv-orange"
+                  className="h-3.5 w-3.5 shrink-0 accent-up-orange"
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm text-nerv-text">{v.title}</span>
+                    <span className="truncate text-sm text-up-text">{v.title}</span>
                     <span className={`font-mono text-[9px] uppercase tracking-wider ${statusColor}`}>{v.status}</span>
                   </div>
-                  <div className="truncate font-mono text-[9px] uppercase tracking-wider text-nerv-dim">
+                  <div className="truncate font-mono text-[9px] uppercase tracking-wider text-up-dim">
                     {v.candidate_game_ids.length} cand · {v.ballots_count}/{v.eligible_voter_count} votos
-                    {winner && <span className="text-nerv-orange"> · winner: {winner}</span>}
+                    {winner && <span className="text-up-orange"> · winner: {winner}</span>}
                   </div>
                 </div>
                 {v.status === 'open' && !confirming && (
                   <button
                     onClick={() => forceClose(v.id)}
-                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-amber/60 hover:text-nerv-amber"
+                    className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-amber/60 hover:text-up-amber"
                   >
                     encerrar
                   </button>
                 )}
                 {confirming ? (
                   <div className="flex shrink-0 gap-1">
-                    <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim">cancelar</button>
-                    <button onClick={() => deleteOne(v.id)} className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-2 py-1 font-mono text-[10px] text-nerv-red">confirmar</button>
+                    <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim">cancelar</button>
+                    <button onClick={() => deleteOne(v.id)} className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red">confirmar</button>
                   </div>
                 ) : (
                   <button
                     onClick={() => setPendingDelete(v.id)}
-                    className="shrink-0 rounded-sm border border-nerv-line px-2 py-1 font-mono text-[10px] text-nerv-dim transition-colors hover:border-nerv-red/60 hover:text-nerv-red"
+                    className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red"
                   >
                     apagar
                   </button>

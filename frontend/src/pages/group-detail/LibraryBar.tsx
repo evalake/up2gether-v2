@@ -8,17 +8,26 @@ const STAGE_LABEL: Record<GameStage, string> = {
   paused: 'pausados',
   abandoned: 'largados',
 }
-const STAGE_COLOR: Record<GameStage, string> = {
-  exploring: 'bg-nerv-orange',
-  campaign: 'bg-nerv-green',
-  endgame: 'bg-nerv-magenta',
-  paused: 'bg-nerv-amber',
-  abandoned: 'bg-nerv-line',
+const STAGE_BORDER: Record<GameStage, string> = {
+  exploring: 'border-up-amber',
+  campaign: 'border-up-green',
+  endgame: 'border-up-orange',
+  paused: 'border-up-line',
+  abandoned: 'border-up-red',
 }
-
-const fadeUp = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
+const STAGE_TEXT: Record<GameStage, string> = {
+  exploring: 'text-up-amber',
+  campaign: 'text-up-green',
+  endgame: 'text-up-orange',
+  paused: 'text-up-dim',
+  abandoned: 'text-up-red',
+}
+const STAGE_BG: Record<GameStage, string> = {
+  exploring: 'bg-up-amber/10',
+  campaign: 'bg-up-green/10',
+  endgame: 'bg-up-orange/10',
+  paused: 'bg-up-line/10',
+  abandoned: 'bg-up-red/10',
 }
 
 type Props = {
@@ -30,31 +39,30 @@ export function LibraryBar({ breakdown, onExplore }: Props) {
   if (breakdown.length === 0) return null
   const total = breakdown.reduce((acc, s) => acc + s.count, 0)
   return (
-    <motion.section {...fadeUp} transition={{ duration: 0.4, delay: 0.2 }} className="space-y-3">
-      <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-nerv-dim">
-        <span>biblioteca</span>
-        <button onClick={onExplore} className="transition-colors hover:text-nerv-orange">
-          explorar →
-        </button>
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
+      className="space-y-3"
+    >
+      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-dim">
+        biblioteca <span className="tabular-nums text-up-orange">{total}</span>
       </div>
-      <div className="flex h-2 overflow-hidden rounded-full bg-nerv-line/30">
+      <div className="flex flex-wrap gap-2">
         {breakdown.map((s, i) => (
-          <motion.div
+          <motion.button
             key={s.stage}
-            initial={{ width: 0 }}
-            animate={{ width: `${(s.count / total) * 100}%` }}
-            transition={{ duration: 0.7, delay: 0.3 + i * 0.08, ease: 'easeOut' }}
-            className={`${STAGE_COLOR[s.stage]}`}
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-x-5 gap-y-1.5 font-mono text-[10px] uppercase tracking-wider text-nerv-dim">
-        {breakdown.map((s) => (
-          <span key={s.stage} className="flex items-center gap-1.5">
-            <span className={`inline-block h-1.5 w-1.5 rounded-full ${STAGE_COLOR[s.stage]}`} />
-            {STAGE_LABEL[s.stage]}{' '}
-            <span className="tabular-nums text-nerv-text/80">{s.count}</span>
-          </span>
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.25 + i * 0.06 }}
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={onExplore}
+            className={`flex items-center gap-2 rounded-sm border ${STAGE_BORDER[s.stage]} ${STAGE_BG[s.stage]} px-3 py-2 transition-colors hover:bg-up-panel/50`}
+          >
+            <span className={`font-display text-lg tabular-nums ${STAGE_TEXT[s.stage]}`}>{s.count}</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{STAGE_LABEL[s.stage]}</span>
+          </motion.button>
         ))}
       </div>
     </motion.section>

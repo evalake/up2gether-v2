@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { DiscordCallbackPage } from '@/pages/DiscordCallbackPage'
 import { LandingPage } from '@/pages/LandingPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { TermsPage } from '@/pages/TermsPage'
+import { ContactPage } from '@/pages/ContactPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
 const GroupsPage = lazy(() => import('@/pages/GroupsPage').then(m => ({ default: m.GroupsPage })))
@@ -48,6 +49,18 @@ function RealtimeBoot() {
   return null
 }
 
+const SCROLL_TOP_PATHS = ['/privacy', '/terms', '/contact']
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    if (SCROLL_TOP_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
+    }
+  }, [pathname])
+  return null
+}
+
 function AnimatedRoutes() {
   const location = useLocation()
   return (
@@ -65,6 +78,7 @@ function AnimatedRoutes() {
           <Route path="/share/sessions/:id" element={<PublicSessionPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/" element={<LandingPage />} />
           <Route
             path="/onboarding"
@@ -174,6 +188,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <RealtimeBoot />
       <BrowserRouter>
+        <ScrollToTop />
         <Suspense fallback={null}>
           <AnimatedRoutes />
         </Suspense>

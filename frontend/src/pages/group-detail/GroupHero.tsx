@@ -28,7 +28,7 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
     <motion.header
       {...fadeUp}
       transition={{ duration: 0.5 }}
-      className="relative overflow-hidden border border-nerv-orange/25 bg-gradient-to-br from-nerv-panel/60 via-nerv-panel/30 to-transparent px-8 py-10"
+      className="relative overflow-hidden border border-up-orange/25 bg-gradient-to-br from-up-panel/60 via-up-panel/30 to-transparent px-6 py-6"
       style={{ clipPath: 'polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px))' }}
     >
       {bgUrl && (
@@ -57,22 +57,22 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
               className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-nerv-bg via-nerv-bg/70 to-nerv-bg/20" />
-          <div className="absolute inset-0 bg-gradient-to-r from-nerv-bg/80 via-transparent to-nerv-bg/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-up-bg via-up-bg/70 to-up-bg/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-up-bg/80 via-transparent to-up-bg/40" />
         </motion.div>
       )}
-      <span className="pointer-events-none absolute left-1 top-1 h-4 w-4 border-l-2 border-t-2 border-nerv-orange/60" />
-      <span className="pointer-events-none absolute bottom-1 right-1 h-4 w-4 border-b-2 border-r-2 border-nerv-orange/60" />
-      <div className="absolute left-0 right-0 top-0 flex items-center justify-between border-b border-nerv-orange/15 bg-black/30 px-4 py-1 font-mono text-[9px] uppercase tracking-[0.25em] text-nerv-orange/70">
+      <span className="pointer-events-none absolute left-1 top-1 h-4 w-4 border-l-2 border-t-2 border-up-orange/60" />
+      <span className="pointer-events-none absolute bottom-1 right-1 h-4 w-4 border-b-2 border-r-2 border-up-orange/60" />
+      <div className="absolute left-0 right-0 top-0 flex items-center justify-between border-b border-up-orange/20 bg-black/30 px-4 py-1 font-mono text-[10px] uppercase tracking-[0.25em] text-up-orange">
         <span>group monitor // {group.name}</span>
-        <span className="tabular-nums text-nerv-green">{now.toLocaleTimeString('pt-BR', { hour12: false })}</span>
+        <span className="tabular-nums text-up-green">{now.toLocaleTimeString('pt-BR', { hour12: false })}</span>
       </div>
-      <div className="h-5" />
+      <div className="h-3" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
           backgroundImage: 'repeating-linear-gradient(0deg, transparent 0 3px, currentColor 3px 4px)',
-          color: '#ff6b35',
+          color: 'var(--color-up-orange)',
         }}
       />
       <motion.div
@@ -80,28 +80,28 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
         animate={{ scaleX: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         style={{ transformOrigin: 'left' }}
-        className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-nerv-orange via-nerv-magenta to-transparent"
+        className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-up-orange via-up-magenta to-transparent"
       />
       <div className="relative flex flex-wrap items-end justify-between gap-6">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-nerv-magenta">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-nerv-green nerv-pulse" />
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-magenta">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-up-green up-pulse" />
             <span>{group.user_role}</span>
-            {isSoleAdmin && <span className="text-nerv-dim">· único admin</span>}
-            {isSysAdmin && <span className="text-nerv-red">· sys_admin</span>}
+            {isSoleAdmin && <span className="text-up-dim">· único admin</span>}
+            {isSysAdmin && <span className="text-up-red">· sys admin</span>}
           </div>
-          <h1 className="mt-3 font-display text-5xl leading-none text-nerv-text sm:text-6xl">{group.name}</h1>
-          <div className="mt-4 flex items-center gap-5 font-mono text-[11px] text-nerv-dim">
-            <Stat n={stats.members} label="membros" tone="text-nerv-green" />
-            <Stat n={stats.games} label="jogos" tone="text-nerv-amber" />
-            <Stat n={stats.votes} label="votações" tone="text-nerv-magenta" />
-            <Stat n={stats.sessions} label="sessões" tone="text-nerv-orange" />
+          <h1 className="mt-2 font-display text-3xl leading-none text-up-text sm:text-4xl">{group.name}</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-4 font-mono text-[11px] text-up-dim">
+            <Stat n={stats.members} label="membros" tone="text-up-green" />
+            <Stat n={stats.games} label="jogos" tone="text-up-amber" />
+            <Stat n={stats.votes} label="votacoes" tone="text-up-magenta" />
+            <Stat n={stats.sessions} label="sessoes" tone="text-up-orange" />
           </div>
         </div>
         {!isSoleAdmin && (
           <button
             onClick={onLeave}
-            className="rounded-sm border border-nerv-line/40 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-nerv-dim transition-colors hover:border-nerv-red/40 hover:text-nerv-red"
+            className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:border-up-red hover:text-up-red"
           >
             sair do grupo
           </button>
@@ -114,7 +114,7 @@ export function GroupHero({ group, isSoleAdmin, isSysAdmin, now, stats, fallback
 function Stat({ n, label, tone }: { n: number; label: string; tone: string }) {
   return (
     <span className="flex items-baseline gap-1.5">
-      <span className={`font-display text-xl tabular-nums ${tone}`}>{n}</span>
+      <span className={`font-display text-lg tabular-nums ${tone}`}>{n}</span>
       <span className="uppercase tracking-wider">{label}</span>
     </span>
   )

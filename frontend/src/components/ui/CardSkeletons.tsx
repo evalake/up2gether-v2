@@ -2,7 +2,7 @@ import { Skeleton } from './Loading'
 
 export function GameCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-sm border border-nerv-orange/15 bg-nerv-panel/30">
+    <div className="overflow-hidden rounded-sm border border-up-orange/15 bg-up-panel/30">
       <Skeleton className="h-32 w-full" />
       <div className="space-y-2 p-3">
         <Skeleton className="h-4 w-3/4" />
@@ -30,7 +30,7 @@ export function GameGridSkeleton({ count = 6 }: { count?: number }) {
 
 export function SessionCardSkeleton() {
   return (
-    <div className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-4">
+    <div className="rounded-sm border border-up-line bg-up-panel/20 p-4">
       <div className="flex items-start gap-3">
         <Skeleton className="h-14 w-24 shrink-0 rounded-sm" />
         <div className="flex-1 space-y-2">
@@ -59,7 +59,7 @@ export function SessionListSkeleton({ count = 3 }: { count?: number }) {
 
 export function VoteCardSkeleton() {
   return (
-    <div className="rounded-sm border border-nerv-line/40 bg-nerv-panel/20 p-4">
+    <div className="rounded-sm border border-up-line bg-up-panel/20 p-4">
       <div className="mb-3 flex items-center justify-between">
         <Skeleton className="h-5 w-48" />
         <Skeleton className="h-4 w-16" />

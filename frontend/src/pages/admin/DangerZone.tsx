@@ -18,23 +18,23 @@ export function DangerZone({
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="rounded-sm border border-nerv-red/20 bg-nerv-red/5 p-5"
+      className="rounded-sm border border-up-red/20 bg-up-red/5 p-5"
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-nerv-red/80">Zona Perigosa</div>
-          <p className="mt-0.5 text-[11px] text-nerv-dim">Acoes irreversiveis. So o dono do servidor ve.</p>
+          <div className="text-[11px] uppercase tracking-wider text-up-red">Zona Perigosa</div>
+          <p className="mt-0.5 text-[11px] text-up-dim">Acoes irreversiveis. So o dono do servidor ve.</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setConfirmKind('reset')}
-            className="rounded-sm border border-nerv-amber/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-amber transition-colors hover:bg-nerv-amber/10"
+            className="rounded-sm border border-up-amber/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-amber transition-colors hover:bg-up-amber/10"
           >
             Resetar Dados
           </button>
           <button
             onClick={() => setConfirmKind('destroy')}
-            className="rounded-sm border border-nerv-red/50 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-red transition-colors hover:bg-nerv-red/10"
+            className="rounded-sm border border-up-red/50 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10"
           >
             Excluir Servidor
           </button>
@@ -43,16 +43,16 @@ export function DangerZone({
       <AnimatePresence>
         {confirmKind === 'reset' && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-            <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-amber/30 bg-black/30 p-3">
-              <p className="text-xs text-nerv-amber">
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-amber/30 bg-black/30 p-3">
+              <p className="text-xs text-up-amber">
                 Apaga jogos, votacoes, temas e sessoes. Mantem grupo e membros. Tem certeza?
               </p>
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
+                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
                 <button
                   onClick={async () => { await onConfirmReset(); setConfirmKind(null) }}
                   disabled={resetPending}
-                  className="rounded-sm border border-nerv-amber/60 bg-nerv-amber/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-amber disabled:opacity-40"
+                  className="rounded-sm border border-up-amber/60 bg-up-amber/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-amber disabled:opacity-40"
                 >
                   {resetPending ? 'resetando...' : 'sim, resetar'}
                 </button>
@@ -62,16 +62,16 @@ export function DangerZone({
         )}
         {confirmKind === 'destroy' && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-            <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-nerv-red/40 bg-black/30 p-3">
-              <p className="text-xs text-nerv-red">
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
+              <p className="text-xs text-up-red">
                 Apaga o servidor e tudo dentro. Não dá pra desfazer. Tem certeza?
               </p>
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-text">cancelar</button>
+                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
                 <button
                   onClick={async () => { await onConfirmDelete(); setConfirmKind(null) }}
                   disabled={deletePending}
-                  className="rounded-sm border border-nerv-red/60 bg-nerv-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-nerv-red disabled:opacity-40"
+                  className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40"
                 >
                   {deletePending ? 'excluindo...' : 'sim, excluir'}
                 </button>

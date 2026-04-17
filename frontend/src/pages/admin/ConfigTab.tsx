@@ -13,18 +13,18 @@ export function ConfigTab({
   const toast = useToast()
   return (
     <>
-      <section className="rounded-sm border border-nerv-orange/15 bg-nerv-panel/30 p-5">
+      <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <div className="text-[11px] uppercase tracking-wider text-nerv-dim">Visual do Discord</div>
-            <p className="mt-1 text-[11px] text-nerv-dim/80">
+            <div className="text-[11px] uppercase tracking-wider text-up-dim">Visual do Discord</div>
+            <p className="mt-1 text-[11px] text-up-dim">
               Puxa ícone, banner, splash e descrição direto do servidor no Discord. Banner/splash só aparecem se o servidor tiver esses recursos habilitados (boosts).
             </p>
             <div className="mt-3 flex items-center gap-3">
               {group.icon_url && (
-                <img loading="lazy" src={group.icon_url} alt="" className="h-12 w-12 rounded-sm border border-nerv-line object-cover" />
+                <img loading="lazy" src={group.icon_url} alt="" className="h-12 w-12 rounded-sm border border-up-line object-cover" />
               )}
-              <div className="flex flex-col gap-0.5 text-[10px] text-nerv-dim">
+              <div className="flex flex-col gap-0.5 text-[10px] text-up-dim">
                 <span>icone: {group.icon_url ? 'ok' : '--'}</span>
                 <span>banner: {group.banner_url ? 'ok' : '--'}</span>
                 <span>splash: {group.splash_url ? 'ok' : '--'}</span>
@@ -41,7 +41,7 @@ export function ConfigTab({
               }
             }}
             disabled={sync.isPending}
-            className="shrink-0 rounded-sm border border-nerv-orange/60 bg-nerv-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/20 disabled:opacity-40"
+            className="shrink-0 rounded-sm border border-up-orange/60 bg-up-orange/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/20 disabled:opacity-40"
           >
             {sync.isPending ? 'sincronizando...' : 'sincronizar'}
           </button>

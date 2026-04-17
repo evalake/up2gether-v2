@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging
+from app.jobs.price_check_cron import check_game_prices
 from app.jobs.theme_cycle_cron import auto_open_theme_cycles
 from app.routers import (
     admin,
@@ -42,6 +43,7 @@ async def lifespan(_: FastAPI):
     # leader election: so 1 machine roda bot + scheduler
     scheduler = AsyncIOScheduler(timezone="UTC")
     scheduler.add_job(auto_open_theme_cycles, CronTrigger(hour=9, minute=0))
+    scheduler.add_job(check_game_prices, CronTrigger(hour="*/6", minute=30))
     bot = PresenceBot(settings.discord_bot_token)
     leader = LeaderElection()
 

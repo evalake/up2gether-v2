@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/store'
-import { Shell } from '@/components/nerv/Shell'
+import { Shell } from '@/components/core/Shell'
 
 export function RequireAuth({ children }: { children: ReactNode }) {
   const token = useAuthStore((s) => s.token)

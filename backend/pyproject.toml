@@ -16,7 +16,6 @@ dependencies = [
     "python-multipart>=0.0.20",
     "structlog>=24.4.0",
     "apscheduler>=3.11.0",
-    "pywebpush>=2.0.1",
     "python-socketio>=5.12.1",
     "python-dateutil>=2.9.0",
     "google-api-python-client>=2.156.0",

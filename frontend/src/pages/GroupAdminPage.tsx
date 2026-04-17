@@ -77,9 +77,9 @@ export function GroupAdminPage() {
   if (!isAdmin) {
     return (
       <div className="space-y-4">
-        <h1 className="font-display text-2xl text-nerv-text">Painel do Admin</h1>
-        <p className="text-sm text-nerv-dim">Você não tem permissão pra acessar esse painel.</p>
-        <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange">
+        <h1 className="font-display text-2xl text-up-text">Painel do Admin</h1>
+        <p className="text-sm text-up-dim">Você não tem permissão pra acessar esse painel.</p>
+        <Link to={`/groups/${id}`} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">
           ← voltar
         </Link>
       </div>
@@ -109,13 +109,13 @@ export function GroupAdminPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between gap-4">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-nerv-orange/80">Painel do Admin</div>
-          <h1 className="mt-1 font-display text-3xl text-nerv-text">{group.data.name}</h1>
-          <p className="mt-1 text-xs text-nerv-dim">Controles avancados do servidor. So admin e sysadmin veem.</p>
+          <div className="text-[11px] uppercase tracking-wider text-up-orange">Painel do Admin</div>
+          <h1 className="mt-1 font-display text-3xl text-up-text">{group.data.name}</h1>
+          <p className="mt-1 text-xs text-up-dim">Controles avancados do servidor. So admin e sysadmin veem.</p>
         </div>
         <Link
           to={`/groups/${id}`}
-          className="text-[11px] uppercase tracking-wider text-nerv-dim transition-colors hover:text-nerv-orange"
+          className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
         >
           ← voltar
         </Link>
@@ -123,7 +123,7 @@ export function GroupAdminPage() {
 
       <SeatIndicator group={group.data} />
 
-      <div className="flex flex-wrap gap-1 border-b border-nerv-line/30 pb-1">
+      <div className="flex flex-wrap gap-1 border-b border-up-line/50 pb-1">
         {TABS.filter((t) => !t.ownerOnly || isOwner).map((t) => (
           <button
             key={t.key}
@@ -131,9 +131,9 @@ export function GroupAdminPage() {
             className={`rounded-t-sm border-b-2 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
               tab === t.key
                 ? t.key === 'danger'
-                  ? 'border-nerv-red text-nerv-red'
-                  : 'border-nerv-orange text-nerv-orange'
-                : 'border-transparent text-nerv-dim transition-colors hover:text-nerv-text'
+                  ? 'border-up-red text-up-red'
+                  : 'border-up-orange text-up-orange'
+                : 'border-transparent text-up-dim transition-colors hover:text-up-text'
             }`}
           >
             {t.label}

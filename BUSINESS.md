@@ -54,7 +54,7 @@ Por grupo (servidor). Precos em BRL.
 | Tier | Preco | Limite de membros | Features | Perfil tipico |
 |------|-------|-------------------|----------|----------------|
 | **Free** | R$ 0 | ate 10 membros | Core: login Discord, sync Steam, votacao, 2 sessoes agendadas simultaneas, tema default | Panela classica: squad de 5 + reservas |
-| **Pro** | R$ 29/mes ou R$ 290/ano | ate 30 membros | Sessoes ilimitadas, analytics basico, temas custom, web push prioritario | 2-3 panelas, crew de faculdade/trampo |
+| **Pro** | R$ 29/mes ou R$ 290/ano | ate 30 membros | Sessoes ilimitadas, analytics basico, temas custom, webhook Discord dedicado | 2-3 panelas, crew de faculdade/trampo |
 | **Community** | R$ 89/mes ou R$ 890/ano | ate 100 membros | Analytics completo, branding (logo/cor), API read, moderacao avancada | Streamer pequeno, comunidade organizada |
 | **Creator** | R$ 249/mes ou R$ 2490/ano | ate 500 membros | White-label, suporte direto (eu no DM), features custom sob demanda | Streamer medio+, servidor grande |
 | **Legacy** | R$ 0 pra sempre | sem limite | Tudo | Grupos existentes ate data do cutoff. Flag no DB. |

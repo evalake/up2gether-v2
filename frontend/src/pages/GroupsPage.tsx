@@ -9,8 +9,8 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
-import { Button } from '@/components/nerv/Button'
-import { KanjiLabel } from '@/components/nerv/KanjiLabel'
+import { Button } from '@/components/core/Button'
+import { KanjiLabel } from '@/components/core/KanjiLabel'
 import { useTitle } from '@/lib/useTitle'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 
@@ -64,29 +64,29 @@ function GuildPickerModal({
             role="dialog"
             aria-modal="true"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md overflow-hidden rounded-lg border border-nerv-orange/25 bg-nerv-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
+            className="relative w-full max-w-md overflow-hidden rounded-lg border border-up-orange/25 bg-up-panel shadow-[0_20px_80px_-20px_rgba(255,102,0,0.35)]"
           >
             <button
               onClick={onClose}
               aria-label="fechar"
-              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-nerv-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-nerv-text"
+              className="absolute right-3 top-3 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-up-dim backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-up-text"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
-            <div className="border-b border-nerv-orange/20 px-4 py-3">
-              <div className="font-display text-sm uppercase tracking-wider text-nerv-text">
+            <div className="border-b border-up-orange/20 px-4 py-3">
+              <div className="font-display text-sm uppercase tracking-wider text-up-text">
                 selecione um server do discord
               </div>
-              <div className="mt-0.5 text-[11px] text-nerv-dim">escolha um servidor da sua conta discord</div>
+              <div className="mt-0.5 text-[11px] text-up-dim">escolha um servidor da sua conta discord</div>
             </div>
-            <div className="border-b border-nerv-orange/20 px-4 py-2">
+            <div className="border-b border-up-orange/20 px-4 py-2">
               <input
                 autoFocus
                 aria-label="buscar servers"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="buscar servers..."
-                className="h-9 w-full rounded-sm border border-nerv-line bg-black/40 px-3 text-xs focus-visible:border-nerv-orange focus-visible:outline-none"
+                className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-3 text-xs focus-visible:border-up-orange focus-visible:outline-none"
               />
             </div>
             <div className="max-h-80 overflow-y-auto">
@@ -101,29 +101,29 @@ function GuildPickerModal({
                     type="button"
                     disabled={already}
                     onClick={() => onPick(g)}
-                    className="flex w-full items-center gap-3 border-b border-nerv-line/60 px-4 py-2.5 text-left transition-colors hover:bg-nerv-orange/10 disabled:opacity-40 disabled:hover:bg-transparent"
+                    className="flex w-full items-center gap-3 border-b border-up-line/60 px-4 py-2.5 text-left transition-colors hover:bg-up-orange/10 disabled:opacity-40 disabled:hover:bg-transparent"
                   >
                     {url ? (
                       <img loading="lazy" src={url} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                     ) : (
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 font-display text-sm text-nerv-orange">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/50 font-display text-sm text-up-orange">
                         {g.name.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="flex-1 truncate text-sm text-nerv-text">{g.name}</span>
-                    {g.owner && <span className="text-[9px] uppercase tracking-wider text-nerv-amber">owner</span>}
-                    {already && <span className="text-[9px] uppercase tracking-wider text-nerv-green">já registrado</span>}
+                    <span className="flex-1 truncate text-sm text-up-text">{g.name}</span>
+                    {g.owner && <span className="text-[9px] uppercase tracking-wider text-up-amber">owner</span>}
+                    {already && <span className="text-[9px] uppercase tracking-wider text-up-green">já registrado</span>}
                   </button>
                 )
               })}
               {!guilds.isLoading && filtered.length === 0 && (
-                <div className="p-6 text-center text-xs text-nerv-dim">nenhum server encontrado</div>
+                <div className="p-6 text-center text-xs text-up-dim">nenhum server encontrado</div>
               )}
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="block w-full border-t border-nerv-orange/30 bg-black/40 py-3 text-xs uppercase tracking-wider text-nerv-orange transition-colors hover:bg-nerv-orange/10"
+              className="block w-full border-t border-up-orange/30 bg-black/40 py-3 text-xs uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/10"
             >
               cancelar
             </button>
@@ -183,7 +183,7 @@ export function GroupsPage() {
       <header className="flex items-end justify-between">
         <div>
           <KanjiLabel jp="グループ" en="groups" />
-          <h1 className="mt-1 font-display text-3xl text-nerv-text">seus grupos</h1>
+          <h1 className="mt-1 font-display text-3xl text-up-text">seus grupos</h1>
         </div>
         <Button onClick={() => setPickerOpen(true)}>
           + adicionar server
@@ -199,11 +199,11 @@ export function GroupsPage() {
 
       <OnboardingChecklist />
 
-<div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-wider text-nerv-dim">
-        <span><span className="text-nerv-orange tabular-nums">{total}</span> grupos</span>
-        <span><span className="text-nerv-green tabular-nums">{totalMembers}</span> membros</span>
-        <span><span className="text-nerv-amber tabular-nums">{totalGames}</span> jogos</span>
-        {activeVotes > 0 && <span><span className="text-nerv-magenta tabular-nums">{activeVotes}</span> votações abertas</span>}
+<div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] uppercase tracking-wider text-up-dim">
+        <span><span className="text-up-orange tabular-nums">{total}</span> grupos</span>
+        <span><span className="text-up-green tabular-nums">{totalMembers}</span> membros</span>
+        <span><span className="text-up-amber tabular-nums">{totalGames}</span> jogos</span>
+        {activeVotes > 0 && <span><span className="text-up-magenta tabular-nums">{activeVotes}</span> votações abertas</span>}
       </div>
 
       {isLoading && <Loading />}
@@ -226,7 +226,7 @@ export function GroupsPage() {
             transition={{ delay: i * 0.04 }}
           >
             <Link to={`/groups/${g.id}`} className="block">
-              <div className="group relative flex min-h-[180px] flex-col overflow-hidden rounded-sm border border-nerv-orange/20 bg-nerv-panel/60 p-4 transition-all hover:border-nerv-orange hover:shadow-[0_0_30px_rgba(255,102,0,0.2)]">
+              <div className="group relative flex min-h-[180px] flex-col overflow-hidden rounded-sm border border-up-orange/20 bg-up-panel/60 p-4 transition-all hover:border-up-orange hover:shadow-[0_0_30px_rgba(255,102,0,0.2)]">
                 {(g.banner_url || g.icon_url) && (
                   <div className="pointer-events-none absolute inset-0">
                     <img
@@ -236,29 +236,29 @@ export function GroupsPage() {
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                       className={`h-full w-full object-cover transition-opacity ${g.banner_url ? 'opacity-20 group-hover:opacity-30' : 'scale-150 opacity-15 blur-2xl group-hover:opacity-25'}`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-nerv-panel via-nerv-panel/70 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-up-panel via-up-panel/70 to-transparent" />
                   </div>
                 )}
                 <div className="relative mb-3 flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     {g.icon_url && (
-                      <img loading="lazy" src={g.icon_url} alt="" className="h-8 w-8 rounded-sm border border-nerv-orange/30 object-cover" />
+                      <img loading="lazy" src={g.icon_url} alt="" className="h-8 w-8 rounded-sm border border-up-orange/30 object-cover" />
                     )}
-                    <div className="font-display text-xl text-nerv-text">{g.name}</div>
+                    <div className="font-display text-xl text-up-text">{g.name}</div>
                   </div>
                   <span className={`rounded-sm border px-1.5 py-0.5 text-[9px] uppercase tracking-wider ${
                     g.user_role === 'admin'
-                      ? 'border-nerv-orange text-nerv-orange'
+                      ? 'border-up-orange text-up-orange'
                       : g.user_role === 'mod'
-                      ? 'border-nerv-amber text-nerv-amber'
-                      : 'border-nerv-line text-nerv-dim'
+                      ? 'border-up-amber text-up-amber'
+                      : 'border-up-line text-up-dim'
                   }`}>{g.user_role}</span>
                 </div>
-                <div className="relative flex gap-4 text-[10px] uppercase tracking-wider text-nerv-dim">
-                  <span>members <span className="text-nerv-green">{g.member_count}</span></span>
-                  <span>games <span className="text-nerv-amber">{g.game_count}</span></span>
+                <div className="relative flex gap-4 text-[10px] uppercase tracking-wider text-up-dim">
+                  <span>members <span className="text-up-green">{g.member_count}</span></span>
+                  <span>games <span className="text-up-amber">{g.game_count}</span></span>
                   {g.active_vote_sessions > 0 && (
-                    <span>voting <span className="text-nerv-magenta">{g.active_vote_sessions}</span></span>
+                    <span>voting <span className="text-up-magenta">{g.active_vote_sessions}</span></span>
                   )}
                 </div>
               </div>

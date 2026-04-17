@@ -5,16 +5,16 @@ type Props = {
 }
 
 const colorMap: Record<NonNullable<Props['color']>, string> = {
-  orange: 'text-nerv-orange',
-  green: 'text-nerv-green',
-  magenta: 'text-nerv-magenta',
-  amber: 'text-nerv-amber',
+  orange: 'text-up-orange',
+  green: 'text-up-green',
+  magenta: 'text-up-magenta',
+  amber: 'text-up-amber',
 }
 
 export function BigNumber({ value, label, color = 'orange' }: Props) {
   return (
-    <div className="flex items-center justify-between rounded-sm border border-nerv-line bg-black/30 px-3 py-2.5">
-      <span className="text-[10px] uppercase tracking-wider text-nerv-dim">{label}</span>
+    <div className="flex items-center justify-between rounded-sm border border-up-line bg-black/30 px-3 py-2.5">
+      <span className="text-[10px] uppercase tracking-wider text-up-dim">{label}</span>
       <span className={`font-display text-2xl tabular-nums leading-none ${colorMap[color]}`}>{value}</span>
     </div>
   )

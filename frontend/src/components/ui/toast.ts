@@ -15,10 +15,11 @@ export const useToastStore = create<ToastStore>((set) => ({
   toasts: [],
   push: (kind, message) => {
     const id = nextId++
-    set((s) => ({ toasts: [...s.toasts, { id, kind, message }] }))
+    const msg = message.charAt(0).toUpperCase() + message.slice(1)
+    set((s) => ({ toasts: [...s.toasts.slice(-2), { id, kind, message: msg }] }))
     setTimeout(() => {
       set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) }))
-    }, 4000)
+    }, 3000)
   },
   dismiss: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }))
