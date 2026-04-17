@@ -56,8 +56,8 @@ async def test_visit_truncates_long_ref(client, db_session):
 
 
 async def test_visit_is_rate_limited(client):
-    # mesmo limite do auth (10/burst). 11a deve 429
-    for _ in range(10):
+    # bucket dedicado pra telemetry: 3/burst, refill 3/min. 4a deve 429.
+    for _ in range(3):
         r = await client.post("/api/telemetry/visit", json={})
         assert r.status_code == 204
     r = await client.post("/api/telemetry/visit", json={})

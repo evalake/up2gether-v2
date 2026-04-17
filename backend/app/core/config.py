@@ -31,6 +31,14 @@ class Settings(BaseSettings):
     # dev only — habilita POST /api/auth/dev-login pra E2E. NUNCA ligar em prod.
     dev_login_enabled: bool = False
 
+    # app_env controla features prod-only (esconder /docs, headers, etc).
+    # setar APP_ENV=production em prod (Fly).
+    app_env: str = "development"
+
+    @property
+    def is_prod(self) -> bool:
+        return self.app_env.lower() in ("production", "prod")
+
     # discord
     discord_client_id: str = ""
     discord_client_secret: str = ""

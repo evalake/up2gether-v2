@@ -41,6 +41,10 @@ class TokenBucket:
 # (nao chega perto desse limit no uso normal).
 _auth_bucket = TokenBucket(capacity=10, refill_per_sec=10 / 60)
 
+# telemetry e 1x por sessao (flag em sessionStorage). bucket estreito pra detectar
+# scanner martelando /telemetry/visit. 3 req burst, 3/min sustentado por IP.
+_telemetry_bucket = TokenBucket(capacity=3, refill_per_sec=3 / 60)
+
 
 def _client_key(request: Request) -> str:
     # Fly injeta Fly-Client-IP, Cloudflare injeta CF-Connecting-IP.
@@ -64,4 +68,13 @@ def rate_limit_auth(request: Request) -> None:
         )
 
 
+def rate_limit_telemetry(request: Request) -> None:
+    if not _telemetry_bucket.allow(_client_key(request)):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="too many requests",
+        )
+
+
 RateLimitAuth = Annotated[None, Depends(rate_limit_auth)]
+RateLimitTelemetry = Annotated[None, Depends(rate_limit_telemetry)]

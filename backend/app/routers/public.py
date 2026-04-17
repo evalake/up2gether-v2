@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.rate_limit import RateLimitAuth
+from app.core.rate_limit import RateLimitTelemetry
 from app.domain.enums import SessionRsvp
 from app.models.game import Game
 from app.models.group import Group
@@ -28,7 +28,7 @@ class VisitPayload(BaseModel):
 async def track_visit(
     payload: VisitPayload,
     db: Annotated[AsyncSession, Depends(get_db)],
-    _rl: RateLimitAuth,
+    _rl: RateLimitTelemetry,
 ) -> None:
     body: dict = {}
     if payload.ref:

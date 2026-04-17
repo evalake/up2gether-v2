@@ -16,11 +16,24 @@ export function DiscordCallbackPage() {
     if (ran.current) return
     ran.current = true
     const code = params.get('code')
+    const state = params.get('state')
     if (!code) {
       setError('código ausente na URL')
       return
     }
-    discordCallback(code)
+    if (!state) {
+      setError('state ausente (login-CSRF bloqueado)')
+      return
+    }
+    let stashed: string | null = null
+    try {
+      stashed = sessionStorage.getItem('u2g-oauth-state')
+    } catch { /* ignore */ }
+    if (!stashed || stashed !== state) {
+      setError('state inválido, refaça o login')
+      return
+    }
+    discordCallback(code, state)
       .then((res) => {
         setToken(res.access_token)
         // user novo ou sem onboarding completo -> wizard
