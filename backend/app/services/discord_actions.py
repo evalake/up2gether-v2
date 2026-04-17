@@ -175,12 +175,14 @@ async def list_group_games(
         .limit(limit)
     )
     if query:
+        # escape % e _ pra nao virar wildcard. User colocar %%% force scan caro.
+        esc = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
         stmt = (
             select(Game)
             .where(
                 Game.group_id == group.id,
                 Game.archived_at.is_(None),
-                Game.name.ilike(f"%{query}%"),
+                Game.name.ilike(f"%{esc}%", escape="\\"),
             )
             .order_by(Game.name.asc())
             .limit(limit)

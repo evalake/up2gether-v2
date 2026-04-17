@@ -375,11 +375,21 @@ async def test_metrics_tier_breakdown(make_user, auth_headers, client, db_sessio
     g2 = uuid.UUID(r2.json()["id"])
     g3 = uuid.UUID(r3.json()["id"])
 
-    # criador ja conta 1 seat em cada (activated_at populado). adicionar o resto:
+    # criador ja conta 1 seat em cada (activated_at populado). adicionar o resto
+    # com activated_at explicito (simula members que logaram via Discord).
+    from app.models.base import utcnow
+
     async def seat(group_id, n):
         for _ in range(n):
             u = await make_user()
-            db_session.add(GroupMembership(group_id=group_id, user_id=u.id, role="member"))
+            db_session.add(
+                GroupMembership(
+                    group_id=group_id,
+                    user_id=u.id,
+                    role="member",
+                    activated_at=utcnow(),
+                )
+            )
         await db_session.commit()
 
     await seat(g1, 4)  # 1 criador + 4 = 5 seats

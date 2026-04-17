@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.core.token_crypto import EncryptedString
 from app.models.base import TimestampMixin, utcnow
 
 
@@ -49,8 +50,10 @@ class IntegrationAccount(Base):
     )
     provider: Mapped[str] = mapped_column(String, nullable=False)  # AuthProvider
     external_id: Mapped[str] = mapped_column(String, nullable=False)
-    access_token: Mapped[str | None] = mapped_column(String, nullable=True)
-    refresh_token: Mapped[str | None] = mapped_column(String, nullable=True)
+    # tokens OAuth criptografados at-rest (Fernet). Plaintext legado e devolvido
+    # as-is pelo TypeDecorator ate proximo refresh reciclar pra encrypted.
+    access_token: Mapped[str | None] = mapped_column(EncryptedString, nullable=True)
+    refresh_token: Mapped[str | None] = mapped_column(EncryptedString, nullable=True)
     token_expires_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )

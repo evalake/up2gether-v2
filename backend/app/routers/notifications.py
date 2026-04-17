@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,7 +36,7 @@ class MarkReadIn(BaseModel):
 async def list_notifications(
     actor: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
-    limit: int = 50,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> list[NotificationOut]:
     rows = (
         (

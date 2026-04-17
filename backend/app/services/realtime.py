@@ -79,7 +79,10 @@ class Broker:
 
     async def _pg_notify(self, payload: str) -> None:
         try:
-            await self._pg_conn.execute(f"NOTIFY {PG_CHANNEL}, '{payload}'")
+            # pg_notify($1,$2) parametriza. NOTIFY com string interpolada quebra
+            # no primeiro payload com aspas simples e abre injection via callers
+            # que passem string do user.
+            await self._pg_conn.execute("SELECT pg_notify($1, $2)", PG_CHANNEL, payload)
         except Exception as e:
             log.warning("pg notify error: %s", e)
 

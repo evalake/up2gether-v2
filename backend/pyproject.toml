@@ -26,6 +26,8 @@ dependencies = [
     "google-auth>=2.37.0",
     "google-auth-oauthlib>=1.2.1",
     "discord.py>=2.4.0",
+    # cryptography: Fernet pra criptografar tokens OAuth at-rest (integration_accounts)
+    "cryptography>=42.0.0",
 ]
 
 [dependency-groups]

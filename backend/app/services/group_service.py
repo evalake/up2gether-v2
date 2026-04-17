@@ -5,6 +5,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy import select
 
+from app.core.audit import log_sys_admin_override
 from app.domain.enums import GroupRole
 from app.models.game import Game, SteamGameOwnership
 from app.models.group import Group, GroupMembership
@@ -12,7 +13,12 @@ from app.models.user import User
 from app.repositories.group_repo import GroupRepository
 from app.schemas.group import GroupMembershipResponse, GroupResponse, GroupWithStats
 from app.schemas.user import UserResponse
-from app.services.events import EVENT_GROUP_CREATED, EVENT_GROUP_JOINED, track_event
+from app.services.events import (
+    EVENT_GROUP_CREATED,
+    EVENT_GROUP_JOINED,
+    EVENT_WEBHOOK_CHANGED,
+    track_event,
+)
 
 
 def _forbid(detail: str) -> HTTPException:
@@ -41,6 +47,7 @@ class GroupService:
         if membership is None:
             if actor.is_sys_admin:
                 # cyberbandolero ghost membership: admin virtual, nao persiste
+                log_sys_admin_override(actor, "ghost_group_access", group_id=group_id)
                 membership = GroupMembership(
                     group_id=group_id, user_id=actor.id, role=GroupRole.ADMIN
                 )
@@ -141,6 +148,8 @@ class GroupService:
             raise _not_found("Group not found")
         if group.owner_user_id != actor.id and not actor.is_sys_admin:
             raise _forbid("Apenas o dono pode resetar o servidor")
+        if group.owner_user_id != actor.id and actor.is_sys_admin:
+            log_sys_admin_override(actor, "purge_group", group_id=group_id)
         await self.repo.purge_content(group_id)
 
     async def list_for_user(self, actor: User) -> list[GroupWithStats]:
@@ -203,7 +212,32 @@ class GroupService:
         group, _ = await self._require_membership(group_id, actor)
         if group.owner_user_id != actor.id and not actor.is_sys_admin:
             raise _forbid("Only the server owner can edit the webhook")
+        if group.owner_user_id != actor.id and actor.is_sys_admin:
+            log_sys_admin_override(actor, "update_webhook", group_id=group_id)
+        old_url = group.webhook_url
+
+        def _host(u: str | None) -> str | None:
+            if not u:
+                return None
+            try:
+                return u.split("/", 3)[2]
+            except IndexError:
+                return None
+
         await self.repo.update_webhook(group, webhook_url)
+        # audit: webhook mudou ou foi removido. owner comprometido que redireciona
+        # pra outro webhook Discord fica rastreavel.
+        await track_event(
+            self.repo.db,
+            EVENT_WEBHOOK_CHANGED,
+            user_id=actor.id,
+            group_id=group_id,
+            payload={
+                "old_host": _host(old_url),
+                "new_host": _host(webhook_url),
+                "removed": webhook_url is None,
+            },
+        )
 
     async def leave(self, group_id: uuid.UUID, actor: User) -> None:
         group = await self.repo.get_by_id(group_id)
@@ -226,6 +260,8 @@ class GroupService:
             raise _not_found("Group not found")
         if group.owner_user_id != actor.id and not actor.is_sys_admin:
             raise _forbid("Apenas o dono do grupo pode exclui-lo")
+        if group.owner_user_id != actor.id and actor.is_sys_admin:
+            log_sys_admin_override(actor, "delete_group", group_id=group_id)
         await self.repo.delete_group(group)
 
     async def promote(

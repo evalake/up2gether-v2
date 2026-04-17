@@ -6,6 +6,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.rate_limit import rate_limit_mutation
 from app.core.security import CurrentUser
 from app.domain.enums import AuthProvider
 from app.integrations.discord import DiscordClient, get_discord_client
@@ -181,6 +182,7 @@ async def update_webhook(
     actor: CurrentUser,
     service: Annotated[GroupService, Depends(get_group_service)],
 ) -> None:
+    rate_limit_mutation(str(actor.id), str(group_id))
     await service.update_webhook(group_id, actor, payload.webhook_url)
 
 
@@ -239,6 +241,7 @@ async def set_current_game(
     actor: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> GroupResponse:
+    rate_limit_mutation(str(actor.id), str(group_id))
     repo = GroupRepository(db)
     grp = await repo.get_by_id(group_id)
     if grp is None:

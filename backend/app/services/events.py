@@ -26,6 +26,7 @@ EVENT_VOTE_CREATED = "vote_created"
 EVENT_VOTE_CAST = "vote_cast"
 EVENT_VOTE_COMPLETED = "vote_completed"
 EVENT_LANDING_VISIT = "landing_visit"
+EVENT_WEBHOOK_CHANGED = "webhook_changed"
 
 
 async def track_event(

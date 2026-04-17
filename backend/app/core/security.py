@@ -72,6 +72,10 @@ async def get_current_user(
     payload = decode_access_token(creds.credentials)
     if not payload or "sub" not in payload:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or expired token")
+    # scoped tokens (sse ticket, oauth-link state) nao podem virar access token.
+    # se vazarem em referer/log, sem essa guarda viram sessao completa pelo TTL.
+    if payload.get("scope") is not None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid or expired token")
     try:
         user_id = uuid.UUID(payload["sub"])
     except ValueError as exc:

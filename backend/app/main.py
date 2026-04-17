@@ -5,6 +5,7 @@ from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging
@@ -84,7 +85,37 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         # API nao renderiza HTML, mas por garantia nega frame
         resp.headers.setdefault("X-Frame-Options", "DENY")
+        # defesa em profundidade: API so retorna JSON, entao proibir qualquer
+        # carregamento de recurso e incorporacao em frame.
+        resp.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+        )
         return resp
+
+
+# limite global de body. Pydantic ja rejeita payload grande, mas uvicorn bufferiza
+# em memoria antes. 256KB cobre todo payload legitimo do app (maior e icon_url
+# + description do grupo).
+MAX_BODY_BYTES = 256 * 1024
+
+
+class BodySizeLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        cl = request.headers.get("content-length")
+        if cl is not None:
+            try:
+                if int(cl) > MAX_BODY_BYTES:
+                    return JSONResponse(
+                        {"detail": "request body too large"},
+                        status_code=413,
+                    )
+            except ValueError:
+                return JSONResponse(
+                    {"detail": "invalid content-length"},
+                    status_code=400,
+                )
+        return await call_next(request)
 
 
 def create_app() -> FastAPI:
@@ -95,6 +126,7 @@ def create_app() -> FastAPI:
     )
     app = FastAPI(title="up2gether", version="2.0.0", lifespan=lifespan, **docs_kwargs)
     app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(BodySizeLimitMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
