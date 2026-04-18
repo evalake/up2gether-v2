@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -13,6 +14,8 @@ from app.models.game import Game, SteamGameOwnership, SteamProfile
 from app.models.group import GroupMembership
 from app.models.user import IntegrationAccount
 
+log = structlog.get_logger()
+
 router = APIRouter(tags=["steam"], prefix="/steam")
 
 
@@ -22,15 +25,18 @@ async def _upsert_steam_profile(
     """Busca summary/level/recent e upserta o SteamProfile snapshot. Best-effort."""
     try:
         summary = await client.get_player_summary(steam_id)
-    except Exception:
+    except Exception as e:
+        log.debug("steam.summary_failed", steam_id=steam_id, err=str(e))
         summary = None
     try:
         level = await client.get_steam_level(steam_id)
-    except Exception:
+    except Exception as e:
+        log.debug("steam.level_failed", steam_id=steam_id, err=str(e))
         level = None
     try:
         recent = await client.get_recently_played(steam_id)
-    except Exception:
+    except Exception as e:
+        log.debug("steam.recent_failed", steam_id=steam_id, err=str(e))
         recent = []
 
     row = (

@@ -11,6 +11,7 @@ import time
 import uuid
 from datetime import UTC, datetime, timedelta
 
+import structlog
 from fastapi import BackgroundTasks
 from sqlalchemy import select
 
@@ -20,6 +21,8 @@ from app.integrations.steam import HttpSteamClient
 from app.models.game import Game, SteamGameOwnership
 from app.models.group import Group
 from app.models.user import IntegrationAccount
+
+log = structlog.get_logger()
 
 # (kind, key) -> last_attempt_ts. processo unico, perde no restart, tudo bem.
 _inflight: dict[tuple[str, str], float] = {}
@@ -59,7 +62,8 @@ async def _resync_steam_user(user_id: uuid.UUID) -> None:
 
             try:
                 owned = await client.get_owned_games(steam_id)
-            except Exception:
+            except Exception as e:
+                log.warning("auto_resync.steam.owned_failed", user_id=str(user_id), err=str(e))
                 owned = []
             owned_by_appid = {int(g["appid"]): g for g in owned if g.get("appid")}
             owned_appids = set(owned_by_appid.keys())
@@ -101,9 +105,9 @@ async def _resync_steam_user(user_id: uuid.UUID) -> None:
 
             await _upsert_steam_profile(db, user_id, steam_id, client)
             await db.commit()
-    except Exception:
+    except Exception as e:
         # best effort, nao pode quebrar a request principal
-        pass
+        log.warning("auto_resync.steam.failed", user_id=str(user_id), err=str(e))
 
 
 async def _resync_discord_guild(group_id: uuid.UUID) -> None:
@@ -118,7 +122,8 @@ async def _resync_discord_guild(group_id: uuid.UUID) -> None:
             client = HttpDiscordClient()
             try:
                 data = await client.fetch_guild_as_bot(grp.discord_guild_id)
-            except Exception:
+            except Exception as e:
+                log.warning("auto_resync.guild.fetch_failed", group_id=str(group_id), err=str(e))
                 data = None
             if data:
                 _apply_guild_visuals(grp, data)
@@ -127,8 +132,8 @@ async def _resync_discord_guild(group_id: uuid.UUID) -> None:
                 from app.services.realtime import get_broker
 
                 get_broker().publish(group_id, kind="group.visuals_updated")
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("auto_resync.guild.failed", group_id=str(group_id), err=str(e))
 
 
 def maybe_resync_steam(

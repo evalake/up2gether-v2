@@ -2,6 +2,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Annotated
 
+import structlog
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,6 +27,8 @@ from app.schemas.group import (
 from app.services.auto_resync import maybe_resync_discord_guild
 from app.services.discord_presence import get_bot
 from app.services.group_service import GroupService
+
+log = structlog.get_logger()
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -65,7 +68,8 @@ async def auto_discover_groups(
         return {"joined": [], "available": []}
     try:
         raw_guilds = await discord.fetch_guilds(integ.access_token)
-    except Exception:
+    except Exception as e:
+        log.warning("groups.fetch_guilds_failed", user_id=str(actor.id), err=str(e))
         return {"joined": [], "available": []}
     guild_ids = [str(g["id"]) for g in raw_guilds]
     if not guild_ids:
