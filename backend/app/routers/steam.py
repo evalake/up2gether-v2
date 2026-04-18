@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -88,7 +88,7 @@ async def _upsert_steam_profile(
 
 @router.get("/search")
 async def steam_search(
-    q: Annotated[str, Query(min_length=2)],
+    q: Annotated[str, Query(min_length=2, max_length=100)],
     _: CurrentUser,
     client: Annotated[SteamClient, Depends(get_steam_client)],
 ) -> list[dict]:
@@ -133,7 +133,7 @@ async def steam_game(
 async def builtin_game_details(
     slug: str,
     _: CurrentUser,
-    name: Annotated[str | None, Query()] = None,
+    name: Annotated[str | None, Query(max_length=120)] = None,
 ) -> dict:
     from app.integrations.builtin_catalog import get_builtin_by_name, get_builtin_by_slug
 
@@ -147,7 +147,8 @@ async def builtin_game_details(
 
 
 class ImportLibraryIn(BaseModel):
-    steam_id_or_vanity: str
+    # steamid64 = 17 digitos, vanity max 32 segundo Steam
+    steam_id_or_vanity: str = Field(..., min_length=2, max_length=64)
 
 
 class ImportLibraryOut(BaseModel):

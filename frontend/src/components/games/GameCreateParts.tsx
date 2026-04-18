@@ -210,7 +210,7 @@ export function ManualForm({
         <input
           autoFocus
           value={form.name}
-          maxLength={150}
+          maxLength={120}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder={t.games.namePlaceholder}
           className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-3 text-sm focus-visible:border-up-orange focus-visible:outline-none"
@@ -319,6 +319,8 @@ export function ManualForm({
                   value={form.steam_appid}
                   onChange={(e) => setForm({ ...form, steam_appid: e.target.value })}
                   placeholder={t.games.optional}
+                  maxLength={10}
+                  inputMode="numeric"
                   className="h-8 w-full rounded-sm border border-up-line bg-black/40 px-2 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                 />
               </div>
@@ -328,6 +330,7 @@ export function ManualForm({
                   value={form.cover_url}
                   onChange={(e) => setForm({ ...form, cover_url: e.target.value })}
                   placeholder={t.games.coverUrlPlaceholder}
+                  maxLength={500}
                   className="h-8 w-full rounded-sm border border-up-line bg-black/40 px-2 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                 />
               </div>

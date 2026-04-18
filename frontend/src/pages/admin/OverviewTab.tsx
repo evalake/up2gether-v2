@@ -74,6 +74,7 @@ export function CurrentGameSection({
           value={gameSearch}
           onChange={(e) => setGameSearch(e.target.value)}
           placeholder={t.admin.searchGame}
+          maxLength={100}
           className="mt-1 h-8 w-full max-w-sm rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-green focus-visible:outline-none"
         />
         {gameSearch && games && (

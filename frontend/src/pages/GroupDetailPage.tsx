@@ -141,7 +141,7 @@ export function GroupDetailPage() {
         onNavigate={navigate}
       />
 
-      <LibraryBar breakdown={stageBreakdown} onExplore={() => navigate(`/groups/${id}/games`)} />
+      <LibraryBar groupId={id} breakdown={stageBreakdown} />
 
       <MembersSection
         members={members.data}

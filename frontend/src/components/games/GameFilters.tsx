@@ -51,6 +51,7 @@ export function GameFilters({
             value={search}
             onChange={(e) => onSearch(e.target.value)}
             placeholder={t.games.filterPlaceholder}
+            maxLength={100}
             className="rounded-sm border border-up-line bg-black/40 py-1 pl-8 pr-3 text-xs placeholder:text-up-dim focus-visible:border-up-orange focus-visible:outline-none transition-colors"
           />
         </div>

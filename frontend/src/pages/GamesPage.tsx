@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useT } from '@/i18n'
 import { translateGenre } from '@/i18n/steamGenres'
@@ -20,9 +20,23 @@ export function GamesPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const games = useGames(id)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [showForm, setShowForm] = useState(false)
-  const [stageFilter, setStageFilter] = useState<Set<string>>(new Set())
+  // seed do ?stage= pra abrir ja filtrado vindo do overview
+  const [stageFilter, setStageFilter] = useState<Set<string>>(() => {
+    const s = searchParams.get('stage')
+    return s ? new Set([s]) : new Set()
+  })
+  // limpa ?stage= depois de seedar pra nao travar em refresh/toggle
+  useEffect(() => {
+    if (searchParams.get('stage')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('stage')
+      setSearchParams(next, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [genreFilter, setGenreFilter] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
 

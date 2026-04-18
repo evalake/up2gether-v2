@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.domain.enums import GameSource, GameStage, HardwareTier, InterestSignal
+
+# tag/genero individual: 50 char ja cobre os mais longos da Steam
+_TagStr = Annotated[str, Field(max_length=50)]
 
 # limites humanos: acima disso tratamos como "infinito"/null
 PLAYER_CAP = 32
@@ -33,14 +37,14 @@ class GameCreate(BaseModel):
     description: str | None = Field(None, max_length=2000)
     is_free: bool = False
     price_current: float | None = Field(None, ge=0, le=100000)
-    genres: list[str] = Field(default=[], max_length=20)
-    tags: list[str] = Field(default=[], max_length=30)
+    genres: list[_TagStr] = Field(default=[], max_length=20)
+    tags: list[_TagStr] = Field(default=[], max_length=30)
     player_min: int = Field(1, ge=1, le=PLAYER_CAP)
     player_max: int | None = Field(None, ge=1)
     min_hardware_tier: HardwareTier = HardwareTier.UNKNOWN
-    developer: str | None = None
-    publisher: str | None = None
-    release_date: str | None = None
+    developer: str | None = Field(None, max_length=200)
+    publisher: str | None = Field(None, max_length=200)
+    release_date: str | None = Field(None, max_length=40)
     metacritic_score: int | None = Field(None, ge=0, le=100)
     price_original: float | None = Field(None, ge=0, le=100000)
     discount_percent: int | None = Field(None, ge=0, le=100)
@@ -68,11 +72,11 @@ class GameUpdate(BaseModel):
     steam_appid: int | None = None
     is_free: bool | None = None
     price_current: float | None = Field(None, ge=0, le=100000)
-    genres: list[str] | None = None
-    tags: list[str] | None = None
-    developer: str | None = None
-    publisher: str | None = None
-    release_date: str | None = None
+    genres: list[_TagStr] | None = Field(None, max_length=20)
+    tags: list[_TagStr] | None = Field(None, max_length=30)
+    developer: str | None = Field(None, max_length=200)
+    publisher: str | None = Field(None, max_length=200)
+    release_date: str | None = Field(None, max_length=40)
     metacritic_score: int | None = Field(None, ge=0, le=100)
     price_original: float | None = Field(None, ge=0, le=100000)
     discount_percent: int | None = Field(None, ge=0, le=100)

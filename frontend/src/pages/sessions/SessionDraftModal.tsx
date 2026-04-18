@@ -229,6 +229,7 @@ export function SessionDraftModal({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t.sessions.searchGamePlaceholder}
+              maxLength={100}
               className="h-8 w-full rounded-sm border border-up-line bg-black/30 px-2.5 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
             />
             <div className="mt-1.5 max-h-32 overflow-y-auto rounded-sm border border-up-line/50 bg-black/20">
@@ -270,6 +271,7 @@ export function SessionDraftModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={selected?.name ?? t.sessions.titlePlaceholder}
+              maxLength={100}
               className="h-8 w-full rounded-sm border border-up-line bg-black/30 px-2.5 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
             />
           </section>

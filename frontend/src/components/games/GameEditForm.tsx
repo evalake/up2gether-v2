@@ -119,7 +119,7 @@ export function GameEditForm({
           <Field label={t.games.namePlaceholder}>
             <input
               value={edit.name}
-              maxLength={150}
+              maxLength={120}
               onChange={(e) => setEdit({ ...edit, name: e.target.value })}
               placeholder={t.games.namePlaceholder}
               className={inputCls}

@@ -77,6 +77,7 @@ export function HistoryPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t.history.searchPlaceholder}
+          maxLength={100}
           className="h-9 w-full max-w-md rounded-sm border border-up-line bg-black/40 px-3 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">

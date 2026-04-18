@@ -55,6 +55,7 @@ export function ChipInput({
           }}
           onBlur={add}
           placeholder={value.length === 0 ? placeholder : ''}
+          maxLength={50}
           className="min-w-[120px] flex-1 bg-transparent text-xs text-up-text placeholder:text-up-dim focus-visible:outline-none"
         />
       </div>

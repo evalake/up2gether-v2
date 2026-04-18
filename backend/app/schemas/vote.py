@@ -55,7 +55,8 @@ class VoteSessionResponse(BaseModel):
 
 
 class BallotSubmit(BaseModel):
-    approvals: list[uuid.UUID]
+    # cap = max candidate_game_ids permitidos numa vote session
+    approvals: list[uuid.UUID] = Field(..., max_length=20)
 
 
 class VoteAuditVoter(BaseModel):

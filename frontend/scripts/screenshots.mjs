@@ -6,7 +6,7 @@ import { mkdirSync } from 'fs'
 const TOKEN = process.argv[2]
 if (!TOKEN) { console.error('uso: node scripts/screenshots.mjs <jwt_token>'); process.exit(1) }
 
-const BASE = 'https://up2gether.vercel.app'
+const BASE = 'https://up2gether.com.br'
 const OUT = 'screenshots'
 mkdirSync(OUT, { recursive: true })
 
