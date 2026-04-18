@@ -96,16 +96,16 @@ export function PreferencesSection() {
   useEffect(() => {
     if (settings.data) {
       setTz(settings.data.timezone ?? 'America/Sao_Paulo')
-      setEmail(settings.data.notification_email ?? (me.data as any)?.discord_email ?? '')
+      setEmail(settings.data.notification_email ?? me.data?.discord_email ?? '')
     }
   }, [settings.data, me.data])
 
   useEffect(() => {
-    const tier = (me.data as any)?.hardware_tier
+    const tier = me.data?.hardware_tier
     if (tier) setHwTier(tier)
   }, [me.data])
 
-  const discordEmail = (me.data as any)?.discord_email as string | undefined
+  const discordEmail = me.data?.discord_email ?? undefined
   const name = me.data?.discord_display_name ?? me.data?.discord_username ?? t.settings.noName
   const saving = patch.isPending || setHw.isPending
   const detected = useMemo(detectTimezone, [])

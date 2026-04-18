@@ -24,6 +24,7 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage').then(m => ({ 
 const AdminMetricsPage = lazy(() => import('@/pages/AdminMetricsPage').then(m => ({ default: m.AdminMetricsPage })))
 import { RequireAuth } from './RequireAuth'
 import { Toaster } from '@/components/ui/Toaster'
+import { ConfirmHost } from '@/components/ui/ConfirmDialog'
 // SSE religado em modo seletivo: so "momentos grandes" (vote opened/closed,
 // phase advanced, session created) disparam refetch. granular fica com poll.
 import { useRealtime } from '@/lib/realtime'
@@ -183,6 +184,7 @@ export function App() {
           <AnimatedRoutes />
         </Suspense>
         <Toaster />
+        <ConfirmHost />
       </BrowserRouter>
     </QueryClientProvider>
   )

@@ -9,6 +9,7 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { useToast } from '@/components/ui/toast'
 import { MemberProfileModal } from '@/components/members/MemberProfileModal'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useT } from '@/i18n'
 import { useLocaleStore } from '@/features/locale/store'
 
@@ -43,6 +44,7 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
   const audit = useSessionAudit(groupId, sessionId)
   const rsvp = useSetRsvp(groupId)
   const del = useDeleteSession(groupId)
+  const confirm = useConfirm()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -105,7 +107,11 @@ export function SessionDetailModal({ groupId, sessionId, canDelete, onClose }: P
                   rsvp.mutate({ sessionId: audit.data!.session.id, status: v })
                 }
                 onDelete={async () => {
-                  if (!confirm(t.sessions.removeConfirm)) return
+                  const ok = await confirm({
+                    title: t.sessions.removeConfirm,
+                    tone: 'danger',
+                  })
+                  if (!ok) return
                   await del.mutateAsync(audit.data!.session.id)
                   onClose()
                 }}

@@ -23,12 +23,13 @@ from app.repositories.user_repo import UserRepository
 _bearer = HTTPBearer(auto_error=False)
 
 
-def issue_access_token(user_id: uuid.UUID, discord_id: str) -> str:
+def issue_access_token(user_id: uuid.UUID, discord_id: str, token_generation: int = 0) -> str:
     settings = get_settings()
     now = datetime.now(UTC)
     payload = {
         "sub": str(user_id),
         "discord_id": discord_id,
+        "gen": token_generation,
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(hours=settings.jwt_expiration_hours)).timestamp()),
     }
@@ -112,6 +113,11 @@ async def get_current_user(
     user = await UserRepository(db).get_by_id(user_id)
     if not user:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not found")
+    # logout/revoke incrementa user.token_generation. JWTs antigos nao batem mais.
+    # token sem gen (legado pre-W1.2) trata como gen=0 pra nao invalidar todo mundo.
+    token_gen = payload.get("gen", 0)
+    if not isinstance(token_gen, int) or token_gen != user.token_generation:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Token revoked")
     return user
 
 

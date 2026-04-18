@@ -78,6 +78,18 @@ async def discord_callback(
     return resp
 
 
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(
+    current: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    # incrementa token_generation: invalida TODOS os JWTs ativos do user.
+    # so o ultimo login fica valido. cobre logout normal, "sair de todos os
+    # dispositivos", e mitiga roubo de token via XSS (basta logar de novo).
+    current.token_generation += 1
+    await db.commit()
+
+
 @router.get("/me", response_model=UserResponse)
 async def me(
     current: CurrentUser,
@@ -178,7 +190,7 @@ async def dev_login(
             user_id=user.id,
             payload={"discord_id": payload.discord_id, "source": "dev"},
         )
-    token = issue_access_token(user.id, user.discord_id)
+    token = issue_access_token(user.id, user.discord_id, user.token_generation)
     return AuthTokenResponse(
         access_token=token,
         user=UserResponse.from_user(user, is_new_user=is_new),

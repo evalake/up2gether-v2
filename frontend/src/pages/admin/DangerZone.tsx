@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useT } from '@/i18n'
 
 export function DangerZone({
@@ -42,46 +43,26 @@ export function DangerZone({
           </button>
         </div>
       </div>
-      <AnimatePresence>
-        {confirmKind === 'reset' && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-            <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-amber/30 bg-black/30 p-3">
-              <p className="text-xs text-up-amber">
-                {t.admin.resetConfirmShort}
-              </p>
-              <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">{t.common.cancel}</button>
-                <button
-                  onClick={async () => { await onConfirmReset(); setConfirmKind(null) }}
-                  disabled={resetPending}
-                  className="rounded-sm border border-up-amber/60 bg-up-amber/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-amber disabled:opacity-40"
-                >
-                  {resetPending ? t.admin.resetting : t.admin.yesResetBtn}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-        {confirmKind === 'destroy' && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-            <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
-              <p className="text-xs text-up-red">
-                {t.admin.deleteConfirmShort}
-              </p>
-              <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">{t.common.cancel}</button>
-                <button
-                  onClick={async () => { await onConfirmDelete(); setConfirmKind(null) }}
-                  disabled={deletePending}
-                  className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40"
-                >
-                  {deletePending ? t.admin.deleting : t.admin.yesDeleteBtn}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ConfirmDialog
+        open={confirmKind === 'reset'}
+        title={t.admin.resetData}
+        message={t.admin.resetConfirmShort}
+        confirmLabel={resetPending ? t.admin.resetting : t.admin.yesResetBtn}
+        tone="warn"
+        pending={resetPending}
+        onConfirm={async () => { await onConfirmReset(); setConfirmKind(null) }}
+        onCancel={() => setConfirmKind(null)}
+      />
+      <ConfirmDialog
+        open={confirmKind === 'destroy'}
+        title={t.admin.deleteServerBtn}
+        message={t.admin.deleteConfirmShort}
+        confirmLabel={deletePending ? t.admin.deleting : t.admin.yesDeleteBtn}
+        tone="danger"
+        pending={deletePending}
+        onConfirm={async () => { await onConfirmDelete(); setConfirmKind(null) }}
+        onCancel={() => setConfirmKind(null)}
+      />
     </motion.section>
   )
 }

@@ -76,6 +76,21 @@ class OnboardingResponse(BaseModel):
     complete: bool
 
 
+class DataExportResponse(BaseModel):
+    """Snapshot LGPD: tudo que o user tem persistido nos nossos sistemas."""
+
+    generated_at: datetime
+    user: dict
+    settings: dict
+    hardware: dict | None
+    integrations: list[dict]
+    memberships: list[dict]
+    rsvps: list[dict]
+    ballots: list[dict]
+    notifications: list[dict]
+    events: list[dict]
+
+
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

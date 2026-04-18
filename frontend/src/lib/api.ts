@@ -37,8 +37,9 @@ export async function api<T>(path: string, opts: Opts = {}): Promise<T> {
 
   // 401 so derruba sessao se for no /auth/me. outros endpoints podem 401
   // por motivos transitorios e nao devem nukar o token do usuario.
+  // usa clearLocal pra nao tentar revogar de novo (loop) -- token ja morreu.
   if (res.status === 401 && path === '/auth/me') {
-    useAuthStore.getState().logout()
+    useAuthStore.getState().clearLocal()
   }
 
   const text = await res.text()

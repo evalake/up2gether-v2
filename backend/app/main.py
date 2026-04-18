@@ -9,6 +9,7 @@ from starlette.responses import JSONResponse
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging
+from app.jobs.events_retention import purge_old_events
 from app.jobs.price_check_cron import check_game_prices
 from app.routers import (
     admin,
@@ -41,6 +42,7 @@ async def lifespan(_: FastAPI):
     # leader election: so 1 machine roda bot + scheduler
     scheduler = AsyncIOScheduler(timezone="UTC")
     scheduler.add_job(check_game_prices, CronTrigger(hour="*/3", minute=30))
+    scheduler.add_job(purge_old_events, CronTrigger(hour=3, minute=15))
     bot = PresenceBot(settings.discord_bot_token)
     leader = LeaderElection()
 

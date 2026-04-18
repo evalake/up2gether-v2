@@ -30,6 +30,15 @@ def _cap_players(v: int | None) -> int | None:
     return v
 
 
+def _validate_http_url_for_cover(v: str | None) -> str | None:
+    """Bloqueia javascript:/data:/file: em cover_url (defesa XSS em href/src)."""
+    if v is None or v == "":
+        return None
+    if not (v.startswith("https://") or v.startswith("http://")):
+        raise ValueError("cover_url precisa comecar com http:// ou https://")
+    return v
+
+
 class GameCreate(BaseModel):
     name: str = Field(..., min_length=2, max_length=120)
     steam_appid: int | None = None
@@ -59,6 +68,11 @@ class GameCreate(BaseModel):
     @classmethod
     def _cap_player_max(cls, v: int | None) -> int | None:
         return _cap_players(v)
+
+    @field_validator("cover_url")
+    @classmethod
+    def _cover(cls, v: str | None) -> str | None:
+        return _validate_http_url_for_cover(v)
 
 
 class GameUpdate(BaseModel):
@@ -90,6 +104,11 @@ class GameUpdate(BaseModel):
     @classmethod
     def _cap_player_max(cls, v: int | None) -> int | None:
         return _cap_players(v)
+
+    @field_validator("cover_url")
+    @classmethod
+    def _cover(cls, v: str | None) -> str | None:
+        return _validate_http_url_for_cover(v)
 
 
 class GameViability(BaseModel):
