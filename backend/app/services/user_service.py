@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import logging
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.enums import HardwareTier
 from app.models.game import Game
-from app.models.group import GroupMembership
+from app.models.group import Group, GroupMembership
 from app.models.session import PlaySession
 from app.models.user import User, UserHardwareProfile
 from app.models.vote import VoteBallot
@@ -16,6 +18,13 @@ from app.schemas.user import (
     SettingsResponse,
     SettingsUpdate,
 )
+
+log = logging.getLogger(__name__)
+
+# ordem de promocao quando o owner sai: tenta admin mais antigo, depois mod,
+# depois member. se ninguem sobra, deleta o grupo (libera discord_guild_id
+# pra recriar).
+_ROLE_RANK = {"admin": 3, "mod": 2, "member": 1}
 
 
 class UserService:
@@ -111,8 +120,65 @@ class UserService:
 
     async def delete_account(self, actor: User) -> None:
         # artefatos pessoais cascata via FK (memberships, ballots, rsvps,
-        # integrations, notifications, hardware). groups onde ele era owner
-        # ficam com owner_user_id = NULL (SET NULL). created_by de votes,
-        # sessions tambem vai pra NULL -- historico preservado.
+        # integrations, notifications, hardware). antes de deletar, resolve
+        # grupos onde ele era owner: transfere pra outro membro ou deleta
+        # o grupo se ele era o unico (libera discord_guild_id).
+        await self._resolve_owned_groups(actor)
         await self.db.delete(actor)
         await self.db.commit()
+
+    async def _resolve_owned_groups(self, actor: User) -> None:
+        owned = (
+            (await self.db.execute(select(Group).where(Group.owner_user_id == actor.id)))
+            .scalars()
+            .all()
+        )
+        for grp in owned:
+            await self._transfer_or_delete_group(grp, actor)
+
+    async def _transfer_or_delete_group(self, grp: Group, owner: User) -> None:
+        # busca todos os memberships exceto o do owner que ta saindo,
+        # ordenado por (rank do role desc, joined_at asc) -- mais senior + mais antigo
+        candidates = (
+            (
+                await self.db.execute(
+                    select(GroupMembership)
+                    .where(
+                        GroupMembership.group_id == grp.id,
+                        GroupMembership.user_id != owner.id,
+                    )
+                    .order_by(GroupMembership.joined_at.asc())
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if not candidates:
+            # owner era o unico no grupo: deleta tudo. cascade limpa games,
+            # sessions, votes, etc. discord_guild_id volta a ficar disponivel.
+            await self.db.delete(grp)
+            return
+
+        # pega o mais senior (admin > mod > member). desempate por joined_at asc.
+        candidates.sort(key=lambda m: (-_ROLE_RANK.get(m.role, 0), m.joined_at))
+        new_owner = candidates[0]
+        old_role = new_owner.role
+        new_owner.role = "admin"
+        grp.owner_user_id = new_owner.user_id
+
+        # avisa o grupo (in-app + webhook discord se tiver)
+        try:
+            from app.services.notifications import notify_group
+
+            await notify_group(
+                self.db,
+                group_id=grp.id,
+                event="group.owner_changed",
+                title=f"novo dono em {grp.name}",
+                body=(
+                    f"o dono anterior excluiu a conta. ownership passou pra outro membro"
+                    f" (era {old_role}, agora admin)."
+                ),
+            )
+        except Exception as e:
+            log.warning("failed to notify owner change for group %s: %s", grp.id, e)
