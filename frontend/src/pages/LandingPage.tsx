@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/features/auth/store'
-import { discordLoginUrl, trackLandingVisit } from '@/features/auth/api'
+import { trackLandingVisit } from '@/features/auth/api'
+import { DiscordLoginLink } from '@/features/auth/DiscordLoginLink'
 import { VoteSim } from '@/components/landing/VoteSim'
 import { VoteTimeline } from '@/components/landing/VoteTimeline'
 import { MomentRow } from '@/components/landing/MomentRow'
@@ -55,12 +56,9 @@ function Header() {
           <a href="#faq" className="transition-colors hover:text-up-orange">
             {t.navFaq}
           </a>
-          <a
-            href={discordLoginUrl()}
-            className="text-up-orange transition-colors hover:text-up-amber"
-          >
+          <DiscordLoginLink className="text-up-orange transition-colors hover:text-up-amber">
             {t.navLogin}
-          </a>
+          </DiscordLoginLink>
         </nav>
       </div>
     </header>
@@ -89,12 +87,9 @@ function Hero() {
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={discordLoginUrl()}
-              className="inline-flex items-center justify-center rounded-sm bg-up-orange px-7 py-3 text-sm font-medium uppercase tracking-widest text-up-bg transition-colors hover:bg-up-amber"
-            >
+            <DiscordLoginLink className="inline-flex items-center justify-center rounded-sm bg-up-orange px-7 py-3 text-sm font-medium uppercase tracking-widest text-up-bg transition-colors hover:bg-up-amber">
               {t.ctaLogin}
-            </a>
+            </DiscordLoginLink>
             <a
               href={BOT_INVITE_URL}
               target="_blank"
@@ -306,12 +301,9 @@ function FinalCta() {
             {t.ctaDesc}
           </p>
           <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <a
-              href={discordLoginUrl()}
-              className="inline-flex items-center justify-center rounded-sm bg-up-orange px-8 py-3.5 text-sm font-medium uppercase tracking-widest text-up-bg transition-colors hover:bg-up-amber"
-            >
+            <DiscordLoginLink className="inline-flex items-center justify-center rounded-sm bg-up-orange px-8 py-3.5 text-sm font-medium uppercase tracking-widest text-up-bg transition-colors hover:bg-up-amber">
               {t.ctaLogin}
-            </a>
+            </DiscordLoginLink>
             <a
               href={BOT_INVITE_URL}
               target="_blank"

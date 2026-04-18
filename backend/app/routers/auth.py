@@ -1,16 +1,26 @@
 from typing import Annotated
+from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.rate_limit import RateLimitAuth
-from app.core.security import CurrentUser, issue_access_token
+from app.core.security import (
+    CurrentUser,
+    issue_access_token,
+    issue_oauth_state,
+    verify_oauth_state,
+)
 from app.integrations.discord import DiscordClient, get_discord_client
 from app.repositories.user_repo import UserRepository
-from app.schemas.auth import AuthTokenResponse, DiscordCallbackRequest
+from app.schemas.auth import (
+    AuthTokenResponse,
+    DiscordCallbackRequest,
+    DiscordLoginUrlResponse,
+)
 from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
 from app.services.events import EVENT_MEMBER_ACTIVATED, track_event
@@ -25,13 +35,47 @@ def get_auth_service(
     return AuthService(UserRepository(db), discord)
 
 
+@router.get("/discord/login-url", response_model=DiscordLoginUrlResponse)
+async def discord_login_url(
+    _rl: RateLimitAuth,
+    next: str | None = None,
+) -> DiscordLoginUrlResponse:
+    settings = get_settings()
+    if not settings.discord_client_id or not settings.discord_redirect_uri:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "discord oauth not configured")
+    # next precisa ser path relativo; ignora se parecer URL absoluta ou for bagunca
+    safe_next = next if (next and next.startswith("/") and "://" not in next) else None
+    state = issue_oauth_state(next_path=safe_next)
+    scope = quote("identify email guilds", safe="")
+    redirect = quote(settings.discord_redirect_uri, safe="")
+    url = (
+        "https://discord.com/api/oauth2/authorize"
+        f"?client_id={settings.discord_client_id}"
+        f"&redirect_uri={redirect}"
+        f"&response_type=code"
+        f"&scope={scope}"
+        f"&state={quote(state, safe='')}"
+    )
+    return DiscordLoginUrlResponse(url=url)
+
+
 @router.post("/discord/callback", response_model=AuthTokenResponse)
 async def discord_callback(
     payload: DiscordCallbackRequest,
     service: Annotated[AuthService, Depends(get_auth_service)],
     _rl: RateLimitAuth,
 ) -> AuthTokenResponse:
-    return await service.login_with_discord(payload.code, ref=payload.ref)
+    # valida state: JWT assinado pelo backend, scope oauth:discord, TTL 10min.
+    # se vier zoado (sig invalida, expirado, scope errado) = 400, frontend mostra
+    # erro centralizado e redireciona pra novo login automatico.
+    state = verify_oauth_state(payload.state)
+    if state is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "invalid or expired state")
+    next_raw = state.get("next")
+    next_path = next_raw if (isinstance(next_raw, str) and next_raw.startswith("/")) else None
+    resp = await service.login_with_discord(payload.code, ref=payload.ref)
+    resp.next = next_path
+    return resp
 
 
 @router.get("/me", response_model=UserResponse)

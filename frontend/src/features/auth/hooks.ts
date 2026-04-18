@@ -1,6 +1,12 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { fetchMe, fetchOnboarding, type DiscordUser, type OnboardingState } from './api'
+import {
+  fetchDiscordLoginUrl,
+  fetchMe,
+  fetchOnboarding,
+  type DiscordUser,
+  type OnboardingState,
+} from './api'
 import { useAuthStore } from './store'
 import { useLocaleStore, type Locale } from '@/features/locale/store'
 
@@ -21,6 +27,22 @@ export function useMe() {
     if (store.locale !== serverLocale) store.setLocale(serverLocale, false)
   }, [q.data?.locale])
   return q
+}
+
+/** URL pro authorize do Discord vem pre-assinada pelo backend.
+ *  state = JWT com TTL de 10min, validado no callback. nao precisa stash cliente,
+ *  funciona cross-browser. prefetch no mount faz o href ficar pronto antes do click.
+ *
+ *  queryKey NAO compartilha prefixo com ['me'] ou outros — convencao da regra de keys.
+ */
+export function useDiscordLoginUrl(next?: string) {
+  return useQuery<{ url: string }>({
+    queryKey: ['auth-login-url', next ?? null],
+    queryFn: () => fetchDiscordLoginUrl(next),
+    staleTime: 5 * 60 * 1000, // 5min, metade do TTL do state
+    gcTime: 10 * 60 * 1000,
+    retry: 1,
+  })
 }
 
 export function useOnboarding() {

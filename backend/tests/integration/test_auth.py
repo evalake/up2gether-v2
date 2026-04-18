@@ -6,7 +6,7 @@ import uuid
 
 import pytest
 
-from app.core.security import issue_access_token
+from app.core.security import issue_access_token, issue_oauth_state
 from app.integrations.discord import DiscordClient, get_discord_client
 from app.models.user import User
 
@@ -55,7 +55,7 @@ async def test_discord_callback_creates_new_user(app, client):
 
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "state": "x" * 32},
+        json={"code": "any", "state": issue_oauth_state()},
     )
     assert res.status_code == 200, res.text
 
@@ -85,7 +85,7 @@ async def test_discord_callback_records_referrer_on_new_signup(app, client, db_s
 
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "state": "x" * 32, "ref": "streamer-foo"},
+        json={"code": "any", "state": issue_oauth_state(), "ref": "streamer-foo"},
     )
     assert res.status_code == 200
     assert res.json()["user"]["is_new_user"] is True
@@ -114,7 +114,7 @@ async def test_discord_callback_rejects_overlong_ref(app, client):
 
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "state": "x" * 32, "ref": "x" * 200},
+        json={"code": "any", "state": issue_oauth_state(), "ref": "x" * 200},
     )
     assert res.status_code == 422
 
@@ -132,7 +132,7 @@ async def test_discord_callback_updates_existing_user(app, client, db_session):
 
     res = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "any", "state": "x" * 32},
+        json={"code": "any", "state": issue_oauth_state()},
     )
     assert res.status_code == 200
     body = res.json()
@@ -186,11 +186,11 @@ async def test_discord_callback_rate_limited(app, client):
     for _ in range(10):
         r = await client.post(
             "/api/auth/discord/callback",
-            json={"code": "x", "state": "x" * 32},
+            json={"code": "x", "state": issue_oauth_state()},
         )
         assert r.status_code == 200
     r = await client.post(
         "/api/auth/discord/callback",
-        json={"code": "x", "state": "x" * 32},
+        json={"code": "x", "state": issue_oauth_state()},
     )
     assert r.status_code == 429
