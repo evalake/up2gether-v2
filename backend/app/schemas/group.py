@@ -24,6 +24,15 @@ def _validate_webhook_url(v: str | None) -> str | None:
     return v
 
 
+def _validate_http_url(v: str | None) -> str | None:
+    """XSS defense: bloqueia javascript:/data:/file: em campos que viram href/src."""
+    if v is None or v == "":
+        return None
+    if not (v.startswith("https://") or v.startswith("http://")):
+        raise ValueError("url precisa comecar com http:// ou https://")
+    return v
+
+
 class GroupCreate(BaseModel):
     discord_guild_id: str = Field(max_length=64)
     name: str = Field(max_length=120)
@@ -35,6 +44,11 @@ class GroupCreate(BaseModel):
     @classmethod
     def _webhook(cls, v: str | None) -> str | None:
         return _validate_webhook_url(v)
+
+    @field_validator("icon_url")
+    @classmethod
+    def _icon(cls, v: str | None) -> str | None:
+        return _validate_http_url(v)
 
 
 class GroupResponse(BaseModel):

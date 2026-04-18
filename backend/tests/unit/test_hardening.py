@@ -139,3 +139,51 @@ def test_encrypted_string_type_decorator_roundtrip():
     enc = col.process_bind_param("abc123", None)
     assert enc != "abc123"
     assert col.process_result_value(enc, None) == "abc123"
+
+
+# -------- XSS defense: URL scheme validation --------
+
+
+@pytest.mark.parametrize(
+    "bad_url",
+    [
+        "javascript:alert(1)",
+        "data:text/html,<script>alert(1)</script>",
+        "file:///etc/passwd",
+        "vbscript:msgbox",
+        "  javascript:alert(1)",  # leading spaces bypass attempt
+    ],
+)
+def test_group_icon_url_rejects_non_http(bad_url):
+    from app.schemas.group import GroupCreate
+
+    with pytest.raises(ValueError):
+        GroupCreate(discord_guild_id="123", name="x", icon_url=bad_url)
+
+
+@pytest.mark.parametrize(
+    "good_url",
+    [
+        "https://cdn.discordapp.com/icons/1/abc.png",
+        "http://localhost:8000/img.png",
+    ],
+)
+def test_group_icon_url_accepts_http(good_url):
+    from app.schemas.group import GroupCreate
+
+    g = GroupCreate(discord_guild_id="123", name="x", icon_url=good_url)
+    assert g.icon_url == good_url
+
+
+def test_game_cover_url_rejects_javascript():
+    from app.schemas.game import GameCreate
+
+    with pytest.raises(ValueError):
+        GameCreate(name="xy", cover_url="javascript:alert(1)")
+
+
+def test_game_cover_url_accepts_https():
+    from app.schemas.game import GameCreate
+
+    g = GameCreate(name="xy", cover_url="https://cdn.akamai.steamstatic.com/...")
+    assert g.cover_url.startswith("https://")
