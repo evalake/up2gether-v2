@@ -1,4 +1,4 @@
-import { discordLoginUrl } from '@/features/auth/api'
+import { DiscordLoginLink } from '@/features/auth/DiscordLoginLink'
 import { Button } from '@/components/core/Button'
 import { Panel } from '@/components/core/Panel'
 import { HazardDivider } from '@/components/core/HazardDivider'
@@ -28,11 +28,11 @@ export function LoginPage() {
               <p className="mt-2 text-up-amber">{t.auth.discordRequired}</p>
             </div>
 
-            <a href={discordLoginUrl()} className="block">
+            <DiscordLoginLink className="block">
               <Button className="w-full justify-center py-3" variant="primary">
                 {t.auth.authenticate}
               </Button>
-            </a>
+            </DiscordLoginLink>
 
             <div className="border-t border-up-line pt-3 text-center text-[10px] uppercase tracking-wider text-up-dim">
               {t.auth.versionLabel}

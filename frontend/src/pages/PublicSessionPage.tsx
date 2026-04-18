@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { useMe } from '@/features/auth/hooks'
 import { rsvpSession } from '@/features/sessions/api'
-import { discordLoginUrl } from '@/features/auth/api'
+import { DiscordLoginLink } from '@/features/auth/DiscordLoginLink'
 import { useToast } from '@/components/ui/toast'
 import { Loading } from '@/components/ui/Loading'
 import { useT } from '@/i18n'
@@ -141,12 +141,12 @@ export function PublicSessionPage() {
               </Link>
             </div>
           ) : (
-            <a
-              href={discordLoginUrl(`/share/sessions/${data.id}`)}
+            <DiscordLoginLink
+              next={`/share/sessions/${data.id}`}
               className="block rounded-sm border border-up-orange/40 bg-up-orange/10 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/20"
             >
               {t.publicSession.loginToConfirm}
-            </a>
+            </DiscordLoginLink>
           )}
         </div>
         <div className="border-t border-up-orange/10 px-5 py-2 text-center text-[10px] uppercase tracking-[0.2em] text-up-dim">

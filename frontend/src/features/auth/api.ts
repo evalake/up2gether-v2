@@ -16,6 +16,8 @@ export type LoginResponse = {
   access_token: string
   token_type: string
   user: DiscordUser
+  // path relativo vindo do state JWT; backend decodifica e devolve aqui
+  next?: string | null
 }
 
 export function discordCallback(code: string, state: string) {
@@ -32,12 +34,18 @@ export function discordCallback(code: string, state: string) {
   return api<LoginResponse>('/auth/discord/callback', { method: 'POST', body }).then((r) => {
     try {
       sessionStorage.removeItem('u2g-ref')
-      sessionStorage.removeItem('u2g-oauth-state')
     } catch {
       /* ignore */
     }
     return r
   })
+}
+
+/** Pede pro backend a URL de authorize do Discord com state ja assinado.
+ *  state e JWT com TTL de 10min. sem sessionStorage = cross-browser ok. */
+export function fetchDiscordLoginUrl(next?: string): Promise<{ url: string }> {
+  const qs = next ? `?next=${encodeURIComponent(next)}` : ''
+  return api<{ url: string }>(`/auth/discord/login-url${qs}`)
 }
 
 /** Captura ?ref=X da URL atual e stasha pra usar no proximo signup. */
@@ -98,39 +106,8 @@ export function fetchMyGuilds() {
   return api<DiscordGuild[]>('/auth/discord/guilds')
 }
 
-function genOauthState(): string {
-  // crypto.randomUUID() sempre disponivel em contextos https (browsers modernos)
-  try {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-      return crypto.randomUUID()
-    }
-  } catch {
-    /* fallthrough */
-  }
-  // fallback ultra-defensivo, ainda 32 chars random
-  const a = new Uint8Array(16)
-  crypto.getRandomValues(a)
-  return Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('')
-}
-
-export function discordLoginUrl(next?: string): string {
-  const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID
-  const redirect = encodeURIComponent(
-    import.meta.env.VITE_DISCORD_REDIRECT_URI ??
-      `${window.location.origin}/auth/discord/callback`,
-  )
-  const scope = encodeURIComponent('identify email guilds')
-  // reusar state existente pra evitar mismatch quando multiplos <a href>
-  // chamam essa funcao no mesmo render (landing tem 3 botoes de login).
-  // callback remove do sessionStorage, entao o proximo login gera um novo.
-  let state: string | null = null
-  try { state = sessionStorage.getItem('u2g-oauth-state') } catch { /* ignore */ }
-  if (!state) {
-    state = genOauthState()
-    try { sessionStorage.setItem('u2g-oauth-state', state) } catch { /* ignore */ }
-  }
-  if (next) {
-    try { sessionStorage.setItem('u2g-auth-next', next) } catch { /* ignore */ }
-  }
-  return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirect}&response_type=code&scope=${scope}&state=${encodeURIComponent(state)}`
+/** Guarda o proximo destino pra navegar pos-login. O valor oficial e assinado dentro
+ *  do state JWT (server-side); esse sessionStorage e so failsafe caso o state expire. */
+export function stashAuthNext(next: string) {
+  try { sessionStorage.setItem('u2g-auth-next', next) } catch { /* ignore */ }
 }
