@@ -1,13 +1,20 @@
 import { api } from '@/lib/api'
 
+import type { HardwareTier } from '@/features/games/api'
+
 export type DiscordUser = {
   id: string
   discord_id: string
   discord_username: string
   discord_display_name: string | null
   discord_avatar: string | null
+  discord_email: string | null
+  created_at: string
   onboarding_completed: boolean
   locale: string | null
+  hardware_tier: HardwareTier
+  steam_linked: boolean
+  steam_id: string | null
   is_new_user: boolean
   is_sys_admin?: boolean
 }
