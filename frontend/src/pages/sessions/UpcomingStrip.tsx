@@ -1,6 +1,8 @@
 import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
 import { steamCover } from '@/lib/steamCover'
+import { useT, type Translations } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 
 type Props = {
   upcoming: PlaySession[]
@@ -8,14 +10,17 @@ type Props = {
   onOpen: (s: PlaySession, start: Date) => void
 }
 
-function relLabel(st: Date) {
+function relLabel(st: Date, t: Translations) {
   const diffMs = st.getTime() - Date.now()
-  if (diffMs < 3600_000) return `em ${Math.max(1, Math.round(diffMs / 60_000))}min`
-  if (diffMs < 86400_000) return `em ${Math.round(diffMs / 3600_000)}h`
-  return `em ${Math.round(diffMs / 86400_000)}d`
+  if (diffMs < 3600_000) return t.sessions.relIn(t.sessions.relMin(Math.max(1, Math.round(diffMs / 60_000))))
+  if (diffMs < 86400_000) return t.sessions.relIn(t.sessions.relH(Math.round(diffMs / 3600_000)))
+  return t.sessions.relIn(t.sessions.relD(Math.round(diffMs / 86400_000)))
 }
 
 export function UpcomingStrip({ upcoming, games, onOpen }: Props) {
+  const t = useT()
+  const locale = useLocaleStore((s) => s.locale)
+  const dtLocale = locale === 'pt' ? 'pt-BR' : 'en-US'
   if (upcoming.length === 0) return null
   return (
     <div className="flex items-stretch gap-3">
@@ -42,13 +47,13 @@ export function UpcomingStrip({ upcoming, games, onOpen }: Props) {
               )}
               <div className="flex min-w-0 flex-col justify-center gap-1 px-4 pr-6">
                 <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-up-orange/50 bg-up-orange/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-orange">
-                  próxima · {relLabel(st)}
+                  {t.sessions.nextSessionPrefix} · {relLabel(st, t)}
                 </span>
                 <span className="truncate font-display text-lg leading-tight text-up-text group-hover/hero:text-up-orange">
                   {s.title}
                 </span>
                 <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                  <span>{st.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}</span>
+                  <span>{st.toLocaleDateString(dtLocale, { weekday: 'short', day: '2-digit', month: 'short' })}</span>
                   <span>·</span>
                   <span>{String(st.getHours()).padStart(2, '0')}:{String(st.getMinutes()).padStart(2, '0')}</span>
                   {gName && gName !== s.title && (
@@ -80,7 +85,7 @@ export function UpcomingStrip({ upcoming, games, onOpen }: Props) {
             <span className="flex min-w-0 flex-col justify-center gap-0.5 px-3 pr-4">
               <span className="max-w-[160px] truncate text-sm text-up-text group-hover/chip:text-up-orange">{s.title}</span>
               <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                {st.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
+                {st.toLocaleDateString(dtLocale, { weekday: 'short', day: '2-digit', month: 'short' })}
               </span>
               <span className="font-mono text-[10px] text-up-orange/80">
                 {String(st.getHours()).padStart(2, '0')}:{String(st.getMinutes()).padStart(2, '0')}
@@ -94,7 +99,7 @@ export function UpcomingStrip({ upcoming, games, onOpen }: Props) {
       })}
       {upcoming.length > 4 && (
         <div className="flex h-28 shrink-0 items-center px-2 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-          +{upcoming.length - 4} no calendário
+          {t.sessions.onCalendar(upcoming.length - 4)}
         </div>
       )}
     </div>

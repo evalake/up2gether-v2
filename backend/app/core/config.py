@@ -53,11 +53,6 @@ class Settings(BaseSettings):
     # steam
     steam_api_key: str = ""
 
-    # google calendar
-    google_client_id: str = ""
-    google_client_secret: str = ""
-    google_redirect_uri: str = ""
-
 
 @lru_cache
 def get_settings() -> Settings:

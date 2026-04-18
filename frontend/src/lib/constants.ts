@@ -25,9 +25,9 @@ export const TIERS: HardwareTier[] = ['low', 'mid', 'high', 'unknown']
 // polling intervals centralizados (ms)
 export const POLL = {
   FAST: 5_000,       // presence, coisas que mudam rapido
-  ACTIVE: 10_000,    // votes abertas, ciclo de temas ativo
+  ACTIVE: 10_000,    // votes abertas
   MEDIUM: 15_000,    // sessions
   SLOW: 20_000,      // games list
-  LAZY: 30_000,      // notificacoes, themes history
-  VERY_LAZY: 60_000, // groups list, ciclo inativo
+  LAZY: 30_000,      // notificacoes
+  VERY_LAZY: 60_000, // groups list
 } as const

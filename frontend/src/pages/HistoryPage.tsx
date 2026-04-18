@@ -8,11 +8,13 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { VoteAuditModal } from '@/components/votes/VoteAuditModal'
 import { useTitle } from '@/lib/useTitle'
+import { useT } from '@/i18n'
 
 // historico derivado: votes fechados com vencedor, ordem desc.
 // nao captura override manual pq n temos log disso ainda
 export function HistoryPage() {
-  useTitle('historico')
+  const t = useT()
+  useTitle(t.history.title)
   const { id = '' } = useParams()
   const group = useGroup(id)
   const votes = useVotes(id)
@@ -53,32 +55,32 @@ export function HistoryPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between gap-4">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-orange">Histórico</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-orange">{t.history.title}</div>
           <h1 className="mt-1 font-display text-3xl text-up-text">
-            {group.data?.name ?? 'Grupo'}
+            {group.data?.name ?? t.history.groupFallback}
           </h1>
           <p className="mt-1 text-xs text-up-dim">
-            Games que já foram escolhidos pelo grupo. Derivado das votações fechadas.
+            {t.history.subtitle}
           </p>
         </div>
         <Link
           to={`/groups/${id}`}
           className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
         >
-          ← voltar
+          ← {t.history.backLink}
         </Link>
       </header>
 
       <div className="flex items-center gap-2">
         <input
-          aria-label="buscar histórico"
+          aria-label={t.history.searchAria}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="buscar por jogo ou título da votação..."
+          placeholder={t.history.searchPlaceholder}
           className="h-9 w-full max-w-md rounded-sm border border-up-line bg-black/40 px-3 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
-          <span className="tabular-nums text-up-orange">{chapters.length}</span> capítulos
+          <span className="tabular-nums text-up-orange">{chapters.length}</span> {t.history.chapters}
         </div>
       </div>
 
@@ -86,8 +88,8 @@ export function HistoryPage() {
         <EmptyState
           tone="soft"
           glyph="✧"
-          title={q ? `nada pra ${JSON.stringify(q)}` : 'nenhum capítulo ainda'}
-          hint={q ? 'tenta outro termo ou limpa a busca' : 'quando uma votação fechar com vencedor, vai aparecer aqui como um capítulo da timeline.'}
+          title={q ? t.history.nothingFor(JSON.stringify(q)) : t.history.noChapters}
+          hint={q ? t.history.tryAnother : t.history.willAppear}
         />
       ) : (
         <div className="space-y-2">
@@ -123,11 +125,11 @@ export function HistoryPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className={`truncate font-display text-lg ${g ? 'text-up-text' : 'text-up-dim'}`}>
-                      {g ? g.name : v.winner_game_id ? '(jogo removido)' : '(sem vencedor)'}
+                      {g ? g.name : v.winner_game_id ? t.history.gameRemoved : t.history.noWinner}
                     </span>
                     {isLatest && (
                       <span className="font-mono text-[10px] uppercase tracking-wider text-up-green">
-                        atual
+                        {t.history.current}
                       </span>
                     )}
                   </div>
@@ -135,7 +137,7 @@ export function HistoryPage() {
                     {v.title}
                   </div>
                   <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-                    {dt} · {v.ballots_count} voto{v.ballots_count === 1 ? '' : 's'} · audit →
+                    {dt} · {t.history.voteCount(v.ballots_count)}
                   </div>
                 </div>
               </button>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { useT } from '@/i18n'
 
 export function NotFoundPage() {
+  const t = useT()
   return (
     <div className="min-h-screen bg-up-grid text-up-dim">
       <header className="border-b border-up-line bg-black/40 backdrop-blur">
@@ -11,24 +13,23 @@ export function NotFoundPage() {
           </Link>
           <nav className="flex items-center gap-4 text-[11px] uppercase tracking-widest">
             <Link to="/privacy" className="transition-colors hover:text-up-orange">
-              Privacidade
+              {t.notFound.privacy}
             </Link>
             <Link to="/terms" className="transition-colors hover:text-up-orange">
-              Termos
+              {t.notFound.terms}
             </Link>
             <Link to="/login" className="transition-colors hover:text-up-orange">
-              Entrar
+              {t.notFound.login}
             </Link>
           </nav>
         </div>
       </header>
 
       <main className="mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center">
-        <span className="font-display text-7xl text-up-orange">404</span>
-        <h1 className="mt-4 font-display text-2xl text-up-dim">Página não encontrada</h1>
+        <span className="font-display text-7xl text-up-orange">{t.notFound.title}</span>
+        <h1 className="mt-4 font-display text-2xl text-up-dim">{t.notFound.heading}</h1>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-up-dim/80">
-          O link que você acessou não existe, foi movido ou expirou. Verifique o endereço ou volte
-          para a página inicial.
+          {t.notFound.body}
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -36,18 +37,18 @@ export function NotFoundPage() {
             to="/"
             className="rounded-lg border border-up-orange/40 bg-up-orange/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-up-orange transition-colors hover:bg-up-orange/20"
           >
-            Voltar para o início
+            {t.notFound.backHome}
           </Link>
           <Link
             to="/login"
             className="rounded-lg border border-up-line px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-up-dim transition-colors hover:border-up-orange hover:text-up-orange"
           >
-            Entrar
+            {t.notFound.login}
           </Link>
         </div>
 
         <footer className="mt-24 border-t border-up-line pt-6 text-[10px] uppercase tracking-widest text-up-dim/70">
-          Up2Gether · Coordenação de sessões para comunidades do Discord
+          {t.notFound.metaDesc}
         </footer>
       </main>
     </div>

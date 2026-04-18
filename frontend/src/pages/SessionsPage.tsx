@@ -118,7 +118,7 @@ export function SessionsPage() {
     try {
       await create.mutateAsync({
         game_id: gameId,
-        title: title || (games.data?.find((g) => g.id === gameId)?.name ?? 'sessão'),
+        title: title || (games.data?.find((g) => g.id === gameId)?.name ?? t.sessions.fallbackTitle),
         start_at: draft.start.toISOString(),
         duration_minutes: duration,
       })

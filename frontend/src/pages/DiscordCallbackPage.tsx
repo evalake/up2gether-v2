@@ -4,8 +4,10 @@ import { discordCallback } from '@/features/auth/api'
 import { useAuthStore } from '@/features/auth/store'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { useT } from '@/i18n'
 
 export function DiscordCallbackPage() {
+  const t = useT()
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const setToken = useAuthStore((s) => s.setToken)
@@ -18,11 +20,11 @@ export function DiscordCallbackPage() {
     const code = params.get('code')
     const state = params.get('state')
     if (!code) {
-      setError('código ausente na URL')
+      setError(t.auth.codeMissing)
       return
     }
     if (!state) {
-      setError('state ausente (login-CSRF bloqueado)')
+      setError(t.auth.stateMissing)
       return
     }
     let stashed: string | null = null
@@ -30,7 +32,7 @@ export function DiscordCallbackPage() {
       stashed = sessionStorage.getItem('u2g-oauth-state')
     } catch { /* ignore */ }
     if (!stashed || stashed !== state) {
-      setError('state inválido, refaça o login')
+      setError(t.auth.stateInvalid)
       return
     }
     discordCallback(code, state)
@@ -50,18 +52,18 @@ export function DiscordCallbackPage() {
         navigate(next, { replace: true })
       })
       .catch((e: Error) => setError(e.message))
-  }, [params, navigate, setToken])
+  }, [params, navigate, setToken, t.auth.codeMissing, t.auth.stateMissing, t.auth.stateInvalid])
 
   if (error) {
     return (
       <div className="p-8">
-        <ErrorBox error={new Error(`erro no login: ${error}`)} />
+        <ErrorBox error={new Error(`${t.auth.loginError}: ${error}`)} />
       </div>
     )
   }
   return (
     <div className="p-8">
-      <Loading label="autenticando..." />
+      <Loading label={t.auth.authenticating} />
     </div>
   )
 }

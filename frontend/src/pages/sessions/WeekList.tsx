@@ -4,8 +4,6 @@ import type { PlaySession } from '@/features/sessions/api'
 import { steamCover } from '@/lib/steamCover'
 import { useT } from '@/i18n'
 
-const WEEKDAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
-
 const addDays = (d: Date, n: number) => {
   const x = new Date(d)
   x.setDate(x.getDate() + n)
@@ -26,15 +24,16 @@ type Props = {
 
 export function WeekList({ weekAnchor, sessions, games, now, onOpenSlot, onOpenDetail }: Props) {
   const t = useT()
+  const weekdays = t.sessions.weekdaysShort
   const days = useMemo(() => {
-    return WEEKDAYS.map((wd, i) => {
+    return weekdays.map((wd, i) => {
       const day = addDays(weekAnchor, i)
       const inDay = sessions
         .filter((s) => sameDay(new Date(s.start_at), day))
         .sort((a, b) => a.start_at.localeCompare(b.start_at))
       return { wd, day, inDay }
     })
-  }, [weekAnchor, sessions])
+  }, [weekAnchor, sessions, weekdays])
 
   const today = new Date()
 

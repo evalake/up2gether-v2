@@ -16,10 +16,9 @@ type Props = {
   gamesCount: number
   votesCount: number
   sessionsCount: number
-  hasTheme: boolean
 }
 
-export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount, hasTheme }: Props) {
+export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount }: Props) {
   const navigate = useNavigate()
   const t = useT()
   const steps: Step[] = [
@@ -46,14 +45,6 @@ export function FirstStepsGuide({ groupId, gamesCount, votesCount, sessionsCount
       cta: t.firstSteps.goToCalendar,
       path: `/groups/${groupId}/sessions`,
       done: sessionsCount > 0,
-    },
-    {
-      n: 4,
-      title: t.firstSteps.setTheme,
-      hint: t.firstSteps.setThemeHint,
-      cta: t.firstSteps.viewTheme,
-      path: `/groups/${groupId}/themes`,
-      done: hasTheme,
     },
   ]
 

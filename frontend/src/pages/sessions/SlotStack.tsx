@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { steamCover } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
+import { useT } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 
 export function SlotStack({
   sessions,
@@ -14,6 +16,9 @@ export function SlotStack({
   isPast: boolean
   onOpen: (id: string) => void
 }) {
+  const t = useT()
+  const locale = useLocaleStore((s) => s.locale)
+  const dtLocale = locale === 'pt' ? 'pt-BR' : 'en-US'
   const [active, setActive] = useState(0)
   const idx = Math.min(active, sessions.length - 1)
   const s = sessions[idx]
@@ -46,7 +51,7 @@ export function SlotStack({
             {s.title}
           </span>
           <span className={`mt-0.5 truncate font-mono text-[10px] uppercase tracking-wider ${isPast ? 'text-up-dim' : 'text-up-orange'}`}>
-            {String(st.getHours()).padStart(2, '0')}:{String(st.getMinutes()).padStart(2, '0')} · {s.rsvp_yes} vao
+            {String(st.getHours()).padStart(2, '0')}:{String(st.getMinutes()).padStart(2, '0')} · {s.rsvp_yes} {t.sessions.goingShort}
           </span>
         </span>
         <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-1 hidden w-56 -translate-x-1/2 rounded-sm border border-up-orange/40 bg-up-panel p-2 text-left text-[10px] shadow-lg group-hover/slot:block">
@@ -55,10 +60,10 @@ export function SlotStack({
             <span className="block truncate text-up-orange">{gName}</span>
           )}
           <span className="mt-1 block text-up-dim">
-            {st.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · {s.duration_minutes / 60}h
+            {st.toLocaleTimeString(dtLocale, { hour: '2-digit', minute: '2-digit' })} · {s.duration_minutes / 60}h
           </span>
           <span className="mt-1 block text-up-dim">
-            <span className="text-up-green">{s.rsvp_yes}</span> vao · <span className="text-up-amber">{s.rsvp_maybe}</span> talvez · <span className="text-up-red">{s.rsvp_no}</span> fora
+            <span className="text-up-green">{s.rsvp_yes}</span> {t.sessions.goingShort} · <span className="text-up-amber">{s.rsvp_maybe}</span> {t.sessions.maybeShort} · <span className="text-up-red">{s.rsvp_no}</span> {t.sessions.outShort}
           </span>
         </span>
       </button>
@@ -69,7 +74,7 @@ export function SlotStack({
               key={ss.id}
               type="button"
               onClick={(e) => { e.stopPropagation(); setActive(i) }}
-              aria-label={`sessão ${i + 1}`}
+              aria-label={t.sessions.sessionNumAria(i + 1)}
               className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-4 bg-up-orange' : 'w-1.5 bg-up-orange/30 hover:bg-up-orange/60'}`}
             />
           ))}

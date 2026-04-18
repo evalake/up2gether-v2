@@ -7,9 +7,6 @@
 //  - game_vote.opened        votacao abriu, quero ver na hora
 //  - game_vote.stage_advanced fase avancou
 //  - game_vote.closed        votacao fechou (reveal)
-//  - theme.cycle_opened      ciclo de tema abriu
-//  - theme.suggestion_created nova sugestao de tema aparece
-//  - theme.decided           tema decidido (reveal)
 //  - session.created         sessao criada
 //  - current_game.changed    jogo da vez trocou
 //
@@ -38,9 +35,6 @@ const BIG_KINDS = new Set([
   'game_vote.opened',
   'game_vote.stage_advanced',
   'game_vote.closed',
-  'theme.cycle_opened',
-  'theme.suggestion_created',
-  'theme.decided',
   'session.created',
   'current_game.changed',
   'group.visuals_updated',
@@ -59,16 +53,6 @@ function invalidateForKind(qc: ReturnType<typeof useQueryClient>, msg: Msg) {
     qc.invalidateQueries({ queryKey: ['groups', gid, 'votes'] })
     qc.invalidateQueries({ queryKey: ['groups', gid] })
     qc.invalidateQueries({ queryKey: ['groups', gid, 'current-game', 'audit'] })
-  }
-
-  if (
-    k === 'theme.cycle_opened' ||
-    k === 'theme.suggestion_created' ||
-    k === 'theme.decided'
-  ) {
-    qc.invalidateQueries({ queryKey: ['groups', gid, 'themes', 'cycle'] })
-    qc.invalidateQueries({ queryKey: ['groups', gid, 'themes', 'current'] })
-    qc.invalidateQueries({ queryKey: ['groups', gid, 'themes'] })
   }
 
   if (k === 'session.created') {

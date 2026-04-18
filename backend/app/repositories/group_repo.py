@@ -10,7 +10,6 @@ from app.models.base import utcnow
 from app.models.game import Game
 from app.models.group import Group, GroupMembership
 from app.models.session import PlaySession
-from app.models.theme import MonthlyTheme, ThemeCycle
 from app.models.vote import VoteSession
 
 
@@ -168,6 +167,6 @@ class GroupRepository:
 
     async def purge_content(self, group_id: uuid.UUID) -> None:
         # zera tudo menos o grupo e os membros
-        for model in (PlaySession, VoteSession, ThemeCycle, MonthlyTheme, Game):
+        for model in (PlaySession, VoteSession, Game):
             await self.db.execute(delete(model).where(model.group_id == group_id))
         await self.db.commit()

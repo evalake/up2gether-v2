@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useMe } from '@/features/auth/hooks'
 import { useToast } from '@/components/ui/toast'
 import { SettingsCard } from '@/pages/settings/SettingsCard'
+import { useT } from '@/i18n'
 
 export function InviteLinkSection() {
+  const t = useT()
   const me = useMe()
   const toast = useToast()
   const [copied, setCopied] = useState(false)
@@ -15,17 +17,17 @@ export function InviteLinkSection() {
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
-      toast.success('link copiado')
+      toast.success(t.settings.inviteCopied)
       setTimeout(() => setCopied(false), 1800)
     } catch {
-      toast.error('falha ao copiar')
+      toast.error(t.settings.inviteCopyFail)
     }
   }
 
   return (
     <SettingsCard
-      title="Seu link de convite"
-      description="Cada pessoa que entra por este link fica creditada como sua indicação."
+      title={t.settings.inviteTitle}
+      description={t.settings.inviteHint}
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <code
@@ -38,7 +40,7 @@ export function InviteLinkSection() {
           onClick={onCopy}
           className="rounded-sm border border-up-orange/40 bg-up-orange/5 px-4 py-2 text-xs text-up-orange transition-colors hover:bg-up-orange/15"
         >
-          {copied ? 'Copiado' : 'Copiar'}
+          {copied ? t.settings.copied : t.settings.copy}
         </button>
       </div>
     </SettingsCard>

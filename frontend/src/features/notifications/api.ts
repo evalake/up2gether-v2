@@ -4,7 +4,6 @@ export type NotificationKind =
   | 'vote_opened'
   | 'vote_closed'
   | 'session_created'
-  | 'theme_cycle_opened'
   | 'test'
   | string
 

@@ -7,6 +7,7 @@ import { rsvpSession } from '@/features/sessions/api'
 import { discordLoginUrl } from '@/features/auth/api'
 import { useToast } from '@/components/ui/toast'
 import { Loading } from '@/components/ui/Loading'
+import { useT } from '@/i18n'
 
 type PublicCard = {
   id: string
@@ -21,6 +22,7 @@ type PublicCard = {
 }
 
 export function PublicSessionPage() {
+  const t = useT()
   const { id = '' } = useParams()
   const [data, setData] = useState<PublicCard | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -32,17 +34,17 @@ export function PublicSessionPage() {
   useEffect(() => {
     api<PublicCard>(`/public/sessions/${id}`)
       .then(setData)
-      .catch((e) => setError(e instanceof Error ? e.message : 'falha'))
-  }, [id])
+      .catch((e) => setError(e instanceof Error ? e.message : t.publicSession.loadFail))
+  }, [id, t.publicSession.loadFail])
 
   if (error) {
     return (
       <div className="grid min-h-screen place-items-center bg-up-bg p-6 text-center">
         <div>
           <div className="font-display text-3xl text-up-red">404</div>
-          <p className="mt-2 text-sm text-up-dim">sessão não encontrada ou foi removida</p>
+          <p className="mt-2 text-sm text-up-dim">{t.publicSession.notFound}</p>
           <Link to="/" className="mt-4 inline-block text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">
-            ← voltar
+            ← {t.publicSession.backLink}
           </Link>
         </div>
       </div>
@@ -66,9 +68,9 @@ export function PublicSessionPage() {
     try {
       await rsvpSession(data.group_id, data.id, status)
       setDoneRsvp(status)
-      toast.success(status === 'yes' ? 'presença confirmada' : status === 'maybe' ? 'marcado como talvez' : 'marcado que não vai')
+      toast.success(status === 'yes' ? t.publicSession.confirmed : status === 'maybe' ? t.publicSession.markedMaybe : t.publicSession.markedNo)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'falha ao confirmar')
+      toast.error(e instanceof Error ? e.message : t.publicSession.confirmFail)
     } finally {
       setRsvping(null)
     }
@@ -83,7 +85,7 @@ export function PublicSessionPage() {
       >
         <div className="border-b border-up-orange/15 px-5 py-3">
           <div className="text-[10px] uppercase tracking-wider text-up-dim">{data.group_name}</div>
-          <div className="mt-0.5 text-[10px] uppercase tracking-wider text-up-orange">convite de sessão</div>
+          <div className="mt-0.5 text-[10px] uppercase tracking-wider text-up-orange">{t.publicSession.invite}</div>
         </div>
         <div className="space-y-4 px-5 py-6">
           <div>
@@ -93,26 +95,26 @@ export function PublicSessionPage() {
             )}
           </div>
           <div className="rounded-sm border border-up-orange/15 bg-black/30 p-3">
-            <div className="text-[10px] uppercase tracking-wider text-up-dim">quando</div>
+            <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.publicSession.when}</div>
             <div className="mt-1 text-sm text-up-text">
               {start.toLocaleString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' })}
             </div>
-            <div className="mt-0.5 text-[11px] text-up-dim">{data.duration_minutes / 60}h de duração</div>
+            <div className="mt-0.5 text-[11px] text-up-dim">{t.publicSession.durationSuffix(data.duration_minutes / 60)}</div>
           </div>
           <div className="flex gap-4 text-[11px] uppercase tracking-wider text-up-dim">
-            <span><span className="text-up-green tabular-nums">{data.rsvp_yes}</span> vão</span>
-            <span><span className="text-up-amber tabular-nums">{data.rsvp_maybe}</span> talvez</span>
+            <span><span className="text-up-green tabular-nums">{data.rsvp_yes}</span> {t.publicSession.going}</span>
+            <span><span className="text-up-amber tabular-nums">{data.rsvp_maybe}</span> {t.publicSession.maybe}</span>
           </div>
           {isPast ? (
             <div className="rounded-sm border border-up-line bg-up-line/10 px-3 py-2 text-center text-[11px] uppercase tracking-wider text-up-dim">
-              sessão já aconteceu
+              {t.publicSession.alreadyHappened}
             </div>
           ) : isLoggedIn ? (
             <div className="space-y-2">
-              <div className="text-[10px] uppercase tracking-wider text-up-dim">você já está logado · responda direto:</div>
+              <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.publicSession.loggedIn}</div>
               <div className="grid grid-cols-3 gap-2">
                 {(['yes', 'maybe', 'no'] as const).map((s) => {
-                  const label = s === 'yes' ? 'vou' : s === 'maybe' ? 'talvez' : 'não vou'
+                  const label = s === 'yes' ? t.publicSession.rsvpGo : s === 'maybe' ? t.publicSession.rsvpMaybe : t.publicSession.rsvpNo
                   const color = s === 'yes' ? 'green' : s === 'maybe' ? 'amber' : 'red'
                   const active = doneRsvp === s
                   return (
@@ -135,7 +137,7 @@ export function PublicSessionPage() {
                 to={`/groups/${data.group_id}/sessions`}
                 className="block text-center text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
               >
-                ver no app →
+                {t.publicSession.viewInApp} →
               </Link>
             </div>
           ) : (
@@ -143,7 +145,7 @@ export function PublicSessionPage() {
               href={discordLoginUrl(`/share/sessions/${data.id}`)}
               className="block rounded-sm border border-up-orange/40 bg-up-orange/10 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-up-orange transition-colors hover:bg-up-orange/20"
             >
-              entrar pra confirmar presença
+              {t.publicSession.loginToConfirm}
             </a>
           )}
         </div>

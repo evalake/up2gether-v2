@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useT } from '@/i18n'
 
 type TocItem = { id: string; label: string }
 
@@ -12,14 +13,15 @@ type Props = {
   children: ReactNode
 }
 
-const NAV: { to: string; label: string }[] = [
-  { to: '/privacy', label: 'Privacidade' },
-  { to: '/terms', label: 'Termos' },
-  { to: '/contact', label: 'Contato' },
-]
-
 export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, children }: Props) {
   const location = useLocation()
+  const t = useT()
+
+  const nav: { to: string; label: string }[] = [
+    { to: '/privacy', label: t.legal.navPrivacy },
+    { to: '/terms', label: t.legal.navTerms },
+    { to: '/contact', label: t.legal.navContact },
+  ]
 
   return (
     <div className="min-h-screen bg-up-bg text-up-dim">
@@ -33,7 +35,7 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
             <span className="font-display text-lg text-up-orange">Up2Gether</span>
           </Link>
           <nav className="flex items-center gap-6 text-[11px] uppercase tracking-widest">
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
@@ -48,7 +50,7 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
               to="/login"
               className="rounded-sm border border-up-orange/40 px-3 py-1 text-up-orange transition-colors hover:bg-up-orange/10"
             >
-              Entrar
+              {t.legal.navLogin}
             </Link>
           </nav>
         </div>
@@ -60,7 +62,7 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
             Up2Gether
           </Link>
           <span className="text-up-line">/</span>
-          <span>Documentos legais</span>
+          <span>{t.legal.breadcrumbLegal}</span>
           <span className="text-up-line">/</span>
           <span className="text-up-text">{title}</span>
         </nav>
@@ -69,11 +71,11 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
           <h1 className="font-display text-4xl text-up-orange sm:text-5xl">{title}</h1>
           <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 font-mono text-[11px] uppercase tracking-widest text-up-dim">
             <div>
-              <span className="text-up-line">Vigência</span>
+              <span className="text-up-line">{t.legal.effectiveLabel}</span>
               <span className="ml-2 text-up-text">{effectiveAt}</span>
             </div>
             <div>
-              <span className="text-up-line">Última revisão</span>
+              <span className="text-up-line">{t.legal.lastRevision}</span>
               <span className="ml-2 text-up-text">{updatedAt}</span>
             </div>
           </div>
@@ -83,13 +85,13 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
           <aside className="mb-10 rounded-md border border-up-amber/30 bg-up-amber/5 p-5">
             <div className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
               <span className="h-1 w-1 rounded-full bg-up-amber" />
-              Resumo em linguagem simples
+              {t.legal.summaryLabel}
             </div>
             <div className="text-sm leading-relaxed text-up-text/90 [&_p]:my-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-1">
               {summary}
             </div>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              O resumo acima é informativo. O texto completo abaixo é o que vale juridicamente.
+              {t.legal.summaryDisclaimer}
             </p>
           </aside>
         )}
@@ -99,16 +101,16 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
             <aside className="hidden md:block">
               <div className="sticky top-8">
                 <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
-                  Índice
+                  {t.legal.tocLabel}
                 </div>
                 <ul className="space-y-1.5 border-l border-up-line/60 pl-3 text-[12px]">
-                  {toc.map((t) => (
-                    <li key={t.id}>
+                  {toc.map((tt) => (
+                    <li key={tt.id}>
                       <a
-                        href={`#${t.id}`}
+                        href={`#${tt.id}`}
                         className="block text-up-dim transition-colors hover:text-up-orange"
                       >
-                        {t.label}
+                        {tt.label}
                       </a>
                     </li>
                   ))}
@@ -117,7 +119,7 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
                   href="#top"
                   className="mt-6 block font-mono text-[10px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
                 >
-                  ↑ topo
+                  ↑ {t.legal.toTop}
                 </a>
               </div>
             </aside>
@@ -146,7 +148,7 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
         <footer className="mt-16 grid gap-6 border-t border-up-line/60 pt-8 text-[12px] sm:grid-cols-2">
           <div>
             <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
-              Canal oficial
+              {t.legal.footerOfficialChannel}
             </div>
             <a
               href="mailto:contato@up2gether.com.br"
@@ -155,12 +157,12 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
               contato@up2gether.com.br
             </a>
             <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              Resposta em até 5 dias úteis
+              {t.legal.footerOfficialSla}
             </p>
           </div>
           <div>
             <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
-              Encarregado de dados (DPO)
+              {t.legal.footerDpo}
             </div>
             <a
               href="mailto:contato@up2gether.com.br?subject=DPO"
@@ -169,7 +171,7 @@ export function LegalLayout({ title, effectiveAt, updatedAt, summary, toc, child
               contato@up2gether.com.br
             </a>
             <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-              Assunto: DPO · Resposta em até 15 dias
+              {t.legal.footerDpoSla}
             </p>
           </div>
         </footer>

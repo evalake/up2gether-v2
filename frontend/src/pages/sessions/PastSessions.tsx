@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
 import { steamCover } from '@/lib/steamCover'
+import { useT } from '@/i18n'
+import { useLocaleStore } from '@/features/locale/store'
 
 type Props = {
   past: PlaySession[]
@@ -12,6 +14,9 @@ type Props = {
 }
 
 export function PastSessions({ past, games, isOpen, onToggle, onOpenDetail }: Props) {
+  const t = useT()
+  const locale = useLocaleStore((s) => s.locale)
+  const dtLocale = locale === 'pt' ? 'pt-BR' : 'en-US'
   if (past.length === 0) return null
   return (
     <section className="space-y-3">
@@ -20,7 +25,7 @@ export function PastSessions({ past, games, isOpen, onToggle, onOpenDetail }: Pr
         className="flex items-center gap-2 text-xs uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
       >
         <span>{isOpen ? '−' : '+'}</span>
-        <span>histórico</span>
+        <span>{t.sessions.history}</span>
         <span className="text-up-orange tabular-nums">{past.length}</span>
       </button>
       <AnimatePresence>
@@ -51,15 +56,15 @@ export function PastSessions({ past, games, isOpen, onToggle, onOpenDetail }: Pr
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="text-[10px] uppercase tracking-wider text-up-dim">
-                      {start.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
+                      {start.toLocaleDateString(dtLocale, { weekday: 'short', day: '2-digit', month: 'short' })}
                       {' · '}
-                      {start.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      {start.toLocaleTimeString(dtLocale, { hour: '2-digit', minute: '2-digit' })}
                     </div>
                     <div className="mt-0.5 truncate text-sm text-up-text">{s.title}</div>
-                    <div className="mt-1 truncate text-xs text-up-dim">{game?.name ?? '?'}</div>
+                    <div className="mt-1 truncate text-xs text-up-dim">{game?.name ?? t.sessions.noGameFallback}</div>
                     <div className="mt-2 flex items-center gap-3 text-[10px] uppercase tracking-wider text-up-dim">
-                      <span><span className="text-up-green tabular-nums">{s.rsvp_yes}</span> vieram</span>
-                      {s.rsvp_no > 0 && <span><span className="text-up-red tabular-nums">{s.rsvp_no}</span> não</span>}
+                      <span><span className="text-up-green tabular-nums">{s.rsvp_yes}</span> {t.sessions.cameShort}</span>
+                      {s.rsvp_no > 0 && <span><span className="text-up-red tabular-nums">{s.rsvp_no}</span> {t.sessions.notShort}</span>}
                       <span className="ml-auto text-up-dim">{s.duration_minutes / 60}h</span>
                     </div>
                   </div>

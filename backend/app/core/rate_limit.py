@@ -47,7 +47,7 @@ _auth_bucket = TokenBucket(capacity=10, refill_per_sec=10 / 60)
 _telemetry_bucket = TokenBucket(capacity=3, refill_per_sec=3 / 60)
 
 # mutations que disparam notify_group (webhook Discord + SSE + push + row em
-# notifications): current-game toggle, webhook update, theme overrides, etc.
+# notifications): current-game toggle, webhook update, etc.
 # Burst 5, sustentado 1 req / 2s por (user, group). flood vector evitado.
 _mutation_bucket = TokenBucket(capacity=5, refill_per_sec=0.5)
 

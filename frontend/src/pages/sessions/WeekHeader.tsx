@@ -1,6 +1,5 @@
 import { useRef } from 'react'
-
-const MONTHS_SHORT = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+import { useT } from '@/i18n'
 
 type ViewMode = 'grid' | 'list'
 
@@ -14,16 +13,20 @@ type Props = {
   onViewChange: (v: ViewMode) => void
 }
 
-function fmtRange(anchor: Date): string {
-  const end = new Date(anchor)
-  end.setDate(anchor.getDate() + 6)
-  const sameMonth = anchor.getMonth() === end.getMonth()
-  const a = `${MONTHS_SHORT[anchor.getMonth()]} ${anchor.getDate()}`
-  const b = sameMonth ? `${end.getDate()}` : `${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`
-  return `${a} a ${b}`
-}
-
 export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJump, onViewChange }: Props) {
+  const t = useT()
+  const months = t.sessions.monthsShort
+  const sep = t.sessions.weekRangeSep
+
+  function fmtRange(anchor: Date): string {
+    const end = new Date(anchor)
+    end.setDate(anchor.getDate() + 6)
+    const sameMonth = anchor.getMonth() === end.getMonth()
+    const a = `${months[anchor.getMonth()]} ${anchor.getDate()}`
+    const b = sameMonth ? `${end.getDate()}` : `${months[end.getMonth()]} ${end.getDate()}`
+    return `${a} ${sep} ${b}`
+  }
+
   const dateRef = useRef<HTMLInputElement>(null)
   const today = new Date()
   const isThisWeek = (() => {
@@ -45,8 +48,8 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
         <button
           type="button"
           onClick={onPrev}
-          aria-label="semana anterior"
-          title="semana anterior"
+          aria-label={t.sessions.prevWeek}
+          title={t.sessions.prevWeek}
           className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-up-orange/10 hover:text-up-orange"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
@@ -54,7 +57,7 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
         <button
           type="button"
           onClick={openPicker}
-          title="escolher data"
+          title={t.sessions.pickDate}
           className="relative min-w-[110px] rounded-full px-3 py-0.5 text-center text-[12px] text-up-text/90 tabular-nums transition-colors hover:bg-up-orange/10 hover:text-up-orange"
         >
           {fmtRange(weekAnchor)}
@@ -71,8 +74,8 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
         <button
           type="button"
           onClick={onNext}
-          aria-label="próxima semana"
-          title="próxima semana"
+          aria-label={t.sessions.nextWeek}
+          title={t.sessions.nextWeek}
           className="grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-up-orange/10 hover:text-up-orange"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
@@ -81,8 +84,8 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
           type="button"
           onClick={onToday}
           disabled={isThisWeek}
-          aria-label="semana de hoje"
-          title="ir pra semana de hoje"
+          aria-label={t.sessions.todayAria}
+          title={t.sessions.todayWeek}
           className="ml-0.5 grid h-7 w-7 place-items-center rounded-full transition-colors hover:bg-up-orange/10 hover:text-up-orange disabled:cursor-default disabled:text-up-dim/40 disabled:hover:bg-transparent disabled:hover:text-up-dim/40"
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z" /></svg>
@@ -93,19 +96,19 @@ export function WeekHeader({ weekAnchor, viewMode, onPrev, onNext, onToday, onJu
           type="button"
           onClick={() => onViewChange('grid')}
           aria-pressed={viewMode === 'grid'}
-          title="grade por horário"
+          title={t.sessions.gridTooltip}
           className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'grid' ? 'bg-up-orange/15 text-up-orange' : 'hover:text-up-orange'}`}
         >
-          grade
+          {t.sessions.gridView}
         </button>
         <button
           type="button"
           onClick={() => onViewChange('list')}
           aria-pressed={viewMode === 'list'}
-          title="lista por dia"
+          title={t.sessions.listTooltip}
           className={`rounded-full px-3 py-1 transition-colors ${viewMode === 'list' ? 'bg-up-orange/15 text-up-orange' : 'hover:text-up-orange'}`}
         >
-          lista
+          {t.sessions.listView}
         </button>
       </div>
     </div>

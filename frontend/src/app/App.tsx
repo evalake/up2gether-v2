@@ -16,7 +16,6 @@ const GroupAdminPage = lazy(() => import('@/pages/GroupAdminPage').then(m => ({ 
 const GamesPage = lazy(() => import('@/pages/GamesPage').then(m => ({ default: m.GamesPage })))
 const GameDetailPage = lazy(() => import('@/pages/GameDetailPage').then(m => ({ default: m.GameDetailPage })))
 const VotesPage = lazy(() => import('@/pages/VotesPage').then(m => ({ default: m.VotesPage })))
-const ThemesPage = lazy(() => import('@/pages/ThemesPage').then(m => ({ default: m.ThemesPage })))
 const SessionsPage = lazy(() => import('@/pages/SessionsPage').then(m => ({ default: m.SessionsPage })))
 const HistoryPage = lazy(() => import('@/pages/HistoryPage').then(m => ({ default: m.HistoryPage })))
 const SettingsPage = lazy(() => import('@/pages/SettingsPage').then(m => ({ default: m.SettingsPage })))
@@ -26,8 +25,7 @@ const AdminMetricsPage = lazy(() => import('@/pages/AdminMetricsPage').then(m =>
 import { RequireAuth } from './RequireAuth'
 import { Toaster } from '@/components/ui/Toaster'
 // SSE religado em modo seletivo: so "momentos grandes" (vote opened/closed,
-// phase advanced, theme decided, session created) disparam refetch. granular
-// fica com o poll.
+// phase advanced, session created) disparam refetch. granular fica com poll.
 import { useRealtime } from '@/lib/realtime'
 
 const queryClient = new QueryClient({
@@ -133,14 +131,6 @@ function AnimatedRoutes() {
             element={
               <RequireAuth>
                 <VotesPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/groups/:id/themes"
-            element={
-              <RequireAuth>
-                <ThemesPage />
               </RequireAuth>
             }
           />

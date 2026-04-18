@@ -35,7 +35,7 @@ def test_scoped_token_has_scope_claim():
 def test_get_current_user_rejects_scoped_token_payload():
     """Simula o check do get_current_user: payload com scope != None e rejeitado."""
     uid = uuid.uuid4()
-    tok = issue_scoped_token(uid, "google-link", ttl_seconds=60)
+    tok = issue_scoped_token(uid, "steam-link", ttl_seconds=60)
     payload = decode_access_token(tok)
     assert payload is not None
     # replica da guarda em app/core/security.py:77
@@ -116,7 +116,7 @@ def test_rate_limit_mutation_raises_429_on_flood():
 
 
 def test_encrypt_decrypt_roundtrip():
-    secret = "ya29.a0fake-google-access-token"
+    secret = "fake-steam-access-token"
     enc = encrypt_token(secret)
     assert enc != secret
     assert decrypt_token(enc) == secret

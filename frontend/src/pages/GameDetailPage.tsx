@@ -20,6 +20,7 @@ import { GameHero } from '@/components/games/GameHero'
 import { GameSidebar } from '@/components/games/GameSidebar'
 import { GameStatusBar } from '@/components/games/GameStatusBar'
 import { GameActionsBar } from '@/components/games/GameActionsBar'
+import { useT, type Translations } from '@/i18n'
 
 // stagger delay entre sections (30ms conforme UX guideline)
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.03 } } }
@@ -29,6 +30,7 @@ const fadeUp = {
 }
 
 export function GameDetailPage() {
+  const t = useT()
   const { id = '', gameId = '' } = useParams()
   const game = useGame(id, gameId)
   useTitle(game.data?.name)
@@ -66,7 +68,7 @@ export function GameDetailPage() {
             </>
           )}
           <Link to={`/groups/${id}/games`} className="transition-colors hover:text-up-orange">
-            biblioteca
+            {t.games.library}
           </Link>
         </nav>
         <GameActionsBar
@@ -110,28 +112,28 @@ export function GameDetailPage() {
                   {v.viability_score.toFixed(0)}
                   <span className="text-lg text-up-dim">%</span>
                 </span>
-                <span className="text-[11px] uppercase tracking-wider text-up-dim">viabilidade</span>
+                <span className="text-[11px] uppercase tracking-wider text-up-dim">{t.games.viability}</span>
               </div>
-              <ViabilityChip score={v.viability_score} />
+              <ViabilityChip score={v.viability_score} t={t} />
             </div>
-            <p className="mb-3 text-xs leading-relaxed text-up-dim">{viabilitySummary(v)}</p>
+            <p className="mb-3 text-xs leading-relaxed text-up-dim">{viabilitySummary(v, t)}</p>
             <div className="mb-3 text-[11px] tracking-wider text-up-dim">
-              <span className="uppercase">interesse do grupo:</span>{' '}
-              <span className="font-mono tabular-nums text-up-green">{v.interest_want_count}</span> {v.interest_want_count === 1 ? 'quer' : 'querem'},{' '}
-              <span className="font-mono tabular-nums text-up-amber">{v.interest_ok_count}</span> {v.interest_ok_count === 1 ? 'topa' : 'topam'},{' '}
-              <span className="font-mono tabular-nums text-up-red">{v.interest_pass_count}</span> {v.interest_pass_count === 1 ? 'passa' : 'passam'}
+              <span className="uppercase">{t.games.groupInterest}</span>{' '}
+              <span className="font-mono tabular-nums text-up-green">{v.interest_want_count}</span> {t.games.want(v.interest_want_count)},{' '}
+              <span className="font-mono tabular-nums text-up-amber">{v.interest_ok_count}</span> {t.games.ok(v.interest_ok_count)},{' '}
+              <span className="font-mono tabular-nums text-up-red">{v.interest_pass_count}</span> {t.games.pass(v.interest_pass_count)}
             </div>
             <div className="space-y-2">
-              <EnergyBar label="PREÇO" value={v.price_score} color="green" />
-              <EnergyBar label="HARDWARE" value={v.hardware_fit_percent} color="amber" />
-              <EnergyBar label="INTERESSE" value={v.interest_score} color="orange" />
+              <EnergyBar label={t.games.price.toUpperCase()} value={v.price_score} color="green" />
+              <EnergyBar label={t.games.hardware.toUpperCase()} value={v.hardware_fit_percent} color="amber" />
+              <EnergyBar label={t.games.interest.toUpperCase()} value={v.interest_score} color="orange" />
             </div>
           </motion.section>
 
           {/* descricao */}
           {g.description && (
             <motion.section variants={fadeUp} className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
-              <div className="mb-2 text-[10px] uppercase tracking-wider text-up-dim">descrição</div>
+              <div className="mb-2 text-[10px] uppercase tracking-wider text-up-dim">{t.games.description}</div>
               <p className="whitespace-pre-line text-sm leading-relaxed text-up-text">{g.description}</p>
             </motion.section>
           )}
@@ -141,7 +143,7 @@ export function GameDetailPage() {
             <motion.section variants={fadeUp} className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-4">
               {g.genres.length > 0 && (
                 <div>
-                  <div className="mb-1.5 text-[10px] uppercase tracking-wider text-up-dim">gêneros</div>
+                  <div className="mb-1.5 text-[10px] uppercase tracking-wider text-up-dim">{t.games.genres}</div>
                   <div className="flex flex-wrap gap-1">
                     {g.genres.map((x) => (
                       <span key={`g-${x}`} className="rounded-sm border border-up-orange/30 bg-up-orange/5 px-2 py-0.5 text-[10px] text-up-text transition-colors hover:border-up-orange/60 hover:text-up-orange">
@@ -151,7 +153,7 @@ export function GameDetailPage() {
                   </div>
                 </div>
               )}
-              {g.tags.length > 0 && <CollapsibleTags tags={g.tags} hasGenres={g.genres.length > 0} />}
+              {g.tags.length > 0 && <CollapsibleTags tags={g.tags} hasGenres={g.genres.length > 0} t={t} />}
             </motion.section>
           )}
         </motion.div>
@@ -171,15 +173,15 @@ export function GameDetailPage() {
   )
 }
 
-function ViabilityChip({ score }: { score: number }) {
+function ViabilityChip({ score, t }: { score: number; t: Translations }) {
   const cfg =
     score >= 75
-      ? { label: 'forte candidato', cls: 'border-up-green/60 bg-up-green/10 text-up-green' }
+      ? { label: t.games.strongCandidate, cls: 'border-up-green/60 bg-up-green/10 text-up-green' }
       : score >= 50
-        ? { label: 'bom candidato', cls: 'border-up-amber/60 bg-up-amber/10 text-up-amber' }
+        ? { label: t.games.goodCandidate, cls: 'border-up-amber/60 bg-up-amber/10 text-up-amber' }
         : score >= 25
-          ? { label: 'precisa de interesse', cls: 'border-up-orange/50 bg-up-orange/10 text-up-orange' }
-          : { label: 'difícil de viabilizar', cls: 'border-up-line bg-black/40 text-up-dim' }
+          ? { label: t.games.needsInterest, cls: 'border-up-orange/50 bg-up-orange/10 text-up-orange' }
+          : { label: t.games.hardToViabilize, cls: 'border-up-line bg-black/40 text-up-dim' }
   return (
     <span className={`rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${cfg.cls}`}>
       {cfg.label}
@@ -187,23 +189,26 @@ function ViabilityChip({ score }: { score: number }) {
   )
 }
 
-function viabilitySummary(v: { price_score: number; hardware_fit_percent: number; interest_score: number }): string {
-  const price = v.price_score >= 70 ? 'Preço acessível' : v.price_score >= 40 ? 'Preço moderado' : 'Preço alto'
-  const hw = v.hardware_fit_percent >= 70 ? 'roda bem para o grupo' : v.hardware_fit_percent >= 40 ? 'hardware exige atenção' : 'hardware pesado para o grupo'
-  const interest = v.interest_score >= 70 ? 'interesse alto' : v.interest_score >= 40 ? 'interesse moderado' : 'pouco interesse ainda'
-  return `${price}, ${hw} e ${interest}.`
+function viabilitySummary(
+  v: { price_score: number; hardware_fit_percent: number; interest_score: number },
+  t: Translations,
+): string {
+  const price = v.price_score >= 70 ? t.games.priceAffordable : v.price_score >= 40 ? t.games.priceModerate : t.games.priceHigh
+  const hw = v.hardware_fit_percent >= 70 ? t.games.hwRunsWell : v.hardware_fit_percent >= 40 ? t.games.hwNeedsAttention : t.games.hwHeavy
+  const interest = v.interest_score >= 70 ? t.games.interestHigh : v.interest_score >= 40 ? t.games.interestModerate : t.games.interestLow
+  return `${price}, ${hw} ${t.common.and} ${interest}.`
 }
 
 const TAG_LIMIT = 8
 
-function CollapsibleTags({ tags, hasGenres }: { tags: string[]; hasGenres: boolean }) {
+function CollapsibleTags({ tags, hasGenres, t }: { tags: string[]; hasGenres: boolean; t: Translations }) {
   const [expanded, setExpanded] = useState(false)
   const needsCollapse = tags.length > TAG_LIMIT
   const visible = expanded || !needsCollapse ? tags : tags.slice(0, TAG_LIMIT)
 
   return (
     <div className={hasGenres ? 'mt-2.5' : ''}>
-      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-up-dim">categorias</div>
+      <div className="mb-1.5 text-[10px] uppercase tracking-wider text-up-dim">{t.games.categories}</div>
       <div className="flex flex-wrap gap-1">
         {visible.map((x) => (
           <span key={`t-${x}`} className="rounded-sm border border-up-line/60 px-1.5 py-0.5 text-[10px] text-up-dim transition-colors hover:border-up-line hover:text-up-text">
@@ -216,7 +221,7 @@ function CollapsibleTags({ tags, hasGenres }: { tags: string[]; hasGenres: boole
             onClick={() => setExpanded((v) => !v)}
             className="rounded-sm border border-up-line/40 px-1.5 py-0.5 text-[10px] text-up-dim transition-colors hover:border-up-orange/40 hover:text-up-orange"
           >
-            {expanded ? 'ver menos' : `+${tags.length - TAG_LIMIT} mais`}
+            {expanded ? t.common.showLess : t.common.showMore(tags.length - TAG_LIMIT)}
           </button>
         )}
       </div>

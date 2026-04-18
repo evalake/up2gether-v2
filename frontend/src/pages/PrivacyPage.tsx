@@ -1,405 +1,311 @@
 import { LegalLayout } from './LegalLayout'
-
-const TOC = [
-  { id: 's1', label: '1. Quem somos' },
-  { id: 's2', label: '2. Definições' },
-  { id: 's3', label: '3. Dados que coletamos' },
-  { id: 's4', label: '4. Bases legais' },
-  { id: 's5', label: '5. Compartilhamento' },
-  { id: 's6', label: '6. Transferência internacional' },
-  { id: 's7', label: '7. Prazos de retenção' },
-  { id: 's8', label: '8. Seus direitos' },
-  { id: 's9', label: '9. Segurança' },
-  { id: 's10', label: '10. Crianças' },
-  { id: 's11', label: '11. Cookies' },
-  { id: 's12', label: '12. Alterações' },
-  { id: 's13', label: '13. Contato' },
-]
+import { useT } from '@/i18n'
 
 export function PrivacyPage() {
+  const t = useT()
+  const toc = [
+    { id: 's1', label: t.privacy.toc1 },
+    { id: 's2', label: t.privacy.toc2 },
+    { id: 's3', label: t.privacy.toc3 },
+    { id: 's4', label: t.privacy.toc4 },
+    { id: 's5', label: t.privacy.toc5 },
+    { id: 's6', label: t.privacy.toc6 },
+    { id: 's7', label: t.privacy.toc7 },
+    { id: 's8', label: t.privacy.toc8 },
+    { id: 's9', label: t.privacy.toc9 },
+    { id: 's10', label: t.privacy.toc10 },
+    { id: 's11', label: t.privacy.toc11 },
+    { id: 's12', label: t.privacy.toc12 },
+    { id: 's13', label: t.privacy.toc13 },
+  ]
+
   return (
     <LegalLayout
-      title="Política de Privacidade"
-      effectiveAt="16 de abril de 2026"
-      updatedAt="16 de abril de 2026"
-      toc={TOC}
+      title={t.privacy.title}
+      effectiveAt={t.privacy.effectiveAt}
+      updatedAt={t.privacy.updatedAt}
+      toc={toc}
       summary={
         <>
-          <p>
-            O Up2Gether só coleta o necessário para organizar sessões de jogo no seu
-            grupo do Discord. Em linhas gerais:
-          </p>
+          <p>{t.privacy.summaryIntro}</p>
           <ul>
             <li>
-              O login usa OAuth do Discord. Recebemos o seu ID, nome, avatar e a lista
-              de servidores. <strong>Não recebemos</strong> senhas, e-mail nem
-              mensagens.
+              {t.privacy.summaryOauth}
+              <strong>{t.privacy.summaryOauthBold}</strong>
+              {t.privacy.summaryOauthEnd}
             </li>
-            <li>
-              Biblioteca Steam e Google Calendar são integrações opcionais, ligadas
-              apenas se você autorizar.
-            </li>
-            <li>Não vendemos dados, não rastreamos com cookies de terceiros.</li>
-            <li>
-              Você pode exportar ou excluir os seus dados a qualquer momento, sem
-              custo, em até 15 dias corridos.
-            </li>
+            <li>{t.privacy.summarySteam}</li>
+            <li>{t.privacy.summaryNoSell}</li>
+            <li>{t.privacy.summaryExport}</li>
           </ul>
         </>
       }
     >
       <section id="s1">
-        <h2>1. Quem somos</h2>
+        <h2>{t.privacy.s1title}</h2>
         <p>
-          Up2Gether é uma plataforma para coordenação de sessões de jogo em
-          comunidades do Discord. Este documento descreve quais dados pessoais
-          coletamos, por que coletamos, com quem compartilhamos e como você pode
-          exercer os seus direitos previstos na{' '}
-          <strong>
-            Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018)
-          </strong>.
+          {t.privacy.s1p1}
+          <strong>{t.privacy.s1p1bold}</strong>
+          {t.privacy.s1p1end}
         </p>
         <p>
-          A identificação completa do controlador (razão social, CNPJ e endereço)
-          pode ser obtida a qualquer momento pelo canal oficial, indicado no fim
-          deste documento. O Encarregado de Tratamento de Dados (DPO) é acessível
-          pelo mesmo canal, com o assunto <code>DPO</code>.
+          {t.privacy.s1p2pre}
+          <code>{t.privacy.s1p2code}</code>
+          {t.privacy.s1p2end}
         </p>
       </section>
 
       <section id="s2">
-        <h2>2. Definições</h2>
-        <p>
-          Para facilitar a leitura, alguns termos têm significado específico neste
-          documento:
-        </p>
+        <h2>{t.privacy.s2title}</h2>
+        <p>{t.privacy.s2intro}</p>
         <ul>
           <li>
-            <strong>Serviço</strong>: o aplicativo web, o bot do Discord e as
-            integrações correlatas do Up2Gether.
+            <strong>{t.privacy.s2service}</strong>
+            {t.privacy.s2serviceDesc}
           </li>
           <li>
-            <strong>Usuário</strong>: pessoa física que acessa o Serviço por meio
-            de conta do Discord.
+            <strong>{t.privacy.s2user}</strong>
+            {t.privacy.s2userDesc}
           </li>
           <li>
-            <strong>Grupo</strong>: espaço de coordenação atrelado a um servidor do
-            Discord, onde o usuário vota, agenda e registra presença em sessões.
+            <strong>{t.privacy.s2group}</strong>
+            {t.privacy.s2groupDesc}
           </li>
           <li>
-            <strong>Administrador do grupo</strong>: usuário com permissão de
-            gerenciar o grupo no Up2Gether.
+            <strong>{t.privacy.s2admin}</strong>
+            {t.privacy.s2adminDesc}
           </li>
           <li>
-            <strong>Dados pessoais</strong>: qualquer informação que permita
-            identificar, direta ou indiretamente, o titular.
+            <strong>{t.privacy.s2data}</strong>
+            {t.privacy.s2dataDesc}
           </li>
         </ul>
       </section>
 
       <section id="s3">
-        <h2>3. Dados que coletamos</h2>
+        <h2>{t.privacy.s3title}</h2>
 
-        <h3>3.1 Identificação via Discord</h3>
-        <p>
-          O acesso é feito exclusivamente por OAuth do Discord. Ao autorizar o
-          login, recebemos:
-        </p>
+        <h3>{t.privacy.s3_1title}</h3>
+        <p>{t.privacy.s3_1intro}</p>
         <table>
           <thead>
             <tr>
-              <th>Campo</th>
-              <th>Finalidade</th>
-              <th>Origem</th>
+              <th>{t.privacy.s3_1thField}</th>
+              <th>{t.privacy.s3_1thPurpose}</th>
+              <th>{t.privacy.s3_1thOrigin}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>ID do Discord</td>
-              <td>identificador único da sua conta</td>
-              <td>Discord OAuth</td>
+              <td>{t.privacy.s3_1discordId}</td>
+              <td>{t.privacy.s3_1discordIdPurpose}</td>
+              <td>{t.privacy.s3_1discordIdOrigin}</td>
             </tr>
             <tr>
-              <td>Nome de usuário e nome de exibição</td>
-              <td>identificação visual dentro do Serviço</td>
-              <td>Discord OAuth</td>
+              <td>{t.privacy.s3_1username}</td>
+              <td>{t.privacy.s3_1usernamePurpose}</td>
+              <td>{t.privacy.s3_1usernameOrigin}</td>
             </tr>
             <tr>
-              <td>Avatar</td>
-              <td>identificação visual (imagem de perfil)</td>
-              <td>Discord CDN</td>
+              <td>{t.privacy.s3_1avatar}</td>
+              <td>{t.privacy.s3_1avatarPurpose}</td>
+              <td>{t.privacy.s3_1avatarOrigin}</td>
             </tr>
             <tr>
-              <td>Lista de servidores (guilds)</td>
-              <td>localizar os grupos aos quais você pertence</td>
-              <td>Discord OAuth</td>
+              <td>{t.privacy.s3_1guilds}</td>
+              <td>{t.privacy.s3_1guildsPurpose}</td>
+              <td>{t.privacy.s3_1guildsOrigin}</td>
             </tr>
           </tbody>
         </table>
         <p>
-          <strong>Não recebemos</strong> a sua senha do Discord, o seu endereço de
-          e-mail, o conteúdo de mensagens privadas ou o histórico de conversas.
+          <strong>{t.privacy.s3_1notReceive}</strong>
+          {t.privacy.s3_1notReceiveEnd}
         </p>
 
-        <h3>3.2 Biblioteca Steam (opcional)</h3>
-        <p>
-          Se você optar por conectar a sua conta Steam, consultamos a API pública
-          da Valve para listar os jogos que você possui. Essa informação é usada
-          apenas para cruzar a biblioteca dos membros do grupo e sugerir títulos
-          jogáveis por todos. A integração pode ser desligada a qualquer momento,
-          o que remove os dados de jogos associados ao seu perfil.
-        </p>
+        <h3>{t.privacy.s3_2title}</h3>
+        <p>{t.privacy.s3_2body}</p>
 
-        <h3>3.3 Google Calendar (opcional)</h3>
-        <p>
-          Caso autorize, criamos eventos no seu Google Calendar para sessões
-          confirmadas. Utilizamos apenas o escopo de escrita em eventos criados
-          pelo Serviço. <strong>Não lemos</strong> a sua agenda pessoal nem
-          eventos de terceiros.
-        </p>
+        <h3>{t.privacy.s3_3title}</h3>
+        <p>{t.privacy.s3_3body}</p>
 
-        <h3>3.4 Dados de uso</h3>
+        <h3>{t.privacy.s3_4title}</h3>
         <p>
-          Registramos a sua atividade dentro do Serviço para exibir histórico,
-          calcular estatísticas e operar as funcionalidades: grupos criados ou
-          ingressados, votos registrados, sessões agendadas, confirmações de
-          presença, temas propostos e comentários postados no contexto dos grupos.
-        </p>
-
-        <h3>3.5 Dados técnicos</h3>
-        <p>
-          Para fins de segurança e diagnóstico, registramos em logs de servidor:
-          endereço IP parcial, identificador do navegador (user agent), carimbo
-          de tempo e rota acessada. Esses registros são mantidos por{' '}
-          <strong>no máximo 90 dias</strong>.
+          {t.privacy.s3_4body1}
+          <strong>{t.privacy.s3_4bold}</strong>
+          {t.privacy.s3_4body2}
         </p>
       </section>
 
       <section id="s4">
-        <h2>4. Bases legais para o tratamento</h2>
-        <p>
-          Conforme o art. 7º da LGPD, o tratamento realizado pelo Up2Gether se
-          fundamenta nas seguintes hipóteses:
-        </p>
+        <h2>{t.privacy.s4title}</h2>
+        <p>{t.privacy.s4intro}</p>
         <table>
           <thead>
             <tr>
-              <th>Dado</th>
-              <th>Base legal</th>
+              <th>{t.privacy.s4thData}</th>
+              <th>{t.privacy.s4thBasis}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Identificação Discord, grupos, votos, sessões</td>
-              <td>Execução de contrato (art. 7º, V)</td>
+              <td>{t.privacy.s4row1data}</td>
+              <td>{t.privacy.s4row1basis}</td>
             </tr>
             <tr>
-              <td>Biblioteca Steam, Google Calendar</td>
-              <td>Consentimento (art. 7º, I), revogável a qualquer momento</td>
+              <td>{t.privacy.s4row2data}</td>
+              <td>{t.privacy.s4row2basis}</td>
             </tr>
             <tr>
-              <td>Logs técnicos e prevenção a abuso</td>
-              <td>Legítimo interesse (art. 7º, IX)</td>
+              <td>{t.privacy.s4row3data}</td>
+              <td>{t.privacy.s4row3basis}</td>
             </tr>
             <tr>
-              <td>Dados fiscais, caso você se torne assinante</td>
-              <td>Obrigação legal ou regulatória (art. 7º, II)</td>
+              <td>{t.privacy.s4row4data}</td>
+              <td>{t.privacy.s4row4basis}</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <section id="s5">
-        <h2>5. Compartilhamento de dados</h2>
+        <h2>{t.privacy.s5title}</h2>
         <p>
-          <strong>Não vendemos</strong> os seus dados. Compartilhamos informações
-          apenas com operadores que executam a infraestrutura do Serviço, nos
-          limites estritamente necessários para a prestação contratada:
+          <strong>{t.privacy.s5intro1}</strong>
+          {t.privacy.s5intro2}
         </p>
         <table>
           <thead>
             <tr>
-              <th>Operador</th>
-              <th>Função</th>
+              <th>{t.privacy.s5thOperator}</th>
+              <th>{t.privacy.s5thFunction}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Discord</td>
-              <td>provedor de identidade, hospedagem do bot oficial</td>
+              <td>{t.privacy.s5discord}</td>
+              <td>{t.privacy.s5discordFn}</td>
             </tr>
             <tr>
-              <td>Valve (Steam)</td>
-              <td>consulta de biblioteca de jogos, quando autorizado</td>
+              <td>{t.privacy.s5valve}</td>
+              <td>{t.privacy.s5valveFn}</td>
             </tr>
             <tr>
-              <td>Google</td>
-              <td>criação de eventos no Calendar, quando autorizado</td>
+              <td>{t.privacy.s5vercel}</td>
+              <td>{t.privacy.s5vercelFn}</td>
             </tr>
             <tr>
-              <td>Vercel</td>
-              <td>hospedagem do aplicativo web</td>
+              <td>{t.privacy.s5fly}</td>
+              <td>{t.privacy.s5flyFn}</td>
             </tr>
             <tr>
-              <td>Fly.io</td>
-              <td>hospedagem do backend e do bot</td>
+              <td>{t.privacy.s5neon}</td>
+              <td>{t.privacy.s5neonFn}</td>
             </tr>
             <tr>
-              <td>Neon</td>
-              <td>banco de dados PostgreSQL</td>
-            </tr>
-            <tr>
-              <td>Cloudflare</td>
-              <td>CDN, DNS e proteção contra abuso</td>
+              <td>{t.privacy.s5cf}</td>
+              <td>{t.privacy.s5cfFn}</td>
             </tr>
           </tbody>
         </table>
-        <p>
-          Todos os operadores atuam sob contrato de confidencialidade. Podemos
-          compartilhar dados mediante ordem judicial ou requisição válida de
-          autoridade competente, nos termos da legislação aplicável.
-        </p>
+        <p>{t.privacy.s5outro}</p>
       </section>
 
       <section id="s6">
-        <h2>6. Transferência internacional</h2>
-        <p>
-          Parte dos operadores listados acima processa dados fora do território
-          nacional, principalmente nos Estados Unidos e em países da União
-          Europeia. Em qualquer transferência internacional, observamos o
-          Capítulo V da LGPD, adotando garantias contratuais apropriadas e
-          verificando o nível de proteção do país de destino.
-        </p>
+        <h2>{t.privacy.s6title}</h2>
+        <p>{t.privacy.s6body}</p>
       </section>
 
       <section id="s7">
-        <h2>7. Prazos de retenção</h2>
+        <h2>{t.privacy.s7title}</h2>
         <table>
           <thead>
             <tr>
-              <th>Categoria</th>
-              <th>Retenção</th>
+              <th>{t.privacy.s7thCategory}</th>
+              <th>{t.privacy.s7thRetention}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Dados da conta ativa</td>
-              <td>enquanto a conta estiver em uso</td>
+              <td>{t.privacy.s7row1cat}</td>
+              <td>{t.privacy.s7row1ret}</td>
             </tr>
             <tr>
-              <td>Após solicitação de exclusão</td>
-              <td>
-                até 30 dias em backup operacional, seguido de apagamento
-                definitivo
-              </td>
+              <td>{t.privacy.s7row2cat}</td>
+              <td>{t.privacy.s7row2ret}</td>
             </tr>
             <tr>
-              <td>Logs técnicos (IP, user agent, rotas)</td>
-              <td>até 90 dias</td>
+              <td>{t.privacy.s7row3cat}</td>
+              <td>{t.privacy.s7row3ret}</td>
             </tr>
             <tr>
-              <td>
-                Dados fiscais, caso exista relação de pagamento no futuro
-              </td>
-              <td>5 anos, por obrigação legal</td>
+              <td>{t.privacy.s7row4cat}</td>
+              <td>{t.privacy.s7row4ret}</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <section id="s8">
-        <h2>8. Seus direitos como titular</h2>
-        <p>A LGPD garante, a qualquer momento, o direito de:</p>
+        <h2>{t.privacy.s8title}</h2>
+        <p>{t.privacy.s8intro}</p>
         <ul>
+          <li>{t.privacy.s8r1}</li>
+          <li>{t.privacy.s8r2}</li>
+          <li>{t.privacy.s8r3}</li>
+          <li>{t.privacy.s8r4}</li>
+          <li>{t.privacy.s8r5}</li>
+          <li>{t.privacy.s8r6}</li>
           <li>
-            confirmar a existência do tratamento e acessar os dados que mantemos
-            sobre você;
-          </li>
-          <li>corrigir dados incompletos, incorretos ou desatualizados;</li>
-          <li>
-            solicitar anonimização, bloqueio ou eliminação de dados tratados em
-            desconformidade com a lei;
-          </li>
-          <li>solicitar portabilidade dos dados para outro fornecedor;</li>
-          <li>
-            revogar o consentimento das integrações opcionais, a qualquer tempo;
-          </li>
-          <li>
-            obter informação sobre entidades com as quais compartilhamos seus
-            dados;
-          </li>
-          <li>
-            apresentar reclamação à{' '}
-            <strong>Autoridade Nacional de Proteção de Dados (ANPD)</strong>.
+            {t.privacy.s8r7pre}
+            <strong>{t.privacy.s8r7bold}</strong>
+            {t.privacy.s8r7post}
           </li>
         </ul>
         <p>
-          Para exercer qualquer desses direitos, escreva para o canal oficial com
-          o assunto <code>LGPD</code>. O prazo máximo de resposta é de{' '}
-          <strong>15 dias corridos</strong>, contados do recebimento da
-          solicitação.
+          {t.privacy.s8outro1}
+          <code>{t.privacy.s8outroCode}</code>
+          {t.privacy.s8outro2}
+          <strong>{t.privacy.s8outroBold}</strong>
+          {t.privacy.s8outro3}
         </p>
       </section>
 
       <section id="s9">
-        <h2>9. Segurança da informação</h2>
-        <p>
-          Não armazenamos senhas de Discord, Google ou Steam. Toda autenticação
-          ocorre nos provedores originais e recebemos apenas tokens de acesso com
-          escopo limitado. Todo o tráfego trafega sobre HTTPS. O banco de dados
-          opera com criptografia em repouso e backups diários. O acesso interno é
-          restrito ao time técnico, com autenticação multi-fator.
-        </p>
-        <p>
-          Em caso de incidente de segurança que afete seus dados pessoais, a
-          comunicação à ANPD e aos titulares afetados será realizada dentro do
-          prazo estabelecido pela LGPD.
-        </p>
+        <h2>{t.privacy.s9title}</h2>
+        <p>{t.privacy.s9p1}</p>
+        <p>{t.privacy.s9p2}</p>
       </section>
 
       <section id="s10">
-        <h2>10. Crianças e adolescentes</h2>
-        <p>
-          O Serviço não é destinado a menores de 13 anos. Para usuários entre 13
-          e 18 anos, recomendamos o uso com ciência e autorização dos
-          responsáveis. Identificado tratamento de dados de menor de 13 anos sem
-          autorização, a exclusão será imediata.
-        </p>
+        <h2>{t.privacy.s10title}</h2>
+        <p>{t.privacy.s10body}</p>
       </section>
 
       <section id="s11">
-        <h2>11. Cookies e armazenamento local</h2>
-        <p>
-          Não utilizamos cookies de rastreamento de terceiros. Não há Google
-          Analytics, Meta Pixel ou ferramentas equivalentes. O único dado
-          armazenado no seu navegador é um token de sessão, estritamente
-          necessário para manter o usuário autenticado.
-        </p>
+        <h2>{t.privacy.s11title}</h2>
+        <p>{t.privacy.s11body}</p>
       </section>
 
       <section id="s12">
-        <h2>12. Alterações desta política</h2>
+        <h2>{t.privacy.s12title}</h2>
         <p>
-          Alterações relevantes nesta política serão comunicadas com pelo menos{' '}
-          <strong>30 dias de antecedência</strong>, por e-mail cadastrado no
-          Discord e dentro do próprio aplicativo. Ajustes menores, como correções
-          ortográficas ou atualização de links, passam a valer a partir da data
-          indicada no topo deste documento.
+          {t.privacy.s12body1}
+          <strong>{t.privacy.s12bold}</strong>
+          {t.privacy.s12body2}
         </p>
       </section>
 
       <section id="s13">
-        <h2>13. Contato</h2>
+        <h2>{t.privacy.s13title}</h2>
         <p>
-          Para qualquer dúvida, reclamação ou solicitação relacionada aos seus
-          dados pessoais, escreva para{' '}
-          <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>.
-          Assuntos relacionados ao Encarregado pelo Tratamento de Dados Pessoais
-          (DPO) devem ser enviados para o mesmo canal com o assunto{' '}
-          <code>DPO</code>. Reclamações relativas à LGPD podem também ser
-          apresentadas diretamente à ANPD por meio dos canais oficiais em{' '}
+          {t.privacy.s13body1}
+          <a href="mailto:contato@up2gether.com.br">contato@up2gether.com.br</a>
+          {t.privacy.s13body2}
+          <code>{t.privacy.s13code}</code>
+          {t.privacy.s13body3}
           <a href="https://www.gov.br/anpd" target="_blank" rel="noopener noreferrer">
-            gov.br/anpd
+            {t.privacy.s13anpdUrl}
           </a>
           .
         </p>

@@ -1,7 +1,7 @@
 """Fernet pra criptografar tokens OAuth at-rest (integration_accounts).
 
-Motivacao: access/refresh do Google/Steam ficavam plaintext no banco. Se backup
-vaza ou snapshot Neon escapa, atacante loga no Calendar do user direto.
+Motivacao: access/refresh do Steam ficavam plaintext no banco. Se backup vaza
+ou snapshot Neon escapa, atacante reusa o token direto.
 
 Legado: tokens plaintext existentes sao detectados no decrypt (fernet falha) e
 retornados as-is. Ciclam pra encrypted no proximo refresh OAuth.

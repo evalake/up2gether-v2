@@ -86,7 +86,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
-          <span className="tabular-nums text-up-orange">{list.length}</span> total
+          <span className="tabular-nums text-up-orange">{list.length}</span> {t.admin.totalLabel}
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
 
       {filtered.length === 0 ? (
         <div className="mt-4 py-6 text-center text-[11px] text-up-dim">
-          {q ? `nenhuma sessão pra "${q}"` : 'nenhuma sessão ainda'}
+          {q ? t.admin.noSessionsMatching(q) : t.admin.noSessionsYet}
         </div>
       ) : (
         <div className="mt-4 divide-y divide-up-line/30">
@@ -141,7 +141,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm text-up-text">{s.title}</span>
                     <span className={`font-mono text-[10px] uppercase tracking-wider ${isPast ? 'text-up-dim' : 'text-up-green'}`}>
-                      {isPast ? 'passada' : 'futura'}
+                      {isPast ? t.admin.sessionPast : t.admin.sessionFuture}
                     </span>
                   </div>
                   <div className="truncate font-mono text-[10px] uppercase tracking-wider text-up-dim">
@@ -150,12 +150,12 @@ export function SessionsTab({ groupId }: { groupId: string }) {
                 </div>
                 {confirming ? (
                   <div className="flex shrink-0 gap-1">
-                    <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim">cancelar</button>
-                    <button onClick={() => deleteOne(s.id)} className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red">confirmar</button>
+                    <button onClick={() => setPendingDelete(null)} className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim">{t.common.cancel}</button>
+                    <button onClick={() => deleteOne(s.id)} className="rounded-sm border border-up-red/60 bg-up-red/10 px-2 py-1 font-mono text-[10px] text-up-red">{t.common.confirm}</button>
                   </div>
                 ) : (
                   <button onClick={() => setPendingDelete(s.id)} className="shrink-0 rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red">
-                    apagar
+                    {t.admin.sessionDelete}
                   </button>
                 )}
               </div>

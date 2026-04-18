@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useT } from '@/i18n'
 
 type Channel = {
   label: string
@@ -8,54 +9,6 @@ type Channel = {
   sla: string
 }
 
-const CHANNELS: Channel[] = [
-  {
-    label: 'Suporte geral',
-    email: 'contato@up2gether.com.br',
-    body:
-      'Dúvidas sobre o produto, bugs, sugestões de funcionalidades e pedidos relativos à conta.',
-    sla: 'Resposta em até 5 dias úteis',
-  },
-  {
-    label: 'Privacidade e LGPD',
-    email: 'contato@up2gether.com.br',
-    subject: 'LGPD',
-    body:
-      'Solicitações de acesso, correção, portabilidade ou exclusão de dados, revogação de consentimento e reclamações relacionadas à Lei Geral de Proteção de Dados.',
-    sla: 'Resposta em até 15 dias corridos',
-  },
-  {
-    label: 'Encarregado de dados (DPO)',
-    email: 'contato@up2gether.com.br',
-    subject: 'DPO',
-    body:
-      'Contato direto com o Encarregado de Tratamento de Dados Pessoais para demandas formais previstas no art. 41 da LGPD.',
-    sla: 'Resposta em até 15 dias corridos',
-  },
-  {
-    label: 'Segurança',
-    email: 'contato@up2gether.com.br',
-    subject: 'SECURITY',
-    body:
-      'Divulgação responsável de vulnerabilidades. Inclua passos de reprodução e impacto estimado. Pedimos que não divulgue publicamente antes da correção.',
-    sla: 'Reconhecimento em até 48 horas',
-  },
-  {
-    label: 'Imprensa e parcerias',
-    email: 'contato@up2gether.com.br',
-    subject: 'IMPRENSA',
-    body:
-      'Entrevistas, solicitações de material de imprensa, propostas de parceria com criadores de conteúdo e integrações comerciais.',
-    sla: 'Resposta em até 10 dias úteis',
-  },
-]
-
-const NAV = [
-  { to: '/privacy', label: 'Privacidade' },
-  { to: '/terms', label: 'Termos' },
-  { to: '/contact', label: 'Contato' },
-]
-
 function mailHref(c: Channel) {
   const q = new URLSearchParams()
   if (c.subject) q.set('subject', c.subject)
@@ -64,6 +17,51 @@ function mailHref(c: Channel) {
 }
 
 export function ContactPage() {
+  const t = useT()
+
+  const channels: Channel[] = [
+    {
+      label: t.contact.channelGeneral,
+      email: 'contato@up2gether.com.br',
+      body: t.contact.channelGeneralBody,
+      sla: t.contact.channelGeneralSla,
+    },
+    {
+      label: t.contact.channelPrivacy,
+      email: 'contato@up2gether.com.br',
+      subject: 'LGPD',
+      body: t.contact.channelPrivacyBody,
+      sla: t.contact.channelPrivacySla,
+    },
+    {
+      label: t.contact.channelDpo,
+      email: 'contato@up2gether.com.br',
+      subject: 'DPO',
+      body: t.contact.channelDpoBody,
+      sla: t.contact.channelDpoSla,
+    },
+    {
+      label: t.contact.channelSecurity,
+      email: 'contato@up2gether.com.br',
+      subject: 'SECURITY',
+      body: t.contact.channelSecurityBody,
+      sla: t.contact.channelSecuritySla,
+    },
+    {
+      label: t.contact.channelPress,
+      email: 'contato@up2gether.com.br',
+      subject: 'IMPRENSA',
+      body: t.contact.channelPressBody,
+      sla: t.contact.channelPressSla,
+    },
+  ]
+
+  const nav = [
+    { to: '/privacy', label: t.contact.navPrivacy },
+    { to: '/terms', label: t.contact.navTerms },
+    { to: '/contact', label: t.contact.navContact },
+  ]
+
   return (
     <div className="min-h-screen bg-up-bg text-up-dim">
       <header className="border-b border-up-line bg-black/40 backdrop-blur">
@@ -76,7 +74,7 @@ export function ContactPage() {
             <span className="font-display text-lg text-up-orange">Up2Gether</span>
           </Link>
           <nav className="flex items-center gap-6 text-[11px] uppercase tracking-widest">
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
@@ -91,7 +89,7 @@ export function ContactPage() {
               to="/login"
               className="rounded-sm border border-up-orange/40 px-3 py-1 text-up-orange transition-colors hover:bg-up-orange/10"
             >
-              Entrar
+              {t.contact.navLogin}
             </Link>
           </nav>
         </div>
@@ -103,20 +101,18 @@ export function ContactPage() {
             Up2Gether
           </Link>
           <span className="text-up-line">/</span>
-          <span className="text-up-text">Contato</span>
+          <span className="text-up-text">{t.contact.breadcrumbContact}</span>
         </nav>
 
         <div className="mb-10 border-b border-up-line/60 pb-8">
-          <h1 className="font-display text-4xl text-up-orange sm:text-5xl">Contato</h1>
+          <h1 className="font-display text-4xl text-up-orange sm:text-5xl">{t.contact.title}</h1>
           <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-up-dim">
-            Escolha o canal abaixo conforme o tipo de solicitação. Todas as
-            mensagens recebidas seguem o prazo de resposta indicado ao lado de
-            cada canal. Para solicitações formais, indique o assunto sugerido.
+            {t.contact.subtitle}
           </p>
         </div>
 
         <section className="grid gap-4 md:grid-cols-2">
-          {CHANNELS.map((c) => (
+          {channels.map((c) => (
             <article
               key={c.label}
               className="flex flex-col justify-between rounded-md border border-up-line/60 bg-up-panel/30 p-5 transition-colors hover:border-up-orange"
@@ -148,7 +144,7 @@ export function ContactPage() {
                   <span>{c.email}</span>
                   {c.subject && (
                     <span className="rounded-sm border border-up-line bg-black/40 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-amber">
-                      assunto: {c.subject}
+                      {t.contact.subjectLabel}: {c.subject}
                     </span>
                   )}
                 </a>
@@ -163,22 +159,18 @@ export function ContactPage() {
         <section className="mt-12 grid gap-6 rounded-md border border-up-line/60 bg-up-panel/30 p-6 sm:grid-cols-2">
           <div>
             <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
-              Horário de atendimento
+              {t.contact.officeHoursLabel}
             </div>
             <p className="text-[13px] leading-relaxed text-up-dim">
-              Segunda a sexta, das 9h às 18h, no fuso de Brasília (GMT-3). Fora
-              desse horário e em feriados nacionais, as mensagens são respondidas
-              no próximo dia útil.
+              {t.contact.officeHoursBody}
             </p>
           </div>
           <div>
             <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
-              Canais oficiais
+              {t.contact.officialChannelsLabel}
             </div>
             <p className="text-[13px] leading-relaxed text-up-dim">
-              O único canal formal de contato é por e-mail. Não há atendimento
-              por redes sociais. Qualquer requisição em outros canais será
-              direcionada ao endereço oficial.
+              {t.contact.officialChannelsBody}
             </p>
           </div>
         </section>
@@ -186,24 +178,19 @@ export function ContactPage() {
         <section className="mt-12 rounded-md border border-up-amber/30 bg-up-amber/5 p-6">
           <div className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
             <span className="h-1 w-1 rounded-full bg-up-amber" />
-            Antes de escrever
+            {t.contact.beforeWritingLabel}
           </div>
           <ul className="space-y-2 text-[13px] leading-relaxed text-up-text/90">
             <li>
-              Para <strong>excluir a sua conta</strong>, você pode fazer isso pelo
-              próprio aplicativo, na seção <code className="font-mono text-[11px] text-up-orange">Configurações</code>.
-              A exclusão por canal é destinada a casos em que o acesso ao
-              aplicativo esteja indisponível.
+              {t.contact.beforeWritingAccount}
+              <code className="font-mono text-[11px] text-up-orange">{t.contact.beforeWritingAccountCode}</code>
+              {t.contact.beforeWritingAccountEnd}
             </li>
             <li>
-              Para <strong>reportar um problema de segurança</strong>, use o
-              canal de Segurança acima e evite divulgar detalhes publicamente até
-              que uma correção esteja disponível.
+              {t.contact.beforeWritingSecurity}
             </li>
             <li>
-              Para <strong>conhecer a identificação completa do operador</strong>
-              {' '}(razão social, CNPJ e endereço), basta solicitar pelo canal de
-              Suporte, e o dado é enviado de volta ao remetente.
+              {t.contact.beforeWritingIdentity}
             </li>
           </ul>
         </section>
@@ -211,11 +198,11 @@ export function ContactPage() {
         <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-up-line/60 pt-6 font-mono text-[10px] uppercase tracking-widest text-up-dim">
           <div>
             <Link to="/privacy" className="transition-colors hover:text-up-orange">
-              Privacidade
+              {t.contact.footerPrivacy}
             </Link>
             <span className="mx-3 text-up-line">·</span>
             <Link to="/terms" className="transition-colors hover:text-up-orange">
-              Termos
+              {t.contact.footerTerms}
             </Link>
           </div>
           <span>up2gether.com.br</span>

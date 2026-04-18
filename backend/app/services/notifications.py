@@ -53,9 +53,6 @@ _EVENT_COLORS: dict[str, int] = {
     "session.updated": 0xFFA94D,  # ambar
     "session.reminder": 0xFFD93D,  # amarelo
     "session.cancelled": 0xE63946,  # vermelho
-    "theme.cycle_opened": 0xB05CFF,  # magenta
-    "theme.suggestion_added": 0x9B7FD4,  # roxo claro
-    "theme.decided": 0x06D6A0,  # verde
     "game_vote.opened": 0xFF6B35,
     "game_vote.closed": 0x06D6A0,
     "game_vote.ballot_cast": 0x4CC9F0,  # ciano

@@ -6,7 +6,7 @@ import type { Game } from '@/features/games/api'
 import { useToast } from '@/components/ui/toast'
 import { useT } from '@/i18n'
 
-export type AdminTab = 'overview' | 'games' | 'votes' | 'sessions' | 'themes' | 'members' | 'config' | 'danger'
+export type AdminTab = 'overview' | 'games' | 'votes' | 'sessions' | 'members' | 'config' | 'danger'
 
 export function CurrentGameSection({
   groupId,
@@ -108,13 +108,12 @@ export function CurrentGameSection({
 }
 
 export function OverviewCounters({
-  games, members, votes, sessions, themes, onJump,
+  games, members, votes, sessions, onJump,
 }: {
   games: number
   members: number
   votes: number
   sessions: number
-  themes: number
   onJump: (t: AdminTab) => void
 }) {
   const t = useT()
@@ -123,7 +122,6 @@ export function OverviewCounters({
     { key: 'members', label: t.admin.counters.members, value: members },
     { key: 'votes', label: t.admin.counters.votes, value: votes },
     { key: 'sessions', label: t.admin.counters.sessions, value: sessions },
-    { key: 'themes', label: t.admin.counters.themes, value: themes },
   ]
   return (
     <section className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">

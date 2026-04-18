@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { steamCover } from '@/lib/steamCover'
 import type { Game } from '@/features/games/api'
+import { useT } from '@/i18n'
 
 type VoteRow = {
   id: string
@@ -25,6 +26,7 @@ export function VoteHistory({
   gameOf: (gid: string) => Game | undefined
   onAudit: (voteId: string) => void
 }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
 
   if (closed.length === 0) return null
@@ -36,7 +38,7 @@ export function VoteHistory({
         className="flex items-center gap-2 text-xs uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange"
       >
         <span>{open ? '−' : '+'}</span>
-        <span>histórico</span>
+        <span>{t.votes.historyLabel}</span>
         <span className="text-up-orange tabular-nums">{closed.length}</span>
       </button>
       <AnimatePresence>
@@ -69,19 +71,19 @@ export function VoteHistory({
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <div className="text-[10px] uppercase tracking-wider text-up-dim">votação encerrada</div>
+                    <div className="text-[10px] uppercase tracking-wider text-up-dim">{t.votes.voteClosed}</div>
                     <div className="mt-0.5 truncate text-sm text-up-text">{v.title}</div>
                     {winner ? (
                       <div className="mt-2">
-                        <div className="text-[10px] uppercase tracking-wider text-up-green">vencedor</div>
+                        <div className="text-[10px] uppercase tracking-wider text-up-green">{t.votes.winner}</div>
                         <div className="truncate text-sm text-up-orange">{winner.name}</div>
                       </div>
                     ) : (
-                      <div className="mt-2 text-xs text-up-dim">sem vencedor</div>
+                      <div className="mt-2 text-xs text-up-dim">{t.votes.noWinner}</div>
                     )}
                     <div className="mt-2 flex items-center gap-3 text-[10px] uppercase tracking-wider text-up-dim">
-                      <span><span className="text-up-text tabular-nums">{v.ballots_count}</span>/{v.eligible_voter_count} votos</span>
-                      <span>{v.candidate_game_ids.length} candidatos</span>
+                      <span><span className="text-up-text tabular-nums">{v.ballots_count}</span>/{v.eligible_voter_count} {t.votes.votesNoun}</span>
+                      <span>{v.candidate_game_ids.length} {t.votes.candidates}</span>
                       <span className="inline-flex items-center gap-1 text-up-orange transition-colors group-hover:text-up-orange">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -90,7 +92,7 @@ export function VoteHistory({
                           <line x1="16" y1="17" x2="8" y2="17" />
                           <polyline points="10 9 9 9 8 9" />
                         </svg>
-                        auditar
+                        {t.votes.audit}
                       </span>
                     </div>
                   </div>

@@ -21,7 +21,7 @@ class Notification(Base, TimestampMixin):
     )
     kind: Mapped[str] = mapped_column(
         String, nullable=False
-    )  # vote_opened, vote_closed, session_created, theme_cycle_opened, session_reminder
+    )  # vote_opened, vote_closed, session_created, session_reminder
     title: Mapped[str] = mapped_column(String, nullable=False)
     body: Mapped[str | None] = mapped_column(String, nullable=True)
     link: Mapped[str | None] = mapped_column(String, nullable=True)

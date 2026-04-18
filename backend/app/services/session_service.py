@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 
@@ -97,43 +97,6 @@ class PlaySessionService:
             group_id=group_id,
             payload={"session_id": str(session.id), "game_id": str(data.game_id)},
         )
-        # best-effort google calendar sync pro criador (se conectado)
-        from app.domain.enums import AuthProvider
-
-        google_int = next(
-            (i for i in actor.integrations if i.provider == AuthProvider.GOOGLE),
-            None,
-        )
-        if google_int and google_int.access_token:
-            try:
-                from app.integrations.google_calendar import HttpGoogleCalendarClient
-
-                gc = HttpGoogleCalendarClient()
-                # se expirado e tem refresh, refresh
-                if (
-                    google_int.token_expires_at
-                    and google_int.token_expires_at < datetime.now(UTC)
-                    and google_int.refresh_token
-                ):
-                    new_tokens = await gc.refresh(google_int.refresh_token)
-                    google_int.access_token = new_tokens.get(
-                        "access_token", google_int.access_token
-                    )
-                    google_int.token_expires_at = datetime.now(UTC) + timedelta(
-                        seconds=int(new_tokens.get("expires_in", 3600))
-                    )
-                    await self.sessions.db.commit()
-                await gc.create_event(
-                    google_int.access_token,
-                    summary=data.title,
-                    start=data.start_at,
-                    duration_min=data.duration_minutes,
-                    description=data.description or "",
-                )
-            except Exception:
-                import logging as _log
-
-                _log.getLogger(__name__).warning("google calendar sync falhou", exc_info=True)
         when = data.start_at.strftime("%d/%m %H:%M")
         fields = [
             {"name": "Jogo", "value": game.name, "inline": True},

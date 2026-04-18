@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MockCursor, type CursorStep } from './MockCursor'
 import { Cover } from './Cover'
 import { MOCK } from './mockGames'
+import { useT } from '@/i18n'
 
 // Foco: uma proxima sessao com RSVP. Sem grid semanal, sem modal:
 // capa grande do jogo, avatares de quem ja confirmou, botoes vou/talvez/nao.
@@ -22,6 +23,7 @@ const INITIAL_CONFIRMED = ['y', 'l', 'r']
 const PENDING_ID = 'm'
 
 export function CalendarVisual() {
+  const t = useT()
   const [hovering, setHovering] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [reminderSet, setReminderSet] = useState(false)
@@ -60,28 +62,28 @@ export function CalendarVisual() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-up-orange" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-up-dim">
-            Próxima sessão · sexta
+            {t.landing.nextSessionHeader}
           </span>
         </div>
         <span className="rounded-sm border border-up-orange/40 bg-up-orange/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-up-orange">
-          em 2h
+          {t.landing.inHours}
         </span>
       </div>
 
       <div className="relative">
         <Cover
           src={game.cover}
-          name="Mergulho profundo"
+          name={t.landing.dgrLocalTitle}
           gradient={game.gradient}
           showTitle={false}
           className="h-36 w-full"
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-up-panel via-up-panel/85 to-transparent px-4 pt-10 pb-3">
           <div className="font-display text-xl leading-tight text-up-text">
-            Mergulho profundo
+            {t.landing.dgrLocalTitle}
           </div>
           <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-up-dim">
-            Deep Rock Galactic · 21h até 23h
+            Deep Rock Galactic{t.landing.gameSubtitleSuffix}
           </div>
         </div>
       </div>
@@ -89,7 +91,7 @@ export function CalendarVisual() {
       <div className="space-y-3 px-4 py-4">
         <div className="flex items-center justify-between">
           <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
-            Quem vai
+            {t.landing.whoGoes}
           </span>
           <AnimatePresence mode="wait">
             <motion.span
@@ -101,7 +103,7 @@ export function CalendarVisual() {
                 confirmed ? 'text-up-green' : 'text-up-amber'
               }`}
             >
-              {confirmedCount}/{MEMBERS.length} confirmados
+              {confirmedCount}/{MEMBERS.length} {t.landing.confirmedSuffix}
             </motion.span>
           </AnimatePresence>
         </div>
@@ -142,7 +144,7 @@ export function CalendarVisual() {
           })}
           {!confirmed && (
             <span className="ml-1 font-mono text-[10px] uppercase tracking-wider text-up-dim/70">
-              {PENDING_ID.toUpperCase()} pendente
+              {PENDING_ID.toUpperCase()} {t.landing.pendingSuffix}
             </span>
           )}
         </div>
@@ -166,13 +168,13 @@ export function CalendarVisual() {
             transition={{ duration: 0.25 }}
             className="flex-1 rounded-sm border border-up-line bg-black/30 py-2 font-mono text-[11px] uppercase tracking-widest text-up-dim"
           >
-            vou
+            {t.landing.rsvpYes}
           </motion.button>
           <button className="flex-1 rounded-sm border border-up-line bg-black/30 py-2 font-mono text-[11px] uppercase tracking-widest text-up-dim">
-            talvez
+            {t.landing.rsvpMaybe}
           </button>
           <button className="flex-1 rounded-sm border border-up-line bg-black/30 py-2 font-mono text-[11px] uppercase tracking-widest text-up-dim">
-            não
+            {t.landing.rsvpNo}
           </button>
         </div>
       </div>
@@ -187,7 +189,7 @@ export function CalendarVisual() {
             className="flex items-center gap-2 border-t border-up-green/30 bg-up-green/5 px-4 py-2.5 font-mono text-[10px] uppercase tracking-wider text-up-green"
           >
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-up-green" />
-            Lembrete agendado · aviso no Discord 30min antes
+            {t.landing.reminderSet}
           </motion.div>
         ) : (
           <motion.div
@@ -197,7 +199,7 @@ export function CalendarVisual() {
             className="flex items-center gap-2 border-t border-up-line/60 px-4 py-2.5 font-mono text-[10px] uppercase tracking-wider text-up-dim"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-up-line" />
-            Confirme presença para receber lembrete no Discord
+            {t.landing.reminderUnset}
           </motion.div>
         )}
       </AnimatePresence>

@@ -3,7 +3,6 @@ import { useT } from '@/i18n'
 import type { Game } from '@/features/games/api'
 import type { PlaySession } from '@/features/sessions/api'
 import type { VoteSession } from '@/features/votes/api'
-import type { Theme } from '@/features/themes/api'
 import { DeckTile } from './DeckTile'
 
 // stage labels resolved at render time via t.stageLabels
@@ -25,16 +24,15 @@ type Props = {
   now: Date
   nextSession?: PlaySession
   nextSessionGame?: Game
-  theme?: Theme
   activeVote?: VoteSession
   topGame?: Game
   onNavigate: (path: string) => void
 }
 
-export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme, activeVote, topGame, onNavigate }: Props) {
+export function CommandDeck({ groupId, now, nextSession, nextSessionGame, activeVote, topGame, onNavigate }: Props) {
   const t = useT()
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       <DeckTile
         i={0}
         tone="orange"
@@ -67,29 +65,6 @@ export function CommandDeck({ groupId, now, nextSession, nextSessionGame, theme,
 
       <DeckTile
         i={1}
-        tone="magenta"
-        label={t.commandDeck.themeOfMonth}
-        empty={!theme}
-        emptyMsg={t.commandDeck.noTheme}
-        emptyCta={t.commandDeck.chooseTheme}
-        onClick={() => onNavigate(`/groups/${groupId}/themes`)}
-        cover={theme?.image_url ?? null}
-      >
-        {theme && (
-          <>
-            <div className="flex items-center gap-2">
-              <span className="rounded-sm border border-up-magenta/30 bg-up-magenta/10 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-up-magenta">{theme.month_year}</span>
-            </div>
-            <div className="mt-1.5 line-clamp-2 font-display text-xl leading-tight text-up-magenta">{theme.theme_name}</div>
-            {theme.description && (
-              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-up-dim">{theme.description}</p>
-            )}
-          </>
-        )}
-      </DeckTile>
-
-      <DeckTile
-        i={2}
         tone="amber"
         label={activeVote ? t.commandDeck.activeVote : t.commandDeck.topViability}
         empty={!activeVote && !topGame}

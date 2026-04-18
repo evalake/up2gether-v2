@@ -93,7 +93,6 @@ export function usePurgeGroup() {
       qc.invalidateQueries({ queryKey: groupKey(id) })
       qc.invalidateQueries({ queryKey: ['games', id] })
       qc.invalidateQueries({ queryKey: ['votes', id] })
-      qc.invalidateQueries({ queryKey: ['themes', id] })
       qc.invalidateQueries({ queryKey: ['sessions', id] })
     },
   })

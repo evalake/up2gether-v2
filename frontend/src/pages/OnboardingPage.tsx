@@ -322,10 +322,10 @@ export function OnboardingPage() {
                   </a>
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">voltar</button>
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.back}</button>
                   <div className="flex gap-2">
                     <button onClick={next} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.skip}</button>
-                    <Button onClick={next}>próximo</Button>
+                    <Button onClick={next}>{t.onboarding.next}</Button>
                   </div>
                 </div>
               </div>

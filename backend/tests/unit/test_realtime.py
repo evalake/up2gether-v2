@@ -16,9 +16,9 @@ async def test_publish_delivers_to_subscriber():
     b = Broker()
     g = uuid.uuid4()
     q, _ = await b.subscribe([g])
-    b.publish(g, kind="theme.vote_cast")
+    b.publish(g, kind="game_vote.ballot_cast")
     msg = await asyncio.wait_for(q.get(), timeout=0.5)
-    assert msg["kind"] == "theme.vote_cast"
+    assert msg["kind"] == "game_vote.ballot_cast"
     assert msg["group_id"] == str(g)
 
 

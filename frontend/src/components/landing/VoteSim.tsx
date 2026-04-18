@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MockCursor, type CursorStep } from './MockCursor'
 import { Cover } from './Cover'
 import { MOCK, type MockGame } from './mockGames'
+import { useT } from '@/i18n'
 
 // Simulacao do fluxo de votacao: cursor clica em um card,
 // votos aparecem em tempo real, lider emerge, rodada avanca.
@@ -24,6 +25,7 @@ type Phase = 0 | 1 | 2 | 3
 const TOTAL_VOTERS = 7
 
 export function VoteSim() {
+  const t = useT()
   const [phase, setPhase] = useState<Phase>(0)
   const [votes, setVotes] = useState<Record<string, number>>({})
   const [userPicked, setUserPicked] = useState<string | null>(null)
@@ -91,10 +93,10 @@ export function VoteSim() {
   const participationPct = Math.min(100, Math.round((votesCast / TOTAL_VOTERS) * 100))
 
   const phaseLabel =
-    phase === 0 ? 'Fase 1/3 · 6 candidatos'
-      : phase === 1 ? 'Fase 2/3 · 3 restam'
-        : phase === 2 ? 'Fase final · 2 restam'
-          : 'Encerrado'
+    phase === 0 ? t.landing.phaseLabel1
+      : phase === 1 ? t.landing.phaseLabel2
+        : phase === 2 ? t.landing.phaseLabel3
+          : t.landing.phaseLabelEnd
 
   return (
     <div className="relative rounded-md border border-up-orange/25 bg-up-panel/60 p-4 shadow-[0_30px_80px_-30px_rgba(255,102,0,0.35)]">
@@ -104,7 +106,7 @@ export function VoteSim() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-up-orange animate-pulse" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-up-dim">
-            Votação · sexta 21h
+            {t.landing.phaseHeader}
           </span>
         </div>
         <AnimatePresence mode="wait">
@@ -123,7 +125,7 @@ export function VoteSim() {
 
       <div className="mb-3">
         <div className="mb-1 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-up-dim">
-          <span>Participação</span>
+          <span>{t.landing.participation}</span>
           <span className={participationPct >= 70 ? 'text-up-green' : 'text-up-amber'}>
             {votesCast}/{TOTAL_VOTERS}
           </span>
@@ -184,6 +186,7 @@ function CandidateCard({
   isUserPick: boolean
   isLeader: boolean
 }) {
+  const t = useT()
   const pct = Math.round((count / maxVotes) * 100)
   const border = isUserPick
     ? 'border-up-magenta shadow-[0_0_22px_rgba(255,0,102,0.22)]'
@@ -205,12 +208,12 @@ function CandidateCard({
       />
       {isUserPick && (
         <div className="absolute right-1.5 top-1.5 z-10 rounded-sm bg-up-magenta/20 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider text-up-magenta">
-          seu voto
+          {t.landing.yourVote}
         </div>
       )}
       <div className="px-2 py-1.5">
         <div className="flex items-center justify-between font-mono text-[9px] text-up-dim">
-          <span>{card.owns}/{card.total} tem</span>
+          <span>{card.owns}/{card.total} {t.landing.ownsSuffix}</span>
           <AnimatePresence mode="wait">
             <motion.span
               key={count}
@@ -236,6 +239,7 @@ function CandidateCard({
 }
 
 function WinnerCard({ card }: { card: Card }) {
+  const t = useT()
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.94 }}
@@ -248,7 +252,7 @@ function WinnerCard({ card }: { card: Card }) {
       <div className="relative">
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-up-amber">
           <span className="h-1 w-1 rounded-full bg-up-green" />
-          Decidido
+          {t.landing.decidedLabel}
         </div>
         <div className="mt-3 flex items-center gap-4">
           <Cover
@@ -261,13 +265,13 @@ function WinnerCard({ card }: { card: Card }) {
           <div>
             <div className="font-display text-2xl text-up-orange">{card.name}</div>
             <div className="mt-1 font-mono text-[10px] text-up-dim">
-              5 votos · {card.owns}/{card.total} já têm
+              {t.landing.votesAndOwners(5, card.owns, card.total)}
             </div>
           </div>
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-sm border border-up-green/40 bg-up-green/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-up-green">
           <span className="h-1 w-1 rounded-full bg-up-green animate-pulse" />
-          Sessão agendada · sex 21h
+          {t.landing.sessionScheduled}
         </div>
       </div>
     </motion.div>

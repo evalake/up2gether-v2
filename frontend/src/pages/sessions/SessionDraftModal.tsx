@@ -285,7 +285,7 @@ export function SessionDraftModal({
                   width="w-7"
                   onDec={() => setHour(hh - 1)}
                   onInc={() => setHour(hh + 1)}
-                  ariaLabel="hora"
+                  ariaLabel={t.sessions.hourAria}
                 />
                 <span className="font-display text-xl text-up-dim/40">:</span>
                 <Stepper
@@ -293,7 +293,7 @@ export function SessionDraftModal({
                   width="w-7"
                   onDec={() => setMinute(mm - MINUTE_STEP)}
                   onInc={() => setMinute(mm + MINUTE_STEP)}
-                  ariaLabel="minuto"
+                  ariaLabel={t.sessions.minuteAria}
                 />
               </div>
               <div className="mt-1.5 flex flex-wrap justify-center gap-1">
@@ -327,7 +327,7 @@ export function SessionDraftModal({
                   width="w-16"
                   onDec={decDuration}
                   onInc={incDuration}
-                  ariaLabel="duração"
+                  ariaLabel={t.sessions.durationAria}
                 />
               </div>
               <div className="mt-1.5 flex flex-wrap justify-center gap-1">

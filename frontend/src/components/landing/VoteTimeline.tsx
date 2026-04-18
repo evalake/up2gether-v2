@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Cover } from './Cover'
 import { MOCK } from './mockGames'
+import { useT } from '@/i18n'
 
 // Timeline estatica do pos-votacao. Lista cronologica de rodadas
 // mostrando o que foi eliminado e o vencedor. Formato deliberadamente
@@ -12,50 +13,50 @@ type Round = {
   items: { id: string; votes: number; eliminated?: boolean; winner?: boolean }[]
 }
 
-const ROUNDS: Round[] = [
-  {
-    label: 'Fase 1 · 6 candidatos',
-    at: '21h05',
-    items: [
-      { id: 'hd2', votes: 5 },
-      { id: 'cs2', votes: 5 },
-      { id: 'leth', votes: 3 },
-      { id: 'pal', votes: 2, eliminated: true },
-      { id: 'brg', votes: 2, eliminated: true },
-      { id: 'phas', votes: 1, eliminated: true },
-    ],
-  },
-  {
-    label: 'Fase 2 · 3 restam',
-    at: '21h09',
-    items: [
-      { id: 'hd2', votes: 5 },
-      { id: 'cs2', votes: 3 },
-      { id: 'leth', votes: 3, eliminated: true },
-    ],
-  },
-  {
-    label: 'Fase final · 2 restam',
-    at: '21h13',
-    items: [
-      { id: 'hd2', votes: 5, winner: true },
-      { id: 'cs2', votes: 2 },
-    ],
-  },
-]
-
 export function VoteTimeline() {
+  const t = useT()
+  const ROUNDS: Round[] = [
+    {
+      label: t.landing.roundsLabel1,
+      at: '21h05',
+      items: [
+        { id: 'hd2', votes: 5 },
+        { id: 'cs2', votes: 5 },
+        { id: 'leth', votes: 3 },
+        { id: 'pal', votes: 2, eliminated: true },
+        { id: 'brg', votes: 2, eliminated: true },
+        { id: 'phas', votes: 1, eliminated: true },
+      ],
+    },
+    {
+      label: t.landing.roundsLabel2,
+      at: '21h09',
+      items: [
+        { id: 'hd2', votes: 5 },
+        { id: 'cs2', votes: 3 },
+        { id: 'leth', votes: 3, eliminated: true },
+      ],
+    },
+    {
+      label: t.landing.roundsLabel3,
+      at: '21h13',
+      items: [
+        { id: 'hd2', votes: 5, winner: true },
+        { id: 'cs2', votes: 2 },
+      ],
+    },
+  ]
   return (
     <div className="rounded-md border border-up-orange/20 bg-up-panel/50 p-5 shadow-[0_30px_80px_-30px_rgba(255,102,0,0.25)]">
       <div className="mb-5 flex items-center justify-between border-b border-up-line/60 pb-3">
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-up-green" />
           <span className="font-mono text-[10px] uppercase tracking-widest text-up-dim">
-            Histórico da votação · sexta
+            {t.landing.voteHistoryHeader}
           </span>
         </div>
         <span className="font-mono text-[10px] uppercase tracking-wider text-up-amber">
-          duração 8min
+          {t.landing.durationLabel}
         </span>
       </div>
 
@@ -106,10 +107,10 @@ export function VoteTimeline() {
           <span className="absolute left-[-2px] top-1 h-5 w-5 rounded-full bg-up-orange shadow-[0_0_14px_rgba(255,102,0,0.7)]" />
           <div className="rounded-sm border border-up-orange/40 bg-up-orange/10 p-3">
             <div className="font-mono text-[10px] uppercase tracking-widest text-up-amber">
-              Sessão criada
+              {t.landing.sessionCreated}
             </div>
             <div className="mt-1 font-display text-sm text-up-text">
-              Helldivers 2 · sexta 21h · 7/7 confirmados
+              Helldivers 2 · {t.landing.sessionCreatedDetail}
             </div>
           </div>
         </motion.div>
@@ -129,6 +130,7 @@ function Row({
   eliminated?: boolean
   winner?: boolean
 }) {
+  const t = useT()
   return (
     <div
       className={`flex items-center gap-3 rounded-sm border bg-black/30 px-2 py-1.5 transition-opacity ${
@@ -167,12 +169,12 @@ function Row({
         </span>
         {winner && (
           <span className="rounded-sm border border-up-orange/50 bg-up-orange/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-up-orange">
-            vencedor
+            {t.landing.winnerBadge}
           </span>
         )}
         {eliminated && !winner && (
           <span className="font-mono text-[9px] uppercase tracking-wider text-up-dim">
-            fora
+            {t.landing.eliminatedBadge}
           </span>
         )}
       </div>

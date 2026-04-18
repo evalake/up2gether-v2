@@ -14,7 +14,6 @@ import {
 import { useGames } from '@/features/games/hooks'
 import { useVotes } from '@/features/votes/hooks'
 import { useSessions } from '@/features/sessions/hooks'
-import { useCurrentTheme } from '@/features/themes/hooks'
 import { useMe } from '@/features/auth/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -40,7 +39,6 @@ export function GroupDetailPage() {
   const games = useGames(id)
   const votes = useVotes(id)
   const sessions = useSessions(id)
-  const theme = useCurrentTheme(id)
   const currentGameAudit = useCurrentGameAudit(id)
   const leave = useLeaveGroup()
   const promote = usePromote(id)
@@ -128,7 +126,6 @@ export function GroupDetailPage() {
         gamesCount={activeGames.length}
         votesCount={(votes.data ?? []).length}
         sessionsCount={(sessions.data ?? []).length}
-        hasTheme={!!theme.data}
       />
 
       <CommandDeck
@@ -136,7 +133,6 @@ export function GroupDetailPage() {
         now={now}
         nextSession={nextSession}
         nextSessionGame={nextSessionGame}
-        theme={theme.data ?? undefined}
         activeVote={activeVote}
         topGame={topGame}
         onNavigate={navigate}

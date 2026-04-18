@@ -37,7 +37,6 @@ class VoteStatus(StrEnum):
 
 class VoteKind(StrEnum):
     GAME = "game"
-    THEME = "theme"
 
 
 class SessionRsvp(StrEnum):
@@ -49,14 +48,6 @@ class SessionRsvp(StrEnum):
 class AuthProvider(StrEnum):
     DISCORD = "discord"
     STEAM = "steam"
-    GOOGLE = "google"
-
-
-class ThemeCyclePhase(StrEnum):
-    SUGGESTING = "suggesting"
-    VOTING = "voting"
-    DECIDED = "decided"
-    CANCELLED = "cancelled"
 
 
 class HardwareTier(StrEnum):

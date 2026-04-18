@@ -4,6 +4,7 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { Avatar } from '@/components/core/Avatar'
 import { useToast } from '@/components/ui/toast'
+import { useT } from '@/i18n'
 
 export function MembersTab({
   members,
@@ -28,19 +29,20 @@ export function MembersTab({
   demote: UseMutationResult<unknown, Error, string>
   kick: UseMutationResult<unknown, Error, string>
 }) {
+  const t = useT()
   const toast = useToast()
 
   return (
     <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-dim">Membros</div>
+          <div className="text-[11px] uppercase tracking-wider text-up-dim">{t.admin.membersTitle}</div>
           <p className="mt-1 text-[11px] text-up-dim">
-            Gerencie roles e remoção. Apenas o dono promove/rebaixa outros admins. Mods não aparecem aqui como editáveis.
+            {t.admin.membersSubtitle}
           </p>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-wider text-up-dim">
-          <span className="tabular-nums text-up-orange">{members?.length ?? 0}</span> total
+          <span className="tabular-nums text-up-orange">{members?.length ?? 0}</span> {t.admin.totalLabel}
         </div>
       </div>
       {isLoading && <div className="mt-4"><Loading /></div>}
@@ -56,14 +58,14 @@ export function MembersTab({
             m.role === 'admin' ? 'text-up-orange' : m.role === 'mod' ? 'text-up-amber' : 'text-up-dim'
           return (
             <div key={m.id} className="flex items-center gap-3 py-3">
-              <button type="button" onClick={() => onOpenProfile(m.user_id)} className="shrink-0 transition-transform hover:scale-105" title="ver perfil">
+              <button type="button" onClick={() => onOpenProfile(m.user_id)} className="shrink-0 transition-transform hover:scale-105" title={t.admin.viewProfileLabel}>
                 <Avatar discordId={m.user?.discord_id} hash={m.user?.discord_avatar} name={name} size="sm" />
               </button>
               <button type="button" onClick={() => onOpenProfile(m.user_id)} className="min-w-0 flex-1 text-left">
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm text-up-text transition-colors hover:text-up-orange">{name}</span>
-                  {isMe && <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">você</span>}
-                  {isTargetOwner && <span className="font-mono text-[10px] uppercase tracking-wider text-up-magenta">dono</span>}
+                  {isMe && <span className="font-mono text-[10px] uppercase tracking-wider text-up-orange">{t.admin.youLabel}</span>}
+                  {isTargetOwner && <span className="font-mono text-[10px] uppercase tracking-wider text-up-magenta">{t.admin.ownerLabel}</span>}
                 </div>
                 <div className={`font-mono text-[10px] uppercase tracking-wider ${roleColor}`}>{m.role}</div>
               </button>
@@ -74,13 +76,13 @@ export function MembersTab({
                       onClick={() => {
                         const next = m.role === 'mod' ? 'admin' : 'mod'
                         if (next === 'admin' && !isOwner) {
-                          toast.error('só o dono pode promover a admin')
+                          toast.error(t.admin.onlyOwnerPromote)
                           return
                         }
                         promote.mutate({ userId: m.user_id, role: next })
                       }}
                       className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-green/60 hover:text-up-green"
-                      title={m.role === 'mod' ? 'promover pra admin' : 'promover pra mod'}
+                      title={m.role === 'mod' ? t.admin.promoteToAdminTitle : t.admin.promoteToModTitle}
                     >
                       {m.role === 'mod' ? 'admin' : 'mod'}
                     </button>
@@ -89,17 +91,17 @@ export function MembersTab({
                     <button
                       onClick={() => demote.mutate(m.user_id)}
                       className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-amber/60 hover:text-up-amber"
-                      title="rebaixar"
+                      title={t.admin.demoteTitle}
                     >
                       -
                     </button>
                   )}
                   <button
                     onClick={() => {
-                      if (confirm(`remover ${name} do grupo?`)) kick.mutate(m.user_id)
+                      if (confirm(t.admin.removeConfirm(name))) kick.mutate(m.user_id)
                     }}
                     className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red"
-                    title="remover do grupo"
+                    title={t.admin.removeFromGroupTitle}
                   >
                     x
                   </button>

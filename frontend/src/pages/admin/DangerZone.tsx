@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useT } from '@/i18n'
 
 export function DangerZone({
   onConfirmReset,
@@ -12,6 +13,7 @@ export function DangerZone({
   resetPending: boolean
   deletePending: boolean
 }) {
+  const t = useT()
   const [confirmKind, setConfirmKind] = useState<null | 'reset' | 'destroy'>(null)
 
   return (
@@ -22,21 +24,21 @@ export function DangerZone({
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-up-red">Zona Perigosa</div>
-          <p className="mt-0.5 text-[11px] text-up-dim">Acoes irreversiveis. So o dono do servidor ve.</p>
+          <div className="text-[11px] uppercase tracking-wider text-up-red">{t.admin.dangerZone}</div>
+          <p className="mt-0.5 text-[11px] text-up-dim">{t.admin.dangerZoneSub}</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setConfirmKind('reset')}
             className="rounded-sm border border-up-amber/40 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-amber transition-colors hover:bg-up-amber/10"
           >
-            Resetar Dados
+            {t.admin.resetData}
           </button>
           <button
             onClick={() => setConfirmKind('destroy')}
             className="rounded-sm border border-up-red/50 px-3 py-1.5 text-[11px] uppercase tracking-wider text-up-red transition-colors hover:bg-up-red/10"
           >
-            Excluir Servidor
+            {t.admin.deleteServerBtn}
           </button>
         </div>
       </div>
@@ -45,16 +47,16 @@ export function DangerZone({
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
             <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-amber/30 bg-black/30 p-3">
               <p className="text-xs text-up-amber">
-                Apaga jogos, votacoes, temas e sessoes. Mantem grupo e membros. Tem certeza?
+                {t.admin.resetConfirmShort}
               </p>
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
+                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">{t.common.cancel}</button>
                 <button
                   onClick={async () => { await onConfirmReset(); setConfirmKind(null) }}
                   disabled={resetPending}
                   className="rounded-sm border border-up-amber/60 bg-up-amber/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-amber disabled:opacity-40"
                 >
-                  {resetPending ? 'resetando...' : 'sim, resetar'}
+                  {resetPending ? t.admin.resetting : t.admin.yesResetBtn}
                 </button>
               </div>
             </div>
@@ -64,16 +66,16 @@ export function DangerZone({
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
             <div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-up-red/40 bg-black/30 p-3">
               <p className="text-xs text-up-red">
-                Apaga o servidor e tudo dentro. Não dá pra desfazer. Tem certeza?
+                {t.admin.deleteConfirmShort}
               </p>
               <div className="flex shrink-0 gap-2">
-                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">cancelar</button>
+                <button onClick={() => setConfirmKind(null)} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-text">{t.common.cancel}</button>
                 <button
                   onClick={async () => { await onConfirmDelete(); setConfirmKind(null) }}
                   disabled={deletePending}
                   className="rounded-sm border border-up-red/60 bg-up-red/10 px-3 py-1 text-[11px] uppercase tracking-wider text-up-red disabled:opacity-40"
                 >
-                  {deletePending ? 'excluindo...' : 'sim, excluir'}
+                  {deletePending ? t.admin.deleting : t.admin.yesDeleteBtn}
                 </button>
               </div>
             </div>

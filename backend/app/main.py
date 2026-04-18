@@ -10,20 +10,17 @@ from starlette.responses import JSONResponse
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.jobs.price_check_cron import check_game_prices
-from app.jobs.theme_cycle_cron import auto_open_theme_cycles
 from app.routers import (
     admin,
     auth,
     events,
     games,
-    google,
     groups,
     health,
     notifications,
     public,
     sessions,
     steam,
-    themes,
     users,
     votes,
 )
@@ -43,7 +40,6 @@ async def lifespan(_: FastAPI):
 
     # leader election: so 1 machine roda bot + scheduler
     scheduler = AsyncIOScheduler(timezone="UTC")
-    scheduler.add_job(auto_open_theme_cycles, CronTrigger(hour=9, minute=0))
     scheduler.add_job(check_game_prices, CronTrigger(hour="*/6", minute=30))
     bot = PresenceBot(settings.discord_bot_token)
     leader = LeaderElection()
@@ -139,13 +135,11 @@ def create_app() -> FastAPI:
     app.include_router(groups.router, prefix="/api")
     app.include_router(games.router, prefix="/api")
     app.include_router(votes.router, prefix="/api")
-    app.include_router(themes.router, prefix="/api")
     app.include_router(sessions.router, prefix="/api")
     app.include_router(users.router, prefix="/api")
     app.include_router(steam.router, prefix="/api")
     app.include_router(public.router, prefix="/api")
     app.include_router(notifications.router, prefix="/api")
-    app.include_router(google.router, prefix="/api")
     app.include_router(events.router, prefix="/api")
     app.include_router(admin.router, prefix="/api")
     return app

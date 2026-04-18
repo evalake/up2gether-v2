@@ -3,8 +3,6 @@ import type { PlaySession } from '@/features/sessions/api'
 import { SlotStack } from './SlotStack'
 import { useT } from '@/i18n'
 
-const WEEKDAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
-
 const addDays = (d: Date, n: number) => {
   const x = new Date(d)
   x.setDate(x.getDate() + n)
@@ -28,11 +26,12 @@ type Props = {
 
 export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay, onToggleFullDay, onOpenSlot, onOpenDetail }: Props) {
   const t = useT()
+  const weekdays = t.sessions.weekdaysShort
   return (
     <div className="overflow-x-auto rounded-sm border border-up-orange/15 bg-up-panel/30">
       <div className="grid min-w-[760px]" style={{ gridTemplateColumns: '40px repeat(7, 1fr)', gridTemplateRows: `auto repeat(${hours.length}, minmax(56px, auto)) auto` }}>
         <div className="border-b border-up-orange/10" />
-        {WEEKDAYS.map((wd, i) => {
+        {weekdays.map((wd, i) => {
           const day = addDays(weekAnchor, i)
           const today = sameDay(day, new Date())
           return (
@@ -47,7 +46,7 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay,
             <div className="border-t border-up-orange/5 px-1 py-0.5 text-right font-mono text-[10px] text-up-dim">
               {String(h).padStart(2, '0')}
             </div>
-            {WEEKDAYS.map((_, i) => {
+            {weekdays.map((_, i) => {
               const day = addDays(weekAnchor, i)
               const slot = new Date(day)
               slot.setHours(h, 0, 0, 0)
@@ -67,7 +66,7 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay,
                     type="button"
                     onClick={() => !isPast && onOpenSlot(slot)}
                     disabled={isPast}
-                    aria-label="novo horário"
+                    aria-label={t.sessions.newTimeAria}
                     title={isPast ? undefined : t.sessions.schedule}
                     className={`absolute inset-0 ${isPast ? 'cursor-not-allowed' : inSlot.length === 0 ? 'group/empty transition-colors hover:bg-up-orange/5' : ''}`}
                   >
@@ -79,7 +78,7 @@ export function CalendarGrid({ weekAnchor, hours, sessions, games, now, fullDay,
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); onOpenSlot(slot) }}
-                      aria-label="adicionar outra no mesmo horário"
+                      aria-label={t.sessions.addAnotherAria}
                       className="absolute right-0.5 top-0.5 z-20 hidden h-4 w-4 place-items-center rounded-full border border-up-orange/50 bg-up-panel text-[10px] leading-none text-up-orange hover:bg-up-orange transition-colors hover:text-up-panel group-hover/cell:grid"
                     >
                       +

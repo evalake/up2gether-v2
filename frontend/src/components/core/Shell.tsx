@@ -72,7 +72,6 @@ function GroupContext({ groupId }: { groupId: string }) {
     { label: t.nav.overview, slug: '' },
     { label: t.nav.games, slug: '/games' },
     { label: t.nav.votes, slug: '/votes' },
-    { label: t.nav.themes, slug: '/themes' },
     { label: t.nav.sessions, slug: '/sessions' },
   ]
   const nav = isAdmin ? [...groupNav, { label: t.nav.admin, slug: '/admin' }] : groupNav

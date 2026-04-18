@@ -16,7 +16,6 @@ import {
 import { useGames } from '@/features/games/hooks'
 import { useVotes } from '@/features/votes/hooks'
 import { useSessions } from '@/features/sessions/hooks'
-import { useThemes } from '@/features/themes/hooks'
 import { useMe } from '@/features/auth/hooks'
 import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -24,7 +23,6 @@ import { useToast } from '@/components/ui/toast'
 import { GamesTab } from './admin/GamesTab'
 import { VotesTab } from './admin/VotesTab'
 import { SessionsTab } from './admin/SessionsTab'
-import { ThemesTab } from './admin/ThemesTab'
 import { MembersTab } from './admin/MembersTab'
 import { ConfigTab } from './admin/ConfigTab'
 import { DangerZone } from './admin/DangerZone'
@@ -41,7 +39,6 @@ export function GroupAdminPage() {
     { key: 'games', label: t.admin.tabs.games },
     { key: 'votes', label: t.admin.tabs.votes },
     { key: 'sessions', label: t.admin.tabs.sessions },
-    { key: 'themes', label: t.admin.tabs.themes },
     { key: 'members', label: t.admin.tabs.members },
     { key: 'config', label: t.admin.tabs.config },
     { key: 'danger', label: t.admin.tabs.danger, ownerOnly: true },
@@ -60,7 +57,6 @@ export function GroupAdminPage() {
   const members = useMembers(id)
   const allVotes = useVotes(id)
   const allSessions = useSessions(id)
-  const allThemes = useThemes(id)
   const promote = usePromote(id)
   const demote = useDemote(id)
   const kick = useKick(id)
@@ -165,7 +161,6 @@ export function GroupAdminPage() {
                 members={members.data?.length ?? 0}
                 votes={allVotes.data?.length ?? 0}
                 sessions={allSessions.data?.length ?? 0}
-                themes={allThemes.data?.length ?? 0}
                 onJump={setTab}
               />
             </>
@@ -174,7 +169,6 @@ export function GroupAdminPage() {
           {tab === 'games' && <GamesTab groupId={id} />}
           {tab === 'votes' && <VotesTab groupId={id} />}
           {tab === 'sessions' && <SessionsTab groupId={id} />}
-          {tab === 'themes' && <ThemesTab groupId={id} />}
 
           {tab === 'config' && <ConfigTab group={group.data} sync={sync} />}
 

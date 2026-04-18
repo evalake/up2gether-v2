@@ -10,7 +10,6 @@ from app.models.game import (
 from app.models.group import Group, GroupMembership
 from app.models.notification import Notification
 from app.models.session import PlaySession, SessionRsvpRow
-from app.models.theme import MonthlyTheme, ThemeCycle, ThemeSuggestion, ThemeVote
 from app.models.user import IntegrationAccount, User, UserHardwareProfile
 from app.models.vote import VoteBallot, VoteSession
 
@@ -22,14 +21,10 @@ __all__ = [
     "GroupMembership",
     "IntegrationAccount",
     "InterestSignalRow",
-    "MonthlyTheme",
     "Notification",
     "PlaySession",
     "SessionRsvpRow",
     "SteamGameOwnership",
-    "ThemeCycle",
-    "ThemeSuggestion",
-    "ThemeVote",
     "User",
     "UserHardwareProfile",
     "VoteBallot",
