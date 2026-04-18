@@ -121,12 +121,15 @@ export function GroupDetailPage() {
         <CurrentGameHero audit={currentGameAudit.data} groupId={id} isAdmin={isAdmin} now={now} />
       )}
 
-      <FirstStepsGuide
-        groupId={id}
-        gamesCount={activeGames.length}
-        votesCount={(votes.data ?? []).length}
-        sessionsCount={(sessions.data ?? []).length}
-      />
+      {/* so renderiza qd as 3 queries terminaram, senao da flash de "0/3 pendente" */}
+      {games.data && votes.data && sessions.data && (
+        <FirstStepsGuide
+          groupId={id}
+          gamesCount={activeGames.length}
+          votesCount={votes.data.length}
+          sessionsCount={sessions.data.length}
+        />
+      )}
 
       <CommandDeck
         groupId={id}
