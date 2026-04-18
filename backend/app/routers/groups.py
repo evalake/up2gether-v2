@@ -170,7 +170,7 @@ async def get_member_profile_endpoint(
     bg: BackgroundTasks,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
-    from app.services.group_profile_service import get_member_profile
+    from app.services.group_member_profile import get_member_profile
 
     return await get_member_profile(db, group_id, target_user_id, actor, bg)
 
@@ -309,7 +309,7 @@ async def current_game_audit(
     actor: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> CurrentGameAudit | None:
-    from app.services.group_profile_service import get_current_game_audit
+    from app.services.group_current_game_audit import get_current_game_audit
 
     return await get_current_game_audit(db, group_id, actor)
 

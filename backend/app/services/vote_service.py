@@ -5,10 +5,8 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
 
 from app.domain.enums import GroupRole, HardwareTier, InterestSignal, VoteStatus
-from app.models.game import Game
 from app.models.user import User
 from app.models.vote import VoteSession, VoteStage
 from app.repositories.game_repo import GameRepository
@@ -26,7 +24,6 @@ from app.services.events import (
     EVENT_VOTE_CREATED,
     track_event,
 )
-from app.services.notifications import notify_group
 from app.services.viability import ViabilityInput, calculate_viability
 from app.services.vote_audit import build_audit
 from app.services.vote_engine import (
@@ -34,6 +31,11 @@ from app.services.vote_engine import (
     calculate_max_selections_for_stage,
     calculate_quorum,
     get_stage_sizes,
+)
+from app.services.vote_notifications import (
+    notify_stage_advanced,
+    notify_vote_closed,
+    notify_vote_opened,
 )
 
 
@@ -139,44 +141,15 @@ class VoteService:
                 "total_stages": total_stages,
             },
         )
-        # notifica todos os membros do grupo + webhook discord
-        cand_games = (
-            (
-                await self.votes.db.execute(
-                    select(Game).where(Game.id.in_(data.candidate_game_ids[:10]))
-                )
-            )
-            .scalars()
-            .all()
-        )
-        fields = [
-            {"name": g.name, "value": f"{g.player_min}+ jogadores", "inline": True}
-            for g in cand_games[:9]
-        ]
-        if len(data.candidate_game_ids) > 9:
-            fields.append(
-                {
-                    "name": "+ " + str(len(data.candidate_game_ids) - 9),
-                    "value": "outros candidatos",
-                    "inline": True,
-                }
-            )
-        await notify_group(
+        await notify_vote_opened(
             self.votes.db,
-            group_id=group_id,
-            event="game_vote.opened",
-            title=f"Nova votação: {data.title}",
-            body=f"{len(data.candidate_game_ids)} candidatos, fecha em {data.duration_hours}h",
-            link=f"/groups/{group_id}/votes",
-            data={"vote_id": str(session.id), "group_id": str(group_id)},
-            exclude_user_ids=[actor.id],
-            webhook_description=(
-                f"Abriu uma nova votação de game no servidor. "
-                f"Fase 1 de {total_stages} — aprove até **{calculate_max_selections_for_stage(n)}** escolhas.\n\n"
-                f"Fase fecha em **{per_stage_hours}h** ou quando todos votarem."
-            ),
-            webhook_fields=fields,
-            webhook_thumbnail_url=cand_games[0].cover_url if cand_games else None,
+            session=session,
+            candidate_ids=list(data.candidate_game_ids),
+            duration_hours=data.duration_hours,
+            per_stage_hours=per_stage_hours,
+            max_selections=calculate_max_selections_for_stage(n),
+            total_stages=total_stages,
+            actor_id=actor.id,
         )
         return await self._to_response(session, actor)
 
@@ -373,23 +346,13 @@ class VoteService:
         await self.votes.add_stage(next_stage)
         session.current_stage_number = next_number
         await self.votes.save()
-        # notifica avanco de fase
-        await notify_group(
+        await notify_stage_advanced(
             self.votes.db,
-            group_id=session.group_id,
-            event="game_vote.stage_advanced",
-            title=f"Fase {next_number} de {total_stages}",
-            body=f"{len(advance_ids)} jogos seguem pra proxima fase de {session.title}",
-            link=f"/groups/{session.group_id}/votes",
-            data={
-                "vote_id": str(session.id),
-                "group_id": str(session.group_id),
-                "stage_number": next_number,
-            },
-            webhook_description=(
-                f"Fase {stage.stage_number} encerrada. **{len(advance_ids)}** jogos avancam "
-                f"pra fase **{next_number}** de **{total_stages}**."
-            ),
+            session=session,
+            stage=stage,
+            next_number=next_number,
+            total_stages=total_stages,
+            advance_count=len(advance_ids),
         )
 
     async def _post_winner_effects(
@@ -432,48 +395,13 @@ class VoteService:
 
             get_broker().publish(session.group_id, kind="current_game.changed")
 
-        winner = await self.games.get_by_id(winner_id)
-        winner_name = winner.name if winner else None
-        winner_cover = winner.cover_url if winner else None
-
-        tally_map: dict[uuid.UUID, int] = {cid: 0 for cid in stage.candidate_game_ids}
-        for b in ballots:
-            for a in b.approvals or []:
-                tally_map[a] = tally_map.get(a, 0) + 1
-        ranked = sorted(tally_map.items(), key=lambda x: -x[1])[:5]
-        fields = []
-        for rank, (cid, cnt) in enumerate(ranked, 1):
-            g = await self.games.get_by_id(cid)
-            if g is None:
-                continue
-            medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else f"{rank}º"
-            fields.append(
-                {
-                    "name": f"{medal} {g.name}",
-                    "value": f"{cnt} voto{'s' if cnt != 1 else ''}",
-                    "inline": True,
-                }
-            )
-        await notify_group(
+        await notify_vote_closed(
             self.votes.db,
-            group_id=session.group_id,
-            event="game_vote.closed",
-            title=f"Votação encerrada: {winner_name}" if winner_name else "Votação encerrada",
-            body=f"Resultado de {session.title}",
-            link=f"/groups/{session.group_id}/votes",
-            data={
-                "vote_id": str(session.id),
-                "group_id": str(session.group_id),
-                "winner_id": str(winner_id),
-            },
-            webhook_description=(
-                f"**{winner_name}** venceu a votação **{session.title}** com "
-                f"{len(ballots)}/{session.eligible_voter_count} participantes na fase final."
-                if winner_name
-                else f"Votação **{session.title}** encerrada sem vencedor."
-            ),
-            webhook_fields=fields or None,
-            webhook_image_url=winner_cover,
+            self.games,
+            session=session,
+            stage=stage,
+            ballots=ballots,
+            winner_id=winner_id,
         )
 
     async def _viability_map(
