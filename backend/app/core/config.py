@@ -1,7 +1,10 @@
 from functools import lru_cache
+from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+AppEnv = Literal["development", "staging", "production"]
 
 
 class Settings(BaseSettings):
@@ -38,11 +41,11 @@ class Settings(BaseSettings):
 
     # app_env controla features prod-only (esconder /docs, headers, etc).
     # setar APP_ENV=production em prod (Fly).
-    app_env: str = "development"
+    app_env: AppEnv = "development"
 
     @property
     def is_prod(self) -> bool:
-        return self.app_env.lower() in ("production", "prod")
+        return self.app_env == "production"
 
     # discord
     discord_client_id: str = ""
@@ -52,6 +55,37 @@ class Settings(BaseSettings):
 
     # steam
     steam_api_key: str = ""
+
+    @model_validator(mode="after")
+    def _guard_production(self) -> "Settings":
+        # boot guard: se app_env=production, exige config completa e bloqueia
+        # qualquer flag perigosa. melhor crashar no startup do que servir requests
+        # com dev-login aberto ou Discord oauth quebrado.
+        if self.app_env != "production":
+            return self
+        problems: list[str] = []
+        if self.dev_login_enabled:
+            problems.append(
+                "DEV_LOGIN_ENABLED=true em production (endpoint /auth/dev-login fica aberto)"
+            )
+        if not self.discord_client_id or not self.discord_client_secret:
+            problems.append("DISCORD_CLIENT_ID/SECRET nao setados (oauth quebra)")
+        if not self.discord_redirect_uri:
+            problems.append("DISCORD_REDIRECT_URI nao setado")
+        if not self.discord_redirect_uri.startswith("https://"):
+            problems.append("DISCORD_REDIRECT_URI precisa ser https em prod")
+        if not self.frontend_base_url.startswith("https://"):
+            problems.append("FRONTEND_BASE_URL precisa ser https em prod")
+        bad_origins = [o for o in self.cors_origins if "localhost" in o or "127.0.0.1" in o]
+        if bad_origins:
+            problems.append(f"CORS_ORIGINS contem localhost em prod: {bad_origins}")
+        if not self.token_encryption_key:
+            problems.append(
+                "TOKEN_ENCRYPTION_KEY nao setado em prod (rotacao de JWT_SECRET vai zerar integracoes)"
+            )
+        if problems:
+            raise ValueError("Boot guard production falhou:\n  - " + "\n  - ".join(problems))
+        return self
 
 
 @lru_cache
