@@ -40,7 +40,7 @@ async def lifespan(_: FastAPI):
 
     # leader election: so 1 machine roda bot + scheduler
     scheduler = AsyncIOScheduler(timezone="UTC")
-    scheduler.add_job(check_game_prices, CronTrigger(hour="*/6", minute=30))
+    scheduler.add_job(check_game_prices, CronTrigger(hour="*/3", minute=30))
     bot = PresenceBot(settings.discord_bot_token)
     leader = LeaderElection()
 

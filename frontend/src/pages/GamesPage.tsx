@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import { useT } from '@/i18n'
+import { translateGenre } from '@/i18n/steamGenres'
+import { useLocaleStore } from '@/features/locale/store'
 import { useGames } from '@/features/games/hooks'
 import { GameGridSkeleton } from '@/components/ui/CardSkeletons'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -24,10 +26,17 @@ export function GamesPage() {
   const [genreFilter, setGenreFilter] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
 
+  const locale = useLocaleStore((s) => s.locale)
+  // normaliza genero pra EN canonico antes de contar/filtrar pra unificar PT antigo + EN novo
+  const norm = (g: string) => translateGenre(g, 'en')
+
   const topGenres = useMemo(() => {
     const counts = new Map<string, number>()
     for (const g of games.data ?? []) {
-      for (const x of g.genres) counts.set(x, (counts.get(x) ?? 0) + 1)
+      for (const x of g.genres) {
+        const k = norm(x)
+        counts.set(k, (counts.get(k) ?? 0) + 1)
+      }
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([g]) => g)
   }, [games.data])
@@ -36,11 +45,11 @@ export function GamesPage() {
     () =>
       games.data?.filter((g) => {
         if (stageFilter.size > 0 && !stageFilter.has(g.stage)) return false
-        if (genreFilter.size > 0 && !g.genres.some((x) => genreFilter.has(x))) return false
+        if (genreFilter.size > 0 && !g.genres.some((x) => genreFilter.has(norm(x)))) return false
         if (search && !g.name.toLowerCase().includes(search.toLowerCase())) return false
         return true
       }),
-    [games.data, stageFilter, genreFilter, search],
+    [games.data, stageFilter, genreFilter, search, locale],
   )
 
   const toggleStage = (s: string) =>

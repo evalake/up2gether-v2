@@ -11,7 +11,6 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/core/Button'
-import { KanjiLabel } from '@/components/core/KanjiLabel'
 import { useTitle } from '@/lib/useTitle'
 import { useT } from '@/i18n'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
@@ -193,8 +192,7 @@ export function GroupsPage() {
     <div className="space-y-6">
       <header className="flex items-end justify-between">
         <div>
-          <KanjiLabel jp="グループ" en="groups" />
-          <h1 className="mt-1 font-display text-3xl text-up-text">{t.groups.title}</h1>
+          <h1 className="font-display text-3xl text-up-text">{t.groups.title}</h1>
         </div>
         <Button onClick={() => setPickerOpen(true)}>
           {t.groups.addServer}

@@ -1,6 +1,7 @@
 import { useLocaleStore, type Locale } from '@/features/locale/store'
 
-const ptMap: Record<string, string> = {
+// canonical EN -> PT
+const enToPt: Record<string, string> = {
   Action: 'Ação',
   Adventure: 'Aventura',
   Casual: 'Casual',
@@ -44,9 +45,23 @@ const ptMap: Record<string, string> = {
   'Visual Novel': 'Visual Novel',
 }
 
+// invertido pra normalizar dado antigo em PT pra EN canonico
+const ptToEn: Record<string, string> = Object.entries(enToPt).reduce(
+  (acc, [en, pt]) => {
+    acc[pt.toLowerCase()] = en
+    return acc
+  },
+  {} as Record<string, string>,
+)
+
+function canonicalize(g: string): string {
+  return ptToEn[g.toLowerCase()] ?? g
+}
+
 export function translateGenre(g: string, locale: Locale): string {
-  if (locale === 'pt') return ptMap[g] ?? g
-  return g
+  const canon = canonicalize(g)
+  if (locale === 'pt') return enToPt[canon] ?? canon
+  return canon
 }
 
 export function useTranslateGenre() {
