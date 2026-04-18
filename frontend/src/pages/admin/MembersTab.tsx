@@ -4,6 +4,7 @@ import { Loading } from '@/components/ui/Loading'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { Avatar } from '@/components/core/Avatar'
 import { useToast } from '@/components/ui/toast'
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useT } from '@/i18n'
 
 export function MembersTab({
@@ -31,6 +32,7 @@ export function MembersTab({
 }) {
   const t = useT()
   const toast = useToast()
+  const confirm = useConfirm()
 
   return (
     <section className="rounded-sm border border-up-orange/15 bg-up-panel/30 p-5">
@@ -97,8 +99,13 @@ export function MembersTab({
                     </button>
                   )}
                   <button
-                    onClick={() => {
-                      if (confirm(t.admin.removeConfirm(name))) kick.mutate(m.user_id)
+                    onClick={async () => {
+                      const ok = await confirm({
+                        title: t.admin.removeConfirm(name),
+                        tone: 'danger',
+                        confirmLabel: t.admin.removeFromGroupTitle,
+                      })
+                      if (ok) kick.mutate(m.user_id)
                     }}
                     className="rounded-sm border border-up-line px-2 py-1 font-mono text-[10px] text-up-dim transition-colors hover:border-up-red/60 hover:text-up-red"
                     title={t.admin.removeFromGroupTitle}
