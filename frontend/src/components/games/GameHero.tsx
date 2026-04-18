@@ -47,7 +47,13 @@ export function GameHero({ game }: { game: Game }) {
 
           <div className="mt-1.5 flex flex-wrap items-center gap-x-1 gap-y-1 text-[11px] tracking-wide text-up-dim">
             {game.developer && <span className="text-up-text">{game.developer}</span>}
-            {game.release_date && <>{game.developer && <span className="text-up-line">&middot;</span>}<span>{game.release_date}</span></>}
+            {game.publisher && game.publisher !== game.developer && (
+              <>
+                {game.developer && <span className="text-up-line">&middot;</span>}
+                <span>{game.publisher}</span>
+              </>
+            )}
+            {game.release_date && <>{(game.developer || game.publisher) && <span className="text-up-line">&middot;</span>}<span>{game.release_date}</span></>}
             {game.metacritic_score != null && (
               <>
                 <span className="text-up-line">&middot;</span>

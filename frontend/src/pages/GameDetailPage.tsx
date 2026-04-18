@@ -21,6 +21,7 @@ import { GameSidebar } from '@/components/games/GameSidebar'
 import { GameStatusBar } from '@/components/games/GameStatusBar'
 import { GameActionsBar } from '@/components/games/GameActionsBar'
 import { useT, type Translations } from '@/i18n'
+import { useTranslateGenre } from '@/i18n/steamGenres'
 
 // stagger delay entre sections (30ms conforme UX guideline)
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.03 } } }
@@ -31,6 +32,7 @@ const fadeUp = {
 
 export function GameDetailPage() {
   const t = useT()
+  const trGenre = useTranslateGenre()
   const { id = '', gameId = '' } = useParams()
   const game = useGame(id, gameId)
   useTitle(game.data?.name)
@@ -147,7 +149,7 @@ export function GameDetailPage() {
                   <div className="flex flex-wrap gap-1">
                     {g.genres.map((x) => (
                       <span key={`g-${x}`} className="rounded-sm border border-up-orange/30 bg-up-orange/5 px-2 py-0.5 text-[10px] text-up-text transition-colors hover:border-up-orange/60 hover:text-up-orange">
-                        {x}
+                        {trGenre(x)}
                       </span>
                     ))}
                   </div>

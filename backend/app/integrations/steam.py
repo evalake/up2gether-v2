@@ -283,7 +283,7 @@ class HttpSteamClient:
         async with httpx.AsyncClient(timeout=10) as client:
             res = await client.get(
                 self.SEARCH_URL,
-                params={"term": query, "l": "portuguese", "cc": "br"},
+                params={"term": query, "l": "english", "cc": "br"},
             )
         if res.status_code != 200:
             raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Steam search failed")
@@ -302,7 +302,7 @@ class HttpSteamClient:
         async with httpx.AsyncClient(timeout=10) as client:
             res = await client.get(
                 self.DETAILS_URL,
-                params={"appids": str(appid), "cc": "br", "l": "portuguese"},
+                params={"appids": str(appid), "cc": "br", "l": "english"},
             )
         if res.status_code != 200:
             raise HTTPException(status.HTTP_502_BAD_GATEWAY, "Steam details failed")
@@ -318,6 +318,7 @@ class HttpSteamClient:
         hw_tier = infer_hardware_tier(data.get("pc_requirements"))
         metacritic = (data.get("metacritic") or {}).get("score")
         devs = data.get("developers") or []
+        pubs = data.get("publishers") or []
         return SteamGameDetails(
             appid=appid,
             name=data.get("name"),
@@ -334,6 +335,7 @@ class HttpSteamClient:
             player_min=pmin,
             player_max=pmax,
             developer=devs[0] if devs else None,
+            publisher=pubs[0] if pubs else None,
             metacritic_score=metacritic,
             hardware_tier=hw_tier,
         )

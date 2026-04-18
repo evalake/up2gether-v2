@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { HardwareTier } from '@/features/games/api'
 import type { SteamSearchItem } from '@/features/steam/api'
 import { useT } from '@/i18n'
+import { useTranslateGenre } from '@/i18n/steamGenres'
 import { Textarea } from '@/components/ui/Textarea'
 import { SteamThumb } from '@/components/SteamThumb'
 import { TIERS } from '@/lib/constants'
@@ -36,6 +37,7 @@ export type FormState = {
   player_max: number | null
   min_hardware_tier: HardwareTier
   developer: string | null
+  publisher: string | null
   release_date: string | null
   metacritic_score: number | null
   price_original: number | null
@@ -56,6 +58,7 @@ export const emptyForm: FormState = {
   player_max: null,
   min_hardware_tier: 'unknown',
   developer: null,
+  publisher: null,
   release_date: null,
   metacritic_score: null,
   price_original: null,
@@ -111,6 +114,7 @@ export function SteamResultsList({ hits, onPick }: { hits: SteamSearchItem[]; on
 
 export function SteamPreview({ form, onClear }: { form: FormState; onClear: () => void }) {
   const t = useT()
+  const trGenre = useTranslateGenre()
   const hwLabel: Record<string, string> = { low: t.games.hwLight, mid: t.games.hwMedium, high: t.games.hwHeavyLabel, unknown: t.games.hwNA }
   const priceLabel = form.is_free
     ? t.games.freeToPlay
@@ -163,7 +167,7 @@ export function SteamPreview({ form, onClear }: { form: FormState; onClear: () =
       {form.genres.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {form.genres.slice(0, 8).map((g) => (
-            <span key={g} className="rounded-sm border border-up-magenta/40 bg-up-magenta/10 px-2 py-0.5 text-[10px] text-up-magenta">{g}</span>
+            <span key={g} className="rounded-sm border border-up-magenta/40 bg-up-magenta/10 px-2 py-0.5 text-[10px] text-up-magenta">{trGenre(g)}</span>
           ))}
           {form.genres.length > 8 && (
             <span className="px-1 text-[10px] text-up-dim">+{form.genres.length - 8}</span>

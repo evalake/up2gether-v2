@@ -39,6 +39,7 @@ class GameCreate(BaseModel):
     player_max: int | None = Field(None, ge=1)
     min_hardware_tier: HardwareTier = HardwareTier.UNKNOWN
     developer: str | None = None
+    publisher: str | None = None
     release_date: str | None = None
     metacritic_score: int | None = Field(None, ge=0, le=100)
     price_original: float | None = Field(None, ge=0, le=100000)
@@ -70,6 +71,7 @@ class GameUpdate(BaseModel):
     genres: list[str] | None = None
     tags: list[str] | None = None
     developer: str | None = None
+    publisher: str | None = None
     release_date: str | None = None
     metacritic_score: int | None = Field(None, ge=0, le=100)
     price_original: float | None = Field(None, ge=0, le=100000)
@@ -119,6 +121,7 @@ class GameResponse(BaseModel):
     created_at: datetime
     archived_at: datetime | None = None
     developer: str | None = None
+    publisher: str | None = None
     release_date: str | None = None
     metacritic_score: int | None = None
     price_original: float | None = None

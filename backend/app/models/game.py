@@ -46,6 +46,7 @@ class Game(Base, TimestampMixin):
     )
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     developer: Mapped[str | None] = mapped_column(String, nullable=True)
+    publisher: Mapped[str | None] = mapped_column(String, nullable=True)
     release_date: Mapped[str | None] = mapped_column(String, nullable=True)
     metacritic_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     price_original: Mapped[float | None] = mapped_column(Float, nullable=True)

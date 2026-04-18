@@ -25,6 +25,7 @@ export type SteamGameDetails = {
   player_min: number | null
   player_max: number | null
   developer: string | null
+  publisher: string | null
   metacritic_score: number | null
   price_initial: number | null
   discount_percent: number | null

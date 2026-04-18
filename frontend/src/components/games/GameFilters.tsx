@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { STAGE_VALUES } from '@/lib/constants'
 import { useStages, useT } from '@/i18n'
+import { useTranslateGenre } from '@/i18n/steamGenres'
 
 const GENRE_LIMIT = 5
 
@@ -92,6 +93,7 @@ export function GameFilters({
 
 function GenreRow({ genres, genreFilter, toggleGenre }: { genres: string[]; genreFilter: Set<string>; toggleGenre: (g: string) => void }) {
   const t = useT()
+  const trGenre = useTranslateGenre()
   const [expanded, setExpanded] = useState(false)
   const needsCollapse = genres.length > GENRE_LIMIT
   const visible = expanded || !needsCollapse ? genres : genres.slice(0, GENRE_LIMIT)
@@ -111,7 +113,7 @@ function GenreRow({ genres, genreFilter, toggleGenre }: { genres: string[]; genr
                 : 'border-up-line text-up-dim hover:border-up-magenta hover:text-up-magenta'
             }`}
           >
-            {g}
+            {trGenre(g)}
           </button>
         )
       })}

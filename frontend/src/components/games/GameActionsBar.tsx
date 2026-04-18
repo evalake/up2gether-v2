@@ -46,6 +46,7 @@ export function GameActionsBar({ game: g, groupId, canManage, editing, onToggleE
           description: d.short_description ?? g.description,
           price_current: d.price != null ? d.price / 100 : g.price_current,
           developer: d.developer ?? g.developer,
+          publisher: d.publisher ?? g.publisher,
           release_date: d.release_date ?? g.release_date,
           metacritic_score: d.metacritic_score ?? g.metacritic_score,
           price_original: d.price_initial != null ? d.price_initial / 100 : g.price_original,

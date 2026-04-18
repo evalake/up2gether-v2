@@ -36,6 +36,7 @@ export type Game = {
   created_at: string
   archived_at: string | null
   developer: string | null
+  publisher: string | null
   release_date: string | null
   metacritic_score: number | null
   price_original: number | null
@@ -62,6 +63,7 @@ export type GameCreateInput = {
   min_hardware_tier?: HardwareTier
   source?: GameSource
   developer?: string | null
+  publisher?: string | null
   release_date?: string | null
   metacritic_score?: number | null
   price_original?: number | null
