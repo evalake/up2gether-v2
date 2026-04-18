@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.security import CurrentUser
 from app.schemas.user import (
+    DataExportResponse,
     HardwareResponse,
     HardwareUpdate,
     OnboardingResponse,
@@ -53,6 +54,15 @@ async def patch_my_settings(
     service: Annotated[UserService, Depends(get_user_service)],
 ) -> SettingsResponse:
     return await service.update_settings(actor, payload)
+
+
+@router.get("/users/me/export", response_model=DataExportResponse)
+async def export_my_data(
+    actor: CurrentUser,
+    service: Annotated[UserService, Depends(get_user_service)],
+) -> DataExportResponse:
+    """LGPD: snapshot completo dos dados pessoais do user."""
+    return await service.export_data(actor)
 
 
 @router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)

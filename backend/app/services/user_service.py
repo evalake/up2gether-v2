@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.enums import HardwareTier
+from app.models.event import Event
 from app.models.game import Game
 from app.models.group import Group, GroupMembership
-from app.models.session import PlaySession
-from app.models.user import User, UserHardwareProfile
+from app.models.notification import Notification
+from app.models.session import PlaySession, SessionRsvpRow
+from app.models.user import IntegrationAccount, User, UserHardwareProfile
 from app.models.vote import VoteBallot
 from app.schemas.user import (
+    DataExportResponse,
     HardwareResponse,
     HardwareUpdate,
     OnboardingResponse,
@@ -116,6 +120,141 @@ class UserService:
             steps_done=done,
             steps_total=4,
             complete=done == 4,
+        )
+
+    async def export_data(self, actor: User) -> DataExportResponse:
+        """Snapshot LGPD: tudo que persistimos sobre o user em JSON serializavel.
+
+        Tokens OAuth (access/refresh) nao entram - sao secret nosso, nao do user.
+        Email do discord entra pq foi o user que cedeu via OAuth.
+        """
+        hw = (
+            await self.db.execute(
+                select(UserHardwareProfile).where(UserHardwareProfile.user_id == actor.id)
+            )
+        ).scalar_one_or_none()
+        integrations = (
+            (
+                await self.db.execute(
+                    select(IntegrationAccount).where(IntegrationAccount.user_id == actor.id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        memberships = (
+            await self.db.execute(
+                select(GroupMembership, Group.name, Group.discord_guild_id)
+                .join(Group, Group.id == GroupMembership.group_id)
+                .where(GroupMembership.user_id == actor.id)
+            )
+        ).all()
+        rsvps = (
+            (
+                await self.db.execute(
+                    select(SessionRsvpRow).where(SessionRsvpRow.user_id == actor.id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        ballots = (
+            (await self.db.execute(select(VoteBallot).where(VoteBallot.user_id == actor.id)))
+            .scalars()
+            .all()
+        )
+        notifs = (
+            (await self.db.execute(select(Notification).where(Notification.user_id == actor.id)))
+            .scalars()
+            .all()
+        )
+        events = (
+            (
+                await self.db.execute(
+                    select(Event).where(Event.user_id == actor.id).order_by(Event.occurred_at.asc())
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+        return DataExportResponse(
+            generated_at=datetime.now(UTC),
+            user={
+                "id": str(actor.id),
+                "discord_id": actor.discord_id,
+                "discord_username": actor.discord_username,
+                "discord_display_name": actor.discord_display_name,
+                "discord_email": actor.discord_email,
+                "created_at": actor.created_at.isoformat() if actor.created_at else None,
+            },
+            settings={
+                "timezone": actor.timezone,
+                "notification_email": actor.notification_email,
+                "locale": actor.locale,
+                "onboarding_completed": actor.onboarding_completed,
+                "settings": actor.settings or {},
+            },
+            hardware=(
+                {"tier": hw.tier, "notes": hw.notes, "updated_at": hw.updated_at.isoformat()}
+                if hw is not None
+                else None
+            ),
+            integrations=[
+                {
+                    "provider": i.provider,
+                    "external_id": i.external_id,
+                    "linked_at": i.linked_at.isoformat() if i.linked_at else None,
+                    "last_sync_at": i.last_sync_at.isoformat() if i.last_sync_at else None,
+                }
+                for i in integrations
+            ],
+            memberships=[
+                {
+                    "group_id": str(m.GroupMembership.group_id),
+                    "group_name": m.name,
+                    "discord_guild_id": m.discord_guild_id,
+                    "role": m.GroupMembership.role,
+                    "joined_at": m.GroupMembership.joined_at.isoformat(),
+                }
+                for m in memberships
+            ],
+            rsvps=[
+                {
+                    "session_id": str(r.session_id),
+                    "status": r.status,
+                    "updated_at": r.updated_at.isoformat() if r.updated_at else None,
+                }
+                for r in rsvps
+            ],
+            ballots=[
+                {
+                    "vote_session_id": str(b.vote_session_id),
+                    "stage_id": str(b.stage_id) if b.stage_id else None,
+                    "approvals": [str(a) for a in (b.approvals or [])],
+                    "submitted_at": b.submitted_at.isoformat() if b.submitted_at else None,
+                }
+                for b in ballots
+            ],
+            notifications=[
+                {
+                    "kind": n.kind,
+                    "title": n.title,
+                    "body": n.body,
+                    "read_at": n.read_at.isoformat() if n.read_at else None,
+                    "created_at": n.created_at.isoformat() if n.created_at else None,
+                }
+                for n in notifs
+            ],
+            events=[
+                {
+                    "event_type": e.event_type,
+                    "occurred_at": e.occurred_at.isoformat(),
+                    "group_id": str(e.group_id) if e.group_id else None,
+                    "payload": e.payload or {},
+                }
+                for e in events
+            ],
         )
 
     async def delete_account(self, actor: User) -> None:
