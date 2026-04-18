@@ -198,3 +198,154 @@ async def test_get_vote_403_for_non_member(make_user, auth_headers, client):
         headers=auth_headers(intruder),
     )
     assert res.status_code == 403
+
+
+async def test_winner_sets_group_current_game(make_user, auth_headers, client):
+    """Vote fechado seta current_game_id no grupo com source='vote'."""
+    owner, g, games = await _setup_group_with_games(
+        make_user, auth_headers, client, "g-vote-6", n=3
+    )
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={
+                "title": "Pick",
+                "candidate_game_ids": [x["id"] for x in games],
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+    await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[2]["id"]]},
+        headers=auth_headers(owner),
+    )
+
+    grp = (await client.get(f"/api/groups/{g['id']}", headers=auth_headers(owner))).json()
+    assert grp["current_game_id"] == games[2]["id"]
+    assert grp["current_game_source"] == "vote"
+
+
+async def test_multistage_advances_through_phases(make_user, auth_headers, client):
+    """6 candidatos: stages [6, 3, 2]. Vota stage 1 -> avanca, vota stage 2 -> winner."""
+    owner, g, games = await _setup_group_with_games(
+        make_user, auth_headers, client, "g-vote-7", n=6
+    )
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={
+                "title": "Multi",
+                "candidate_game_ids": [x["id"] for x in games],
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+    assert vote["total_stages"] == 3
+    assert vote["current_stage_number"] == 1
+    assert vote["max_selections"] == 3
+
+    # vota nos 3 primeiros pra eles avancarem
+    res = await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[0]["id"], games[1]["id"]]},
+        headers=auth_headers(owner),
+    )
+    body = res.json()
+    # owner sozinho (eligible=1) fechou stage 1, abriu stage 2
+    assert body["status"] == "open"
+    assert body["current_stage_number"] == 2
+
+    # stage 2 tem 3 candidatos. vota num que avanca pra final (stage 3 = 2 candidatos)
+    advance_after_s1 = sorted(body["stages"], key=lambda s: s["stage_number"])[1][
+        "candidate_game_ids"
+    ]
+    res = await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [advance_after_s1[0]]},
+        headers=auth_headers(owner),
+    )
+    body = res.json()
+    # stage 2 com 3 candidatos: 100% consensus (1/1) gera early_consensus
+    assert body["status"] == "closed"
+    assert body["winner_game_id"] == advance_after_s1[0]
+
+
+async def test_force_close_picks_winner_from_current_stage(make_user, auth_headers, client):
+    """Admin pode forcar close: pega winner do stage atual mesmo sem todos votarem."""
+    owner, g, games = await _setup_group_with_games(
+        make_user, auth_headers, client, "g-vote-8", n=2
+    )
+    second = await make_user(username="second")
+    await client.post(
+        "/api/groups",
+        json={"discord_guild_id": "g-vote-8", "name": "Squad"},
+        headers=auth_headers(second),
+    )
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={
+                "title": "Pick",
+                "candidate_game_ids": [x["id"] for x in games],
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+    # so o owner vota, second nao
+    await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[1]["id"]]},
+        headers=auth_headers(owner),
+    )
+    # ainda aberto pq second nao votou
+    chk = (
+        await client.get(
+            f"/api/groups/{g['id']}/votes/{vote['id']}",
+            headers=auth_headers(owner),
+        )
+    ).json()
+    assert chk["status"] == "open"
+
+    # owner forca close -> games[1] vence (1 voto vs 0)
+    res = await client.post(
+        f"/api/groups/{g['id']}/votes/{vote['id']}/close",
+        headers=auth_headers(owner),
+    )
+    body = res.json()
+    assert body["status"] == "closed"
+    assert body["winner_game_id"] == games[1]["id"]
+
+
+async def test_ballot_outside_current_stage_rejected(make_user, auth_headers, client):
+    """Apos avancar de stage, ballot com candidato eliminado -> 400."""
+    owner, g, games = await _setup_group_with_games(
+        make_user, auth_headers, client, "g-vote-9", n=6
+    )
+    vote = (
+        await client.post(
+            f"/api/groups/{g['id']}/votes",
+            json={
+                "title": "Multi",
+                "candidate_game_ids": [x["id"] for x in games],
+            },
+            headers=auth_headers(owner),
+        )
+    ).json()
+    res = await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [games[0]["id"], games[1]["id"]]},
+        headers=auth_headers(owner),
+    )
+    body = res.json()
+    assert body["current_stage_number"] == 2
+    advanced = sorted(body["stages"], key=lambda s: s["stage_number"])[1]["candidate_game_ids"]
+    eliminated = [x["id"] for x in games if x["id"] not in advanced]
+    assert eliminated, "expected at least one eliminated game"
+
+    res = await client.put(
+        f"/api/votes/{vote['id']}/ballot",
+        json={"approvals": [eliminated[0]]},
+        headers=auth_headers(owner),
+    )
+    assert res.status_code == 400
