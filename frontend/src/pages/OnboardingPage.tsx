@@ -11,6 +11,7 @@ import { Avatar } from '@/components/core/Avatar'
 import { Loading } from '@/components/ui/Loading'
 import { useT } from '@/i18n'
 import type { HardwareTier } from '@/features/games/api'
+import { useLocaleStore, type Locale } from '@/features/locale/store'
 
 type DiscoverResult = {
   joined: { id: string; name: string; icon_url: string | null }[]
@@ -41,7 +42,7 @@ const TIMEZONES = [
   'UTC',
 ]
 
-const STEPS = ['welcome', 'servers', 'timezone', 'hardware', 'steam', 'done'] as const
+const STEPS = ['welcome', 'language', 'servers', 'timezone', 'hardware', 'steam', 'done'] as const
 type Step = typeof STEPS[number]
 
 function guildIcon(url: string | null) {
@@ -68,6 +69,13 @@ export function OnboardingPage() {
   const createGroup = useCreateGroup()
 
   const [step, setStep] = useState<Step>('welcome')
+  const storeLocale = useLocaleStore((s) => s.locale)
+  const setStoreLocale = useLocaleStore((s) => s.setLocale)
+  const [locale, setLocalLocale] = useState<Locale>(storeLocale)
+  const pickLocale = (l: Locale) => {
+    setLocalLocale(l)
+    setStoreLocale(l, true)
+  }
   const [tz, setTz] = useState(() => {
     try { return Intl.DateTimeFormat().resolvedOptions().timeZone } catch { return 'America/Sao_Paulo' }
   })
@@ -129,7 +137,7 @@ export function OnboardingPage() {
 
   const finish = async () => {
     try {
-      await patch.mutateAsync({ timezone: tz, onboarding_completed: true })
+      await patch.mutateAsync({ timezone: tz, locale, onboarding_completed: true })
       await setHw.mutateAsync({ tier: hwTier })
     } catch { /* continua */ }
     navigate('/groups', { replace: true })
@@ -176,6 +184,38 @@ export function OnboardingPage() {
                   </p>
                 </div>
                 <Button onClick={next} className="mx-auto">{t.onboarding.letsGo}</Button>
+              </div>
+            )}
+
+            {step === 'language' && (
+              <div className="space-y-5">
+                <div className="text-center">
+                  <h2 className="font-display text-2xl text-up-text">{t.onboarding.languageLabel}</h2>
+                  <p className="mt-1 text-sm text-up-dim">{t.onboarding.languageHint}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { id: 'pt' as Locale, label: 'Português' },
+                    { id: 'en' as Locale, label: 'English' },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => pickLocale(opt.id)}
+                      className={`rounded-sm border px-4 py-3 text-sm transition-all ${
+                        locale === opt.id
+                          ? 'border-up-orange bg-up-orange/10 text-up-orange'
+                          : 'border-up-line text-up-dim hover:border-up-orange'
+                      }`}
+                    >
+                      <div className="font-mono text-[10px] uppercase tracking-wider">{opt.id}</div>
+                      <div className="mt-0.5">{opt.label}</div>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                  <button onClick={prev} className="text-[11px] uppercase tracking-wider text-up-dim transition-colors hover:text-up-orange">{t.onboarding.back}</button>
+                  <Button onClick={next}>{t.onboarding.next}</Button>
+                </div>
               </div>
             )}
 
@@ -306,6 +346,7 @@ export function OnboardingPage() {
                       value={steamUrl}
                       onChange={(e) => setSteamUrl(e.target.value)}
                       placeholder={t.onboarding.steamPlaceholder}
+                      maxLength={200}
                       className="h-9 flex-1 rounded-sm border border-up-line bg-black/40 px-3 text-xs focus-visible:border-up-orange focus-visible:outline-none"
                     />
                     <Button onClick={importSteam} disabled={steamLoading || !steamUrl.trim()}>

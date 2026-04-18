@@ -7,6 +7,7 @@ export type DiscordUser = {
   discord_display_name: string | null
   discord_avatar: string | null
   onboarding_completed: boolean
+  locale: string | null
   is_new_user: boolean
   is_sys_admin?: boolean
 }

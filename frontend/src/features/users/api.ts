@@ -10,6 +10,7 @@ export type HardwareResponse = {
 export type SettingsResponse = {
   timezone: string | null
   notification_email: string | null
+  locale: string | null
   onboarding_completed: boolean
   settings: Record<string, unknown>
 }
@@ -17,6 +18,7 @@ export type SettingsResponse = {
 export type SettingsUpdate = {
   timezone?: string | null
   notification_email?: string | null
+  locale?: string | null
   onboarding_completed?: boolean
   settings?: Record<string, unknown>
 }

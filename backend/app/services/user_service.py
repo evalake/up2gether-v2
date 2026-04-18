@@ -41,6 +41,7 @@ class UserService:
         return SettingsResponse(
             timezone=actor.timezone,
             notification_email=actor.notification_email,
+            locale=actor.locale,
             onboarding_completed=actor.onboarding_completed,
             settings=actor.settings or {},
         )
@@ -50,6 +51,8 @@ class UserService:
             actor.timezone = data.timezone
         if data.notification_email is not None:
             actor.notification_email = data.notification_email
+        if data.locale is not None:
+            actor.locale = data.locale
         if data.onboarding_completed is not None:
             actor.onboarding_completed = data.onboarding_completed
         if data.settings is not None:

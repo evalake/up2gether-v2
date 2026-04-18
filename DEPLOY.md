@@ -12,10 +12,11 @@ fly launch --no-deploy --copy-config    # usa fly.toml ja existente
 fly secrets set \
   JWT_SECRET="..." \
   DATABASE_URL="postgresql+asyncpg://..." \
-  CORS_ORIGINS='["https://up2gether.vercel.app"]' \
+  CORS_ORIGINS='["https://up2gether.com.br","https://www.up2gether.com.br"]' \
+  FRONTEND_BASE_URL="https://up2gether.com.br" \
   DISCORD_CLIENT_ID="..." \
   DISCORD_CLIENT_SECRET="..." \
-  DISCORD_REDIRECT_URI="https://up2gether.vercel.app/auth/discord/callback" \
+  DISCORD_REDIRECT_URI="https://up2gether.com.br/auth/discord/callback" \
   STEAM_API_KEY="..."
 fly deploy
 ```
@@ -28,7 +29,7 @@ o CMD do Dockerfile roda `alembic upgrade head` antes do uvicorn, entao a primei
 - env vars:
   - `VITE_API_URL=https://up2gether-api.fly.dev/api`
   - `VITE_DISCORD_CLIENT_ID=...`
-  - `VITE_DISCORD_REDIRECT_URI=https://up2gether.vercel.app/auth/discord/callback`
+  - `VITE_DISCORD_REDIRECT_URI=https://up2gether.com.br/auth/discord/callback`
 
 ## pos-deploy
 - whitelist do redirect uri novo no discord dev portal
