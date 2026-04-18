@@ -176,6 +176,69 @@ async def test_me_with_unknown_user_returns_401(client):
 
 
 @pytest.mark.asyncio
+async def test_logout_revokes_existing_tokens(app, client, db_session):
+    """Apos logout, JWT antigo do mesmo user vira 401."""
+    user = User(discord_id="logout-1", discord_username="lo", settings={})
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    token = issue_access_token(user.id, user.discord_id, user.token_generation)
+
+    # token funciona antes do logout
+    r = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+
+    # logout incrementa generation
+    r = await client.post("/api/auth/logout", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 204
+
+    # mesmo token nao serve mais
+    r = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 401
+
+    # novo login emite token novo que funciona
+    await db_session.refresh(user)
+    new_token = issue_access_token(user.id, user.discord_id, user.token_generation)
+    r = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {new_token}"})
+    assert r.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_logout_without_token_returns_401(client):
+    r = await client.post("/api/auth/logout")
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_legacy_token_without_gen_still_works(app, client, db_session):
+    """Token antigo (pre-W1.2) sem claim 'gen' e tratado como gen=0.
+    Evita derrubar usuarios logados na hora do deploy.
+    """
+    from datetime import UTC, datetime, timedelta
+
+    import jwt as _jwt
+
+    from app.core.config import get_settings
+
+    user = User(discord_id="legacy", discord_username="le", settings={})
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+
+    settings = get_settings()
+    now = datetime.now(UTC)
+    payload = {
+        "sub": str(user.id),
+        "discord_id": user.discord_id,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(hours=1)).timestamp()),
+    }
+    legacy_token = _jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    r = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {legacy_token}"})
+    assert r.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_discord_callback_rate_limited(app, client):
     """Bruteforce no /discord/callback eventualmente retorna 429.
     Capacity e 10, entao a 11a chamada no mesmo burst deve bloquear.

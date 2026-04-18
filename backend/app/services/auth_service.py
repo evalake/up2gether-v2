@@ -49,7 +49,7 @@ class AuthService:
                 payload=payload,
             )
 
-        jwt_token = issue_access_token(user.id, user.discord_id)
+        jwt_token = issue_access_token(user.id, user.discord_id, user.token_generation)
         return AuthTokenResponse(
             access_token=jwt_token,
             user=UserResponse.from_user(user, is_new_user=is_new),

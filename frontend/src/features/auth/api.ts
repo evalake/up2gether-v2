@@ -80,6 +80,12 @@ export function fetchMe() {
   return api<DiscordUser>('/auth/me')
 }
 
+/** Revoga o JWT atual no backend (incrementa token_generation do user).
+ *  Best-effort: se falhar (rede/401 ja expirado) ainda assim limpa local. */
+export function logoutApi() {
+  return api<void>('/auth/logout', { method: 'POST' })
+}
+
 export type OnboardingState = {
   has_group: boolean
   has_games: boolean

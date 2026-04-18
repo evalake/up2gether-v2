@@ -26,6 +26,9 @@ class User(Base, TimestampMixin):
     locale: Mapped[str | None] = mapped_column(String(8), nullable=True)
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     settings: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
+    # incrementa em logout / "sair de todos os dispositivos" / delete account.
+    # JWT carrega o gen no payload, get_current_user rejeita se nao bater.
+    token_generation: Mapped[int] = mapped_column(default=0, nullable=False)
 
     integrations: Mapped[list[IntegrationAccount]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="selectin"
