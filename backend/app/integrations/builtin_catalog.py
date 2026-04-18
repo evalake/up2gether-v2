@@ -2,6 +2,9 @@
 
 Esses jogos nao tem API publica de catalogo, entao a gente mantem
 os metadados aqui. Covers sao URLs publicas oficiais.
+
+Tudo em EN canonico pra bater com o resto do app (Steam tb retorna em EN).
+Tradutor em runtime no frontend cuida do display por locale.
 """
 
 from __future__ import annotations
@@ -14,13 +17,14 @@ BUILTIN_GAMES: list[dict] = [
         "source": "riot",
         # ddragon e o CDN oficial da Riot, estavel desde 2012
         "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg",
-        "description": "MOBA 5v5 competitivo da Riot Games. Escolha entre mais de 160 campeoes e destrua o Nexus inimigo.",
+        "description": "Competitive 5v5 MOBA from Riot Games. Pick from 160+ champions and destroy the enemy Nexus.",
         "is_free": True,
-        "genres": ["MOBA", "Estrategia"],
+        "genres": ["MOBA", "Strategy"],
         "player_min": 1,
         "player_max": 10,
         "min_hardware_tier": "low",
         "developer": "Riot Games",
+        "publisher": "Riot Games",
         "release_date": "2009-10-27",
     },
     {
@@ -30,13 +34,14 @@ BUILTIN_GAMES: list[dict] = [
         "source": "riot",
         # valorant-api.com - CDN publica estavel, splash do mapa Ascent
         "cover_url": "https://media.valorant-api.com/maps/7eaecc1b-4337-bbf6-6ab9-04b8f06b3319/splash.png",
-        "description": "FPS tatico 5v5 com agentes e habilidades unicas. Plante a spike e domine o mapa.",
+        "description": "Tactical 5v5 FPS with agents and unique abilities. Plant the spike and dominate the map.",
         "is_free": True,
-        "genres": ["FPS", "Tatico"],
+        "genres": ["FPS", "Tactical"],
         "player_min": 2,
         "player_max": 10,
         "min_hardware_tier": "low",
         "developer": "Riot Games",
+        "publisher": "Riot Games",
         "release_date": "2020-06-02",
     },
     {
@@ -46,13 +51,14 @@ BUILTIN_GAMES: list[dict] = [
         "source": "riot",
         # ddragon splash tematico (TFT usa campeoes de LoL)
         "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/AurelionSol_0.jpg",
-        "description": "Auto battler da Riot. Monte seu comp, posicione seus campeoes e venca os 7 oponentes.",
+        "description": "Auto battler from Riot. Build your comp, position your champions and beat the other 7 opponents.",
         "is_free": True,
-        "genres": ["Auto Battler", "Estrategia"],
+        "genres": ["Auto Battler", "Strategy"],
         "player_min": 1,
         "player_max": 8,
         "min_hardware_tier": "low",
         "developer": "Riot Games",
+        "publisher": "Riot Games",
         "release_date": "2019-06-26",
     },
     {
@@ -62,13 +68,14 @@ BUILTIN_GAMES: list[dict] = [
         "source": "riot",
         # ddragon splash (LoR usa personagens de Runeterra)
         "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ezreal_0.jpg",
-        "description": "Card game estrategico no universo de League of Legends.",
+        "description": "Strategic card game set in the League of Legends universe.",
         "is_free": True,
-        "genres": ["Card Game", "Estrategia"],
+        "genres": ["Card Game", "Strategy"],
         "player_min": 1,
         "player_max": 2,
         "min_hardware_tier": "low",
         "developer": "Riot Games",
+        "publisher": "Riot Games",
         "release_date": "2020-04-29",
     },
     {
@@ -78,13 +85,14 @@ BUILTIN_GAMES: list[dict] = [
         "source": "riot",
         # ddragon splash (Wild Rift usa mesmos campeoes)
         "cover_url": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg",
-        "description": "Versao mobile/console de League of Legends. MOBA 5v5 com partidas de ~15 minutos.",
+        "description": "Mobile/console version of League of Legends. 5v5 MOBA with ~15 minute matches.",
         "is_free": True,
-        "genres": ["MOBA", "Estrategia"],
+        "genres": ["MOBA", "Strategy"],
         "player_min": 1,
         "player_max": 10,
         "min_hardware_tier": "low",
         "developer": "Riot Games",
+        "publisher": "Riot Games",
         "release_date": "2020-10-27",
     },
     {
@@ -94,13 +102,14 @@ BUILTIN_GAMES: list[dict] = [
         "source": "epic",
         # unreal CDN - bloqueia bots mas browsers carregam normal
         "cover_url": "https://cdn2.unrealengine.com/social-image-chapter4-s3-3840x2160-d35912cc25ad.jpg",
-        "description": "Battle royale ate 100 jogadores com construcao, armas e modos criativos.",
+        "description": "Battle royale up to 100 players with building, weapons and creative modes.",
         "is_free": True,
         "genres": ["Battle Royale", "Shooter"],
         "player_min": 1,
         "player_max": 4,
         "min_hardware_tier": "mid",
         "developer": "Epic Games",
+        "publisher": "Epic Games",
         "release_date": "2017-07-21",
     },
 ]

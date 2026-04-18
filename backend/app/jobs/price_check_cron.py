@@ -14,6 +14,7 @@ import structlog
 from sqlalchemy import select
 
 from app.core.database import SessionLocal
+from app.integrations.builtin_catalog import BUILTIN_GAMES
 from app.integrations.steam import HttpSteamClient
 from app.models.game import Game
 from app.services.notifications import notify_group
@@ -39,9 +40,6 @@ async def check_game_prices() -> None:
             .scalars()
             .all()
         )
-
-        if not games:
-            return
 
         by_appid: dict[int, list[Game]] = {}
         for g in games:
@@ -168,6 +166,59 @@ async def check_game_prices() -> None:
 
             await asyncio.sleep(_DELAY_BETWEEN_REQUESTS)
 
+        # tb sincroniza builtin (Riot/Epic) pra pegar mudanca de catalogo
+        builtin_updated = await _sync_builtin_games(db)
+
         # commit sempre, ate sem promo houve resync de metadata
         await db.commit()
-        log.info("price_check.done", updated=updated, notified=notified)
+        log.info("price_check.done", updated=updated, notified=notified, builtin=builtin_updated)
+
+
+async def _sync_builtin_games(db) -> int:
+    """Re-sincroniza jogos com source riot/epic a partir do catalogo hardcoded.
+
+    Como nao tem API externa, o catalogo e a fonte da verdade. Match por nome
+    (case-insensitive) que e o mesmo criterio do GameCreate.
+    """
+    rows = (
+        (
+            await db.execute(
+                select(Game).where(
+                    Game.steam_appid.is_(None),
+                    Game.source.in_(["riot", "epic"]),
+                    Game.archived_at.is_(None),
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    if not rows:
+        return 0
+
+    by_name = {g["name"].lower(): g for g in BUILTIN_GAMES}
+    updated = 0
+    for game in rows:
+        b = by_name.get(game.name.lower())
+        if b is None:
+            continue
+        if b.get("description"):
+            game.description = b["description"]
+        if b.get("cover_url"):
+            game.cover_url = b["cover_url"]
+        if b.get("genres"):
+            game.genres = list(b["genres"])
+        if b.get("release_date"):
+            game.release_date = b["release_date"]
+        if b.get("player_min") is not None:
+            game.player_min = b["player_min"]
+        if b.get("player_max") is not None:
+            game.player_max = b["player_max"]
+        if b.get("developer"):
+            game.developer = b["developer"]
+        if b.get("publisher"):
+            game.publisher = b["publisher"]
+        if b.get("min_hardware_tier"):
+            game.min_hardware_tier = b["min_hardware_tier"]
+        updated += 1
+    return updated
