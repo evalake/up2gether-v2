@@ -59,11 +59,10 @@ async function run() {
     ['02_overview', `/groups/${groupId}`],
     ['03_games', `/groups/${groupId}/games`],
     ['04_votes', `/groups/${groupId}/votes`],
-    ['05_themes', `/groups/${groupId}/themes`],
-    ['06_sessions', `/groups/${groupId}/sessions`],
-    ['07_admin', `/groups/${groupId}/admin`],
-    ['08_history', `/groups/${groupId}/history`],
-    ['09_settings', `/settings`],
+    ['05_sessions', `/groups/${groupId}/sessions`],
+    ['06_admin', `/groups/${groupId}/admin`],
+    ['07_history', `/groups/${groupId}/history`],
+    ['08_settings', `/settings`],
   ]
 
   for (const [name, path] of routes) {

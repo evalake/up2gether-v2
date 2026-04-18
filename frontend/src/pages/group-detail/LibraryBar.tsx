@@ -1,13 +1,7 @@
 import { motion } from 'framer-motion'
 import type { GameStage } from '@/features/games/api'
+import { useT } from '@/i18n'
 
-const STAGE_LABEL: Record<GameStage, string> = {
-  exploring: 'explorando',
-  campaign: 'em campanha',
-  endgame: 'fim de jogo',
-  paused: 'pausados',
-  abandoned: 'largados',
-}
 const STAGE_BORDER: Record<GameStage, string> = {
   exploring: 'border-up-amber',
   campaign: 'border-up-green',
@@ -36,6 +30,7 @@ type Props = {
 }
 
 export function LibraryBar({ breakdown, onExplore }: Props) {
+  const t = useT()
   if (breakdown.length === 0) return null
   const total = breakdown.reduce((acc, s) => acc + s.count, 0)
   return (
@@ -46,7 +41,7 @@ export function LibraryBar({ breakdown, onExplore }: Props) {
       className="space-y-3"
     >
       <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-dim">
-        biblioteca <span className="tabular-nums text-up-orange">{total}</span>
+        {t.games.library} <span className="tabular-nums text-up-orange">{total}</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {breakdown.map((s, i) => (
@@ -61,7 +56,7 @@ export function LibraryBar({ breakdown, onExplore }: Props) {
             className={`flex items-center gap-2 rounded-sm border ${STAGE_BORDER[s.stage]} ${STAGE_BG[s.stage]} px-3 py-2 transition-colors hover:bg-up-panel/50`}
           >
             <span className={`font-display text-lg tabular-nums ${STAGE_TEXT[s.stage]}`}>{s.count}</span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{STAGE_LABEL[s.stage]}</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-up-dim">{t.stageLabels[s.stage]}</span>
           </motion.button>
         ))}
       </div>

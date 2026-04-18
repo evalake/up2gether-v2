@@ -2,7 +2,7 @@
 
 ## Essencial / QoL
 - [x] Histórico de games jogados (timeline/rewind mensal a partir de sessions + votes)
-- [x] Audit completo de votes/themes/sessions
+- [x] Audit completo de votes/sessions
 - [ ] Dark/light toggle persistente
 - [x] Empty states guiados (grupo vazio, primeira sessão, etc)
 - [ ] Loading states suavizados tematicos EVA (skeletons soft, nao spinners), perf geral mais fluida
@@ -11,7 +11,7 @@
 - [ ] "Quem ta on agora" via presence do Discord
 - [ ] Reações rápidas em sessão (👍/🤔/❌) além do RSVP
 - [ ] Stats pessoais (horas jogadas, votos, sugestões do mês)
-- [ ] MVP do mês / badges leves (mais sessões, mais votos, tema vencedor)
+- [ ] MVP do mês / badges leves (mais sessões, mais votos)
 
 ## Membros
 - [ ] Modal de perfil do membro estilo Discord: clicar num avatar/nome em qualquer lugar abre o painel completo (avatar animado, banner, accent color, bio, sessoes criadas, votos, historico, stats). Puxar tudo que a API do Discord oferece -- banner, gifs, etc.
