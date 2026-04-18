@@ -6,6 +6,7 @@ import { useAuthStore } from '@/features/auth/store'
 import { useThemeStore } from '@/features/theme/store'
 import { useLocaleStore } from '@/features/locale/store'
 import { useMe } from '@/features/auth/hooks'
+import { usePatchSettings } from '@/features/users/hooks'
 import { useGroup } from '@/features/groups/hooks'
 import { useT } from '@/i18n'
 import { Avatar } from './Avatar'
@@ -13,12 +14,20 @@ import { NotificationBell } from './NotificationBell'
 
 function LocaleToggle() {
   const locale = useLocaleStore((s) => s.locale)
-  const toggle = useLocaleStore((s) => s.toggle)
+  const setLocale = useLocaleStore((s) => s.setLocale)
   const t = useT()
+  const token = useAuthStore((s) => s.token)
+  const patch = usePatchSettings()
+  const onClick = () => {
+    const next = locale === 'en' ? 'pt' : 'en'
+    setLocale(next, true)
+    // se logado, persistir no server pra replicar em outros devices
+    if (token) patch.mutate({ locale: next })
+  }
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={onClick}
       title={t.nav.switchLang}
       aria-label={t.nav.switchLang}
       className="flex items-center gap-1.5 rounded-sm border border-up-orange/30 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-up-orange transition-colors hover:border-up-orange hover:bg-up-orange/10"

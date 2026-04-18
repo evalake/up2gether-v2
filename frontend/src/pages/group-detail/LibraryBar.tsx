@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import type { GameStage } from '@/features/games/api'
 import { useT } from '@/i18n'
 
@@ -25,12 +26,13 @@ const STAGE_BG: Record<GameStage, string> = {
 }
 
 type Props = {
+  groupId: string
   breakdown: { stage: GameStage; count: number }[]
-  onExplore: () => void
 }
 
-export function LibraryBar({ breakdown, onExplore }: Props) {
+export function LibraryBar({ groupId, breakdown }: Props) {
   const t = useT()
+  const navigate = useNavigate()
   if (breakdown.length === 0) return null
   const total = breakdown.reduce((acc, s) => acc + s.count, 0)
   return (
@@ -40,9 +42,13 @@ export function LibraryBar({ breakdown, onExplore }: Props) {
       transition={{ duration: 0.4, delay: 0.2 }}
       className="space-y-3"
     >
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-dim">
+      <button
+        type="button"
+        onClick={() => navigate(`/groups/${groupId}/games`)}
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-up-dim transition-colors hover:text-up-text"
+      >
         {t.games.library} <span className="tabular-nums text-up-orange">{total}</span>
-      </div>
+      </button>
       <div className="flex flex-wrap gap-2">
         {breakdown.map((s, i) => (
           <motion.button
@@ -52,7 +58,7 @@ export function LibraryBar({ breakdown, onExplore }: Props) {
             transition={{ duration: 0.3, delay: 0.25 + i * 0.06 }}
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.97 }}
-            onClick={onExplore}
+            onClick={() => navigate(`/groups/${groupId}/games?stage=${s.stage}`)}
             className={`flex items-center gap-2 rounded-sm border ${STAGE_BORDER[s.stage]} ${STAGE_BG[s.stage]} px-3 py-2 transition-colors hover:bg-up-panel/50`}
           >
             <span className={`font-display text-lg tabular-nums ${STAGE_TEXT[s.stage]}`}>{s.count}</span>

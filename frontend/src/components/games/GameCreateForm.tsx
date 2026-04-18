@@ -242,6 +242,7 @@ export function GameCreateForm({
                   value={steamQ}
                   onChange={(e) => setSteamQ(e.target.value)}
                   placeholder={t.games.searchSteamPlaceholder}
+                  maxLength={100}
                   className="h-9 flex-1 bg-transparent text-sm focus-visible:outline-none"
                 />
                 {(steamLoading || filling) && (

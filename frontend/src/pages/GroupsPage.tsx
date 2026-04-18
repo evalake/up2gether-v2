@@ -94,6 +94,7 @@ function GuildPickerModal({
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t.groups.searchServers}
+                maxLength={100}
                 className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-3 text-xs focus-visible:border-up-orange focus-visible:outline-none"
               />
             </div>

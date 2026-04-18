@@ -52,6 +52,7 @@ export function SteamLibrarySection() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={t.settings.steamPlaceholder}
+          maxLength={64}
           className="h-9 min-w-[240px] flex-1 rounded-sm border border-up-line bg-black/50 px-3 text-sm text-up-text placeholder:text-up-dim focus-visible:border-up-orange focus-visible:outline-none"
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !loading) run()

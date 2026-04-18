@@ -96,6 +96,7 @@ export function SessionsTab({ groupId }: { groupId: string }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t.admin.searchSession}
+          maxLength={100}
           className="h-8 min-w-[180px] flex-1 rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
         />
         {filtered.length > 0 && (

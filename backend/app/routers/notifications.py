@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,7 +29,8 @@ class NotificationOut(BaseModel):
 
 
 class MarkReadIn(BaseModel):
-    ids: list[uuid.UUID] | None = None  # None = mark all
+    # None = mark all. cap evita payload absurdo
+    ids: list[uuid.UUID] | None = Field(None, max_length=500)
 
 
 @router.get("", response_model=list[NotificationOut])

@@ -600,6 +600,8 @@ export const en = {
     hi: (name: string) => `hey, ${name}`,
     setupHint: "let's set everything up in less than a minute...",
     letsGo: "let's go",
+    languageLabel: 'language',
+    languageHint: 'we detected your language, but you can change it here.',
     yourServers: 'your servers',
     foundServers: 'we found these servers on your Discord...',
     searchingServers: 'searching servers...',

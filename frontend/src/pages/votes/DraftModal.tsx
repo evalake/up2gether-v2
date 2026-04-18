@@ -66,6 +66,7 @@ export function DraftModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t.votes.draftPlaceholder}
+            maxLength={120}
             className="mt-1 h-9 w-full rounded-sm border-transparent border-b-up-line bg-transparent px-0 text-base text-up-text focus-visible:border-b-up-orange focus-visible:outline-none"
           />
         </div>
@@ -75,6 +76,7 @@ export function DraftModal({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.sessions.searchGamePlaceholder}
+            maxLength={100}
             className="h-9 w-full rounded-sm border border-up-line bg-black/20 px-3 text-xs text-up-text placeholder:text-up-dim focus-visible:border-up-orange/60 focus-visible:outline-none"
           />
         </div>

@@ -4,7 +4,8 @@ from app.schemas.user import UserResponse
 
 
 class DiscordCallbackRequest(BaseModel):
-    code: str
+    # OAuth codes do Discord ficam <100 chars; 512 e folga. min=1 so evita vazio
+    code: str = Field(min_length=1, max_length=512)
     # state exigido pra fechar login-CSRF. frontend gera antes do redirect pro
     # discord, stasha em sessionStorage, valida na volta antes de mandar pra ca.
     # aqui so garante que veio algo de tamanho minimo (crypto.randomUUID = 36).

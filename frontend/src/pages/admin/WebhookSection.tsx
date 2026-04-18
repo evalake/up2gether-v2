@@ -63,6 +63,7 @@ export function WebhookSection({ groupId, current }: { groupId: string; current:
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={t.admin.webhookPlaceholder}
+            maxLength={512}
             className="h-9 w-full rounded-sm border border-up-line bg-black/40 px-2 text-xs text-up-text focus-visible:border-up-orange focus-visible:outline-none"
           />
           <div className="flex flex-wrap gap-2">

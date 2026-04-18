@@ -23,6 +23,7 @@ class User(Base, TimestampMixin):
     discord_email: Mapped[str | None] = mapped_column(String, nullable=True)
     timezone: Mapped[str | None] = mapped_column(String, nullable=True)
     notification_email: Mapped[str | None] = mapped_column(String, nullable=True)
+    locale: Mapped[str | None] = mapped_column(String(8), nullable=True)
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     settings: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
 

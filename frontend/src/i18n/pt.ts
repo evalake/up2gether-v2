@@ -601,6 +601,8 @@ export const pt: Translations = {
     hi: (name: string) => `opa, ${name}`,
     setupHint: 'vamos configurar tudo em menos de um minuto...',
     letsGo: 'bora',
+    languageLabel: 'idioma',
+    languageHint: 'detectamos seu idioma, mas você pode trocar aqui.',
     yourServers: 'seus servidores',
     foundServers: 'encontramos esses servidores no seu Discord...',
     searchingServers: 'buscando servidores...',
